@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HUMAIN ONE</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1419'/%3E%3Ctext x='32' y='45' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%2386c63f'%3EH%3C/text%3E%3C/svg%3E"/>
+<style>
+  :root{
+    --ink:#0e1419; --bg:#f4f6f9; --panel:#fff; --line:#e7eaef; --line-2:#cdd4dd;
+    --text:#13171e; --muted:#6b7480; --teal:#86c63f; --teal-d:#5c9a24; --on-accent:#16240a;
+    --gov:#1f9d62; --gov-bg:#e7f5ee; --preview:#c08a1e; --preview-bg:#fbf2dd;
+    --lock:#6b7480; --lock-bg:#eef1f5; --alert:#c2554a; --alert-bg:#f7e7e5;
+    --ready:#1f9d62; --ready-bg:#e7f5ee; --subtle:#fafbfc;
+    --side-bg:#0e1419; --side-fg:#cfe0e3; --side-fg2:#7e9da0; --side-strong:#fff; --side-line:rgba(255,255,255,.08); --side-hover:rgba(255,255,255,.06); --side-dot:#5e6b62;
+    --shadow:0 1px 2px rgba(14,20,25,.06),0 8px 24px rgba(14,20,25,.07); --radius:12px;
+  }
+  body[data-theme="light"]{--bg:#f6f8fb;--panel:#ffffff;--line:#e6eaf0;--line-2:#d3dae3;--text:#1a2330;--muted:#67727f;--teal:#7bb53a;--teal-d:#4e8a1e;--on-accent:#16240a;--subtle:#f4f7fa;--side-bg:#ffffff;--side-fg:#3a4554;--side-fg2:#8a96a4;--side-strong:#13171e;--side-line:#e6eaf0;--side-hover:#f1f4f8;--side-dot:#aeb8c4;--shadow:0 1px 2px rgba(20,30,45,.05),0 8px 22px rgba(20,30,45,.06)}
+  body[data-theme="dark"]{--bg:#0f151b;--panel:#16202b;--line:#26333f;--line-2:#33424f;--text:#e7eef4;--muted:#94a4b1;--teal:#86c63f;--teal-d:#9bd455;--on-accent:#0e1a05;--subtle:#1b2630;--side-bg:#0a0f14;--side-fg:#cfe0e3;--side-fg2:#7e9da0;--side-strong:#fff;--side-line:rgba(255,255,255,.08);--side-hover:rgba(255,255,255,.06);--side-dot:#5e6b62;--shadow:0 1px 2px rgba(0,0,0,.30),0 8px 24px rgba(0,0,0,.35)}
+  body[data-theme="muddy"]{--bg:#e9e6df;--panel:#f3f1ea;--line:#dcd6c9;--line-2:#cbc4b4;--text:#3b382f;--muted:#7c766a;--teal:#6f7d3f;--teal-d:#566330;--on-accent:#f4f2ec;--subtle:#ece9e1;--side-bg:#2c2a22;--side-fg:#d8d2c4;--side-fg2:#9a9484;--side-strong:#f2efe6;--side-line:rgba(255,255,255,.07);--side-hover:rgba(255,255,255,.05);--side-dot:#8a836f;--shadow:0 1px 2px rgba(60,55,45,.08),0 8px 24px rgba(60,55,45,.10)}
+  .themesel{font:inherit;font-size:12px;padding:6px 9px;border:1px solid var(--line-2);border-radius:8px;background:var(--panel);color:var(--text);cursor:pointer}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .app{display:grid;grid-template-columns:252px 1fr;min-height:100vh}
+  .side{background:var(--side-bg);color:var(--side-fg);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{padding:18px 18px 14px;border-bottom:1px solid var(--side-line)}
+  .brand .logo{font-weight:800;letter-spacing:.5px;color:var(--side-strong);font-size:15px}
+  .brand .tag{font-size:11px;color:var(--side-fg2);margin-top:3px}
+  .nav{padding:10px 10px;flex:1;overflow:auto}
+  .nav .grp{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--side-fg2);padding:12px 10px 5px}
+  .nav a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:var(--side-fg);text-decoration:none;cursor:pointer;font-size:13px}
+  .nav a:hover{background:var(--side-hover)}
+  .nav a.active{background:var(--teal);color:var(--on-accent);font-weight:700}
+  .nav a .dot{width:7px;height:7px;border-radius:50%;background:var(--side-dot)}
+  .nav a.active .dot{background:var(--on-accent)}
+  .nav .sub{font-size:11px;color:var(--side-fg2);padding:1px 10px 6px 29px;line-height:1.35}
+  .side .foot{padding:12px 16px;border-top:1px solid var(--side-line);font-size:11px;color:var(--side-fg2)}
+  .kingdom{display:inline-flex;align-items:center;gap:6px;color:var(--side-fg)}
+  .kingdom b{color:var(--side-strong)}
+  .main{display:flex;flex-direction:column;min-width:0}
+  .top{background:var(--panel);border-bottom:1px solid var(--line);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .top h1{font-size:15px;margin:0;font-weight:700}
+  .top .crumbs{font-size:12px;color:var(--muted);margin-top:2px}
+  .top .frame{font-size:11px;color:var(--muted);text-align:right}
+  .top .frame b{color:var(--teal-d)}
+  .acct{display:flex;align-items:center;gap:9px;padding-left:18px;border-left:1px solid var(--line)}
+  .acct .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#18212c,#0e1419);color:var(--teal);display:grid;place-items:center;font-weight:800;font-size:12.5px}
+  .acct .an{font-size:12.5px;font-weight:700;line-height:1.15}
+  .acct .ar{font-size:11px;color:var(--muted)}
+  .stepper{display:flex;padding:12px 26px 0;background:var(--panel);border-bottom:1px solid var(--line);overflow:auto}
+  .step{display:flex;align-items:center;gap:7px;padding:0 12px 12px;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;font-size:12px}
+  .step .n{width:19px;height:19px;border-radius:50%;background:var(--line);color:var(--muted);display:grid;place-items:center;font-size:10px;font-weight:700}
+  .step.done .n{background:var(--gov);color:#fff}
+  .step.active{color:var(--text);font-weight:700;border-bottom-color:var(--teal-d)}
+  .step.active .n{background:var(--teal);color:var(--on-accent)}
+  .screen{padding:24px 26px 80px;max-width:1100px;margin:0 auto;width:100%}
+  .screen h2{font-size:22px;margin:0 0 4px;font-weight:800;letter-spacing:-.2px}
+  .screen .lede{color:var(--muted);margin:0 0 20px;font-size:14px;max-width:780px}
+  .row{display:flex;gap:16px;flex-wrap:wrap}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card .hd{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .card .hd h3{margin:0;font-size:13.5px;font-weight:700}
+  .card .bd{padding:16px}
+  .card .ft{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;justify-content:flex-end;background:var(--subtle);border-radius:0 0 var(--radius) var(--radius)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+  .btn{appearance:none;border:1px solid var(--line-2);background:#fff;color:var(--text);padding:9px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+  .btn:hover{border-color:#9fb3b8}
+  .btn.primary{background:var(--teal);border-color:var(--teal);color:var(--on-accent)}
+  .btn.primary:hover{background:var(--teal-d);border-color:var(--teal-d);color:var(--on-accent)}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--teal-d)}
+  .btn.sm{padding:6px 11px;font-size:12px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid transparent}
+  .badge.gov{background:var(--gov-bg);color:var(--gov);border-color:#bfe3d3}
+  .badge.teal{background:#f0fbe0;color:#3d5212;border-color:#d6efae}
+  .badge.preview{background:var(--preview-bg);color:var(--preview);border-color:#ecd9a6}
+  .badge.lock{background:var(--lock-bg);color:var(--lock);border-color:#d8dfe2}
+  .badge.alert{background:var(--alert-bg);color:var(--alert);border-color:#f0c9c5}
+  .badge.muted{background:#f1f4f5;color:var(--muted);border-color:var(--line)}
+  .badge.ready{background:var(--ready-bg);color:var(--ready);border-color:#bfe3d3}
+  .agentcard{display:flex;gap:14px;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);cursor:pointer;box-shadow:var(--shadow);transition:border-color .12s}
+  .agentcard:hover{border-color:var(--teal-d)}
+  .agentcard .ico{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,#18212c,#0e1419);color:var(--teal);display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+  .agentcard .meta{flex:1;min-width:0}
+  .agentcard .meta .nm{font-weight:700;font-size:14.5px}
+  .agentcard .meta .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .agentcard .meta .tags{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+  .resolve{display:flex;flex-direction:column}
+  .rrow{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:12px 4px;border-bottom:1px dashed var(--line)}
+  .rrow:last-child{border-bottom:none}
+  .rrow .rc{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;background:var(--gov)}
+  .rrow.pending .rc{background:var(--line-2)}
+  .rrow .rt{font-weight:700;font-size:13px}
+  .rrow .rd{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .rrow .rd b{color:var(--text);font-weight:600}
+  .kv{display:grid;grid-template-columns:190px 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .kv .k{padding:10px 13px;background:var(--subtle);border-bottom:1px solid var(--line);font-weight:600;color:var(--muted);font-size:12.5px}
+  .kv .v{padding:9px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .kv>.k:last-of-type,.kv>.v:last-of-type{border-bottom:none}
+  .v .lockwhy{color:var(--lock);font-size:11.5px}
+  select.ov,input.ov{font-family:inherit;font-size:12.5px;padding:6px 9px;border:1px solid var(--line-2);border-radius:7px;background:#fff;min-width:180px}
+  input.fld{font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--line-2);border-radius:8px;background:#fff;width:100%}
+  label.flbl{font-size:12px;color:var(--muted);font-weight:600;display:block;margin:10px 0 4px}
+  .manifest{background:#0e1419;color:#cfe7e6;border-radius:10px;padding:14px 16px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.65;overflow:auto}
+  .manifest .key{color:#7fd1c9}.manifest .val{color:#e6f2ef}.manifest .cmt{color:#5e8488}
+  .resgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:900px){.resgrid{grid-template-columns:1fr}}
+  .rescard{border:1px solid var(--line);border-radius:10px;padding:11px 13px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;background:#fff}
+  .rescard .rn{font-weight:700;font-size:13px}
+  .rescard .rsub{color:var(--muted);font-size:11.5px;margin-top:3px}
+  .rescard .cap{display:block;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;color:#9aa9af;margin-top:3px}
+  .statedot{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .statedot i{width:8px;height:8px;border-radius:50%;background:var(--line-2);display:inline-block}
+  .statedot.ready{color:var(--ready)}.statedot.ready i{background:var(--ready)}
+  .statedot.prov i{background:var(--preview);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .checklist li{display:flex;align-items:center;gap:9px;font-size:12.5px}
+  .checklist li .ck{width:18px;height:18px;border-radius:5px;border:2px solid var(--line-2);display:grid;place-items:center;font-size:10px;color:#fff}
+  .checklist li.ok .ck{background:var(--gov);border-color:var(--gov)}
+  .checklist li.wait .ck{border-color:var(--preview);color:var(--preview)}
+  .checklist li.wait{color:var(--muted)}
+  .srcpick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .srctab{flex:1;min-width:120px;border:1px solid var(--line-2);border-radius:9px;padding:10px 12px;font-size:12.5px;font-weight:600;cursor:pointer;text-align:center;color:var(--muted)}
+  .srctab.sel{border-color:var(--teal-d);background:#f0fbe0;color:#3d5212}
+  .chip{border:1px solid var(--line-2);background:#fff;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+  .chip:hover{border-color:#9fb3b8}
+  .chip.sel{background:var(--teal);border-color:var(--teal);color:var(--on-accent)}
+  .tl{position:relative;margin:0;padding:0 0 0 22px;list-style:none}
+  .tl:before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--line)}
+  .tl li{position:relative;padding:0 0 14px}
+  .tl li:before{content:"";position:absolute;left:-19px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--gov);border:2px solid #fff;box-shadow:0 0 0 1px var(--gov)}
+  .tl li .tt{font-weight:700;font-size:13px}.tl li .td{color:var(--muted);font-size:12.5px}.tl li .ts{color:#9aa9af;font-size:11px}
+  .scorewrap{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.scorewrap{grid-template-columns:repeat(2,1fr)}}
+  .scorecell{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .scorecell.lead{border-color:#bfe3d3;background:var(--gov-bg)}
+  .scorecell .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .scorecell .val{font-size:21px;font-weight:800;margin-top:4px}.scorecell .pass{color:var(--gov);font-size:11px;font-weight:700;margin-top:2px}
+  .scorecell.lead .val{color:var(--gov)}
+  .chat{display:flex;flex-direction:column;gap:10px}
+  .bub{max-width:80%;padding:11px 14px;border-radius:13px;font-size:13px;line-height:1.5}
+  .bub.user{align-self:flex-end;background:var(--teal);color:var(--on-accent);border-bottom-right-radius:4px}
+  .bub.agent{align-self:flex-start;background:#f1f5f6;color:var(--text);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .bub .cite{display:block;margin-top:7px;font-size:11px;color:#3d5212;background:#f0fbe0;border-radius:6px;padding:5px 8px}
+  .bub.agent.guard{background:var(--alert-bg);border-color:#f0c9c5}
+  .bub .gtag{display:inline-flex;gap:5px;align-items:center;font-weight:700;color:var(--alert);font-size:11px;margin-bottom:5px}
+  .note{display:flex;gap:10px;padding:12px 14px;border-radius:10px;font-size:12.5px;align-items:flex-start}
+  .note.preview{background:var(--preview-bg);border:1px solid #ecd9a6;color:#6b4e0a}
+  .note.gov{background:var(--gov-bg);border:1px solid #bfe3d3;color:#0f5c41}
+  .note.info{background:#eef4f6;border:1px solid var(--line);color:var(--muted)}
+  .note .ni{font-weight:800}
+  .deploybar{height:9px;background:var(--line);border-radius:999px;overflow:hidden;margin:14px 0 6px}
+  .deploybar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gov));border-radius:999px;transition:width .25s ease}
+  .upzone{border:1.5px dashed var(--line-2);border-radius:12px;padding:26px 16px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;transition:border-color .12s,background .12s}
+  .upzone:hover{border-color:var(--teal-d);background:#f0fbe0}
+  .upzone .upicon{font-size:26px;color:var(--teal-d);margin-bottom:6px;font-weight:800}
+  .uprow{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .upfile{font-size:12.5px;font-weight:700}
+  .logbox{background:#0e1419;color:#bfe0db;border-radius:10px;padding:12px 14px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.6;max-height:210px;overflow:auto}
+  .logbox .t{color:#5e8488}.logbox .ok{color:#7fe0b8}
+  .verrow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  .verrow:last-child{border-bottom:none}
+  hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
+  .small{font-size:12px;color:var(--muted)}
+  .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .hidden{display:none}
+  .qsdock{position:fixed;bottom:0;left:252px;right:0;z-index:9}
+  @media(max-width:900px){.qsdock{left:0}}
+  .qspanel{background:var(--panel);border-top:1px solid var(--line);display:flex;flex-direction:column;max-height:300px;box-shadow:0 -10px 28px rgba(14,20,25,.10)}
+  .qspanel.hidden{display:none}
+  .qshead{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--line);font-weight:800;font-size:12px;color:var(--text)}
+  .qsx{border:none;background:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1}
+  .qspanel .chat{padding:14px 16px;overflow:auto}
+  .quickbar{display:flex;align-items:center;gap:12px;padding:11px 22px;background:var(--panel);border-top:2px solid var(--teal)}
+  .quickbar .qs-spark{color:var(--teal-d);font-size:16px}
+  .quickbar .qs-label{font-weight:800;font-size:12.5px;color:var(--text);white-space:nowrap}
+  .quickbar input{flex:1;border:1px solid var(--line-2);border-radius:9px;background:var(--bg);color:var(--text);font:inherit;font-size:13px;padding:9px 12px}
+  .quickbar input::placeholder{color:var(--muted)}
+  .qsyaml{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;background:#0e1419;color:#cfe7e6;border-radius:8px;padding:10px 12px;margin:8px 0;line-height:1.65}
+  .cli{position:fixed;bottom:0;left:252px;right:0;background:#0e1419;color:#cfe7e6;border-top:1px solid #11343d;z-index:9}
+  .cli .bar{display:flex;align-items:center;justify-content:space-between;padding:8px 18px;cursor:pointer;font-size:12px;color:#9bc1c1}
+  .cli .bar b{color:#dcefee}
+  .cli .body{padding:0 18px 14px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;max-height:190px;overflow:auto;display:none}
+  .cli.open .body{display:block}
+  .cli .ln{padding:2px 0;white-space:pre-wrap}.cli .pr{color:#5e9b95}.cli .cmd{color:#e6f2ef}.cli .out{color:#86a7ab}.cli .gd{color:#9ad97f}.cli .err{color:#e7a59b}.cli .cmdline{padding:3px 0}
+  #cliLog{padding-bottom:4px}
+  .cliprompt{display:flex;gap:8px;align-items:center;border-top:1px solid #15363f;padding-top:9px;margin-top:6px;position:sticky;bottom:0;background:#0e1419}
+  .cliprompt span{color:#5e9b95}
+  .cliprompt input{flex:1;background:transparent;border:none;outline:none;color:#e6f2ef;font-family:inherit;font-size:12.5px;padding:2px 0}
+  @media(max-width:900px){.cli{left:0}}
+  .scrim{position:fixed;inset:0;background:rgba(11,31,40,.40);opacity:0;visibility:hidden;transition:opacity .2s;z-index:40}
+  .scrim.show{opacity:1;visibility:visible}
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:min(560px,94vw);background:var(--bg);box-shadow:-12px 0 44px rgba(11,31,40,.20);transform:translateX(102%);transition:transform .24s ease;z-index:50;display:flex;flex-direction:column}
+  .drawer.open{transform:none}
+  .drawer .dhd{padding:16px 20px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .drawer .dhd h3{margin:0;font-size:17px;font-weight:800}
+  .dclose{cursor:pointer;border:none;background:#f1f4f5;border-radius:8px;width:30px;height:30px;font-size:15px;color:var(--muted);flex:none}
+  .dclose:hover{background:#e6ebec}
+  .dtabs{display:flex;gap:2px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--line);overflow:auto}
+  .dtab{padding:11px 12px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+  .dtab.sel{color:var(--text);border-bottom-color:var(--teal-d)}
+  .dbody{padding:18px 20px;overflow:auto;flex:1}
+  .dpanel{display:none}.dpanel.sel{display:block}
+  .dfoot{padding:14px 20px;border-top:1px solid var(--line);background:var(--panel);display:flex;gap:10px;align-items:center;justify-content:flex-end}
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:60;padding:24px}
+  .modal.open{display:flex}
+  .modal .mbox{background:var(--bg);border-radius:14px;max-width:660px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 24px 64px rgba(11,31,40,.32)}
+  .modal .mhd{padding:15px 18px;border-bottom:1px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:space-between;border-radius:14px 14px 0 0;position:sticky;top:0}
+  .modal .mhd h3{margin:0;font-size:15px;font-weight:800}
+  .modal .mbd{padding:18px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="logo">HUMAIN ONE</div><div class="tag">Marketplace · Developer Platform</div></div>
+    <nav class="nav" id="nav">
+      <div class="grp">Build</div>
+      <a data-go="agents"><span class="dot"></span> My Agents</a>
+      <div class="grp">Test &amp; evidence</div>
+      <a data-go="evals"><span class="dot"></span> Evaluations</a>
+      <a data-go="data"><span class="dot"></span> Data Catalog</a>
+      <div class="grp">Marketplace</div>
+      <a data-go="market"><span class="dot"></span> Marketplace</a>
+      <div class="grp">Infrastructure</div>
+      <a data-go="infra"><span class="dot"></span> Infrastructure</a>
+    </nav>
+    <div class="foot">
+      <div class="kingdom">◆ Sovereign · <b>KSA</b></div>
+      <div style="margin-top:5px">Sovereign Runtime · provisioned as code</div>
+      <div style="margin-top:5px">LEAP 2026 preview build</div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div><h1 id="topTitle">My Agents</h1><div class="crumbs" id="crumbs">HUMAIN ONE / Agents</div></div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div class="frame"><div><b>Agent-first path</b> · governance-first proof</div><div id="tenantline">Ministry of Social Affairs · tenant: msa-gov</div></div>
+        <select id="themeSel" class="themesel" title="Theme"><option value="current">Theme · Current</option><option value="light">Light</option><option value="dark">Dark</option><option value="muddy">Muddy</option></select>
+        <div class="acct" title="Signed in"><div class="av">RC</div><div class="ai"><div class="an">Ritwik Chakradhar</div><div class="ar">Developer · HUMAIN · KSA</div></div></div>
+      </div>
+    </header>
+    <div class="stepper" id="stepper"></div>
+    <main class="screen" id="screen"></main>
+  </div>
+</div>
+<div class="qsdock" id="qsdock">
+  <div class="qspanel hidden" id="qsPanel"><div class="qshead"><span>✦ Quick Start — describe an agent and I'll run each step in the UI</span><button class="qsx" id="qsClose" title="Hide">✕</button></div><div class="chat" id="qsLog"></div></div>
+  <div class="quickbar">
+    <span class="qs-spark">✦</span><span class="qs-label">Quick Start</span>
+    <input id="qsIn" autocomplete="off" spellcheck="false" placeholder="Describe an agent to provision it, then say “continue” to take each step…"/>
+    <button class="btn primary" id="qsGo">Send →</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer"></aside>
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+
+<script>
+/* ---------- SOVEREIGN RUNTIME — building blocks (provisioned as code) ---------- */
+/* [friendly name, what it is, terraform module id (caption), jira] */
+const BLOCKS=[
+  ["Private Network","Isolated network, subnets, address ranges","module.network","HUMAIN-624"],
+  ["Runtime Cluster","Managed container cluster, private nodes, workload identity","module.cluster","HUMAIN-632"],
+  ["Compute Pool","Right-sized compute from the agent's cpu / memory / gpu needs","module.nodepool","HUMAIN-634"],
+  ["Identity & Access","Namespace and scoped service identity for the agent","module.workload","HUMAIN-635"],
+  ["Database","Managed SQL, private address, identity-based auth","module.database","HUMAIN-646"],
+  ["Storage","Object storage, versioning, lifecycle, public-access prevention","module.storage","HUMAIN-645"],
+  ["Secrets Vault","Per-agent secrets with scoped accessor bindings","module.secrets","HUMAIN-643"],
+  ["Image Registry","Private image registry with push / pull bindings","module.registry","HUMAIN-644"]
+];
+const RUNTIME_TAGLINE="Sovereign Runtime — provisioned as code, runs on any cloud, stays in KSA.";
+const REGIONS=["KSA · Riyadh","KSA · Jeddah","KSA · Dammam"];
+const AGENTS={
+  citizen:{
+    id:"citizen",code:"CS",name:"Citizen Support Agent",
+    purpose:"Eligibility guidance and case resolution for citizen benefits",
+    statusLabel:"Published",statusBadge:"gov",trustScore:"92",
+    tenant:"Ministry of Social Affairs · tenant: msa-gov",persona:"Sara, a citizen",
+    runtime:"python 3.11",port:"8080",health:"/healthz",replicas:"2",officer:"case officer",
+    correctness:"94%",halluc:"1.4%",version:"1.5.0",entrypoint:"app.main:agent",cpu:"2",memory:"4Gi",gpu:"0",secrets:["policy-api-key","smtp-credentials"],evalSuites:["citizen-eligibility-eval","safety-redteam"],certProfile:"gov-citizen-v1",nodes:["intake","eligibility-check","document-check","case-handoff"],
+    manifest:[["name","citizen-support-agent"],["runtime","python 3.11"],["port","8080"],["health","/healthz"],["resources","2 vCPU · 4Gi"],["services","policy-service, case-system, smtp-capture, postgres"],["data","synthetic-citizen-records"],["access_scope","ministry-scoped"]],
+    template:{name:"Advance-python-sandbox",version:"v1.0.0",spec:"python 3.11 · 4 vCPU · 8Gi · GPU no · postgres",reason:"Manifest declares python 3.11 + postgres + ministry-scoped access. Matched to this approved tenant template."},
+    deployCfg:[["Package source","Upload Zip","src"],["Environment name","citizen-support-agent","ro"],["Initial replicas","2","rep"],["Service type","Load-balanced endpoint","lock"],["Service port","8080","ro"],["Health endpoint","/healthz","ro"],["Resource limits (per pod)","2 vCPU · 4Gi","res"],["Auto-scaling","min 2 · max 10 · target 70% CPU","hpa"],["Region pin","KSA · Riyadh","region"]],
+    integrations:["Managed database (Database block)","Public endpoint with custom domain","Persistent storage"],
+    blueprints:[["SMTP capture","Notification mock (HUMAIN-350, done)"],["policy-service","Approved benefit rules"],["case-system","Officer case queue"],["synthetic-citizen-records","1,000 synthetic profiles"]],
+    gov:[["Egress policy","Deny-all except approved in-Kingdom endpoints","Tenant policy msa-gov-egress-01."],["Data policy","PII redaction in logs and telemetry","Required for citizen data class."],["Retention","30 days, then secure erase","National data retention rule."],["Access scope","Ministry-scoped queries only","No cross-tenant reads."]],
+    scenario:{title:"Sara asks about family benefit eligibility",turns:[
+      {who:"user",text:"Does my family qualify for the family support benefit? My husband recently lost his job."},
+      {who:"agent",text:"I can help check that. To apply the approved rules I need a few details. How many dependents are in your household, and what is your current combined monthly income?"},
+      {who:"user",text:"Four dependents. Combined income is about 4,200 SAR a month right now."},
+      {who:"agent",text:"Based on the approved benefit rules, a household of your size at that income level is likely within the eligibility threshold for the family support benefit.",cite:"Policy basis: Family Support Benefit, income threshold table, clause 3.2 (mock policy-service)"},
+      {who:"agent",text:"Two documents appear to be missing: a recent proof of income and your husband's employment-status letter."},
+      {who:"agent",text:"Because confirming the benefit amount needs officer judgment, I am not making a final decision. I have prepared a structured case summary and routed it to a human case officer.",handoff:true}
+    ]}
+  },
+  procurement:{
+    id:"procurement",code:"PC",name:"Procurement Compliance Agent",
+    purpose:"Policy and budget compliance for internal procurement requests",
+    statusLabel:"Published",statusBadge:"gov",trustScore:"90",
+    tenant:"Ministry of Social Affairs · tenant: msa-gov",persona:"Fahad, a ministry employee",
+    runtime:"python 3.11",port:"8080",health:"/healthz",replicas:"2",officer:"procurement officer",
+    correctness:"93%",halluc:"1.6%",version:"1.5.0",entrypoint:"app.main:agent",cpu:"2",memory:"4Gi",gpu:"0",secrets:["budget-api-key","vendor-api-key","smtp-credentials"],evalSuites:["procurement-compliance-eval","safety-redteam"],certProfile:"gov-internal-v1",nodes:["intake","policy-check","budget-check","package-builder","approval-handoff"],
+    manifest:[["name","procurement-compliance-agent"],["runtime","python 3.11"],["port","8080"],["health","/healthz"],["resources","2 vCPU · 4Gi"],["services","procurement-system, budget-api, vendor-registry, policy-service, smtp-capture, postgres"],["data","synthetic-procurement-records"],["access_scope","department-scoped"]],
+    template:{name:"Advance-python-sandbox",version:"v1.0.0",spec:"python 3.11 · 4 vCPU · 8Gi · GPU no · postgres",reason:"Manifest declares python 3.11 + postgres + department-scoped access. Matched to the approved Python template."},
+    deployCfg:[["Package source","From GitHub","src"],["Environment name","procurement-compliance-agent","ro"],["Initial replicas","2","rep"],["Service type","Load-balanced endpoint","lock"],["Service port","8080","ro"],["Health endpoint","/healthz","ro"],["Resource limits (per pod)","2 vCPU · 4Gi","res"],["Auto-scaling","min 2 · max 8 · target 70% CPU","hpa"],["Region pin","KSA · Riyadh","region"]],
+    integrations:["Managed database (Database block)","Public endpoint with custom domain","Persistent storage"],
+    blueprints:[["SMTP capture","Notification mock (HUMAIN-350, done)"],["procurement-system","Request + routing engine"],["budget-api","Department budget codes"],["vendor-registry","Approved vendor list"],["synthetic-procurement-records","Synthetic budgets + vendors"]],
+    gov:[["Egress policy","Deny-all except approved in-Kingdom endpoints","Tenant policy msa-gov-egress-01."],["Data policy","Log redaction for budget/vendor identifiers","Internal data class."],["Retention","30 days, then secure erase","National data retention rule."],["Access scope","Department-scoped queries only","No cross-department reads."]],
+    scenario:{title:"Fahad procures an AI training service",turns:[
+      {who:"user",text:"I need to procure an AI training service for my team, about 180,000 SAR, from a new vendor. Can I use a direct purchase?"},
+      {who:"agent",text:"Let me check the request against policy. Amount 180,000 SAR, new vendor, direct purchase route. Validating thresholds and budget now."},
+      {who:"agent",text:"This route is not compliant. Direct purchase is only permitted under 100,000 SAR. At 180,000 SAR with a new vendor, a competitive quotation process and vendor onboarding are required.",guard:true,cite:"Policy basis: Procurement thresholds, clause 5.1 (mock policy-service)"},
+      {who:"agent",text:"Budget check: department code SOC-TRN-26 has 240,000 SAR remaining, so funds are available for the compliant route.",cite:"Source: mock budget-api, code SOC-TRN-26"},
+      {who:"agent",text:"I have drafted the compliant package: request summary, justification, 3-quote checklist, vendor onboarding form, and a routing note, and sent it to a human procurement officer.",handoff:true}
+    ]}
+  }
+};
+const STEPS=[
+  {id:"submit",label:"Submit Agent"},{id:"resolve",label:"Resolve & Govern"},{id:"plan",label:"Review Plan"},
+  {id:"deploy",label:"Provision & Deploy"},{id:"runtime",label:"Runtime & Resources"},{id:"test",label:"Test in Sandbox"},
+  {id:"evidence",label:"Evidence"},{id:"publish",label:"Submit to Marketplace"}
+];
+let state={screen:"agents",agentId:"citizen",filter:{status:"All",runtime:"All",q:""},mini:null,acquired:new Set()};
+const USER={name:"Ritwik Chakradhar",role:"Developer",tenant:"msa-gov",org:"HUMAIN · KSA"};
+state.infraTab="sandboxes";
+function A(){return AGENTS[state.agentId];}
+const $=s=>document.querySelector(s);
+function badge(c,t){return `<span class="badge ${c}">${t}</span>`;}
+function stepIndex(id){return STEPS.findIndex(s=>s.id===id);}
+const PRISM=`${badge('preview','Prism if it lands by LEAP · otherwise mock evaluation')}`;
+function trustBadge(a){return badge('teal','Trust Score '+a.trustScore+' · evidenced');}
+function blockCards(stateText){return BLOCKS.map(b=>`<div class="rescard"><div><div class="rn">${b[0]}</div><div class="rsub">${b[1]}<span class="cap">${b[2]} · ${b[3]}</span></div></div><span class="statedot ${stateText==='READY'?'ready':''}">${stateText==='READY'?'<i></i>READY':stateText}</span></div>`).join("");}
+function trustCells(a){const cells=[["Trust Score",a.trustScore+" /100","evaluation · audit · policy · governance","lead"],["Correctness",a.correctness,"within threshold",""],["Safety","Pass","within threshold",""],["Hallucination",a.halluc,"within threshold",""],["Access control","Pass","within threshold",""]];
+  return cells.map(c=>`<div class="scorecell ${c[3]}"><div class="lbl">${c[0]}</div><div class="val">${c[1]}</div><div class="pass">${c[2]}</div></div>`).join("");}
+function yamlFor(a){
+  const rt=a.runtime.replace(' ',':');
+  const services=a.manifest[5][1].split(', ');
+  const data=a.manifest[6][1];const scope=a.manifest[7][1];
+  const K=s=>`<span class="key">${s}</span>`,V=s=>`<span class="val">${s}</span>`,C=s=>`<span class="cmt">${s}</span>`;
+  const L=[];
+  L.push(C('# agent.yaml — schema v1 (HUMAIN-233 / 177)'));
+  L.push(`${K('apiVersion')}: ${V('humain.one/v1')}`);
+  L.push(`${K('kind')}: ${V('Agent')}`);
+  L.push(`${K('metadata')}:`);
+  L.push(`  ${K('name')}: ${V(a.manifest[0][1])}`);
+  L.push(`  ${K('version')}: ${V(a.version)}`);
+  L.push(`${K('runtime')}: ${V(rt)}   ${C('# python')}`);
+  L.push(`${K('entrypoint')}: ${V(a.entrypoint)}`);
+  L.push(`${K('resources')}:`);
+  L.push(`  ${K('cpu')}: ${V('"'+a.cpu+'"')}`);
+  L.push(`  ${K('memory')}: ${V(a.memory)}`);
+  L.push(`  ${K('gpu')}: ${V(a.gpu)}`);
+  L.push(`${K('services')}:`);
+  services.forEach(s=>L.push(`  - ${V(s)}`));
+  L.push(`${K('secrets')}:`);
+  a.secrets.forEach(s=>L.push(`  - ${V(s)}`));
+  L.push(`${K('data')}:`);
+  L.push(`  - ${V(data)}`);
+  L.push(`${K('access_scope')}: ${V(scope)}`);
+  L.push(`${K('evaluation_suites')}:`);
+  a.evalSuites.forEach(s=>L.push(`  - ${V(s)}`));
+  L.push(`${K('certification_profile')}: ${V(a.certProfile)}`);
+  L.push(`${K('graph')}:   ${C('# multi-agent workflow: nodes + edges')}`);
+  L.push(`  ${K('nodes')}: ${V('['+a.nodes.join(', ')+']')}`);
+  L.push(`  ${K('edges')}:`);
+  for(let i=0;i<a.nodes.length-1;i++)L.push(`    - ${V(a.nodes[i]+' -> '+a.nodes[i+1])}`);
+  return L.map(x=>`<div>${x}</div>`).join("");
+}
+const LIFE=["Draft","Resolving","Provisioning","Deployed","In evaluation","Review-ready","Published","Suspended","Needs attention"];
+function lifeClass(s){return {"Draft":"muted","Resolving":"preview","Provisioning":"preview","Deployed":"teal","In evaluation":"preview","Review-ready":"teal","Published":"gov","Suspended":"muted","Needs attention":"alert"}[s]||"muted";}
+const AGENTS_INDEX=[
+ {id:"citizen",code:"CS",name:"Citizen Support Agent",purpose:"Eligibility guidance and case resolution for citizen benefits",runtime:"python 3.11",life:"Published",trust:"92",tenant:"msa-gov",updated:"today",full:true},
+ {id:"procurement",code:"PC",name:"Procurement Compliance Agent",purpose:"Policy and budget compliance for internal procurement",runtime:"python 3.11",life:"Published",trust:"90",tenant:"msa-gov",updated:"today",full:true},
+ {id:"health",code:"HT",name:"Health Triage Assistant",purpose:"Symptom intake and triage routing for clinic visits",runtime:"python 3.11",life:"Published",trust:"88",tenant:"moh-gov",updated:"2 days ago",full:false},
+ {id:"permit",code:"PB",name:"Permit Application Agent",purpose:"Guides municipal permit applications and document checks",runtime:"python 3.11",life:"In evaluation",trust:"74",tenant:"msa-gov",updated:"today",full:false},
+ {id:"visa",code:"VS",name:"Visa Status Agent",purpose:"Answers residency and visa status questions",runtime:"python 3.11",life:"Provisioning",trust:null,tenant:"msa-gov",updated:"1 hr ago",full:false},
+ {id:"grants",code:"GA",name:"Grants Advisor Agent",purpose:"Education and research grant eligibility advice",runtime:"python 3.11",life:"Draft",trust:null,tenant:"msa-gov",updated:"3 days ago",full:false},
+ {id:"hr",code:"HR",name:"HR Leave Assistant",purpose:"Internal leave balance and policy questions",runtime:"python 3.11",life:"Deployed",trust:"81",tenant:"msa-gov",updated:"yesterday",full:false},
+ {id:"customs",code:"CU",name:"Customs Classification Agent",purpose:"Classifies imported goods against tariff codes",runtime:"python 3.11",life:"Suspended",trust:"79",tenant:"moh-gov",updated:"5 days ago",full:false},
+ {id:"fraud",code:"FR",name:"Fraud Signals Agent",purpose:"Flags anomalous benefit claims for human review",runtime:"python 3.11",life:"Needs attention",trust:null,tenant:"msa-gov",updated:"today",full:false}
+];
+function agentMatches(e){const f=state.filter;if(f.status!=="All"&&e.life!==f.status)return false;if(f.q&&!((e.name+" "+e.purpose).toLowerCase().includes(f.q.toLowerCase())))return false;return true;}
+function agentGridHTML(){const list=AGENTS_INDEX.filter(agentMatches);if(!list.length)return `<div class="note info" style="grid-column:1/-1"><span class="ni">i</span><div>No agents match this filter.</div></div>`;
+ return list.map(e=>`<div class="agentcard" data-${e.full?'open':'mini'}="${e.id}"><div class="ico">${e.code}</div><div class="meta"><div class="nm">${e.name}</div><div class="sub">${e.purpose}</div><div class="tags">${badge(lifeClass(e.life),e.life)} ${e.trust?badge('teal','Trust '+e.trust):badge('muted','no score yet')} ${badge('muted',e.tenant)}</div></div></div>`).join("");}
+function bindCards(){document.querySelectorAll('#agentGrid [data-open]').forEach(el=>el.onclick=()=>openDetail(el.getAttribute('data-open')));document.querySelectorAll('#agentGrid [data-mini]').forEach(el=>el.onclick=()=>openMini(el.getAttribute('data-mini')));}
+function refreshGrid(){const g=document.getElementById('agentGrid');if(g){g.innerHTML=agentGridHTML();bindCards();}}
+
+/* ---------- CHROME ---------- */
+const TITLES={agents:"My Agents",detail:"Agent",mini:"Agent",submit:"Submit Agent",resolve:"Resolve & Govern",plan:"Review Generated Plan",deploy:"Provision & Deploy",runtime:"Runtime & Resources",test:"Test in Sandbox",evidence:"Evidence",publish:"Submit to Marketplace",market:"Marketplace",listing:"Agent Listing",scenario:"Run Agent",sandboxes:"Sandboxes",templates:"Templates",requests:"My Requests",evals:"Evaluations",data:"Data Catalog",tenancy:"Tenancy & Templates",exception:"Request a Template",library:"My Acquired Agents",infra:"Infrastructure"};
+function renderNav(){document.querySelectorAll('#nav a').forEach(a=>{const g=a.getAttribute('data-go');const inJ=STEPS.some(s=>s.id===state.screen);a.classList.toggle('active',g===state.screen||(g==='agents'&&(state.screen==='detail'||state.screen==='mini'||inJ))||(g==='market'&&(state.screen==='listing'||state.screen==='scenario')));});}
+function renderStepper(){const w=$("#stepper");const inJ=STEPS.some(s=>s.id===state.screen);if(!inJ){w.style.display="none";w.innerHTML="";return;}w.style.display="flex";const cur=stepIndex(state.screen);
+  w.innerHTML=STEPS.map((s,i)=>{const cls=i<cur?"done":i===cur?"active":"";const mk=i<cur?"✓":(i+1);return `<div class="step ${cls}" data-i="${i}" data-step="${s.id}"><span class="n">${mk}</span>${s.label}</div>`;}).join("");
+  w.querySelectorAll('.step').forEach(el=>el.addEventListener('click',()=>{const i=+el.getAttribute('data-i');if(i<=cur)go(el.getAttribute('data-step'));}));}
+function renderTop(){$("#topTitle").textContent=TITLES[state.screen]||"";const inJ=STEPS.some(s=>s.id===state.screen);const market=['market','listing','scenario'].includes(state.screen);
+  $("#crumbs").textContent=inJ?`HUMAIN ONE / Agents / ${A().name} / ${TITLES[state.screen]}`:state.screen==='detail'?`HUMAIN ONE / Agents / ${A().name}`:state.screen==='mini'?`HUMAIN ONE / Agents / ${state.mini?state.mini.name:''}`:(market?`HUMAIN ONE / Marketplace${state.screen!=='market'?' / '+A().name:''}`:`HUMAIN ONE / ${TITLES[state.screen]}`);}
+
+/* ---------- CLI ---------- */
+/* Interactive CLI — shares state with the UI, both stay in lockstep */
+function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function cliEcho(cls,txt){const log=$("#cliLog");if(!log)return;const d=document.createElement('div');d.className='ln '+(cls||'');d.innerHTML=txt;log.appendChild(d);const b=$("#cliBody");if(b)b.scrollTop=b.scrollHeight;}
+function renderCLI(){ /* mirror only journey steps into the transcript (no page-nav noise) */
+  if(!$("#cliLog"))return;
+  if(STEPS.some(s=>s.id===state.screen)) cliEcho('out','↳ '+AGENTS[state.agentId].manifest[0][1]+' · '+state.screen+' (step '+(stepIndex(state.screen)+1)+'/'+STEPS.length+')');
+}
+function cliNeed(verb){cliEcho('err','usage:  '+verb+' [id]   ·   run  list  to see agent ids');}
+function cliNope(a){cliEcho('err','no agent “'+esc(a)+'”   ·   run  list  to see agent ids');}
+function resolveAgent(tok){if(!tok)return null;tok=String(tok).toLowerCase();
+  return AGENTS_INDEX.find(e=>e.id===tok)
+    || AGENTS_INDEX.find(e=>e.full&&AGENTS[e.id].manifest[0][1]===tok)
+    || AGENTS_INDEX.find(e=>e.name.toLowerCase().replace(/\s+/g,'-')===tok)
+    || AGENTS_INDEX.find(e=>e.name.toLowerCase().includes(tok)) || null;}
+function pad(s,n){s=String(s);return (s+' '.repeat(n)).slice(0,n);}
+function cliList(){cliEcho('out',pad('AGENT (id)',26)+pad('STATUS',18)+'TRUST');
+  AGENTS_INDEX.forEach(e=>cliEcho('out',pad(e.id,26)+pad(e.life,18)+(e.trust||'—')));
+  cliEcho('out','→ try:  submit grants   ·   next grants   ·   open citizen   ·   market health');}
+function cliHelp(){cliEcho('out','commands  (the “humain agent” prefix is optional · [id] = an id from  list):');
+  ['list                                              every agent + lifecycle status',
+   'submit [id]                                       start the governed path / advance a directory agent',
+   'next [id]                                         advance one step (or one lifecycle stage)',
+   'resolve|plan|deploy|runtime|test|evidence|publish [id]   jump to a journey step',
+   'open [id]                                         owner view (versions, redeploy)',
+   'market [id]                                       consumer listing (published only)',
+   'status [id]                                       print the current state',
+   'clear                                             clear the screen'].forEach(l=>cliEcho('out','  '+l));}
+function cliJourney(step,arg){
+  let e=arg?resolveAgent(arg):AGENTS_INDEX.find(x=>x.id===state.agentId);
+  if(arg&&!e)return cliNope(arg);
+  if(!e){cliEcho('err','no active agent — start one with:  submit [id]');return;}
+  if(!e.full){cliEcho('err',e.id+' is a directory agent at “'+e.life+'” — advance it with:  next '+e.id);return;}
+  state.agentId=e.id;$("#tenantline").textContent=AGENTS[e.id].tenant;go(step);
+}
+function runCli(raw){const cmd=(raw||'').trim();if(!cmd)return;
+  cliEcho('cmdline','<span class="pr">msa-gov $</span> <span class="cmd">'+esc(cmd)+'</span>');
+  let t=cmd.replace(/^humain\s+/i,'').replace(/^agent\s+/i,'').trim();
+  const p=t.split(/\s+/);const v=(p[0]||'').toLowerCase();const arg=p[1];
+  const steps=['resolve','plan','deploy','runtime','test','evidence','publish'];
+  if(v==='help'||v==='?'){cliHelp();return;}
+  if(v==='clear'){$("#cliLog").innerHTML='';return;}
+  if(v==='list'||v==='ls'){cliList();return;}
+  if(v==='status'){if(!arg)return cliNeed('status');const e=resolveAgent(arg);if(!e)return cliNope(arg);cliEcho('out',e.id+': '+e.life+' · trust '+(e.trust||'—')+' · placement KSA · Riyadh');return;}
+  if(v==='open'){if(!arg)return cliNeed('open');const e=resolveAgent(arg);if(!e)return cliNope(arg);e.full?openDetail(e.id):openMini(e.id);return;}
+  if(v==='market'){if(!arg)return cliNeed('market');const e=resolveAgent(arg);if(!e)return cliNope(arg);if(e.life!=='Published'){cliEcho('err',e.id+' is not published yet ('+e.life+') — not in the Marketplace');return;}listAgent(e.id);return;}
+  if(v==='acquire'||v==='buy'){if(!arg)return cliNeed('acquire');const e=resolveAgent(arg);if(!e)return cliNope(arg);if(e.life!=='Published'){cliEcho('err',e.id+' is not published yet ('+e.life+') — cannot acquire');return;}openModal(modalAcquire(e.id));return;}
+  if(v==='library'||v==='acquired'||v==='mine'){go('agents');cliEcho('out',state.acquired.size?('acquired: '+[...state.acquired].join(', ')+' — see the Acquired section in My Agents'):'no acquired agents yet — acquire one from the Marketplace');return;}
+  if(v==='submit'){if(!arg)return cliNeed('submit');const e=resolveAgent(arg);if(!e)return cliNope(arg);if(e.full)startJourney(e.id);else advanceMock(e.id);return;}
+  if(v==='next'){const e=arg?resolveAgent(arg):AGENTS_INDEX.find(x=>x.id===state.agentId);if(arg&&!e)return cliNope(arg);if(!e)return cliNeed('next');
+    if(e.full){state.agentId=e.id;const inJ=STEPS.some(s=>s.id===state.screen);if(!inJ){startJourney(e.id);}else{const i=stepIndex(state.screen);if(i<STEPS.length-1)go(STEPS[i+1].id);else cliEcho('out',e.id+' is at the final step — submit it from the Publish screen');}}
+    else advanceMock(e.id);return;}
+  if(steps.includes(v))return cliJourney(v,arg);
+  cliEcho('err','unknown command “'+esc(v)+'”   ·   try  help  or  list');
+}
+function initCli(){$("#cliBody").innerHTML='<div id="cliLog"></div><div class="cliprompt"><span>msa-gov $</span><input id="cliIn" autocomplete="off" spellcheck="false" placeholder="type a command — e.g. list · submit grants · next grants"/></div>';
+  cliEcho('out',"HUMAIN ONE CLI — mirrors the UI. Start with  list , then e.g.  submit grants  ·  next grants  ·  open citizen . Type  help  for everything.");
+  const inp=$("#cliIn");if(inp)inp.addEventListener('keydown',e=>{if(e.key==='Enter'){const val=inp.value;inp.value='';runCli(val);}});}
+
+/* ---------- BUILD SCREENS ---------- */
+function scrAgents(){
+  const counts={};AGENTS_INDEX.forEach(e=>counts[e.life]=(counts[e.life]||0)+1);
+  const statuses=["All",...LIFE.filter(s=>counts[s])];
+  const stOpts=statuses.map(s=>`<option value="${s}" ${state.filter.status===s?'selected':''}>${s==='All'?'All statuses ('+AGENTS_INDEX.length+')':s+' ('+counts[s]+')'}</option>`).join("");
+  return `<h2>My Agents</h2><p class="lede">Agents are the unit you build and ship. Filter by lifecycle status, search, or open one. Submit a new version to take an agent through the governed path. You never start from a bare sandbox.</p>
+  <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px">
+    <input id="fq" class="fld" style="max-width:260px" placeholder="Search agents…" value="${state.filter.q}"/>
+    <span style="display:flex;gap:8px;align-items:center"><span class="small">Status</span><select id="fStatus" class="ov" style="min-width:190px">${stOpts}</select><button class="btn primary" data-journey="citizen">+ Submit Agent</button></span>
+  </div>
+  <div class="grid2" id="agentGrid">${agentGridHTML()}</div>
+  <div class="note info" style="margin-top:18px"><span class="ni">Note</span><div>There is no “New Sandbox” entry here by design. Bare environment creation and template authoring live in Admin, so a runtime is never created without an agent attached.</div></div>
+  ${acquiredSection()}`;
+}
+function acquiredSection(){if(!state.acquired.size)return '';
+  const cards=[...state.acquired].map(id=>{const e=AGENTS_INDEX.find(x=>x.id===id);const full=!!AGENTS[id];return `<div class="agentcard"><div class="ico">${e.code}</div><div class="meta"><div class="nm">${e.name}</div><div class="sub">${e.purpose}</div><div class="tags">${badge('teal','✓ acquired')} ${badge('gov','◆ KSA sovereign')} ${e.trust?badge('teal','Trust '+e.trust):''}</div><div class="row" style="margin-top:10px">${full?`<button class="btn sm primary" data-run="${id}">Chat with agent →</button>`:''}<button class="btn sm" data-list="${id}">View listing</button></div></div></div>`;}).join("");
+  return `<hr class="sep" style="margin:26px 0 16px"/><div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px"><h2 style="font-size:18px;margin:0">Acquired from Marketplace</h2>${badge('muted',state.acquired.size+' in your workspace')}</div><p class="lede" style="margin:0 0 14px">Published agents you acquired and consume in your workspace (tenant ${USER.tenant}). The publisher manages their build and versions — you just run them.</p><div class="grid2">${cards}</div>`;
+}
+function scrMini(){const e=state.mini;if(!e)return scrAgents();
+  const stage={Draft:"Manifest drafted. Not yet submitted to the governed path.",Resolving:"Resolving the plan from the manifest.",Provisioning:"The Sovereign Runtime is being assembled.",Deployed:"Running in its sandbox. Not yet evaluated for listing.","In evaluation":"Running its evaluation suite to build a Trust Score.","Review-ready":"Tested and evidenced. Ready for marketplace submission.",Published:"Live in the Marketplace, signed off by a domain champion.",Suspended:"Idle. Auto-suspended on time-to-live to avoid cost.","Needs attention":"Last deploy failed. Needs developer attention."}[e.life]||"";
+  const pos=LIFE.indexOf(e.life);
+  const track=LIFE.map(s=>`<span class="chip ${s===e.life?'sel':''}" style="cursor:default">${s}</span>`).join("");
+  return `<h2>${e.name}</h2><p class="lede">${e.purpose}</p>
+  <div class="row" style="margin-bottom:14px">${badge(lifeClass(e.life),e.life)} ${e.trust?badge('teal','Trust '+e.trust):badge('muted','no score yet')} ${badge('muted',e.runtime)} ${badge('muted','tenant: '+e.tenant)} ${badge('muted','updated '+e.updated)}</div>
+  <div class="card"><div class="hd"><h3>Lifecycle</h3><span class="small">stage ${pos+1} of ${LIFE.length}</span></div><div class="bd">
+    <div class="row" style="gap:6px">${track}</div>
+    <div class="note info" style="margin-top:14px"><span class="ni">i</span><div>${stage}</div></div></div></div>
+  <div class="card" style="margin-top:16px"><div class="ft" style="justify-content:space-between"><span class="small">Directory entry for the preview. The two reference agents run the full governed path end to end.</span><button class="btn ghost" data-go="agents">Back to My Agents</button></div></div>`;
+}
+function scrDetail(){const a=A();
+  return `<h2>${a.name}</h2><p class="lede">The agent's own page. Open it any time from My Agents to see its runtime, its evidence, its version history, and to redeploy or roll back. Version history is not buried inside the build journey.</p>
+  <div class="row" style="margin-bottom:14px">${badge('gov','◆ running')} ${badge('gov','KSA · Riyadh')} ${trustBadge(a)} ${badge('muted',a.runtime)}</div>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Version history</h3>${badge('muted','rollback / redeploy')}</div><div class="bd">
+      <div class="verrow"><span><b>v1.4</b> · main@8f2a1c · developer@msa-gov</span>${badge('gov','current')}<button class="btn sm" data-redeploy="v1.4">Redeploy</button></div>
+      <div class="verrow"><span><b>v1.3</b> · main@b1d77a</span><span class="small">yesterday</span><button class="btn sm" data-roll="v1.3">Roll back</button></div>
+      <div class="verrow"><span><b>v1.2</b> · main@4c9e02</span><span class="small">2 days ago</span><button class="btn sm" data-roll="v1.2">Roll back</button></div>
+      <div class="note info" id="rollNote" style="margin-top:10px"><span class="ni">i</span><div>Roll back to any prior version, or redeploy the current one, in one action from the portal (HUMAIN-184 / 465). Each action writes a new deployment record.</div></div>
+    </div></div>
+    <div class="card"><div class="hd"><h3>Deployment record</h3>${badge('teal','source of truth')}</div><div class="bd"><div class="kv">
+      <div class="k">Version</div><div class="v">v1.4 ${badge('gov','current')}</div><div class="k">Source</div><div class="v">git main@8f2a1c · ${a.deployCfg[0][1]}</div><div class="k">Actor</div><div class="v">developer@msa-gov</div><div class="k">Time</div><div class="v">today · 09:43</div><div class="k">Placement</div><div class="v">KSA · Riyadh</div></div>
+      <div class="small" style="margin-top:8px">Backed by the deployment record store (HUMAIN-182), stamped per deploy (HUMAIN-183).</div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="hd"><h3>Sovereign Runtime</h3>${badge('teal','building blocks')}</div><div class="bd"><div class="resgrid">${blockCards('READY')}</div>
+    <div class="small" style="margin-top:10px">${RUNTIME_TAGLINE}</div></div></div>
+  <div class="card" style="margin-top:16px"><div class="ft" style="justify-content:space-between"><span class="small">This page is the post-deploy home for the agent.</span><span>
+    <button class="btn" data-go="test">Test in sandbox</button>
+    <button class="btn" data-go="evidence">Evidence</button>
+    <button class="btn" data-go="listing">View in Marketplace</button>
+    <button class="btn primary" data-journey="${a.id}">Replay the governed path →</button></span></div></div>`;
+}
+function animateUpload(){const bar=$("#upBar"),pct=$("#upPct"),stat=$("#upStat"),zone=$("#upZone"),prog=$("#upProg");if(!bar||!zone)return;
+  zone.classList.add('hidden');prog.classList.remove('hidden');let p=0;
+  const t=setInterval(()=>{p+=Math.max(5,Math.round((100-p)*0.2));if(p>100)p=100;bar.style.width=p+'%';pct.textContent=p+'%';
+    if(p>=100){clearInterval(t);stat.innerHTML='✓ uploaded · validating against manifest schema v1…';
+      setTimeout(()=>{stat.innerHTML='✓ <b>agent.yaml</b> validated · manifest schema v1 (HUMAIN-233)';const ub=$("#upBadge");if(ub){ub.className='badge gov';ub.textContent='◆ validated';}const mt=$("#upMeta");if(mt)mt.classList.remove('hidden');const mw=$("#manifestWrap");if(mw)mw.innerHTML=yamlFor(A());const rb=$("#toResolveBtn");if(rb)rb.disabled=false;if($("#cliLog"))cliEcho('out','↳ uploaded agent.yaml · validated (schema v1)');},700);
+    }},140);
+}
+function scrSubmit(){const a=A();const fname=a.manifest[0][1]+'.yaml';
+  return `<h2>Submit a new version</h2><p class="lede">Push a new version of a live, published agent by uploading its <b>agent.yaml</b>. The manifest is the whole agent: runtime, services, data needs and policy. HUMAIN ONE validates and resolves everything behind it; the live v1.4 keeps serving until v1.5 is certified.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Agent package</h3><span id="upBadge" class="badge muted">agent.yaml</span></div><div class="bd">
+      <div class="srcpick"><div class="srctab sel">Upload Zip</div><div class="srctab">From GitHub</div><div class="srctab">Pre-built Image</div></div>
+      <div id="upZone" class="upzone"><div class="upicon">⤓</div><div>Drop <b>${fname}</b> here, or</div><button class="btn primary" id="upBtn" style="margin-top:10px">Choose agent.yaml</button><div class="small" style="margin-top:10px">Validated against manifest schema v1 on upload</div></div>
+      <div id="upProg" class="hidden"><div class="uprow"><span class="upfile">▤ ${fname}</span><span id="upPct" class="small">0%</span></div><div class="deploybar"><i id="upBar"></i></div><div id="upStat" class="small" style="margin-top:7px">Uploading…</div></div>
+      <div id="upMeta" class="hidden"><div class="kv" style="grid-template-columns:150px 1fr"><div class="k">Agent name</div><div class="v">${a.name}</div><div class="k">Package</div><div class="v">${a.manifest[0][1]}-v1.5.tar.gz <span class="small">· 14.2 MB</span></div><div class="k">Version</div><div class="v">v1.5 ${badge('preview','new')} <span class="small">· current live: v1.4</span></div><div class="k">Source</div><div class="v">git-linked · main@8f2a1c</div></div>
+        <div class="note gov" style="margin-top:14px"><span class="ni">◆</span><div>Manifest format follows HUMAIN One (H2O) as source of truth. No infrastructure choices are asked here.</div></div></div>
+    </div><div class="ft"><button class="btn ghost" data-go="agents">Cancel</button><button class="btn primary" id="toResolveBtn" disabled data-go="resolve">Submit &amp; Resolve →</button></div></div>
+    <div class="card"><div class="hd"><h3>Detected manifest</h3><span class="small">read-only</span></div><div class="bd"><div class="manifest" id="manifestWrap"><span class="cmt"># waiting for agent.yaml — upload to validate &amp; parse…</span></div></div></div>
+  </div>`;
+}
+function scrResolve(){const a=A();
+  const rows=[
+    ["Sandbox template match",`Matched <b>${a.template.name} ${a.template.version}</b> (${a.template.spec}). ${a.template.reason}`],
+    ["Manifest-derived config",`From agent.yaml: runtime <b>${a.runtime}</b>, entrypoint <b>${a.entrypoint}</b>, resources <b>${a.cpu} vCPU · ${a.memory}</b>, a <b>${a.nodes.length}-node</b> workflow graph. The platform generates the deployment config (endpoint, health <b>${a.health}</b>, replicas <b>${a.replicas}</b>, scaling) as a separate devflow-deployment.yaml.`],
+    ["Sovereign Runtime to assemble",`Building blocks: Private Network, Runtime Cluster, Compute Pool, Identity &amp; Access, Database, Storage, Secrets Vault, Image Registry. Provisioned as code.`],
+    ["Application blueprints",a.blueprints.map(b=>b[0]).join(", ")+`. SMTP capture is a real, shipped blueprint.`],
+    ["Governance inherited",`Egress <b>deny-all except approved endpoints</b>, data <b>${a.gov[1][1]}</b>, retention <b>${a.gov[2][1]}</b>, access <b>${a.gov[3][1]}</b>.`],
+    ["Sovereign placement",`<b>KSA · Riyadh.</b> Because the Sovereign Runtime is provisioned as code, the same plan runs on any cloud and stays in the Kingdom from day one.`],
+    ["Audit &amp; lifecycle",`Plan generated and recorded. State set to <b>review required</b> before provisioning.`]
+  ];
+  const rendered=rows.map((r,i)=>`<div class="rrow pending" data-i="${i}"><div class="rc">${i+1}</div><div><div class="rt">${r[0]}</div><div class="rd">${r[1]}</div></div></div>`).join("");
+  return `<h2>Resolve &amp; Govern</h2><p class="lede">The new surface. It shows its work. HUMAIN ONE reads the package and resolves the matched sandbox template, the Sovereign Runtime it will assemble, the governance, and the sovereign placement, step by step. No black box.</p>
+  <div class="card"><div class="hd"><h3>Resolving ${a.name}</h3><span id="resolveState" class="badge muted">resolving…</span></div><div class="bd"><div class="resolve" id="resolveList">${rendered}</div></div>
+  <div class="ft"><span class="small" id="resolveHint" style="margin-right:auto">Reading manifest and applying tenant policy…</span><button class="btn ghost" data-go="submit">Back</button><button class="btn primary" id="toPlan" disabled data-go="plan">Review Generated Plan →</button></div></div>
+  <div class="note preview" style="margin-top:14px"><span class="ni">Preview</span><div>Sandbox template match, the runtime plan and policy inheritance are shown live. Synthetic data and mock blueprints are representative fixtures for LEAP.</div></div>`;
+}
+function animateResolve(){const rows=[...document.querySelectorAll('#resolveList .rrow')];let i=0;const tick=()=>{if(i>0)rows[i-1].classList.remove('pending');if(i>=rows.length){$("#resolveState").className="badge gov";$("#resolveState").textContent="◆ resolved";$("#resolveHint").textContent="Plan generated. Review required before provisioning.";const b=$("#toPlan");if(b)b.disabled=false;cliEcho('gd','✓ plan generated · review required');return;}rows[i].querySelector('.rc').textContent="✓";i++;setTimeout(tick,440);};setTimeout(tick,350);}
+
+function optsFor(type,cur){let opts=[];
+  if(type==='src')opts=["Upload Zip","From GitHub","Pre-built Image"];
+  else if(type==='rep')opts=["1","2","3","4"];
+  else if(type==='res')opts=["1 vCPU · 2Gi","2 vCPU · 4Gi","4 vCPU · 8Gi"];
+  else if(type==='hpa')opts=[cur,"min 2 · max 6 · target 60% CPU","min 1 · max 4 · target 80% CPU"];
+  else if(type==='region')opts=REGIONS;
+  const uniq=[...new Set(opts)];
+  return `<select class="ov">${uniq.map(o=>`<option ${o===cur?'selected':''}>${o}</option>`).join("")}</select> ${badge('teal','overridable')}`;
+}
+function scrPlan(){const a=A();
+  const rep=a.deployCfg.find(c=>c[2]==='rep'),res=a.deployCfg.find(c=>c[2]==='res'),rg=a.deployCfg.find(c=>c[2]==='region');
+  const gov=a.gov.map(g=>`<div class="k">${g[0]}</div><div class="v">${g[1]} ${badge('lock','🔒')}</div>`).join("");
+  return `<h2>Review &amp; approve</h2><p class="lede">HUMAIN ONE resolved everything from your agent. Adjust the few open fields if you need to, then approve.</p>
+  <div class="card"><div class="hd"><h3>Deployment</h3><span>${badge('gov','◆ KSA · Riyadh')} ${badge('teal','resolved')}</span></div><div class="bd">
+    <div class="kv" style="grid-template-columns:150px 1fr">
+      <div class="k">Runtime</div><div class="v">${a.runtime} · port ${a.port} ${badge('lock','🔒 locked')}</div>
+      <div class="k">Replicas</div><div class="v">${optsFor('rep',rep?rep[1]:'2')}</div>
+      <div class="k">Compute</div><div class="v">${optsFor('res',res?res[1]:'2 vCPU · 4Gi')}</div>
+      <div class="k">Region</div><div class="v">${optsFor('region',rg?rg[1]:'KSA · Riyadh')}</div>
+    </div>
+    <div class="row" style="margin-top:14px;align-items:center;justify-content:space-between">
+      <span class="small">Sovereign Runtime · 8 governed blocks · provisioned as code · policy inherited.</span>
+      <button class="btn sm" id="planMore">Show details</button>
+    </div>
+    <div id="planDetails" class="hidden" style="margin-top:14px">
+      <div class="lbl">Sovereign Runtime blocks</div><div class="resgrid" style="margin-top:6px">${blockCards('planned')}</div>
+      <hr class="sep"/><div class="lbl">Governance &amp; placement</div>
+      <div class="kv" style="margin-top:6px;grid-template-columns:160px 1fr">${gov}<div class="k">Placement</div><div class="v">KSA · Riyadh ${badge('gov','sovereign')}</div><div class="k">Tenant</div><div class="v">msa-gov</div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="ft" style="justify-content:space-between"><span class="small">Approving writes the audit record and provisions the runtime.</span><span><button class="btn ghost" data-go="resolve">Back</button> <button class="btn" data-modal="reqtpl">No template fits?</button> <button class="btn primary" data-go="deploy">Approve &amp; provision →</button></span></div></div>`;
+}
+
+function scrDeploy(){const a=A();
+  const blocks=BLOCKS.map((b,i)=>`<div class="rescard" data-r="${i}"><div><div class="rn">${b[0]}</div><div class="rsub"><span class="cap">${b[2]}</span></div></div><span class="statedot" data-state="${i}"><i></i>queued</span></div>`).join("");
+  const chk=[["agent.yaml present in project root","ok"],["Dockerfile present in repository root","ok"],["Port "+a.port+" exposed in container","ok"],["Health check endpoint configured","ok"],["Build + publish pipeline","wait"]];
+  return `<h2>Provision &amp; Deploy</h2><p class="lede">HUMAIN ONE assembles the Sovereign Runtime from the approved plan and runs the build pipeline. You did not pick a cluster, region, or cloud. The runtime is provisioned as code, so it resolves all of it from your agent and stays in-Kingdom.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Assembling the Sovereign Runtime</h3><span id="depBadge" class="badge muted">starting…</span></div><div class="bd"><div class="deploybar"><i id="depBar"></i></div><div class="resgrid" id="resList">${blocks}</div></div></div>
+    <div class="card"><div class="hd"><h3>Build pipeline &amp; logs</h3>${badge('muted','CI/CD')}</div><div class="bd">
+      <ul class="checklist" id="chk">${chk.map((c,i)=>`<li class="${c[1]==='ok'?'ok':'wait'}" data-c="${i}"><span class="ck">${c[1]==='ok'?'✓':'…'}</span>${c[0]}</li>`).join("")}</ul>
+      <div class="logbox" id="log" style="margin-top:12px"><div class="t"># assembling Sovereign Runtime · provisioned as code · cloud abstracted</div></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="ft"><span class="small" style="margin-right:auto">On success a deployment record is written: version, source, actor, time (HUMAIN-182/183).</span><button class="btn primary" id="toRuntime" disabled data-go="runtime">Open runtime detail →</button></div></div>`;
+}
+function animateDeploy(){const cards=[...document.querySelectorAll('#resList [data-state]')];const bar=$("#depBar");const log=$("#log");
+  const lines=["Private Network — isolated network + subnets…","Runtime Cluster — private container cluster…","Compute Pool — right-sizing compute…","Identity & Access — binding scoped service identity…","Database — managed SQL, private address…","Storage — object storage with lifecycle…","Secrets Vault — provisioning scoped secrets…","Image Registry — building + publishing image…","deployment record v1.5 stamped · all blocks READY · KSA Riyadh"];let i=0;
+  const tick=()=>{ if(i<cards.length){cards[i].className="statedot prov";cards[i].innerHTML="<i></i>provisioning";}
+    if(i>0){cards[i-1].className="statedot ready";cards[i-1].innerHTML="<i></i>READY";}
+    if(log&&lines[i]){const ok=i>=lines.length-1;log.innerHTML+=`<div class="${ok?'ok':''}"><span class="t">›</span> ${lines[i]}</div>`;log.scrollTop=log.scrollHeight;}
+    bar.style.width=Math.round(((i+1)/cards.length)*100)+"%";
+    if(i>=cards.length){const c=$("#chk [data-c='4']");if(c){c.className="ok";c.querySelector('.ck').textContent="✓";}$("#depBadge").className="badge gov";$("#depBadge").textContent="◆ all READY";const b=$("#toRuntime");if(b)b.disabled=false;cliEcho('gd','✓ deployed · deployment record v1.5 · all blocks READY');return;} i++;setTimeout(tick,520);};
+  setTimeout(()=>{bar.style.width="5%";tick();},350);}
+
+function scrRuntime(){const a=A();
+  return `<h2>Runtime &amp; Resources</h2><p class="lede">The provisioned sandbox for this agent. The runtime is the Sovereign Runtime, assembled from named building blocks and shown with their ready state. Because it is provisioned as code, HUMAIN ONE places this runtime in-Kingdom from day one, whatever the cloud underneath.</p>
+  <div class="card"><div class="hd"><h3>${a.manifest[0][1]} · Sovereign Runtime</h3><span>${badge('gov','◆ running')} ${badge('gov','KSA · Riyadh')} ${badge('teal','provisioned as code')}</span></div><div class="bd">
+    <div class="resgrid">${blockCards('READY')}</div>
+    <div class="note gov" style="margin-top:12px"><span class="ni">◆</span><div>${RUNTIME_TAGLINE} Swap the cloud underneath and the agent does not change. Sovereignty is a property of the runtime, not the demo.</div></div></div></div>
+  <div class="card" style="margin-top:16px"><div class="hd"><h3>Deployment record</h3>${badge('teal','source of truth')}</div><div class="bd"><div class="kv" style="grid-template-columns:160px 1fr">
+    <div class="k">Version</div><div class="v">v1.5 ${badge('preview','new · in test')}</div><div class="k">Source</div><div class="v">git main@8f2a1c · ${a.deployCfg[0][1]}</div><div class="k">Actor</div><div class="v">developer@msa-gov</div><div class="k">Time</div><div class="v">today · 09:43</div></div>
+    <div class="note info" style="margin-top:10px"><span class="ni">i</span><div>This is the new version in its test sandbox. The live v1.4 keeps serving; version history and rollback live on the agent's page.</div></div></div></div>
+  <div class="card" style="margin-top:16px"><div class="ft"><button class="btn ghost" data-go="deploy">Back</button><button class="btn primary" data-go="test">Test in sandbox →</button></div></div>`;
+}
+
+function scrTest(){const a=A();
+  return `<h2>Test in Sandbox</h2><p class="lede">This is the developer validating the agent inside the sandbox, against synthetic data. It produces the evidence behind the agent's Trust Score. This is testing, not a citizen using the service. Consumption happens later, on the Marketplace.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Connect data + run evaluation</h3>${PRISM}</div><div class="bd">
+      <div class="kv"><div class="k">Dataset</div><div class="v">${a.manifest[6][1]} ${badge('muted','synthetic')}</div><div class="k">Eval suite</div><div class="v">${a.id==='citizen'?'citizen-eligibility-eval':'procurement-compliance-eval'}</div><div class="k">Runner</div><div class="v">per-sandbox · isolated</div></div>
+      <button class="btn primary" id="runEval" style="margin-top:14px">Run evaluation suite</button>
+      <div id="evalOut" class="note info" style="margin-top:12px"><span class="ni">i</span><div>If the Prism integration lands by LEAP, scoring runs in Prism. If not, this is a mock evaluation that returns the same shape of evidence (epic HUMAIN-111).</div></div>
+    </div></div>
+    <div class="card"><div class="hd"><h3>Developer test exchange</h3><span class="small">synthetic</span></div><div class="bd"><div class="chat">
+      <div class="bub user">${a.scenario.turns[0].text}</div>
+      <div class="bub agent">${a.id==='citizen'?'Likely within the eligibility threshold; two documents missing. Routing a case summary to a case officer.':'That route is not compliant at 180,000 SAR. Recommending the competitive quotation route and drafting the package for a procurement officer.'}<span class="cite">Policy-grounded · redaction applied · human handoff prepared</span></div>
+    </div>
+    <div class="note gov" style="margin-top:12px"><span class="ni">◆</span><div>No production data. The developer is checking behavior and capturing evidence before the new version is published.</div></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="ft"><button class="btn ghost" data-go="runtime">Back</button><button class="btn primary" data-go="evidence">See evidence →</button></div></div>`;
+}
+
+function scrEvidence(){const a=A();
+  return `<h2>Evidence</h2><p class="lede">The lifecycle and evidence trail behind the agent's Trust Score. It turns a tested agent into a publishable one, and travels with the agent into the Marketplace.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Lifecycle &amp; audit trail</h3>${badge('gov','immutable')}</div><div class="bd"><ul class="tl">
+      <li><div class="tt">Plan generated</div><div class="td">Sandbox template ${a.template.version} matched, Sovereign Runtime + governance resolved.</div><div class="ts">09:41</div></li>
+      <li><div class="tt">Plan approved</div><div class="td">Audit record written.</div><div class="ts">09:42</div></li>
+      <li><div class="tt">Provisioned + deployed</div><div class="td">All Sovereign Runtime blocks READY · deployment record v1.5 · KSA Riyadh.</div><div class="ts">09:43</div></li>
+      <li><div class="tt">Tested on synthetic data</div><div class="td">${a.id==='citizen'?'4 redactions':'3 redactions'} · policy traces captured.</div><div class="ts">09:45</div></li>
+      <li><div class="tt">Human handoff recorded</div><div class="td">Structured case package routed to the ${a.officer} queue. The agent did not make the final decision.</div><div class="ts">09:46</div></li>
+      <li><div class="tt">Submitted for certification</div><div class="td">Queued for domain champion sign-off before listing (preview).</div><div class="ts">09:47</div></li>
+    </ul></div></div>
+    <div class="card"><div class="hd"><h3>Runtime &amp; governance</h3></div><div class="bd"><div class="kv">
+      <div class="k">Runtime</div><div class="v">Sovereign Runtime · KSA Riyadh ${badge('gov','running')}</div>
+      <div class="k">Provisioning</div><div class="v">As code · cloud abstracted</div>
+      <div class="k">Egress</div><div class="v">Deny-all except approved ${badge('lock','🔒')}</div>
+      <div class="k">Redactions</div><div class="v">${a.id==='citizen'?'4 applied':'3 applied'}</div>
+      <div class="k">Policy traces</div><div class="v">All claims linked to approved rules</div>
+      <div class="k">Deployment record</div><div class="v">v1.5 · developer@msa-gov</div></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="hd"><h3>Trust Score</h3>${PRISM}</div><div class="bd"><div class="scorewrap">${trustCells(a)}</div>
+    <div class="note info" style="margin-top:12px"><span class="ni">i</span><div>The Trust Score is a composite of evaluation, audit completeness, policy grounding and governance. It measures readiness to trust, not raw model accuracy.</div></div>
+    <div class="note preview" style="margin-top:10px"><span class="ni">Preview</span><div>If Prism lands by LEAP these are live Prism scores; otherwise it is a mock evaluation of the same shape. Certification (domain champion sign-off) is shown as preview.</div></div></div>
+    <div class="ft"><button class="btn ghost" data-go="test">Back</button><button class="btn primary" data-go="publish">Submit to Marketplace →</button></div></div>`;
+}
+
+function scrPublish(){const a=A();
+  return `<h2>Submit v1.5 to Marketplace</h2><p class="lede">The supply side ends here. Version <b>v1.5</b> is submitted carrying its Trust Score and evidence. Publishing is gated behind certification: a domain champion signs off before v1.5 replaces v1.4 as the live listing. The live v1.4 keeps serving until then.</p>
+  <div class="card"><div class="hd"><h3>${a.name} · v1.5</h3><span>${trustBadge(a)} ${badge('preview','certification gate · preview')}</span></div><div class="bd">
+    <ul class="checklist"><li class="ok"><span class="ck">✓</span>Trust Score and evaluation evidence attached</li><li class="ok"><span class="ck">✓</span>Audit trail + deployment record (v1.5) attached</li><li class="ok"><span class="ck">✓</span>Policy traces captured</li><li class="wait"><span class="ck">…</span>Domain champion sign-off — in the domain champion queue (preview)</li></ul>
+    <div class="note preview" style="margin-top:14px"><span class="ni">Preview</span><div>The domain-champion queue and certification gating are shown for direction. On sign-off, v1.5 becomes the live listing and v1.4 is retained for rollback.</div></div></div>
+    <div class="ft"><button class="btn ghost" data-go="evidence">Back</button><button class="btn primary" data-go="market">View Marketplace →</button></div></div>`;
+}
+
+/* ---------- MARKETPLACE (demand side) ---------- */
+function scrMarket(){
+  const pub=AGENTS_INDEX.filter(e=>e.life==='Published');
+  const cards=pub.map(e=>`<div class="agentcard" data-list="${e.id}"><div class="ico">${e.code}</div><div class="meta"><div class="nm">${e.name}</div><div class="sub">${e.purpose}</div><div class="tags">${badge('gov','◆ KSA sovereign')} ${e.trust?badge('teal','Trust '+e.trust):badge('muted','no score')} ${badge('gov','published')} ${state.acquired.has(e.id)?badge('teal','✓ acquired'):''}</div></div></div>`).join("");
+  return `<h2>Marketplace</h2><p class="lede">The demand side. Only <b>published</b> agents are listed — each has passed certification and carries a Trust Score and its evidence. This is where ministries and agencies discover and consume agents. It is separate from the build path.</p>
+  <div class="note info" style="margin-bottom:14px"><span class="ni">i</span><div>Single-tenant today. Open, self-serve consumption across the Kingdom is the end-state demand model, sequenced after the supply-side foundation.</div></div>
+  <div class="grid2">${cards}</div>`;
+}
+function scrListing(){const a=A();
+  const gov=a.gov.map(g=>`<div class="k">${g[0]}</div><div class="v">${g[1]}</div>`).join("");
+  return `<h2>${a.name}</h2><p class="lede">A published listing. A consumer reads the Trust Score and the evidence and governance behind it, trusts it, then runs the agent. This is consumption, on the demand side, not the developer journey.</p>
+  <div class="card"><div class="hd"><h3>${a.name}</h3><span>${trustBadge(a)} ${badge('gov','◆ KSA sovereign')} ${badge('preview','review-ready')}</span></div><div class="bd">
+    <div class="small">${a.purpose} · runtime ${a.runtime} · tenant msa-gov · publisher Ministry of Social Affairs</div></div></div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card"><div class="hd"><h3>Evidence behind the Trust Score</h3>${PRISM}</div><div class="bd">
+      <div class="scorewrap" style="margin:0 0 12px">${trustCells(a)}</div>
+      <div class="kv"><div class="k">Deployment record</div><div class="v">v1.4 · main@8f2a1c · developer@msa-gov</div><div class="k">Audit trail</div><div class="v">Plan → approve → provision → test → handoff (immutable)</div><div class="k">Policy traces</div><div class="v">Every claim linked to approved rules</div><div class="k">Redactions</div><div class="v">${a.id==='citizen'?'4 applied':'3 applied'}</div><div class="k">Human handoff</div><div class="v">Routed to ${a.officer} queue</div></div></div></div>
+    <div class="card"><div class="hd"><h3>Governance &amp; sovereignty</h3>${badge('gov','explicit')}</div><div class="bd"><div class="kv">${gov}
+      <div class="k">Placement</div><div class="v">KSA · Riyadh ${badge('gov','sovereign')}</div>
+      <div class="k">Runtime</div><div class="v">Sovereign Runtime (provisioned as code)</div>
+      <div class="k">Certification</div><div class="v">Domain champion sign-off ${badge('preview','preview')}</div></div>
+      <div class="note gov" style="margin-top:12px"><span class="ni">◆</span><div>Access to the agent follows its data classification. The cloud substrate is abstracted by the Sovereign Runtime, so the listing is in-Kingdom by construction.</div></div></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="ft" style="justify-content:space-between"><span class="small">Same package pattern reuses across ministries.</span><span><button class="btn ghost" data-go="market">Back to Marketplace</button><button class="btn primary" data-go="scenario">Run this agent →</button></span></div></div>`;
+}
+function scrScenario(){const a=A();const s=a.scenario;
+  const bubs=s.turns.map(t=>{if(t.who==='user')return `<div class="bub user">${t.text}</div>`;let inner="";if(t.guard)inner+=`<span class="gtag">⚠ Guardrail · non-compliant route blocked</span>`;inner+=t.text;if(t.cite)inner+=`<span class="cite">${t.cite}</span>`;if(t.handoff)inner+=`<span class="cite">↪ Human-in-the-loop: structured package routed to the ${a.officer} queue. The agent does not make the final decision.</span>`;return `<div class="bub agent${t.guard?' guard':''}">${inner}</div>`;}).join("");
+  return `<h2>Run Agent · ${a.persona}</h2><p class="lede">Demand side. A consumer uses the published agent. This is the runtime behavior a ministry sees, running in policy on synthetic data for the preview.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>${s.title}</h3>${badge('gov','◆ in policy')}</div><div class="bd"><div class="chat">${bubs}</div></div><div class="ft"><span class="small" style="margin-right:auto">Consuming: ${a.name}</span><button class="btn" data-go="listing">Back to listing</button></div></div>
+    <div class="card"><div class="hd"><h3>What governance did here</h3></div><div class="bd"><ul class="tl">
+      <li><div class="tt">Policy-grounded answers</div><div class="td">Every claim cites approved rules.</div></li>
+      <li><div class="tt">Redaction applied</div><div class="td">Identifiers redacted before logs.</div></li>
+      <li><div class="tt">Guardrail held</div><div class="td">${a.id==='citizen'?'No final benefit decision made by the agent.':'A non-compliant route was refused, not executed.'}</div></li>
+      <li><div class="tt">Human handoff</div><div class="td">Structured package routed to the ${a.officer}.</div></li>
+    </ul><div class="note gov"><span class="ni">◆</span><div>No production data. Synthetic fixtures only.</div></div></div></div>
+  </div>`;
+}
+
+/* ---------- SECONDARY ---------- */
+function scrTemplates(){return `<p class="lede">Approved sandbox configurations available to your tenant. Agents are matched to these during Resolve. Developers do not build infrastructure here. Each template assembles the Sovereign Runtime from its building blocks.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>basic-python-sandbox</h3>${badge('muted','system default')}</div><div class="bd"><div class="kv"><div class="k">Version</div><div class="v">v1.0.0</div><div class="k">Runtime</div><div class="v">python 3.11</div><div class="k">CPU / Mem</div><div class="v">2 vCPU · 4Gi · GPU no</div><div class="k">Services</div><div class="v">postgres</div><div class="k">Runtime blocks</div><div class="v"><span class="small">Network · Cluster · Compute · Database</span></div></div></div></div>
+    <div class="card"><div class="hd"><h3>Advance-python-sandbox</h3>${badge('gov','active')}</div><div class="bd"><div class="kv"><div class="k">Version</div><div class="v">v1.0.0</div><div class="k">Runtime</div><div class="v">python 3.11</div><div class="k">CPU / Mem</div><div class="v">4 vCPU · 8Gi · GPU no</div><div class="k">Services</div><div class="v">postgres</div><div class="k">Runtime blocks</div><div class="v"><span class="small">Network · Cluster · Compute · Identity · Database · Storage · Secrets · Registry</span></div></div></div></div>
+  </div>
+  <div class="row" style="margin-top:14px"><button class="btn" id="reqExt">Request extension</button><button class="btn" data-modal="reqtpl">Request new template</button></div>
+  <div id="extNote"></div>`;
+}
+function scrSandboxes(){
+  const cards=SANDBOXES.map(sb=>{const a=AGENTS[sb.agentId];return `<div class="agentcard" data-sbx="${sb.id}"><div class="ico">▦</div><div class="meta"><div class="nm">${sb.id}</div><div class="sub">Sandbox for ${a.name}</div><div class="tags">${badge(sb.statusBadge,sb.status)} ${badge('muted',sbxCompute(a))} ${badge('muted','KSA · Riyadh')} ${badge('teal','8 runtime blocks')}</div></div></div>`;}).join("");
+  return `<p class="lede">Provisioned runtimes, each attached to an agent and assembled from the Sovereign Runtime building blocks. Click one to see its compute, scaling, network, and cost. Nothing is created from this screen; idle sandboxes auto-suspend on a time-to-live.</p>
+  <div class="grid2">${cards}</div>
+  <div class="note info" style="margin-top:18px"><span class="ni">i</span><div>Bare environments are created only in Admin. Every sandbox here is owned by an agent, so none are left orphaned and billing.</div></div>`;
+}
+function scrRequests(){return `<p class="lede">Template and extension requests you have raised. These route to a tenant admin for approval. You cannot self-provision a bare environment; you request a template instead.</p>
+  <div class="card"><div class="hd"><h3>Open requests</h3><button class="btn sm" data-modal="reqtpl">+ New request</button></div><div class="bd"><div class="kv" style="grid-template-columns:1.6fr 1fr 1fr 1fr"><div class="k">Request</div><div class="k">Type</div><div class="k">Routed to</div><div class="k">Status</div>
+    <div class="v">Custom GPU runtime profile</div><div class="v">New template</div><div class="v">Tenant admin</div><div class="v">${badge('preview','pending approval')}</div>
+    <div class="v">Advance-python-sandbox · +memory</div><div class="v">Extension</div><div class="v">Tenant admin</div><div class="v">${badge('gov','approved')}</div>
+    <div class="v">Node 20 template</div><div class="v">New template</div><div class="v">Tenant admin</div><div class="v">${badge('gov','approved → published')}</div></div></div></div>`;
+}
+function scrEvals(){
+  const cards=EVALS.map(ev=>{const a=AGENTS[ev.agentId];return `<div class="agentcard" data-eval="${ev.id}"><div class="ico">✓</div><div class="meta"><div class="nm">${a.name} · v1.4</div><div class="sub">${ev.suite}</div><div class="tags">${badge('teal','Trust '+a.trustScore)} ${badge('muted',ev.focus)} ${badge('gov','pass')} ${badge('muted',ev.scenarios+' scenarios')}</div></div></div>`;}).join("");
+  return `<h2>Evaluations</h2><p class="lede">Evaluation runs and the Trust Score per agent version. Click a run to see the score breakdown, suite details, and scenario-level checks. ${`<span class="badge preview">Prism if it lands by LEAP · otherwise mock evaluation</span>`}</p>
+  <div class="grid2">${cards}</div>
+  <div class="note info" style="margin-top:18px"><span class="ni">i</span><div>epic HUMAIN-111 · evaluation evidence travels with the agent into the Marketplace.</div></div>`;
+}
+function scrData(){return `<h2>Data Catalog</h2><p class="lede">Datasets available to attach to sandboxes. Synthetic and mock sources for safe testing. No production citizen or enterprise data is used in the preview.</p>
+  <div class="card"><div class="bd"><div class="kv" style="grid-template-columns:1.4fr 1fr 1fr"><div class="k">Dataset</div><div class="k">Type</div><div class="k">Used by</div>
+    <div class="v">synthetic-citizen-records</div><div class="v">${badge('muted','synthetic')}</div><div class="v">Citizen Support Agent</div>
+    <div class="v">synthetic-procurement-records</div><div class="v">${badge('muted','synthetic')}</div><div class="v">Procurement Compliance Agent</div></div></div></div>`;
+}
+function scrTenancy(){return `<div class="note preview" style="margin-bottom:14px"><span class="ni">🔒</span><div><b>Admin access only.</b> Tenancy governance, template authoring, and bare environment creation. Kept out of the developer path so a runtime is never created without an agent attached.</div></div>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Tenants &amp; quotas</h3>${badge('gov','governed')}</div><div class="bd"><div class="kv" style="grid-template-columns:1.4fr 1fr 1fr"><div class="k">Tenant</div><div class="k">Sandbox quota</div><div class="k">Status</div>
+      <div class="v">msa-gov</div><div class="v">8 / 20</div><div class="v">${badge('gov','active')}</div>
+      <div class="v">moh-gov</div><div class="v">3 / 15</div><div class="v">${badge('gov','active')}</div>
+      <div class="v">pif-enterprise-01</div><div class="v">1 / 10</div><div class="v">${badge('muted','onboarding')}</div></div>
+      <div class="note info" style="margin-top:12px"><span class="ni">i</span><div>Quotas and policy limits are enforced per tenant. Every tenant's Sovereign Runtime is placed in-Kingdom.</div></div></div></div>
+    <div class="card"><div class="hd"><h3>Approved templates</h3>${badge('gov','tenant: msa-gov')}</div><div class="bd"><div class="kv" style="grid-template-columns:1fr auto"><div class="k">basic-python-sandbox</div><div class="v">v1.0.0 ${badge('gov','active')}</div><div class="k">Advance-python-sandbox</div><div class="v">v1.0.0 ${badge('gov','active')}</div><div class="k">Advance-node-sandbox</div><div class="v">v1.0.0 ${badge('gov','active')}</div><div class="k">Custom GPU profile</div><div class="v">${badge('preview','pending')}</div></div></div>
+      <div class="ft"><button class="btn" data-modal="authtpl">+ Author template</button></div></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="hd"><h3>Bare environment creation</h3>${badge('alert','admin scope')}</div><div class="bd">
+    <p>Creating an empty sandbox with no agent attached is allowed here, for template authoring and platform testing only.</p>
+    <button class="btn" data-modal="bareenv">Create bare environment</button></div></div>`;
+}
+function scrException(){const a=A();return `<h2>Request a Template</h2><p class="lede">This path only appears when no approved template matches the agent. It is not part of the normal golden path. The request goes to an admin for approval.</p>
+  <div class="grid2">
+    <div class="card"><div class="hd"><h3>Why you are here</h3>${badge('alert','no approved match')}</div><div class="bd"><p>The agent declared a configuration none of the approved templates for <b>msa-gov</b> can satisfy. You cannot self-provision a bare environment. Request a new template instead.</p><div class="kv" style="margin-top:8px"><div class="k">Unmatched need</div><div class="v">Custom GPU runtime profile</div><div class="k">Routes to</div><div class="v">Tenant admin · template author</div></div></div><div class="ft"><button class="btn ghost" data-go="plan">Back to plan</button><button class="btn primary" id="reqTpl">Submit template request</button></div></div>
+    <div class="card"><div class="hd"><h3>Approval queue</h3><span class="small">admin view</span></div><div class="bd"><ul class="tl" id="apprTl"><li><div class="tt">Request drafted</div><div class="td">Custom GPU runtime profile for ${a.name}.</div></li></ul><div class="note info"><span class="ni">i</span><div>Once an admin approves and publishes the template, it becomes a matched option and the agent returns to the normal resolve path.</div></div></div></div>
+  </div>`;
+}
+
+/* ---------- OVERLAYS: drawer + modal ---------- */
+function openDrawer(html){const d=$("#drawer");d.innerHTML=html;$("#scrim").classList.add('show');d.classList.add('open');bindDrawer();}
+function openModal(html){$("#mbox").innerHTML=html;$("#scrim").classList.add('show');$("#modal").classList.add('open');bindModal();}
+function closeOverlays(){$("#drawer").classList.remove('open');$("#modal").classList.remove('open');$("#scrim").classList.remove('show');}
+function openNamedModal(n){const M={reqtpl:modalReqTpl,authtpl:modalAuthTpl,bareenv:modalBareEnv};if(M[n])openModal(M[n]());}
+function verPanel(a){return `
+  <div class="verrow"><span><b>v1.5</b> · main@8f2a1c · developer@msa-gov</span>${badge('preview','pending publish')}<span class="small">awaiting sign-off</span></div>
+  <div class="verrow"><span><b>v1.4</b> · main@2b9c10</span>${badge('gov','current · live')}<button class="btn sm" data-act="redeploy">Redeploy</button></div>
+  <div class="verrow"><span><b>v1.3</b> · main@b1d77a</span><span class="small">yesterday</span><button class="btn sm" data-act="roll" data-v="v1.3">Roll back</button></div>
+  <div class="note info" id="drNote" style="margin-top:10px"><span class="ni">i</span><div>Roll back or redeploy in one action; each writes a new deployment record (HUMAIN-184 / 182).</div></div>
+  <hr class="sep"/><div class="lbl">Deployment record</div>
+  <div class="kv" style="margin-top:6px;grid-template-columns:120px 1fr"><div class="k">Version</div><div class="v">v1.4 ${badge('gov','current')}</div><div class="k">Source</div><div class="v">git main@8f2a1c · ${a.deployCfg[0][1]}</div><div class="k">Actor</div><div class="v">developer@msa-gov</div><div class="k">Placement</div><div class="v">KSA · Riyadh</div></div>`;}
+function evPanel(a){return `
+  <div class="scorewrap" style="grid-template-columns:repeat(2,1fr)">${trustCells(a)}</div>
+  <div class="note info" style="margin-top:12px"><span class="ni">i</span><div>Trust Score is a composite of evaluation, audit, policy grounding and governance — readiness to trust, not raw accuracy.</div></div>
+  <hr class="sep"/><div class="lbl">Audit trail</div>
+  <ul class="tl" style="margin-top:8px"><li><div class="tt">Plan approved</div><div class="td">Audit record written.</div></li><li><div class="tt">Provisioned + deployed</div><div class="td">All Sovereign Runtime blocks READY · v1.4.</div></li><li><div class="tt">Tested on synthetic data</div><div class="td">Policy traces captured.</div></li><li><div class="tt">Human handoff</div><div class="td">Routed to the ${a.officer} queue.</div></li></ul>`;}
+function govPanel(a){const gov=a.gov.map(g=>`<div class="k">${g[0]}</div><div class="v">${g[1]}</div>`).join("");
+  return `<div class="kv" style="grid-template-columns:140px 1fr">${gov}<div class="k">Placement</div><div class="v">KSA · Riyadh ${badge('gov','sovereign')}</div><div class="k">Runtime</div><div class="v">Sovereign Runtime (as code)</div><div class="k">Certification</div><div class="v">Domain champion sign-off ${badge('preview','preview')}</div></div>`;}
+function agentDrawer(id,ctx){
+  const e=AGENTS_INDEX.find(x=>x.id===id);const full=e.full;const a=full?AGENTS[id]:null;
+  const pos=LIFE.indexOf(e.life);
+  const track=LIFE.map(s=>`<span class="chip ${s===e.life?'sel':''}" style="cursor:default">${s}</span>`).join("");
+  const blocks=full?`<div class="lbl" style="margin-top:16px">Sovereign Runtime</div><div class="resgrid" style="margin-top:6px">${blockCards('READY')}</div>`:`<div class="note info" style="margin-top:14px"><span class="ni">i</span><div>Directory entry for this preview. Use the action below to take it to its next lifecycle step. Full evidence and run are wired for the two reference agents.</div></div><div class="note info" id="mNote" style="display:none;margin-top:12px"></div>`;
+  const overview=`<div class="row" style="gap:6px;margin-bottom:12px">${badge(lifeClass(e.life),e.life)} ${e.trust?badge('teal','Trust '+e.trust):badge('muted','no score yet')} ${badge('muted',e.runtime)} ${badge('muted','tenant: '+e.tenant)}</div>
+    <p class="small">${e.purpose}</p>
+    <div class="lbl" style="margin-top:10px">Lifecycle · stage ${pos+1} of ${LIFE.length}</div><div class="row" style="gap:6px;margin-top:6px">${track}</div>${blocks}`;
+  const tabs=[["overview","Overview"]];let panels=`<div class="dpanel sel" data-panel="overview">${overview}</div>`;
+  if(full){tabs.push(["versions","Versions"],["evidence","Evidence"],["gov","Governance"]);
+    panels+=`<div class="dpanel" data-panel="versions">${verPanel(a)}</div><div class="dpanel" data-panel="evidence">${evPanel(a)}</div><div class="dpanel" data-panel="gov">${govPanel(a)}</div>`;}
+  const tabsHTML=tabs.map((t,i)=>`<div class="dtab ${i===0?'sel':''}" data-tab="${t[0]}">${t[1]}</div>`).join("");
+  let acts=`<button class="btn ghost" data-act="close">Close</button>`;
+  if(full&&ctx==='market')acts+=`<button class="btn primary" data-act="scenario" data-id="${id}">Run this agent →</button>`;
+  else if(full)acts+=`<button class="btn" data-act="scenario" data-id="${id}">Run (demo)</button><button class="btn primary" data-act="journey" data-id="${id}">Submit new version →</button>`;
+  else if(e.life==='Published')acts+=`<button class="btn primary" data-act="mmarket" data-id="${id}">View in Marketplace →</button>`;
+  else acts+=`<button class="btn primary" data-act="advance" data-id="${id}">${STEPVERB[e.life]||'Advance →'}</button>`;
+  return `<div class="dhd"><div><h3>${e.name}</h3><div class="small">${ctx==='market'?'Marketplace listing':'Agent'} · ${id}</div></div><button class="dclose" data-act="close">✕</button></div>
+    <div class="dtabs">${tabsHTML}</div><div class="dbody">${panels}</div><div class="dfoot">${acts}</div>`;
+}
+function bindDrawer(){const d=$("#drawer");
+  d.querySelectorAll('.dtab').forEach(t=>t.onclick=()=>{const k=t.getAttribute('data-tab');d.querySelectorAll('.dtab').forEach(x=>x.classList.toggle('sel',x===t));d.querySelectorAll('.dpanel').forEach(p=>p.classList.toggle('sel',p.getAttribute('data-panel')===k));});
+  d.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{const act=b.getAttribute('data-act');
+    if(act==='close')closeOverlays();
+    else if(act==='journey'){closeOverlays();startJourney(b.getAttribute('data-id'));}
+    else if(act==='scenario')openModal(modalScenario(b.getAttribute('data-id')));
+    else if(act==='roll'||act==='redeploy'){const n=$("#drNote");if(n){n.className='note gov';n.innerHTML='<span class="ni">✓</span><div>'+(act==='roll'?('Rolled back to '+b.getAttribute('data-v')):'Redeployed v1.4')+' in one action. A new deployment record was written.</div>';}}
+    else if(act==='openagent')openDrawer(agentDrawer(b.getAttribute('data-id'),'build'));
+    else if(act==='sbxop'){const n=$("#sbxNote");if(n){n.className='note gov';n.innerHTML='<span class="ni">✓</span><div>'+b.getAttribute('data-op')+' requested for this sandbox. The control-plane records the action and logs a lifecycle event.</div>';}}
+    else if(act==='rerun'){const n=$("#evNote");if(n){n.style.display='block';n.className='note gov';n.innerHTML='<span class="ni">✓</span><div>Suite re-queued on the current sandbox. Results will attach to v1.4 as new evidence.</div>';}}
+    else if(act==='advance')advanceMock(b.getAttribute('data-id'));
+    else if(act==='mmarket')listAgent(b.getAttribute('data-id'));
+    else if(act==='acquire')openModal(modalAcquire(b.getAttribute('data-id')));
+    else if(act==='library'){closeOverlays();go('agents');}
+  });
+}
+function modalScenario(id){const a=AGENTS[id];const s=a.scenario;
+  const bubs=s.turns.map(t=>{if(t.who==='user')return `<div class="bub user">${t.text}</div>`;let inner="";if(t.guard)inner+=`<span class="gtag">⚠ Guardrail · non-compliant route blocked</span>`;inner+=t.text;if(t.cite)inner+=`<span class="cite">${t.cite}</span>`;if(t.handoff)inner+=`<span class="cite">↪ Human-in-the-loop: routed to the ${a.officer} queue. The agent does not make the final decision.</span>`;return `<div class="bub agent${t.guard?' guard':''}">${inner}</div>`;}).join("");
+  return `<div class="mhd"><h3>Run · ${a.persona}</h3><button class="dclose" data-act="close">✕</button></div><div class="mbd"><div class="row" style="gap:6px;margin-bottom:10px">${badge('gov','◆ in policy')} ${badge('muted',a.name)} ${badge('muted','synthetic data')}</div><div class="chat">${bubs}</div><div class="note gov" style="margin-top:12px"><span class="ni">◆</span><div>No production data. Policy-grounded, redacted, with a human handoff to the ${a.officer}.</div></div></div>`;}
+function modalAuthTpl(){return `<div class="mhd"><h3>Author template</h3><button class="dclose" data-act="close">✕</button></div><div class="mbd">
+  <label class="flbl">Template name</label><input class="fld" id="tplName" placeholder="e.g. gov-gpu-python-sandbox"/>
+  <div class="row" style="margin-top:4px"><div style="flex:1"><label class="flbl">Runtime</label><input class="fld" value="python 3.11"/></div><div style="flex:1"><label class="flbl">CPU / Memory</label><input class="fld" value="8 vCPU · 16Gi"/></div></div>
+  <label class="flbl">Sovereign Runtime blocks</label><input class="fld" value="Network · Cluster · Compute · Identity · Database · Storage · Secrets · Registry"/>
+  <div id="authDone"></div>
+  <div class="dfoot" style="padding:14px 0 0;border:none;background:none"><button class="btn ghost" data-act="close">Cancel</button><button class="btn primary" id="authSave">Publish template</button></div></div>`;}
+function modalBareEnv(){return `<div class="mhd"><h3>Create bare environment</h3><button class="dclose" data-act="close">✕</button></div><div class="mbd">
+  <div class="note preview"><span class="ni">⚠</span><div>Bare environments have no agent and no auto-suspend owner. Use only for template authoring or platform testing.</div></div>
+  <label class="flbl">Environment name</label><input class="fld" id="bareName" placeholder="e.g. tpl-author-scratch"/>
+  <label class="flbl">Region</label><input class="fld" value="KSA · Riyadh"/>
+  <div id="bareDone"></div>
+  <div class="dfoot" style="padding:14px 0 0;border:none;background:none"><button class="btn ghost" data-act="close">Cancel</button><button class="btn primary" id="bareCreate">Create environment</button></div></div>`;}
+function modalReqTpl(){return `<div class="mhd"><h3>Request a template</h3><button class="dclose" data-act="close">✕</button></div><div class="mbd">
+  <p class="small">No approved template matched. You cannot self-provision a bare environment; request a new template and it routes to a tenant admin.</p>
+  <div class="kv" style="margin-top:8px;grid-template-columns:140px 1fr"><div class="k">Unmatched need</div><div class="v">Custom GPU runtime profile</div><div class="k">Routes to</div><div class="v">Tenant admin · template author</div></div>
+  <ul class="tl" id="apprTl" style="margin-top:12px"><li><div class="tt">Request drafted</div><div class="td">Custom GPU runtime profile.</div></li></ul>
+  <div class="dfoot" style="padding:14px 0 0;border:none;background:none"><button class="btn ghost" data-act="close">Cancel</button><button class="btn primary" id="reqTpl">Submit request</button></div></div>`;}
+function bindModal(){const m=$("#mbox");
+  m.querySelectorAll('[data-act="close"]').forEach(b=>b.onclick=closeOverlays);
+  const as=m.querySelector('#authSave');if(as)as.onclick=()=>{const nm=(m.querySelector('#tplName').value||'new-template');m.querySelector('#authDone').innerHTML=`<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Template <b>${nm}</b> published to msa-gov. It is now a matchable option in Resolve.</div></div>`;as.disabled=true;as.textContent="Published";};
+  const bcr=m.querySelector('#bareCreate');if(bcr)bcr.onclick=()=>{const nm=(m.querySelector('#bareName').value||'bare-env');m.querySelector('#bareDone').innerHTML=`<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Bare environment <b>${nm}</b> created in-Kingdom for template authoring. No agent attached; excluded from the developer path.</div></div>`;bcr.disabled=true;bcr.textContent="Created";};
+  const rq=m.querySelector('#reqTpl');if(rq)rq.onclick=()=>{m.querySelector('#apprTl').innerHTML+=`<li><div class="tt">Submitted to admin</div><div class="td">Pending approval in the admin queue.</div></li>`;rq.disabled=true;rq.textContent="Request submitted";};
+  const ci=m.querySelector('#chatIn'),cs=m.querySelector('#chatSend');
+  if(ci&&cs){const log=m.querySelector('#chatLog');const a=AGENTS[log.getAttribute('data-aid')];
+    const send=()=>{const v=ci.value.trim();if(!v)return;ci.value='';const u=document.createElement('div');u.className='bub user';u.textContent=v;log.appendChild(u);log.scrollTop=log.scrollHeight;
+      const r=chatReply(a,v);setTimeout(()=>{const b=document.createElement('div');b.className='bub agent'+(r.guard?' guard':'');let h=(r.guard?'<span class="gtag">⚠ Guardrail · non-compliant route flagged</span>':'')+esc(r.text);if(r.cite)h+='<span class="cite">'+esc(r.cite)+'</span>';if(r.handoff)h+='<span class="cite">↪ Routed to the '+a.officer+' queue — the agent does not make the final decision.</span>';b.innerHTML=h;log.appendChild(b);log.scrollTop=log.scrollHeight;},450);};
+    cs.onclick=send;ci.addEventListener('keydown',e=>{if(e.key==='Enter')send();});setTimeout(()=>{ci.focus();},60);}
+  const aq=m.querySelector('#acqBtn');if(aq)aq.onclick=()=>{const id=aq.getAttribute('data-id');state.acquired.add(id);const e=AGENTS_INDEX.find(x=>x.id===id);const full=!!AGENTS[id];
+    const acts=(full?'<button class="btn" id="acqRun">Run it now →</button>':'')+'<button class="btn primary" id="acqLib">View my acquired agents →</button>';
+    m.querySelector('#acqDone').innerHTML='<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Acquired. <b>'+e.name+'</b> is now in your workspace (tenant '+USER.tenant+'), running in-Kingdom under your governance.</div></div><div style="display:flex;gap:10px;margin-top:12px;justify-content:flex-end">'+acts+'</div>';
+    aq.disabled=true;aq.textContent='Acquired';
+    const rb=m.querySelector('#acqRun');if(rb)rb.onclick=()=>openModal(modalChat(id));
+    const lb=m.querySelector('#acqLib');if(lb)lb.onclick=()=>{closeOverlays();go('agents');};
+    cliEcho('out','↳ acquired '+id+' → your workspace ('+USER.tenant+')');};
+}
+
+/* ---------- SANDBOX DRAWER ---------- */
+function cfg(a,label){const r=a.deployCfg.find(c=>c[0]===label);return r?r[1]:'';}
+const SANDBOXES=[
+ {id:"sbx-7f31",agentId:"citizen",status:"Running",statusBadge:"gov",created:"today · 09:43",ttl:"auto-suspend in 7h 50m",costDay:"≈ 310 SAR/day"},
+ {id:"sbx-4a90",agentId:"procurement",status:"Suspended · idle TTL",statusBadge:"muted",created:"yesterday · 14:20",ttl:"resumes on next deploy or test",costDay:"≈ 0 SAR/day while suspended"}
+];
+function sbxCompute(a){return `${cfg(a,'Resource limits (per pod)')} × ${cfg(a,'Initial replicas')}`;}
+function sandboxDrawer(id){
+  const sb=SANDBOXES.find(s=>s.id===id);const a=AGENTS[sb.agentId];
+  const compute=`<div class="kv" style="grid-template-columns:160px 1fr">
+    <div class="k">Resource limits</div><div class="v">${cfg(a,'Resource limits (per pod)')} <span class="small">per pod</span></div>
+    <div class="k">Initial replicas</div><div class="v">${cfg(a,'Initial replicas')}</div>
+    <div class="k">Auto-scaling</div><div class="v">${cfg(a,'Auto-scaling')}</div>
+    <div class="k">Service</div><div class="v">${cfg(a,'Service type')} · port ${cfg(a,'Service port')}</div>
+    <div class="k">Health</div><div class="v">${cfg(a,'Health endpoint')}</div>
+    <div class="k">Runtime</div><div class="v">${a.runtime}</div></div>`;
+  const netdata=`<div class="kv" style="grid-template-columns:160px 1fr">
+    <div class="k">Egress</div><div class="v">${a.gov[0][1]} ${badge('lock','🔒')}</div>
+    <div class="k">Endpoint</div><div class="v">Load-balanced · custom domain</div>
+    <div class="k">Persistent storage</div><div class="v">Attached (Storage block)</div>
+    <div class="k">Dataset</div><div class="v">${a.manifest[6][1]} ${badge('muted','synthetic')}</div>
+    <div class="k">Secrets</div><div class="v">${a.secrets.length} in Secrets Vault</div></div>`;
+  const lifecost=`<div class="kv" style="grid-template-columns:160px 1fr">
+    <div class="k">State</div><div class="v">${badge(sb.statusBadge,sb.status)}</div>
+    <div class="k">Created</div><div class="v">${sb.created}</div>
+    <div class="k">Time-to-live</div><div class="v">${sb.ttl}</div>
+    <div class="k">Cost (est.)</div><div class="v">${sb.costDay} ${badge('preview','attribution preview')}</div>
+    <div class="k">Tagging</div><div class="v"><span class="small">tenant=msa-gov · sandbox=${sb.id} · agent=${a.manifest[0][1]}</span></div></div>
+    <div class="note info" id="sbxNote" style="margin-top:12px"><span class="ni">i</span><div>Cost is attributed per tenant, sandbox and agent via consistent tagging. Idle sandboxes auto-suspend on TTL, so nothing runs orphaned.</div></div>`;
+  const tabs=[["compute","Compute"],["blocks","Runtime"],["net","Network & data"],["life","Lifecycle & cost"]];
+  const panels=`<div class="dpanel sel" data-panel="compute">${compute}</div><div class="dpanel" data-panel="blocks"><div class="resgrid">${blockCards('READY')}</div></div><div class="dpanel" data-panel="net">${netdata}</div><div class="dpanel" data-panel="life">${lifecost}</div>`;
+  const tabsHTML=tabs.map((t,i)=>`<div class="dtab ${i===0?'sel':''}" data-tab="${t[0]}">${t[1]}</div>`).join("");
+  const opBtn=sb.status==='Running'?`<button class="btn" data-act="sbxop" data-op="Suspend">Suspend</button>`:`<button class="btn" data-act="sbxop" data-op="Resume">Resume</button>`;
+  return `<div class="dhd"><div><h3>${sb.id}</h3><div class="small">Sandbox · ${a.manifest[0][1]} · ${badge(sb.statusBadge,sb.status)}</div></div><button class="dclose" data-act="close">✕</button></div>
+    <div class="dtabs">${tabsHTML}</div><div class="dbody">${panels}</div>
+    <div class="dfoot"><button class="btn ghost" data-act="close">Close</button>${opBtn}<button class="btn" data-act="sbxop" data-op="Delete">Delete</button><button class="btn primary" data-act="openagent" data-id="${sb.agentId}">Open agent →</button></div>`;
+}
+function openSandboxDrawer(id){openDrawer(sandboxDrawer(id));}
+
+/* ---------- EVALUATION DRAWER ---------- */
+const EVALS=[
+ {id:"ev-cit-elig",agentId:"citizen",suite:"citizen-eligibility-eval",focus:"Functional",ran:"today · 09:45",dur:"3m 12s",scenarios:24,checks:[["Eligibility within approved threshold","pass"],["Missing-document detection","pass"],["Escalation to case officer","pass"],["PII redaction in logs","pass"],["Refuses final benefit decision","pass"],["Out-of-policy question handling","pass"]]},
+ {id:"ev-cit-safety",agentId:"citizen",suite:"safety-redteam",focus:"Safety",ran:"today · 09:45",dur:"4m 02s",scenarios:30,checks:[["Jailbreak resistance","pass"],["Prompt-injection resistance","pass"],["Harmful-output refusal","pass"],["No data exfiltration","pass"],["Stays in policy under pressure","pass"]]},
+ {id:"ev-pro-comp",agentId:"procurement",suite:"procurement-compliance-eval",focus:"Functional",ran:"today · 09:46",dur:"2m 51s",scenarios:21,checks:[["Threshold detection","pass"],["Budget validation","pass"],["Non-compliant route refusal","pass"],["Compliant package generation","pass"],["Identifier redaction","pass"],["Escalation to procurement officer","pass"]]},
+ {id:"ev-pro-safety",agentId:"procurement",suite:"safety-redteam",focus:"Safety",ran:"today · 09:46",dur:"3m 48s",scenarios:30,checks:[["Jailbreak resistance","pass"],["Prompt-injection resistance","pass"],["Refuses to bypass approvals","pass"],["No vendor-data leakage","pass"],["Stays in policy under pressure","pass"]]}
+];
+function evalDrawer(id){const ev=EVALS.find(e=>e.id===id);const a=AGENTS[ev.agentId];
+  const checks=ev.checks.map(c=>`<div class="verrow"><span>${c[0]}</span><span></span>${badge('gov',c[1])}</div>`).join("");
+  return `<div class="dhd"><div><h3>${a.name} · v1.4</h3><div class="small">${ev.suite} · ${ev.focus} · ${badge('gov','pass')}</div></div><button class="dclose" data-act="close">✕</button></div>
+    <div class="dbody">
+      <div class="lbl">Trust Score breakdown</div>
+      <div class="scorewrap" style="grid-template-columns:repeat(2,1fr);margin-top:6px">${trustCells(a)}</div>
+      <hr class="sep"/><div class="lbl">Suite details</div>
+      <div class="kv" style="margin-top:6px;grid-template-columns:150px 1fr"><div class="k">Suite</div><div class="v">${ev.suite}</div><div class="k">Dataset</div><div class="v">${a.manifest[6][1]} ${badge('muted','synthetic')}</div><div class="k">Scenarios</div><div class="v">${ev.scenarios}</div><div class="k">Runner</div><div class="v">per-sandbox · isolated</div><div class="k">Ran</div><div class="v">${ev.ran} · ${ev.dur}</div></div>
+      <hr class="sep"/><div class="lbl">Scenario checks</div>
+      <div style="margin-top:6px">${checks}</div>
+      <div class="note info" id="evNote" style="display:none"></div>
+      <div class="note preview" style="margin-top:12px"><span class="ni">Preview</span><div>If Prism lands by LEAP these are live Prism results; otherwise a mock evaluation of the same shape.</div></div>
+    </div>
+    <div class="dfoot"><button class="btn ghost" data-act="close">Close</button><button class="btn" data-act="rerun">Re-run suite</button><button class="btn primary" data-act="openagent" data-id="${ev.agentId}">Open agent →</button></div>`;
+}
+function openEvalDrawer(id){openDrawer(evalDrawer(id));}
+
+/* ---------- MOCK AGENT LIFECYCLE PROGRESSION ---------- */
+const NEXT={"Draft":"Review-ready","Resolving":"Review-ready","Provisioning":"Review-ready","Deployed":"Review-ready","In evaluation":"Review-ready","Review-ready":"Published","Needs attention":"Review-ready","Suspended":"Deployed"};
+const STEPVERB={"Draft":"Build, test & evaluate →","Resolving":"Finish & evaluate →","Provisioning":"Finish & evaluate →","Deployed":"Run evaluation →","In evaluation":"Mark review-ready →","Review-ready":"Publish →","Needs attention":"Retry & evaluate →","Suspended":"Resume →"};
+const STEPNOTE={"Review-ready":"Resolved, provisioned, tested and evaluated — ready to submit to the Marketplace.","Published":"Certified by a domain champion. Now live in the Marketplace.","Deployed":"Resumed. The agent is running again."};
+function advanceMock(id){const e=AGENTS_INDEX.find(x=>x.id===id);const prev=e.life;const nx=NEXT[prev];
+  if(!nx){cliEcho('out',id+' is already '+prev+(prev==='Published'?' — open it with:  market '+id:''));return;}
+  e.life=nx;
+  if(!e.trust && (nx==='In evaluation'||nx==='Review-ready'||nx==='Published')) e.trust=String(74+Math.floor(Math.random()*12));
+  let note; if(prev==='Suspended')note='Resumed. The agent is running again.'; else if(prev==='Needs attention')note='Reprovisioned, redeployed and re-evaluated — ready to submit.'; else note=STEPNOTE[nx]||('Advanced to '+nx+'.');
+  state.mini=e; if(typeof refreshGrid==='function')refreshGrid();
+  openDrawer(agentDrawer(id,'build'));
+  const n=$("#mNote"); if(n){n.style.display='block';n.className='note gov';n.innerHTML='<span class="ni">✓</span><div>'+note+'</div>';}
+  cliEcho('out','↳ '+id+': '+prev+' → '+nx+(NEXT[nx]?'   ·   next:  next '+id:(nx==='Published'?'   ·   now live — try:  market '+id:'')));
+}
+
+/* ---------- ACQUIRED (consumer workspace) ---------- */
+function scrLibrary(){const ids=[...state.acquired];
+  if(!ids.length) return `<h2>Acquired agents</h2><p class="lede">Agents you acquire from the Marketplace run here, in your workspace (tenant ${USER.tenant} · ${USER.org}), in-Kingdom under your governance.</p>
+    <div class="note info"><span class="ni">i</span><div>You haven't acquired any agents yet. Open the <b>Marketplace</b>, pick a published agent, and choose <b>Acquire agent</b> — it then appears here to run.</div></div>
+    <div style="margin-top:14px"><button class="btn primary" data-go="market">Browse Marketplace →</button></div>`;
+  const cards=ids.map(id=>{const e=AGENTS_INDEX.find(x=>x.id===id);const full=!!AGENTS[id];return `<div class="agentcard"><div class="ico">${e.code}</div><div class="meta"><div class="nm">${e.name}</div><div class="sub">${e.purpose}</div><div class="tags">${badge('teal','✓ acquired')} ${badge('gov','◆ KSA sovereign')} ${e.trust?badge('muted','Trust '+e.trust):''}</div><div class="row" style="margin-top:10px;gap:8px">${full?`<button class="btn sm primary" data-run="${id}">Chat with agent →</button>`:`<span class="small">Trial wired for reference agents</span>`}<button class="btn sm" data-list="${id}">View listing</button></div></div></div>`;}).join("");
+  return `<h2>Acquired agents</h2><p class="lede">Agents you have acquired from the Marketplace, running in your workspace (tenant ${USER.tenant}), in-Kingdom. You consume them; the publisher manages their build and versions.</p><div class="grid2">${cards}</div>`;
+}
+
+/* ---------- MARKETPLACE (consumer) DRAWER ---------- */
+function marketDrawer(id){
+  const e=AGENTS_INDEX.find(x=>x.id===id);const full=e.full;const a=full?AGENTS[id]:null;
+  const ov=`<div class="row" style="gap:6px;margin-bottom:12px">${badge('gov','◆ Published')} ${e.trust?badge('teal','Trust '+e.trust):badge('muted','no score')} ${badge('gov','◆ KSA sovereign')} ${state.acquired.has(id)?badge('teal','✓ in your workspace'):''}</div>
+    <p class="small">${e.purpose}</p>
+    <div class="lbl" style="margin-top:12px">What you get</div>
+    <ul class="checklist" style="margin-top:8px">
+      <li class="ok"><span class="ck">✓</span>Governed lifecycle — built, tested and certified</li>
+      <li class="ok"><span class="ck">✓</span>Sovereign — runs in-Kingdom, data stays in KSA</li>
+      <li class="ok"><span class="ck">✓</span>Evidence-backed — Trust Score, audit trail, policy traces</li>
+      <li class="ok"><span class="ck">✓</span>Human-in-the-loop on high-risk steps</li>
+    </ul>
+    <div class="kv" style="margin-top:12px;grid-template-columns:130px 1fr"><div class="k">Publisher</div><div class="v">Ministry of Social Affairs</div><div class="k">Certification</div><div class="v">Domain champion ${badge('preview','preview')}</div><div class="k">Access</div><div class="v">Follows the agent's data classification</div></div>
+    ${full?'':`<div class="note info" style="margin-top:12px"><span class="ni">i</span><div>Full evidence and a live trial are wired for the two reference agents in this preview.</div></div>`}`;
+  const tabs=[["overview","Overview"]];let panels=`<div class="dpanel sel" data-panel="overview">${ov}</div>`;
+  if(full){tabs.push(["evidence","Evidence"],["gov","Governance"]);panels+=`<div class="dpanel" data-panel="evidence">${evPanel(a)}</div><div class="dpanel" data-panel="gov">${govPanel(a)}</div>`;}
+  const tabsHTML=tabs.map((t,i)=>`<div class="dtab ${i===0?'sel':''}" data-tab="${t[0]}">${t[1]}</div>`).join("");
+  const owned=state.acquired.has(id);
+  let acts=`<button class="btn ghost" data-act="close">Close</button>`;
+  if(full)acts+=`<button class="btn" data-act="scenario" data-id="${id}">Try the agent →</button>`;
+  acts+= owned ? `<button class="btn primary" data-act="library">Open in my workspace →</button>` : `<button class="btn primary" data-act="acquire" data-id="${id}">Acquire agent</button>`;
+  return `<div class="dhd"><div><h3>${e.name}</h3><div class="small">Marketplace listing · published · consume only</div></div><button class="dclose" data-act="close">✕</button></div>
+    <div class="dtabs">${tabsHTML}</div><div class="dbody">${panels}</div><div class="dfoot">${acts}</div>`;
+}
+function chatReply(a,msg){const m=(msg||'').toLowerCase();const num=(m.match(/\d[\d,]{2,}/)||[])[0];const big=num&&parseInt(num.replace(/,/g,''),10)>=100000;
+  if(a.id==='citizen'){
+    if(/qualif|eligib|benefit|support|subsid|grant/.test(m))return{text:"Eligibility depends on household size and combined monthly income, checked against the approved benefit rules. If you share those two, I can check the threshold.",cite:"Family Support Benefit · income threshold table, clause 3.2 (policy-service)"};
+    if(/document|papers|proof|letter|missing|need/.test(m))return{text:"A complete application usually needs a recent proof of income and an employment-status letter. I can flag anything missing from your case record.",cite:"Required documents checklist (policy-service)"};
+    if(/income|salary|depend|household|child|sar|\d/.test(m))return{text:"Thank you. At that household size and income you are likely within the eligibility threshold. The final amount needs officer judgment, so I won't decide it — I'll route a structured case summary to a human case officer.",cite:"Family Support Benefit · clause 3.2 (policy-service)",handoff:true};
+    return{text:"I can check benefit eligibility, list the documents you need, and route your case to an officer. What would you like to do?"};
+  }
+  if(/direct|purchase|procure|buy|vendor/.test(m)&&(big||/new vendor/.test(m)))return{text:"That route looks non-compliant: direct purchase is only permitted under 100,000 SAR. For this amount, or a new vendor, a competitive quotation process and vendor onboarding are required.",cite:"Procurement thresholds · clause 5.1 (policy-service)",guard:true};
+  if(/budget|fund|code|afford/.test(m))return{text:"Checking the department budget code… funds appear available for the compliant route. I can draft the request against it.",cite:"budget-api · code SOC-TRN-26"};
+  if(/package|draft|prepare|approv|route|submit/.test(m))return{text:"I've drafted the compliant package — request summary, justification, a 3-quote checklist and vendor onboarding — and routed it to a human procurement officer for approval.",handoff:true};
+  if(/purchase|procure|buy|vendor|\d/.test(m))return{text:"Got it. I'll check the amount and vendor against policy thresholds and budget. What's the amount, and is the vendor already approved?"};
+  return{text:"Tell me the amount, vendor and scope, and I'll validate it against policy and budget, then prepare a compliant package."};
+}
+function modalChat(id){const a=AGENTS[id];
+  const greet=a.id==='citizen'?"As-salāmu ʿalaykum. I'm the Citizen Support Agent. I can check benefit eligibility, the documents you need, and route your case to an officer. How can I help?":"Hello. I'm the Procurement Compliance Agent. Describe what you need to procure and I'll check policy and budget, then prepare a compliant package.";
+  return `<div class="mhd"><h3>Chat · ${a.name}</h3><button class="dclose" data-act="close">✕</button></div><div class="mbd">
+    <div class="row" style="gap:6px;margin-bottom:10px">${badge('gov','◆ running in-Kingdom')} ${badge('teal','✓ in your workspace')} ${badge('muted','synthetic data')}</div>
+    <div class="chat" id="chatLog" data-aid="${id}" style="max-height:46vh;overflow:auto;padding:2px"><div class="bub agent">${greet}</div></div>
+    <div class="row" style="gap:8px;margin-top:12px;flex-wrap:nowrap"><input id="chatIn" class="fld" style="flex:1" placeholder="Type a message…" autocomplete="off"/><button class="btn primary" id="chatSend">Send</button></div>
+    <div class="note gov" style="margin-top:10px"><span class="ni">◆</span><div>Policy-grounded, redacted, in-Kingdom. High-risk decisions route to a human, not the agent.</div></div></div>`;
+}
+function qsSlug(s){return (s||'agent').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'new-agent';}
+function qsName(d){d=(d||'').trim().replace(/^(an?|the|build|create|make|set\s+up|i\s+want\s+to|i\s+want|i\s+need|provision)\s+/i,'').trim();d=(d.split(/[.,\n]/)[0]||'');if(!d)return 'New Agent';if(d.length>44)d=d.slice(0,44).trim();return d.charAt(0).toUpperCase()+d.slice(1);}
+function createQuickAgent(desc){const id='quickstart';const nm=qsName(desc);
+  AGENTS[id]=Object.assign({},AGENTS.citizen,{id:id,code:'QS',name:nm,purpose:(desc&&desc.length<70?desc:'Created with Quick Start'),manifest:AGENTS.citizen.manifest.map((m,i)=>i===0?['name',qsSlug(nm)]:m)});}
+const QSNOTE={submit:'Submitting the agent package…',resolve:'Resolving — matched a sandbox template and assembling the Sovereign Runtime.',plan:'Here is the generated plan. Tweak the dropdowns if you like, or say “approve”.',deploy:'Provisioning the runtime in-Kingdom — applying the blocks.',runtime:'Runtime is live — all blocks READY.',test:'Running the evaluation suite on synthetic data.',evidence:'Evidence captured — Trust Score, audit trail, policy traces.',publish:'Submitted to the Marketplace. That is the full governed path. ✦'};
+function qsAppend(role,html){const log=$("#qsLog");if(!log)return;const d=document.createElement('div');d.className='bub '+(role==='user'?'user':'agent');if(role==='user')d.textContent=html;else d.innerHTML=html;log.appendChild(d);log.scrollTop=log.scrollHeight;}
+function qsSend(){const i=$("#qsIn");if(!i)return;const v=i.value.trim();if(!v)return;i.value='';const p=$("#qsPanel");if(p)p.classList.remove('hidden');qsAppend('user',v);qsHandle(v);}
+function qsHandle(v){const t=v.toLowerCase();
+  const stepMap={submit:'submit',resolve:'resolve',plan:'plan',deploy:'deploy',provision:'deploy',runtime:'runtime',status:'runtime',test:'test',evaluat:'test',evidence:'evidence',publish:'publish'};
+  let target=null;for(const k in stepMap){if(t.indexOf(k)>=0){target=stepMap[k];break;}}
+  const advance=/\b(continue|next|proceed|keep going|go on|yes|do it|approve|ship|onward)\b/.test(t)||t==='go';
+  const inJourney=AGENTS['quickstart']&&state.agentId==='quickstart'&&STEPS.some(s=>s.id===state.screen);
+  const looksDescribe=v.split(/\s+/).length>=4&&!advance&&!target;
+  if(!inJourney||looksDescribe){
+    createQuickAgent(v);
+    qsAppend('agent','Scaffolded <b>'+esc(qsSlug(qsName(v)))+'</b> — python, governed, in-Kingdom. Submitting now; watch the main panel.');
+    startJourney('quickstart');
+    setTimeout(function(){if(typeof animateUpload==='function')animateUpload();},350);
+    setTimeout(function(){qsAppend('agent','Uploaded and validated against schema v1. Say <b>continue</b> to resolve — or name a step: resolve, plan, deploy, test, publish.');},1700);
+    return;
+  }
+  let next; if(target)next=target; else {const i=stepIndex(state.screen);next=STEPS[Math.min(i+1,STEPS.length-1)].id;}
+  state.agentId='quickstart';go(next);
+  qsAppend('agent',QSNOTE[next]||('Moved to '+next+'.'));
+  if(next!=='publish')qsAppend('agent','Say <b>continue</b> for the next step.');
+}
+function modalAcquire(id){const e=AGENTS_INDEX.find(x=>x.id===id);const owned=state.acquired.has(id);
+  return `<div class="mhd"><h3>Acquire · ${e.name}</h3><button class="dclose" data-act="close">✕</button></div><div class="mbd">
+    <p class="small">Add this published agent to your workspace. It runs on the Sovereign Runtime, in-Kingdom, under your tenant's governance. You consume it — you do not manage its build or versions.</p>
+    <div class="kv" style="margin-top:8px;grid-template-columns:150px 1fr"><div class="k">Acquiring as</div><div class="v">${USER.name} · ${USER.role}</div><div class="k">Into workspace</div><div class="v">tenant ${USER.tenant} · ${USER.org}</div><div class="k">Access scope</div><div class="v">Follows the agent's data classification</div><div class="k">Placement</div><div class="v">KSA · Riyadh ${badge('gov','sovereign')}</div><div class="k">Trust Score</div><div class="v">${e.trust?e.trust+' /100':'—'} ${badge('teal','evidenced')}</div></div>
+    <div id="acqDone">${owned?'<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Already in your workspace.</div></div>':''}</div>
+    <div class="dfoot" style="padding:14px 0 0;border:none;background:none"><button class="btn ghost" data-act="close">Close</button><button class="btn primary" id="acqBtn" data-id="${id}" ${owned?'disabled':''}>${owned?'Acquired':'Confirm acquisition'}</button></div></div>`;
+}
+
+function scrInfra(){const tab=state.infraTab||'sandboxes';
+  const T=[['sandboxes','Sandboxes'],['templates','Templates'],['requests','My Requests'],['tenancy','Tenancy 🔒']];
+  const tabs=T.map(t=>`<div class="dtab ${t[0]===tab?'sel':''}" data-infratab="${t[0]}">${t[1]}</div>`).join("");
+  const body=tab==='templates'?scrTemplates():tab==='requests'?scrRequests():tab==='tenancy'?scrTenancy():scrSandboxes();
+  return `<h2>Infrastructure</h2><p class="lede">Runtimes, templates and requests — the platform layer behind your agents. Provisioned as code; bare environments are created only in Admin.</p>
+  <div class="dtabs" style="margin:6px 0 18px;padding:0 4px;border-radius:0">${tabs}</div>
+  <div id="infraBody">${body}</div>`;
+}
+
+/* ---------- ROUTER ---------- */
+const RENDER={agents:scrAgents,detail:scrDetail,mini:scrMini,submit:scrSubmit,resolve:scrResolve,plan:scrPlan,deploy:scrDeploy,runtime:scrRuntime,test:scrTest,evidence:scrEvidence,publish:scrPublish,market:scrMarket,listing:scrListing,scenario:scrScenario,templates:scrTemplates,sandboxes:scrSandboxes,requests:scrRequests,evals:scrEvals,data:scrData,tenancy:scrTenancy,exception:scrException,library:scrLibrary,infra:scrInfra};
+function go(screen){state.screen=screen;$("#screen").innerHTML=(RENDER[screen]||scrAgents)();renderTop();renderStepper();renderNav();renderCLI();window.scrollTo({top:0});bindScreen();if(screen==='resolve')animateResolve();if(screen==='deploy')animateDeploy();}
+function openDetail(id){state.agentId=id;$("#tenantline").textContent=AGENTS[id].tenant;openDrawer(agentDrawer(id,'build'));cliEcho('out','↳ open '+id+' (owner)');}
+function openMini(id){openDrawer(agentDrawer(id,'build'));cliEcho('out','↳ open '+id);}
+function startJourney(id){state.agentId=id;$("#tenantline").textContent=AGENTS[id].tenant;go('submit');}
+function listAgent(id){if(AGENTS[id])state.agentId=id;openDrawer(marketDrawer(id));cliEcho('out','↳ marketplace · '+id+' (consumer)');}
+function bindScreen(){
+  document.querySelectorAll('[data-go]').forEach(el=>{if(el.closest('#nav'))return;el.addEventListener('click',()=>go(el.getAttribute('data-go')));});
+  document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openDetail(el.getAttribute('data-open'))));
+  document.querySelectorAll('[data-journey]').forEach(el=>el.addEventListener('click',()=>startJourney(el.getAttribute('data-journey'))));
+  document.querySelectorAll('[data-list]').forEach(el=>el.addEventListener('click',()=>listAgent(el.getAttribute('data-list'))));
+  document.querySelectorAll('[data-run]').forEach(el=>el.addEventListener('click',()=>openModal(modalChat(el.getAttribute('data-run')))));
+  const ub=$("#upBtn");if(ub)ub.addEventListener('click',e=>{e.stopPropagation();animateUpload();});
+  const uz=$("#upZone");if(uz)uz.addEventListener('click',()=>animateUpload());
+  document.querySelectorAll('[data-mini]').forEach(el=>el.addEventListener('click',()=>openMini(el.getAttribute('data-mini'))));
+  const fSt=$("#fStatus");if(fSt)fSt.addEventListener('change',()=>{state.filter.status=fSt.value;refreshGrid();});
+  const fQ=$("#fq");if(fQ)fQ.addEventListener('input',()=>{state.filter.q=fQ.value;refreshGrid();});
+  document.querySelectorAll('[data-modal]').forEach(el=>el.addEventListener('click',()=>openNamedModal(el.getAttribute('data-modal'))));
+  document.querySelectorAll('[data-sbx]').forEach(el=>el.addEventListener('click',()=>openSandboxDrawer(el.getAttribute('data-sbx'))));
+  document.querySelectorAll('[data-infratab]').forEach(el=>el.addEventListener('click',()=>{state.infraTab=el.getAttribute('data-infratab');go('infra');}));
+  const pm=$("#planMore");if(pm)pm.addEventListener('click',()=>{const d=$("#planDetails");if(d){const hidden=d.classList.toggle('hidden');pm.textContent=hidden?'Show details':'Hide details';}});
+  document.querySelectorAll('[data-eval]').forEach(el=>el.addEventListener('click',()=>openEvalDrawer(el.getAttribute('data-eval'))));
+  document.querySelectorAll('[data-roll]').forEach(el=>el.addEventListener('click',()=>{const n=$("#rollNote");if(n){n.className="note gov";n.innerHTML=`<span class="ni">✓</span><div>Rolled back to ${el.getAttribute('data-roll')} in one action. A new deployment record was written with actor and time.</div>`;}}));
+  document.querySelectorAll('[data-redeploy]').forEach(el=>el.addEventListener('click',()=>{const n=$("#rollNote");if(n){n.className="note gov";n.innerHTML=`<span class="ni">✓</span><div>Redeployed ${el.getAttribute('data-redeploy')}. Sovereign Runtime re-assembled, image rebuilt, new deployment record stamped.</div>`;}}));
+  const rt=$("#reqTpl");if(rt)rt.addEventListener('click',()=>{const tl=$("#apprTl");tl.innerHTML+=`<li><div class="tt">Submitted to admin</div><div class="td">Status: pending approval in the admin queue.</div></li>`;rt.disabled=true;rt.textContent="Request submitted";});
+  const re=$("#runEval");if(re)re.addEventListener('click',()=>{const o=$("#evalOut");o.className="note gov";o.innerHTML=`<span class="ni">✓</span><div>Suite complete on synthetic data. Trust Score ${A().trustScore}, correctness ${A().correctness}, safety pass, access-control pass. Attached to v1.4 as evidence. (Prism if available, otherwise mock — same evidence shape.)</div>`;re.disabled=true;re.textContent="Evaluation complete";});
+  const rx=$("#reqExt");if(rx)rx.addEventListener('click',()=>{const o=$("#extNote");if(o){o.innerHTML=`<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Extension request submitted to the tenant admin. Track it under My Requests.</div></div>`;}rx.disabled=true;});
+  const at=$("#authTpl");if(at)at.addEventListener('click',()=>{$("#authForm").classList.toggle('hidden');});
+  const ac=$("#authCancel");if(ac)ac.addEventListener('click',()=>$("#authForm").classList.add('hidden'));
+  const as=$("#authSave");if(as)as.addEventListener('click',()=>{const nm=($("#tplName").value||'new-template');const d=$("#authDone");d.innerHTML=`<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Template <b>${nm}</b> published to tenant msa-gov. It is now a matchable option in Resolve, assembling the Sovereign Runtime from the chosen blocks.</div></div>`;as.disabled=true;as.textContent="Published";});
+  const bb=$("#bareBtn");if(bb)bb.addEventListener('click',()=>{$("#bareForm").classList.toggle('hidden');});
+  const bc=$("#bareCancel");if(bc)bc.addEventListener('click',()=>$("#bareForm").classList.add('hidden'));
+  const bcr=$("#bareCreate");if(bcr)bcr.addEventListener('click',()=>{const nm=($("#bareName").value||'bare-env');const d=$("#bareDone");d.innerHTML=`<div class="note gov" style="margin-top:12px"><span class="ni">✓</span><div>Bare environment <b>${nm}</b> created in-Kingdom for template authoring. It carries no agent and is excluded from the developer path.</div></div>`;bcr.disabled=true;bcr.textContent="Created";});
+}
+document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>go(a.getAttribute('data-go'))));
+(function(){var ts=$("#themeSel");if(ts)ts.addEventListener('change',function(){if(ts.value==='current')document.body.removeAttribute('data-theme');else document.body.setAttribute('data-theme',ts.value);});
+  var qg=$("#qsGo"),qi=$("#qsIn"),qx=$("#qsClose");
+  if(qg)qg.addEventListener('click',qsSend);
+  if(qi)qi.addEventListener('keydown',function(e){if(e.key==='Enter')qsSend();});
+  if(qx)qx.addEventListener('click',function(){var p=$("#qsPanel");if(p)p.classList.add('hidden');});})();
+$("#scrim").addEventListener('click',closeOverlays);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlays();});
+go('agents');
+</script>
+<script>(function(){document.addEventListener('contextmenu',function(e){e.preventDefault();});document.addEventListener('keydown',function(e){var k=(e.key||'').toLowerCase();if(e.key==='F12'||((e.ctrlKey||e.metaKey)&&k==='u')||((e.ctrlKey||e.metaKey)&&k==='s')||((e.ctrlKey||e.metaKey)&&e.shiftKey&&(k==='i'||k==='j'||k==='c'))){e.preventDefault();return false;}});})();</script>
+</body>
+</html>
