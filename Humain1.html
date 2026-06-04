@@ -283,10 +283,11 @@ const AGENTS={
     statusLabel:"Published",statusBadge:"gov",trustScore:"92",
     tenant:"Ministry of Social Affairs · tenant: msa-gov",persona:"Sara, a citizen",
     runtime:"python 3.11",port:"8080",health:"/healthz",replicas:"2",officer:"case officer",
+    srcType:"git",srcRepo:"github.com/msa-gov/citizen-support-agent",srcRef:"main@8f2a1c",
     correctness:"94%",halluc:"1.4%",version:"1.5.0",entrypoint:"app.main:agent",cpu:"2",memory:"4Gi",gpu:"0",secrets:["policy-api-key","smtp-credentials"],evalSuites:["citizen-eligibility-eval","safety-redteam"],certProfile:"gov-citizen-v1",nodes:["intake","eligibility-check","document-check","case-handoff"],
     manifest:[["name","citizen-support-agent"],["runtime","python 3.11"],["port","8080"],["health","/healthz"],["resources","2 vCPU · 4Gi"],["services","policy-service, case-system, smtp-capture, postgres"],["data","synthetic-citizen-records"],["access_scope","ministry-scoped"]],
     template:{name:"Advance-python-sandbox",version:"v1.0.0",spec:"python 3.11 · 4 vCPU · 8Gi · GPU no · postgres",reason:"Manifest declares python 3.11 + postgres + ministry-scoped access. Matched to this approved tenant template."},
-    deployCfg:[["Package source","Upload Zip","src"],["Environment name","citizen-support-agent","ro"],["Initial replicas","2","rep"],["Service type","Load-balanced endpoint","lock"],["Service port","8080","ro"],["Health endpoint","/healthz","ro"],["Resource limits (per pod)","2 vCPU · 4Gi","res"],["Auto-scaling","min 2 · max 10 · target 70% CPU","hpa"],["Region pin","KSA · Riyadh","region"]],
+    deployCfg:[["Package source","git · github.com/msa-gov/citizen-support-agent @ main","src"],["Environment name","citizen-support-agent","ro"],["Initial replicas","2","rep"],["Service type","Load-balanced endpoint","lock"],["Service port","8080","ro"],["Health endpoint","/healthz","ro"],["Resource limits (per pod)","2 vCPU · 4Gi","res"],["Auto-scaling","min 2 · max 10 · target 70% CPU","hpa"],["Region pin","KSA · Riyadh","region"]],
     integrations:["Managed database (Database block)","Public endpoint with custom domain","Persistent storage"],
     blueprints:[["SMTP capture","Notification mock (HUMAIN-350, done)"],["policy-service","Approved benefit rules"],["case-system","Officer case queue"],["synthetic-citizen-records","1,000 synthetic profiles"]],
     gov:[["Egress policy","Deny-all except approved in-Kingdom endpoints","Tenant policy msa-gov-egress-01."],["Data policy","PII redaction in logs and telemetry","Required for citizen data class."],["Retention","30 days, then secure erase","National data retention rule."],["Access scope","Ministry-scoped queries only","No cross-tenant reads."]],
@@ -305,10 +306,11 @@ const AGENTS={
     statusLabel:"Published",statusBadge:"gov",trustScore:"90",
     tenant:"Ministry of Social Affairs · tenant: msa-gov",persona:"Fahad, a ministry employee",
     runtime:"python 3.11",port:"8080",health:"/healthz",replicas:"2",officer:"procurement officer",
+    srcType:"git",srcRepo:"github.com/msa-gov/procurement-compliance-agent",srcRef:"main@b1d77a",
     correctness:"93%",halluc:"1.6%",version:"1.5.0",entrypoint:"app.main:agent",cpu:"2",memory:"4Gi",gpu:"0",secrets:["budget-api-key","vendor-api-key","smtp-credentials"],evalSuites:["procurement-compliance-eval","safety-redteam"],certProfile:"gov-internal-v1",nodes:["intake","policy-check","budget-check","package-builder","approval-handoff"],
     manifest:[["name","procurement-compliance-agent"],["runtime","python 3.11"],["port","8080"],["health","/healthz"],["resources","2 vCPU · 4Gi"],["services","procurement-system, budget-api, vendor-registry, policy-service, smtp-capture, postgres"],["data","synthetic-procurement-records"],["access_scope","department-scoped"]],
     template:{name:"Advance-python-sandbox",version:"v1.0.0",spec:"python 3.11 · 4 vCPU · 8Gi · GPU no · postgres",reason:"Manifest declares python 3.11 + postgres + department-scoped access. Matched to the approved Python template."},
-    deployCfg:[["Package source","From GitHub","src"],["Environment name","procurement-compliance-agent","ro"],["Initial replicas","2","rep"],["Service type","Load-balanced endpoint","lock"],["Service port","8080","ro"],["Health endpoint","/healthz","ro"],["Resource limits (per pod)","2 vCPU · 4Gi","res"],["Auto-scaling","min 2 · max 8 · target 70% CPU","hpa"],["Region pin","KSA · Riyadh","region"]],
+    deployCfg:[["Package source","git · github.com/msa-gov/procurement-compliance-agent @ main","src"],["Environment name","procurement-compliance-agent","ro"],["Initial replicas","2","rep"],["Service type","Load-balanced endpoint","lock"],["Service port","8080","ro"],["Health endpoint","/healthz","ro"],["Resource limits (per pod)","2 vCPU · 4Gi","res"],["Auto-scaling","min 2 · max 8 · target 70% CPU","hpa"],["Region pin","KSA · Riyadh","region"]],
     integrations:["Managed database (Database block)","Public endpoint with custom domain","Persistent storage"],
     blueprints:[["SMTP capture","Notification mock (HUMAIN-350, done)"],["procurement-system","Request + routing engine"],["budget-api","Department budget codes"],["vendor-registry","Approved vendor list"],["synthetic-procurement-records","Synthetic budgets + vendors"]],
     gov:[["Egress policy","Deny-all except approved in-Kingdom endpoints","Tenant policy msa-gov-egress-01."],["Data policy","Log redaction for budget/vendor identifiers","Internal data class."],["Retention","30 days, then secure erase","National data retention rule."],["Access scope","Department-scoped queries only","No cross-department reads."]],
@@ -352,6 +354,10 @@ function yamlFor(a){
   L.push(`  ${K('version')}: ${V(a.version)}`);
   L.push(`${K('runtime')}: ${V(rt)}   ${C('# python')}`);
   L.push(`${K('entrypoint')}: ${V(a.entrypoint)}`);
+  L.push(`${K('source')}:   ${C('# where the code lives — no separate package upload')}`);
+  L.push(`  ${K('type')}: ${V(a.srcType||'git')}`);
+  L.push(`  ${K('repo')}: ${V(a.srcRepo||'github.com/your-org/your-agent')}`);
+  L.push(`  ${K('ref')}: ${V(a.srcRef||'main')}`);
   L.push(`${K('resources')}:`);
   L.push(`  ${K('cpu')}: ${V('"'+a.cpu+'"')}`);
   L.push(`  ${K('memory')}: ${V(a.memory)}`);
@@ -372,6 +378,14 @@ function yamlFor(a){
   for(let i=0;i<a.nodes.length-1;i++)L.push(`    - ${V(a.nodes[i]+' -> '+a.nodes[i+1])}`);
   return L.map(x=>`<div>${x}</div>`).join("");
 }
+function yamlText(a){
+  const rt=a.runtime.replace(' ',':');const services=a.manifest[5][1].split(', ');const data=a.manifest[6][1];const scope=a.manifest[7][1];
+  const L=['# agent.yaml — schema v1 (HUMAIN-233 / 177)','apiVersion: humain.one/v1','kind: Agent','metadata:','  name: '+a.manifest[0][1],'  version: '+a.version,'runtime: '+rt+'   # python','entrypoint: '+a.entrypoint,'source:   # where the code lives — no separate package upload','  type: '+(a.srcType||'git'),'  repo: '+(a.srcRepo||'github.com/your-org/your-agent'),'  ref: '+(a.srcRef||'main'),'resources:','  cpu: "'+a.cpu+'"','  memory: '+a.memory,'  gpu: '+a.gpu,'services:'];
+  services.forEach(s=>L.push('  - '+s));L.push('secrets:');a.secrets.forEach(s=>L.push('  - '+s));L.push('data:');L.push('  - '+data);L.push('access_scope: '+scope);L.push('evaluation_suites:');a.evalSuites.forEach(s=>L.push('  - '+s));L.push('certification_profile: '+a.certProfile);L.push('graph:   # multi-agent workflow: nodes + edges');L.push('  nodes: ['+a.nodes.join(', ')+']');L.push('  edges:');for(let i=0;i<a.nodes.length-1;i++)L.push('    - '+a.nodes[i]+' -> '+a.nodes[i+1]);
+  return L.join('\n');
+}
+const EXAMPLE_YAML=['# agent.yaml — schema v1 (HUMAIN-233 / 177)','# This is the only file you submit. It is the whole agent:','# runtime, source, resources, services, data, policy and evaluation.','apiVersion: humain.one/v1','kind: Agent','metadata:','  name: my-first-agent','  version: 1.0.0','runtime: python:3.11','entrypoint: app.main:agent','source:           # where the code lives — no separate package upload','  type: git       # git | zip | image','  repo: github.com/your-org/my-first-agent','  ref: main','resources:','  cpu: "2"','  memory: 4Gi','  gpu: 0','services:','  - policy-service','  - postgres','secrets:','  - policy-api-key','data:','  - synthetic-records','access_scope: ministry-scoped','evaluation_suites:','  - baseline-eval','  - safety-redteam','certification_profile: gov-citizen-v1','graph:            # multi-agent workflow: nodes + edges','  nodes: [intake, check, handoff]','  edges:','    - intake -> check','    - check -> handoff'].join('\n');
+function downloadText(name,text){try{const b=new Blob([text],{type:'text/yaml'});const u=URL.createObjectURL(b);const el=document.createElement('a');el.href=u;el.download=name;document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);}catch(e){}}
 const LIFE=["Draft","Resolving","Provisioning","Deployed","In evaluation","Review-ready","Published","Suspended","Needs attention"];
 function lifeClass(s){return {"Draft":"muted","Resolving":"preview","Provisioning":"preview","Deployed":"teal","In evaluation":"preview","Review-ready":"teal","Published":"gov","Suspended":"muted","Needs attention":"alert"}[s]||"muted";}
 const AGENTS_INDEX=[
@@ -510,24 +524,41 @@ function scrDetail(){const a=A();
     <button class="btn" data-go="listing">View in Marketplace</button>
     <button class="btn primary" data-journey="${a.id}">Replay the governed path →</button></span></div></div>`;
 }
+function validateManifest(src){const ub=$("#upBadge");if(ub){ub.className='badge gov';ub.textContent='◆ validated';}
+  const mt=$("#upMeta");if(mt)mt.classList.remove('hidden');
+  const mw=$("#manifestWrap");if(mw)mw.innerHTML=yamlFor(A());
+  const rb=$("#toResolveBtn");if(rb)rb.disabled=false;
+  if($("#cliLog"))cliEcho('out','↳ agent.yaml validated (schema v1) · source '+(src||'upload'));}
 function animateUpload(){const bar=$("#upBar"),pct=$("#upPct"),stat=$("#upStat"),zone=$("#upZone"),prog=$("#upProg");if(!bar||!zone)return;
   zone.classList.add('hidden');prog.classList.remove('hidden');let p=0;
   const t=setInterval(()=>{p+=Math.max(5,Math.round((100-p)*0.2));if(p>100)p=100;bar.style.width=p+'%';pct.textContent=p+'%';
     if(p>=100){clearInterval(t);stat.innerHTML='✓ uploaded · validating against manifest schema v1…';
-      setTimeout(()=>{stat.innerHTML='✓ <b>agent.yaml</b> validated · manifest schema v1 (HUMAIN-233)';const ub=$("#upBadge");if(ub){ub.className='badge gov';ub.textContent='◆ validated';}const mt=$("#upMeta");if(mt)mt.classList.remove('hidden');const mw=$("#manifestWrap");if(mw)mw.innerHTML=yamlFor(A());const rb=$("#toResolveBtn");if(rb)rb.disabled=false;if($("#cliLog"))cliEcho('out','↳ uploaded agent.yaml · validated (schema v1)');},700);
+      setTimeout(()=>{stat.innerHTML='✓ <b>agent.yaml</b> validated · manifest schema v1 (HUMAIN-233)';validateManifest('upload');},700);
     }},140);
 }
+function useEditedYaml(){const ta=$("#yamlEdit");const stat=$("#editStat");
+  if(ta&&(!ta.value||!/kind:\s*Agent/i.test(ta.value))){if(stat){stat.className='note alert';stat.innerHTML='<span class="ni">!</span><div>This does not look like an agent manifest. It needs at least <b>kind: Agent</b> and a <b>metadata.name</b>.</div>';}return;}
+  if(stat){stat.className='note gov';stat.innerHTML='<span class="ni">✓</span><div>Manifest validated against schema v1 (HUMAIN-233). Parsed and ready to resolve.</div>';}
+  validateManifest('edited');}
 function scrSubmit(){const a=A();const fname=a.manifest[0][1]+'.yaml';
-  return `<h2>Submit a new version</h2><p class="lede">Push a new version of a live, published agent by uploading its <b>agent.yaml</b>. The manifest is the whole agent: runtime, services, data needs and policy. HUMAIN ONE validates and resolves everything behind it; the live v1.4 keeps serving until v1.5 is certified.</p>
+  return `<h2>Submit a new version</h2><p class="lede">You submit one thing: the agent's <b>agent.yaml</b>. The manifest is the whole agent — runtime, services, data, policy, and a <b>source</b> field that says where the code lives. There is no separate package upload. HUMAIN ONE validates and resolves everything behind it, and the live v1.4 keeps serving until v1.5 is certified.</p>
   <div class="grid2">
-    <div class="card"><div class="hd"><h3>Agent package</h3><span id="upBadge" class="badge muted">agent.yaml</span></div><div class="bd">
-      <div class="srcpick"><div class="srctab sel">Upload Zip</div><div class="srctab">From GitHub</div><div class="srctab">Pre-built Image</div></div>
-      <div id="upZone" class="upzone"><div class="upicon">⤓</div><div>Drop <b>${fname}</b> here, or</div><button class="btn primary" id="upBtn" style="margin-top:10px">Choose agent.yaml</button><div class="small" style="margin-top:10px">Validated against manifest schema v1 on upload</div></div>
-      <div id="upProg" class="hidden"><div class="uprow"><span class="upfile">▤ ${fname}</span><span id="upPct" class="small">0%</span></div><div class="deploybar"><i id="upBar"></i></div><div id="upStat" class="small" style="margin-top:7px">Uploading…</div></div>
-      <div id="upMeta" class="hidden"><div class="kv" style="grid-template-columns:150px 1fr"><div class="k">Agent name</div><div class="v">${a.name}</div><div class="k">Package</div><div class="v">${a.manifest[0][1]}-v1.5.tar.gz <span class="small">· 14.2 MB</span></div><div class="k">Version</div><div class="v">v1.5 ${badge('preview','new')} <span class="small">· current live: v1.4</span></div><div class="k">Source</div><div class="v">git-linked · main@8f2a1c</div></div>
-        <div class="note gov" style="margin-top:14px"><span class="ni">◆</span><div>Manifest format follows HUMAIN One (H2O) as source of truth. No infrastructure choices are asked here.</div></div></div>
+    <div class="card"><div class="hd"><h3>Agent manifest</h3><span id="upBadge" class="badge muted">agent.yaml</span></div><div class="bd">
+      <div class="srcpick"><div class="srctab sel" data-mmode="upload">⤓ Upload agent.yaml</div><div class="srctab" data-mmode="edit">✎ Edit inline</div></div>
+      <div id="mUpload">
+        <div id="upZone" class="upzone"><div class="upicon">⤓</div><div>Drop <b>${fname}</b> here, or</div><button class="btn primary" id="upBtn" style="margin-top:10px">Choose agent.yaml</button><div class="small" style="margin-top:10px">Validated against manifest schema v1 on upload</div></div>
+        <div id="upProg" class="hidden"><div class="uprow"><span class="upfile">▤ ${fname}</span><span id="upPct" class="small">0%</span></div><div class="deploybar"><i id="upBar"></i></div><div id="upStat" class="small" style="margin-top:7px">Uploading…</div></div>
+        <div class="row" style="justify-content:space-between;align-items:center;margin-top:12px"><span class="small">Don't have one yet?</span><button class="btn sm" id="dlExample">⤓ Download example agent.yaml</button></div>
+      </div>
+      <div id="mEdit" class="hidden">
+        <textarea id="yamlEdit" spellcheck="false" style="width:100%;min-height:300px;font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:12px;line-height:1.55;background:var(--ink);color:#dfe7ea;border:1px solid var(--line-2);border-radius:10px;padding:14px;resize:vertical;white-space:pre">${yamlText(a)}</textarea>
+        <div class="row" style="justify-content:space-between;align-items:center;margin-top:10px"><span class="small">Edit the manifest here and validate without leaving the browser.</span><span style="display:flex;gap:8px"><button class="btn sm" id="dlExample2">⤓ Download</button><button class="btn primary sm" id="useYaml">Validate &amp; use →</button></span></div>
+        <div id="editStat" class="note info" style="margin-top:12px"><span class="ni">i</span><div>The manifest is the only thing you submit. The <b>source</b> field declares where the code lives.</div></div>
+      </div>
+      <div id="upMeta" class="hidden"><div class="kv" style="grid-template-columns:150px 1fr;margin-top:14px"><div class="k">Agent name</div><div class="v">${a.name}</div><div class="k">Version</div><div class="v">v1.5 ${badge('preview','new')} <span class="small">· current live: v1.4</span></div><div class="k">Source</div><div class="v">${a.srcType||'git'} · ${a.srcRepo||'github.com/your-org/your-agent'} @ ${(a.srcRef||'main').split('@')[1]||a.srcRef||'main'}</div></div>
+        <div class="note gov" style="margin-top:14px"><span class="ni">◆</span><div>Manifest format follows HUMAIN One (H2O) as source of truth. No infrastructure choices are asked here, and there is no second file to upload.</div></div></div>
     </div><div class="ft"><button class="btn ghost" data-go="agents">Cancel</button><button class="btn primary" id="toResolveBtn" disabled data-go="resolve">Submit &amp; Resolve →</button></div></div>
-    <div class="card"><div class="hd"><h3>Detected manifest</h3><span class="small">read-only</span></div><div class="bd"><div class="manifest" id="manifestWrap"><span class="cmt"># waiting for agent.yaml — upload to validate &amp; parse…</span></div></div></div>
+    <div class="card"><div class="hd"><h3>Detected manifest</h3><span class="small">read-only</span></div><div class="bd"><div class="manifest" id="manifestWrap"><span class="cmt"># waiting for agent.yaml — upload or edit to validate &amp; parse…</span></div></div></div>
   </div>`;
 }
 function scrResolve(){const a=A();
@@ -1039,6 +1070,10 @@ function bindScreen(){
   document.querySelectorAll('[data-run]').forEach(el=>el.addEventListener('click',()=>openModal(modalChat(el.getAttribute('data-run')))));
   const ub=$("#upBtn");if(ub)ub.addEventListener('click',e=>{e.stopPropagation();animateUpload();});
   const uz=$("#upZone");if(uz)uz.addEventListener('click',()=>animateUpload());
+  document.querySelectorAll('[data-mmode]').forEach(el=>el.addEventListener('click',()=>{const m=el.getAttribute('data-mmode');document.querySelectorAll('[data-mmode]').forEach(t=>t.classList.toggle('sel',t===el));const up=$("#mUpload"),ed=$("#mEdit");if(up)up.classList.toggle('hidden',m!=='upload');if(ed)ed.classList.toggle('hidden',m!=='edit');}));
+  const dx=$("#dlExample");if(dx)dx.addEventListener('click',()=>downloadText('agent.example.yaml',EXAMPLE_YAML));
+  const dx2=$("#dlExample2");if(dx2)dx2.addEventListener('click',()=>downloadText((A().manifest[0][1]||'agent')+'.yaml',($("#yamlEdit")?$("#yamlEdit").value:EXAMPLE_YAML)));
+  const uy=$("#useYaml");if(uy)uy.addEventListener('click',useEditedYaml);
   document.querySelectorAll('[data-mini]').forEach(el=>el.addEventListener('click',()=>openMini(el.getAttribute('data-mini'))));
   const fSt=$("#fStatus");if(fSt)fSt.addEventListener('change',()=>{state.filter.status=fSt.value;refreshGrid();});
   const fQ=$("#fq");if(fQ)fQ.addEventListener('input',()=>{state.filter.q=fQ.value;refreshGrid();});
