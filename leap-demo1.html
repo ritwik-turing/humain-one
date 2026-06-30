@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMAIN ALM · Agent Lifecycle Marketplace</title>
+<style>
+  :root{
+    --frame:#0c2b27; --frame2:#071d1a; --rail-line:rgba(255,255,255,.07);
+    --canvas:#f4f8f5; --card:#ffffff; --ink:#0f211c; --ink2:#48584f; --ink3:#7a8a82;
+    --line:#e3eae5; --line2:#edf2ee;
+    --green:#16b39c; --green-d:#0b7a6c; --green-soft:#e2f5f0; --green-ring:rgba(22,179,156,.18);
+    --amber:#c8842a; --amber-soft:#fbf1e2; --blue:#2f6bd6; --blue-soft:#eaf1fc;
+    --violet:#6d54c8; --violet-soft:#efebfb;
+    --radius:14px; --shadow:0 1px 2px rgba(20,32,26,.05),0 8px 24px rgba(20,32,26,.06);
+    --shadow-sm:0 1px 2px rgba(20,32,26,.06);
+    --mono:"SF Mono",ui-monospace,"Roboto Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--frame);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.45}
+  .app{display:grid;grid-template-columns:268px 1fr 344px;height:100vh;overflow:hidden}
+  @media(max-width:1180px){.app{grid-template-columns:248px 1fr 300px}}
+  @media(max-width:980px){.app{grid-template-columns:248px 1fr}.valuerail{display:none}}
+
+  /* ===== Sidebar / single nav (white) ===== */
+  .rail{background:var(--card);color:var(--ink2);display:flex;flex-direction:column;border-right:1px solid var(--line)}
+  .brand{padding:18px 18px 14px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--line)}
+  .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--green),var(--green-d));display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;box-shadow:0 4px 12px rgba(22,179,156,.3)}
+  .brand h1{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:.2px;line-height:1.1}
+  .brand .sub{font-size:11px;color:var(--ink3);margin-top:1px}
+
+  .mode{padding:14px 16px 6px}
+  .mode .lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;font-weight:700}
+  .seg{display:flex;background:#f1f5f3;border:1px solid var(--line);border-radius:11px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--ink3);font-family:inherit;font-size:12px;font-weight:600;padding:8px 6px;border-radius:8px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+  .seg button .t{font-size:12px}
+  .seg button .d{font-size:9.5px;color:var(--ink3);font-weight:500}
+  .seg button.on{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;box-shadow:0 4px 12px rgba(22,179,156,.3)}
+  .seg button.on .t,.seg button.on .d{color:#fff}
+  .seg button.on .d{color:rgba(255,255,255,.85)}
+
+  .nav-title{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-weight:700;padding:16px 20px 8px}
+  .stages{list-style:none;padding:0 12px;overflow-y:auto;flex:1}
+  .stage{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:10px;cursor:pointer;color:var(--ink2);transition:.13s;position:relative;margin-bottom:2px}
+  .stage:hover{background:#f4f8f6}
+  .stage.active{background:var(--green-soft);color:var(--ink)}
+  .stage.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--green)}
+  .dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0;color:var(--ink3);background:#fff}
+  .stage.done .dot{background:var(--green);border-color:var(--green);color:#fff}
+  .stage.active .dot{border-color:var(--green);color:var(--green-d)}
+  .stage .nm{font-size:12.5px;font-weight:600;line-height:1.15}
+  .stage .nm small{display:block;font-size:10.5px;font-weight:500;color:var(--ink3);margin-top:1px}
+  .stage.active .nm small{color:var(--green-d)}
+
+  .rail-foot{padding:14px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:8px}
+  .rail-foot .ok{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-ring)}
+
+  /* ===== Main ===== */
+  .main{background:radial-gradient(115% 65% at 100% 0%,#e4f5ee 0%,rgba(228,245,238,0) 44%),radial-gradient(85% 60% at 0% 100%,#e7f5ef 0%,rgba(231,245,239,0) 42%),var(--canvas);overflow-y:auto;position:relative}
+  .topbar{position:sticky;top:0;z-index:10;background:rgba(244,248,245,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 30px;display:flex;align-items:center;gap:16px}
+  .agent-id{display:flex;align-items:center;gap:12px;min-width:0}
+  .agent-av{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#22324a,#0f1c2e);color:#cfe3ff;display:grid;place-items:center;font-weight:700;font-size:15px;flex-shrink:0}
+  .agent-meta h2{font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .agent-meta .row{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink3);margin-top:1px}
+  .agent-meta .row b{color:var(--ink2);font-weight:600}
+  .spacer{flex:1}
+  .status-chip{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid;transition:.2s}
+  .status-chip .pulse{width:7px;height:7px;border-radius:50%}
+  .st-draft{background:#f1f0ea;color:#6b7167;border-color:#e0dfd7}.st-draft .pulse{background:#9aa097}
+  .st-prov{background:var(--violet-soft);color:#4e3aa0;border-color:#ddd4f6}.st-prov .pulse{background:var(--violet)}
+  .st-deploy{background:var(--blue-soft);color:#2354b8;border-color:#cfe0fa}.st-deploy .pulse{background:var(--blue)}
+  .st-eval{background:var(--amber-soft);color:#9c6418;border-color:#f1ddbf}.st-eval .pulse{background:var(--amber)}
+  .st-cert{background:var(--green-soft);color:var(--green-d);border-color:#cbeee6}.st-cert .pulse{background:var(--green)}
+  .st-pub{background:linear-gradient(135deg,#16b39c,#0b7a6c);color:#fff;border-color:transparent}.st-pub .pulse{background:#fff}
+  .help-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink2);cursor:pointer;font-weight:700}
+
+  .canvas{padding:26px 30px 60px;max-width:1080px;margin:0 auto}
+
+  /* ===== value rail (white) with 3 value-prop cells ===== */
+  .valuerail{background:var(--card);border-left:1px solid var(--line);overflow-y:auto;padding:22px 20px}
+  .valuerail .vtitle{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-weight:800;margin:4px 2px 14px}
+  .value{position:sticky;top:0;display:flex;flex-direction:column;align-items:stretch;gap:14px}
+  .value .vmark{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--green-d);font-weight:800}
+  .value h3{font-size:16.5px;font-weight:750;letter-spacing:-.2px;margin-top:2px;color:var(--ink);line-height:1.3}
+  .vcells{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+  .vcell{display:flex;align-items:center;gap:11px;background:#fbfdfc;border:1px solid var(--line);border-radius:12px;padding:13px 14px;transition:.3s}
+  .vcell .vn{width:24px;height:24px;border-radius:7px;background:var(--green-soft);color:var(--green-d);display:grid;place-items:center;font-size:11px;font-weight:800;flex-shrink:0;transition:.3s}
+  .vcell .vt{font-size:12.5px;font-weight:650;color:var(--ink2);line-height:1.25}
+  .vcell.hot{background:var(--green-soft);border-color:var(--green);box-shadow:0 0 0 3px var(--green-ring);transform:translateX(2px)}
+  .vcell.hot .vn{background:var(--green);color:#fff}
+  .vcell.hot .vt{color:var(--ink)}
+
+  /* stepper */
+  .stepper{display:flex;align-items:center;gap:0;margin-bottom:22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:6px;box-shadow:var(--shadow-sm)}
+  .step{flex:1;display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;position:relative;cursor:pointer;transition:.13s}
+  .step:hover{background:#faf9f5}
+  .step .sn{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0;border:1.5px solid var(--line);color:var(--ink3);background:#fff}
+  .step.done .sn{background:var(--green);border-color:var(--green);color:#fff}
+  .step.active .sn{background:var(--ink);border-color:var(--ink);color:#fff}
+  .step .stx{font-size:11.5px;font-weight:600;color:var(--ink2);line-height:1.1}
+  .step.active .stx{color:var(--ink)}
+  .step .stx small{display:block;font-size:9.5px;color:var(--ink3);font-weight:500}
+  .step .conn{position:absolute;right:-2px;top:50%;width:14px;height:2px;background:var(--line)}
+  .step.done .conn{background:var(--green)}
+  .step:last-child .conn{display:none}
+
+  /* generic */
+  .h-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+  .h-ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:20px;flex-shrink:0;background:var(--green-soft);color:var(--green-d)}
+  .h-row h3{font-size:20px;font-weight:750;letter-spacing:-.4px}
+  .h-row p{font-size:13px;color:var(--ink2);margin-top:3px;max-width:680px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:4px 9px;border-radius:999px;background:var(--green-soft);color:var(--green-d)}
+
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr 1fr}
+  .g12{grid-template-columns:1.4fr 1fr}
+  @media(max-width:900px){.g2,.g3,.g12{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow-sm)}
+  .card.tight{padding:15px}
+  .card h4{font-size:13px;font-weight:700;letter-spacing:-.1px;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .card .ch-sub{font-size:11.5px;color:var(--ink3);margin-bottom:13px}
+  .card h4 .ic{font-size:14px}
+
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:5px;letter-spacing:.01em}
+  .field label .req{color:var(--green-d)}
+  .inp{width:100%;border:1px solid var(--line);background:#fcfcfa;border-radius:9px;padding:9px 11px;font-family:inherit;font-size:12.5px;color:var(--ink);transition:.13s}
+  .inp:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-ring);background:#fff}
+  textarea.inp{resize:vertical;min-height:62px}
+  select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237c887f' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+
+  .kv{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line2);font-size:12.5px}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--ink2);display:flex;align-items:center;gap:8px}
+  .kv .v{font-weight:650;color:var(--ink)}
+  .kv .v.mono{font-family:var(--mono);font-size:11.5px}
+  .tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--green-soft);color:var(--green-d)}
+  .tag.b{background:var(--blue-soft);color:#2354b8}.tag.v{background:var(--violet-soft);color:#4e3aa0}.tag.a{background:var(--amber-soft);color:#9c6418}.tag.n{background:#f1f0ea;color:#6b7167}
+
+  .check{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line2)}
+  .check:last-child{border-bottom:0}
+  .ck{width:20px;height:20px;border-radius:6px;background:var(--green-soft);color:var(--green-d);display:grid;place-items:center;font-size:12px;font-weight:800;flex-shrink:0}
+  .ck.wait{background:#f1f0ea;color:#9aa097}
+  .check .ct{font-size:12px;font-weight:600;color:var(--ink)}
+  .check .cd{font-size:11px;color:var(--ink3)}
+
+  .score{display:flex;align-items:center;gap:18px}
+  .ring{--p:0;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--green) calc(var(--p)*1%),#edece6 0);display:grid;place-items:center;flex-shrink:0}
+  .ring .inner{width:74px;height:74px;border-radius:50%;background:#fff;display:grid;place-items:center;flex-direction:column}
+  .ring .num{font-size:25px;font-weight:800;color:var(--ink);line-height:1}
+  .ring .lab{font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+  .metrics{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .metric .mv{font-size:19px;font-weight:800;letter-spacing:-.5px}
+  .metric .ml{font-size:10.5px;color:var(--ink3);font-weight:600}
+  .bar{height:6px;border-radius:6px;background:#edece6;margin-top:6px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--green-d))}
+
+  .transcript{background:#082420;border-radius:11px;padding:13px 15px;font-family:var(--mono);font-size:11px;color:#bcd3c5;line-height:1.7;max-height:188px;overflow-y:auto}
+  .transcript .u{color:#7fd6a3}.transcript .a{color:#e6efe9}.transcript .sys{color:#6f7d74}.transcript .t{color:#7c9cd6}
+
+  .yaml{background:#082420;border-radius:11px;overflow:hidden;border:1px solid #143a33}
+  .yaml .yh{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid #143a33;font-size:11px;color:#8b988f;font-family:var(--mono)}
+  .yaml .yd{width:9px;height:9px;border-radius:50%}
+  .yaml pre{padding:13px 15px;font-family:var(--mono);font-size:11px;color:#c9dbd0;line-height:1.65;overflow-x:auto}
+  .yaml .yk{color:#7fd6a3}.yaml .yv{color:#e6efe9}.yaml .yc{color:#5e6b62}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;font-family:inherit;font-size:13px;font-weight:650;padding:11px 18px;cursor:pointer;transition:.14s}
+  .btn-primary{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;box-shadow:0 4px 14px rgba(22,179,156,.3)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(22,179,156,.38)}
+  .btn-ghost{background:var(--card);color:var(--ink2);border:1px solid var(--line)}
+  .btn-ghost:hover{background:#faf9f5}
+  .btn-dark{background:var(--ink);color:#fff}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+  .actions{display:flex;align-items:center;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+  .actions .note{font-size:11.5px;color:var(--ink3);margin-left:auto}
+
+  .seq{display:flex;gap:10px;margin-bottom:16px}
+  .seq .sq{flex:1;border:1px solid var(--line);border-radius:11px;padding:12px;background:#fcfcfa;position:relative;transition:.15s}
+  .seq .sq.on{border-color:var(--green);background:var(--green-soft);box-shadow:0 0 0 3px var(--green-ring)}
+  .seq .sq.ok{border-color:#cbeee6}
+  .seq .sq .sqn{font-size:10px;font-weight:800;color:var(--ink3);letter-spacing:.08em}
+  .seq .sq.on .sqn,.seq .sq.ok .sqn{color:var(--green-d)}
+  .seq .sq .sqt{font-size:12.5px;font-weight:700;margin-top:3px}
+  .seq .sq .sqd{font-size:10.5px;color:var(--ink3);margin-top:2px}
+  .seq .sq .sqmark{position:absolute;top:11px;right:11px;font-size:13px;color:var(--green-d)}
+
+  /* buyer card */
+  .buyer{background:linear-gradient(170deg,#ffffff,#f7faf8);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .buyer .bh{display:flex;align-items:center;gap:12px}
+  .buyer .bav{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#22324a,#0f1c2e);color:#cfe3ff;display:grid;place-items:center;font-weight:700;font-size:18px}
+  .buyer .bt{font-size:15px;font-weight:750}
+  .buyer .bm{font-size:11px;color:var(--ink3)}
+  .buyer .verify{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--green-d);background:var(--green-soft);padding:5px 9px;border-radius:999px;border:1px solid #cbeee6}
+  .buyer .bdesc{font-size:12px;color:var(--ink2);margin:12px 0;line-height:1.5}
+  .buyer .bsig{display:flex;flex-wrap:wrap;gap:7px}
+  .bsig .s{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--ink2);background:#f4f3ed;border:1px solid var(--line);padding:5px 9px;border-radius:8px}
+  .bsig .s .d{font-size:11px}
+  .buyer .bfoot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}
+  .buyer .price{font-size:13px;font-weight:750}.buyer .price small{font-weight:500;color:var(--ink3)}
+
+  .domains{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .dchip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--ink2);background:#fff;border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+  .dchip.live{background:var(--green-soft);border-color:#cbeee6;color:var(--green-d);font-weight:700}
+
+  .banner{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--green);border-radius:11px;padding:13px 16px;margin-top:18px}
+  .banner .bi{font-size:18px}
+  .banner .btxt b{font-size:12.5px}.banner .btxt p{font-size:11.5px;color:var(--ink3);margin-top:1px}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;z-index:50;display:flex;align-items:center;gap:10px}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .ti{width:20px;height:20px;border-radius:50%;background:var(--green);display:grid;place-items:center;font-size:12px}
+
+  .locked{text-align:center;padding:40px 20px;color:var(--ink3)}
+  .locked .li{font-size:32px;opacity:.5;margin-bottom:10px}
+  .locked b{display:block;color:var(--ink2);font-size:14px;margin-bottom:4px}
+
+  /* ===== value box transition ===== */
+  .value{transition:opacity .35s ease}
+  .value.swap{opacity:0}
+
+  /* ===== autoplay demo bar ===== */
+  .demobar{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
+  .play-btn{display:inline-flex;align-items:center;gap:9px;border:0;border-radius:9px;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;font-family:inherit;font-size:12.5px;font-weight:700;padding:9px 15px;cursor:pointer;box-shadow:0 4px 12px rgba(22,179,156,.28);transition:.14s}
+  .play-btn:hover{transform:translateY(-1px)}
+  .play-btn.playing{background:var(--ink);box-shadow:none}
+  .play-tri{font-size:13px}
+  .demobar .dlabel{font-size:12px;font-weight:650;color:var(--ink2)}
+  .demobar .dlabel small{display:block;font-size:10.5px;font-weight:500;color:var(--ink3)}
+  .demobar .dprog{flex:1;height:6px;border-radius:6px;background:#edece6;overflow:hidden;position:relative}
+  .demobar .dprog i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--green-d));transition:width .3s linear}
+  .demobar .dcount{font-size:11px;font-weight:700;color:var(--ink3);min-width:64px;text-align:right}
+
+  /* ===== manual-step callout ===== */
+  .callout{position:fixed;right:30px;bottom:30px;width:360px;background:#0c2b27;color:#eaf3ee;border-radius:16px;padding:0;box-shadow:0 18px 50px rgba(0,0,0,.4);z-index:60;opacity:0;transform:translateY(16px) scale(.98);transition:.3s cubic-bezier(.34,1.3,.6,1);pointer-events:none;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+  .callout.show{opacity:1;transform:translateY(0) scale(1)}
+  .callout .cobar{height:4px;background:rgba(255,255,255,.08)}
+  .callout .cobar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--green),#4fe3cf);transform-origin:left;transform:scaleX(0)}
+  .callout.show .cobar i{animation:cofill linear forwards}
+  @keyframes cofill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .callout .coin{padding:15px 17px 16px}
+  .callout .cobadge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:999px;margin-bottom:9px}
+  .cobadge.manual{background:rgba(200,132,42,.18);color:#f0b96a;border:1px solid rgba(200,132,42,.35)}
+  .cobadge.auto{background:rgba(22,179,156,.16);color:#57ddc4;border:1px solid rgba(22,179,156,.32)}
+  .callout .cohand{font-size:15px}
+  .callout h5{font-size:14.5px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:5px}
+  .callout p{font-size:12px;color:#a6b7ad;line-height:1.5}
+  .callout .codo{margin-top:11px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#cdeee5;background:rgba(255,255,255,.05);border-radius:9px;padding:8px 11px}
+  .callout .codo .k{font-size:13px}
+
+  /* ===== demo focus highlight ===== */
+  .demo-hl{position:relative;animation:hlpulse 1.6s ease-in-out infinite;border-radius:14px}
+  @keyframes hlpulse{0%,100%{box-shadow:0 0 0 2px var(--green),0 0 0 6px var(--green-ring)}50%{box-shadow:0 0 0 2px var(--green),0 0 0 11px rgba(22,179,156,.08)}}
+
+  /* ===== PRISM dataviz ===== */
+  .prism{display:flex;flex-direction:column;gap:14px}
+  .prism-hero{display:grid;grid-template-columns:184px 1fr;gap:8px;align-items:center;background:radial-gradient(120% 140% at 0% 0%,#123f38 0%,#0c2b27 60%);border-radius:16px;padding:16px 18px;border:1px solid rgba(255,255,255,.06)}
+  @media(max-width:780px){.prism-hero{grid-template-columns:1fr}}
+  .gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .gauge{width:170px;height:170px}
+  .gtrack{stroke:rgba(255,255,255,.09)}
+  .gauge-arc{stroke-dasharray:var(--c);stroke-dashoffset:var(--off);transform:rotate(-90deg);transform-origin:90px 90px;animation:gdraw 1.3s cubic-bezier(.3,0,.2,1) forwards}
+  @keyframes gdraw{from{stroke-dashoffset:var(--c)}to{stroke-dashoffset:var(--off)}}
+  .gauge-num{fill:#fff;font:800 38px var(--sans)}
+  .gauge-lab{fill:#7fb3a8;font:700 9px var(--sans);letter-spacing:.14em}
+  .gauge-cap{font-size:10.5px;font-weight:600;color:#7fb3a8;letter-spacing:.02em}
+  .radar-wrap{display:flex;align-items:center;gap:12px;justify-content:center}
+  .radar{width:200px;height:196px;flex-shrink:0}
+  .rgrid{fill:none;stroke:rgba(255,255,255,.10)}
+  .raxis{stroke:rgba(255,255,255,.10)}
+  .rdata{fill:rgba(22,179,156,.32);stroke:#4fe3cf;stroke-width:2;transform-box:fill-box;transform-origin:center;animation:rpop .9s cubic-bezier(.34,1.45,.55,1) forwards;opacity:0}
+  @keyframes rpop{from{transform:scale(.15);opacity:0}to{transform:scale(1);opacity:1}}
+  .rlab{fill:#9fc7bd;font:700 8.5px var(--sans)}
+  .rdot{fill:#4fe3cf}
+  .rlegend{display:flex;flex-direction:column;gap:6px}
+  .rlegend .rl{display:flex;align-items:center;gap:7px;font-size:11px;color:#cfe6df;font-weight:600}
+  .rlegend .rl b{color:#fff;margin-left:auto;font-weight:800}
+  .rlegend .rl .rd{width:7px;height:7px;border-radius:2px;background:#4fe3cf}
+
+  .prism-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:780px){.prism-tiles{grid-template-columns:1fr 1fr}}
+  .ptile{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px;box-shadow:var(--shadow-sm)}
+  .ptile .pv{font-size:23px;font-weight:850;letter-spacing:-.6px;color:var(--ink)}
+  .ptile .pv small{font-size:13px;font-weight:700;color:var(--ink3)}
+  .ptile .pl{font-size:10.5px;color:var(--ink3);font-weight:650;margin-top:1px}
+  .pbar{height:7px;border-radius:7px;background:#edece6;margin-top:9px;overflow:hidden}
+  .pbar i{display:block;height:100%;border-radius:7px;transform-origin:left;transform:scaleX(0);animation:pgrow 1.1s cubic-bezier(.3,0,.2,1) forwards .15s}
+  .pbar i.g{background:linear-gradient(90deg,var(--green),var(--green-d))}
+  .pbar i.b{background:linear-gradient(90deg,#4f8be6,#2354b8)}
+  .pbar i.a{background:linear-gradient(90deg,#e0a44e,#c8842a)}
+  @keyframes pgrow{to{transform:scaleX(1)}}
+
+  .prism-row{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}
+  @media(max-width:780px){.prism-row{grid-template-columns:1fr}}
+  .donut{width:118px;height:118px}
+  .dtrack{fill:none;stroke:#edece6;stroke-width:11}
+  .darc{fill:none;stroke:#16b39c;stroke-width:11;stroke-linecap:round;stroke-dasharray:var(--dash) var(--c);stroke-dashoffset:var(--c);transform:rotate(-90deg);transform-origin:60px 60px;animation:ddraw 1.1s cubic-bezier(.3,0,.2,1) forwards .2s}
+  @keyframes ddraw{to{stroke-dashoffset:0}}
+  .dnum{fill:var(--ink);font:850 22px var(--sans);text-anchor:middle}
+  .dsub{fill:var(--ink3);font:700 8.5px var(--sans);text-anchor:middle;letter-spacing:.08em}
+  .donut-card{display:flex;align-items:center;gap:14px}
+  .donut-card .dleg .dt{font-size:12.5px;font-weight:700}
+  .donut-card .dleg .dd{font-size:11px;color:var(--ink3);margin-top:2px;max-width:150px}
+  .spark{width:100%;height:64px}
+  .sarea{fill:rgba(22,179,156,.12);stroke:none}
+  .sline{fill:none;stroke:#16b39c;stroke-width:2.5;stroke-linejoin:round;stroke-dasharray:520;stroke-dashoffset:520;animation:sdraw 1.3s ease forwards .2s}
+  @keyframes sdraw{to{stroke-dashoffset:0}}
+  .sdot{fill:#0b7a6c}
+  .spark-card .skhead{display:flex;align-items:baseline;justify-content:space-between}
+  .spark-card .skv{font-size:20px;font-weight:850;color:var(--ink)}
+  .spark-card .skd{font-size:10.5px;color:var(--ink3);font-weight:650}
+  .prism-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+  /* ===== line icons (managed-agents look) ===== */
+  .h-ic svg,.hi{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .seg .hi,.brand .hi{width:15px;height:15px}
+
+  /* ===== in-flow narration (replaces overlapping callout) ===== */
+  .narration{display:none;background:linear-gradient(160deg,#0c2b27,#123f38);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 13px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+  .narration.show{display:block;animation:nslide .35s cubic-bezier(.34,1.2,.6,1)}
+  @keyframes nslide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .narration .ntop{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .nbadge{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 7px;border-radius:999px}
+  .nbadge.manual{background:rgba(224,170,80,.16);color:#f0b96a;border:1px solid rgba(224,170,80,.32)}
+  .nbadge.auto{background:rgba(22,179,156,.16);color:#57ddc4;border:1px solid rgba(22,179,156,.32)}
+  .narration h5{font-size:13px;font-weight:700;color:#fff;line-height:1.25}
+  .narration .ncount{margin-left:auto;font-size:10px;font-weight:700;color:#7fb3a8}
+  .narration .ndo{margin-top:7px;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:#cdeee5;background:rgba(255,255,255,.06);border-radius:8px;padding:6px 9px;line-height:1.3}
+  .narration .nbarwrap{height:3px;background:rgba(255,255,255,.08);margin-top:9px;border-radius:3px;overflow:hidden}
+  .narration .nbarwrap i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4fe3cf,#16b39c);border-radius:3px}
+
+  /* ===== cinematic play intro ===== */
+  .intro{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(120% 120% at 50% 30%,#123f38 0%,#071d1a 70%);opacity:0;pointer-events:none;transition:opacity .5s}
+  .intro.show{opacity:1;pointer-events:auto}
+  .intro .ilogo{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#16b39c,#0b7a6c);display:grid;place-items:center;color:#fff;font-weight:800;font-size:30px;box-shadow:0 10px 40px rgba(22,179,156,.4);animation:ipop .8s cubic-bezier(.34,1.5,.5,1)}
+  .intro .imark{margin-top:20px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#57ddc4;font-weight:800;opacity:0;animation:ifade .6s ease .25s forwards}
+  .intro h2{margin-top:10px;font-size:30px;font-weight:750;color:#fff;letter-spacing:-.6px;max-width:680px;line-height:1.2;opacity:0;animation:ifade .6s ease .45s forwards}
+  .intro p{margin-top:12px;font-size:14px;color:#9fb1a7;opacity:0;animation:ifade .6s ease .65s forwards}
+  @keyframes ipop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes ifade{to{opacity:1}}
+
+  /* ===== certified seal stamp ===== */
+  .seal-wrap{position:relative;display:grid;place-items:center;padding:8px 0}
+  .seal{width:128px;height:128px;animation:stamp .6s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes stamp{0%{transform:scale(2.4) rotate(-18deg);opacity:0}60%{transform:scale(.92) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+  .seal .sring{fill:none;stroke:var(--green-d);stroke-width:2}
+  .seal .sring2{fill:none;stroke:var(--green);stroke-width:1;stroke-dasharray:2 3}
+  .seal .stext{fill:var(--green-d);font:800 11px var(--sans);letter-spacing:.04em}
+  .seal .score{fill:var(--ink);font:850 30px var(--sans);text-anchor:middle}
+  .seal .slab{fill:var(--green-d);font:800 8px var(--sans);text-anchor:middle;letter-spacing:.14em}
+
+  /* ===== more eval graphs ===== */
+  .chart-card h4{margin-bottom:2px}
+  .chart-card .ch-sub{margin-bottom:12px}
+  .gbar{width:100%;height:150px}
+  .gbar .gb{transform-origin:bottom;transform:scaleY(0);animation:gbgrow .9s cubic-bezier(.3,0,.2,1) forwards}
+  .gbar .gb.h{fill:#16b39c}.gbar .gb.b{fill:#cfd6cf}.gbar .gb.t{fill:none;stroke:#c8842a;stroke-width:2;stroke-dasharray:3 3}
+  @keyframes gbgrow{to{transform:scaleY(1)}}
+  .gbar .gbaxis{stroke:#e6e5de;stroke-width:1}
+  .gbar .gblabel{fill:var(--ink3);font:600 9px var(--sans);text-anchor:middle}
+  .gbar .gbval{fill:var(--ink);font:800 9.5px var(--sans);text-anchor:middle}
+  .glegend{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap}
+  .glegend span{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;color:var(--ink2)}
+  .glegend .sw{width:10px;height:10px;border-radius:3px}
+
+  .catbars{display:flex;flex-direction:column;gap:11px}
+  .catrow{display:grid;grid-template-columns:96px 1fr 34px;align-items:center;gap:10px}
+  .catrow .cn{font-size:11.5px;font-weight:600;color:var(--ink2)}
+  .catrow .ctrack{height:9px;background:#edece6;border-radius:9px;overflow:hidden}
+  .catrow .ctrack i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--green),var(--green-d));transform-origin:left;transform:scaleX(0);animation:pgrow 1s cubic-bezier(.3,0,.2,1) forwards .1s}
+  .catrow .cval{font-size:11.5px;font-weight:800;color:var(--ink);text-align:right}
+
+  .histo{width:100%;height:118px}
+  .histo .hb{fill:#4f8be6;transform-origin:bottom;transform:scaleY(0);animation:gbgrow .85s cubic-bezier(.3,0,.2,1) forwards}
+  .histo .hb.peak{fill:#16b39c}
+  .histo .hx{fill:var(--ink3);font:600 8.5px var(--sans);text-anchor:middle}
+
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#16b39c;margin-right:5px;box-shadow:0 0 0 0 rgba(22,179,156,.6);animation:livep 1.4s infinite}
+  @keyframes livep{0%{box-shadow:0 0 0 0 rgba(22,179,156,.55)}70%{box-shadow:0 0 0 8px rgba(22,179,156,0)}100%{box-shadow:0 0 0 0 rgba(22,179,156,0)}}
+
+  .main.demoing{padding-bottom:40vh}                 /* room so the last card can center on a laptop */
+  .gauge-num.counting{font-variant-numeric:tabular-nums}
+  /* during the demo, keep narration pinned under the topbar so it never scrolls out of view */
+  /* so scrolled-to cards clear the sticky topbar+narration on a laptop */
+  #panel .card,#panel .grid,#panel .seq,#panel .buyer,#panel .yaml,#panel .prism-hero,#panel .prism-row,#panel .prism{scroll-margin-top:200px;scroll-margin-bottom:24px}
+  .demo-hl{scroll-margin-top:200px}
+
+  /* ===== unified line-icon system (replaces all emoji) ===== */
+  .card h4 .ic{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:var(--green-soft);flex-shrink:0}
+  .card h4 .ic svg{width:14px;height:14px;stroke:var(--green-d);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .banner .bi{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:var(--green-soft);flex-shrink:0}
+  .banner .bi svg{width:18px;height:18px;stroke:var(--green-d);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .locked .li svg{width:34px;height:34px;stroke:var(--ink3);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .ndo svg{width:13px;height:13px;stroke:#cdeee5;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .nbadge svg{width:12px;height:12px;margin-right:1px;vertical-align:-1px}
+  .nbadge.manual svg{stroke:#f0b96a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .nbadge.auto svg{fill:#57ddc4;stroke:none}
+  .btn .bi-i{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px}
+  /* completion checks in rail + stepper */
+  .step .sn svg,.dot svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;display:block}
+  .step.active .sn svg{stroke:#fff}
+  .ck svg{width:12px;height:12px;stroke:var(--green-d);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .ckrow{flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .ckrow .ct{font-size:12px;font-weight:600;color:var(--ink)}
+  .ckrow .cv{font-size:11.5px;font-weight:650;color:var(--ink2);text-align:right}
+  .bsig .s .d svg{width:12px;height:12px;stroke:var(--green-d);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px}
+
+  /* ===== Submit: YAML upload ===== */
+  .dropzone{border:1.5px dashed var(--line);border-radius:12px;padding:26px 18px;text-align:center;cursor:pointer;transition:.15s;background:#fcfefd}
+  .dropzone:hover{border-color:var(--green);background:var(--green-soft)}
+  .dropzone.done{border-style:solid;border-color:#cbeee6;background:var(--green-soft);text-align:left;padding:14px 16px;cursor:default}
+  .dz-ic{width:42px;height:42px;border-radius:11px;background:var(--green-soft);display:grid;place-items:center;margin:0 auto 11px}
+  .dz-ic svg{width:20px;height:20px;stroke:var(--green-d);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .dz-t{font-size:13.5px;font-weight:650;color:var(--ink)} .dz-t b{font-weight:800}
+  .dz-s{font-size:11.5px;color:var(--ink3);margin-top:4px}
+  .dz-browse{color:var(--green-d);font-weight:700;text-decoration:underline}
+  .dz-actions{display:flex;gap:18px;margin-top:12px}
+  .dz-actions a{font-size:11.5px;font-weight:650;color:var(--green-d);text-decoration:none;cursor:pointer}
+  .dz-actions a:hover{text-decoration:underline}
+  .dz-file{display:flex;align-items:center;gap:12px}
+  .dz-file .dz-fic{width:38px;height:38px;border-radius:9px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0}
+  .dz-file .dz-fic svg{width:18px;height:18px;stroke:var(--green-d);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .dz-fmeta b{font-size:13px;font-weight:750;display:block} .dz-fmeta span{font-size:11px;color:var(--ink3)}
+  .dz-file .dz-x{margin-left:auto;color:var(--green-d);font-weight:800;font-size:15px}
+  .dropzone.uploading{border-style:solid;border-color:#cbeee6;background:var(--green-soft);text-align:left;padding:14px 16px;cursor:default}
+  .dz-status{font-size:11px;color:var(--green-d);font-weight:600}
+  .dz-prog{height:6px;border-radius:6px;background:#e3efe9;overflow:hidden;margin-top:11px}
+  .dz-prog i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--green-d))}
+  .sub-split{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line2)}
+  @media(max-width:560px){.sub-split{grid-template-columns:1fr}}
+
+  /* ===== Evaluate: metric inputs ===== */
+  .metricchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .mchip{font-size:11.5px;font-weight:650;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;user-select:none;transition:.13s;display:inline-flex;align-items:center;gap:7px}
+  .mchip::before{content:"";width:7px;height:7px;border-radius:50%;background:#d6ddd8;transition:.13s}
+  .mchip.on{background:var(--green-soft);border-color:#cbeee6;color:var(--green-d)}
+  .mchip.on::before{background:var(--green);box-shadow:0 0 0 3px var(--green-ring)}
+  .field label.inlbl{display:block;font-size:11px;font-weight:700;color:var(--ink2);margin:14px 0 2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== SINGLE NAV RAIL ===== -->
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo">H</div>
+      <div>
+        <h1>HUMAIN ALM</h1>
+        <div class="sub">Agent Lifecycle Marketplace</div>
+      </div>
+    </div>
+
+    <div class="mode">
+      <div class="lbl">Experience Mode</div>
+      <div class="seg" id="seg">
+        <button data-mode="leap" class="on"><span class="t">Quick Start</span><span class="d">Guided · 4 steps</span></button>
+        <button data-mode="dev"><span class="t">Developer</span><span class="d">Granular · 8 steps</span></button>
+      </div>
+    </div>
+
+    <div class="nav-title" id="navTitle">Lifecycle</div>
+    <ul class="stages" id="stages"></ul>
+
+    <div class="rail-foot">
+      <span class="ok"></span> HUMAIN-managed runtime · KSA region
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+    <div class="topbar">
+      <div class="agent-id">
+        <div class="agent-av">CS</div>
+        <div class="agent-meta">
+          <h2>Citizen Services Guide</h2>
+          <div class="row"><b>Owner</b> Ministry of Digital Services · <b>ID</b> agt_ksa_csg_014</div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div id="statusChip" class="status-chip st-draft"><span class="pulse"></span><span id="statusLabel">Draft</span></div>
+      <button class="help-btn" title="About HUMAIN ALM">?</button>
+    </div>
+
+    <div class="canvas">
+      <div class="demobar">
+        <button class="play-btn" id="playBtn" onclick="toggleDemo()"><span class="play-tri">▶</span> <span id="playTxt">Play guided demo</span></button>
+        <div class="dlabel">Auto-play walkthrough<small id="demoSub">Runs the full lifecycle · pauses on manual steps</small></div>
+        <div class="dprog"><i id="demoProg"></i></div>
+        <div class="dcount" id="demoCount">0 / 0</div>
+      </div>
+
+      <div id="panel"></div>
+    </div>
+  </main>
+
+  <!-- ===== VALUE RAIL (right) ===== -->
+  <aside class="valuerail">
+    <div class="narration" id="narration">
+      <div class="ntop">
+        <span class="nbadge" id="nBadge"></span>
+        <span class="ncount" id="nCount"></span>
+      </div>
+      <h5 id="nTitle"></h5>
+      <div class="ndo"><span>👉</span><span id="nDo"></span></div>
+      <p id="nBody" hidden></p>
+      <div class="nbarwrap"><i id="nBar"></i></div>
+    </div>
+    <div class="vtitle">Why this step matters</div>
+    <div class="value" id="valueBox"></div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"><span class="ti">✓</span><span id="toastMsg"></span></div>
+
+<div class="intro" id="intro">
+  <div class="ilogo">H</div>
+  <div class="imark">HUMAIN · Agent Lifecycle Marketplace</div>
+  <h2 id="introTitle">From an idea to a trusted, certified marketplace agent</h2>
+  <p>A managed walkthrough. HUMAIN handles the runtime, the evidence, governance and publishing.</p>
+</div>
+
+<script>
+/* ============ STATE ============ */
+const MODES = {
+  leap: {
+    title:"Quick Start Lifecycle",
+    stages:[
+      {id:"submit",  n:"Submit Agent",      sub:"Define & package",  status:["Draft","st-draft"]},
+      {id:"resolve", n:"Provision & Deploy",  sub:"Fit & safe hosting", status:["Deployed","st-deploy"]},
+      {id:"evaluate",n:"Evaluate",          sub:"Evidence & Prism",   status:["Evaluated","st-eval"]},
+      {id:"publish", n:"Cert & Publish",    sub:"Certify & list",     status:["Certified","st-cert"]},
+    ]
+  },
+  dev: {
+    title:"Developer Lifecycle",
+    stages:[
+      {id:"manifest",n:"Submit Manifest", sub:"YAML & validate",   status:["Draft","st-draft"]},
+      {id:"provision",n:"Template & Provision", sub:"Match & guardrails", status:["Provisioned","st-prov"]},
+      {id:"deploy",  n:"Deploy",          sub:"Endpoint & logs",   status:["Deployed","st-deploy"]},
+      {id:"runtime", n:"Runtime / Test",  sub:"Smoke & boundary",  status:["Deployed","st-deploy"]},
+      {id:"eval",    n:"Eval",            sub:"Prism suite",       status:["Evaluated","st-eval"]},
+      {id:"cert",    n:"Cert",            sub:"Policy checks",     status:["Certified","st-cert"]},
+      {id:"pub",     n:"Publish",         sub:"Marketplace listing",status:["Published","st-pub"]},
+    ]
+  }
+};
+
+let state = { mode:"leap", idx:0, published:false };
+
+/* ============ PER-STEP USP (black value box) ============ */
+/* Each step says what the product does for you AT THAT STEP, in plain language. */
+const USP = {
+  "leap:submit":{mark:"Step 1 · Intake",h:"Upload one manifest. HUMAIN takes it from there.",p:"Most platforms stop at hosting the agent. Here, one upload starts the whole chain. It picks the runtime, runs the evaluation, checks governance and publishes. You don't need an MLOps team to wire any of it up.",chips:["No MLOps team","One upload in","Pipeline runs itself"]},
+  "leap:resolve":{mark:"Step 2 · Managed runtime",h:"HUMAIN sizes the agent and hosts it for you.",p:"The platform chooses the runtime, sets the limits and keeps it inside the sovereign boundary. You don't over-buy compute, and you can't host it in the wrong place. This is what managed actually means.",chips:["Right-sized","Stays in region","No over-buying"]},
+  "leap:evaluate":{mark:"Step 3 · Independent evidence",h:"Proof you can see, not claims you have to trust.",p:"HUMAIN runs its own tests over the live agent and hands you a signed evidence pack you can open and audit. A company that only hosts agents can't give you this. We can.",chips:["Prism evidence","Audit-ready","Run by HUMAIN"]},
+  "leap:publish":{mark:"Step 4 · Certify and publish",h:"Only certified agents reach citizens.",p:"Certification is the gate to the marketplace, so every listing carries trust signals a buyer can check. HUMAIN doesn't just host agents. It puts trusted ones in front of the people who need them.",chips:["Gov-grade cert","Buyer trust signals","Listed in minutes"]},
+  "dev:manifest":{mark:"Step 1 · Declare",h:"One manifest, and it carries the whole lifecycle.",p:"Write the agent down once in YAML. HUMAIN validates it and carries it through provisioning, evaluation and certification, so what ships is what you built.",chips:["One source of truth","Validated up front","No drift"]},
+  "dev:provision":{mark:"Step 2 · Template & provision",h:"Match a governed template, then provision safely.",p:"HUMAIN matches a runtime template that already meets policy, then provisions guardrailed compute from it. Override or go bare-environment when you need to. You skip weeks of infra and can't over-provision.",chips:["Weeks to minutes","Hard limits","Full override"]},
+  "dev:deploy":{mark:"Step 3 · Safe deploy",h:"Ship with health checks, logs and a way back.",p:"HUMAIN pushes the image to the guardrailed runtime, watches its health and keeps a one-click rollback ready. Shipping never means losing control.",chips:["Health-checked","One-click rollback","Live logs"]},
+  "dev:runtime":{mark:"Step 4 · Prove behaviour",h:"Test the agent before a citizen ever does.",p:"Smoke, tool-call, auth and handoff tests run against the live agent, so unsafe behaviour shows up while it is still pre-production.",chips:["Pre-prod tests","Auth boundary","Handoff checked"]},
+  "dev:eval":{mark:"Step 5 · Independent Prism",h:"Independent scoring, with a signed evidence pack.",p:"The Prism suite scores the agent against set thresholds on a real dataset and produces an evidence pack you can export. Most vendors can't show you this.",chips:["Threshold-gated","Signed pack","Run by HUMAIN"]},
+  "dev:cert":{mark:"Step 6 · Governance gate",h:"Certification is the gate the marketplace enforces.",p:"After evaluation, HUMAIN checks geography, human oversight, audit trail and data residency, then certifies. Evidence becomes trust you can govern.",chips:["Policy-checked","Auditable","Gov-grade"]},
+  "dev:pub":{mark:"Step 7 · Trusted distribution",h:"Publish a certified agent with trust on the label.",p:"The listing shows the Trust score, the certification and where it runs, so a buyer can check it at a glance. Distribution scales without watering down trust.",chips:["Buyer trust signals","Access control","Scales trust"]}
+};
+function renderValue(){
+  const id = MODES[state.mode].stages[state.idx].id;
+  const u = USP[state.mode+":"+id];
+  if(!u) return;
+  const box = document.getElementById('valueBox');
+  box.innerHTML = `<div class="vmark">${u.mark}</div>
+      <h3>${u.h}</h3>
+      <div class="vcells">${u.chips.map((c,i)=>`<div class="vcell" data-c="${i}"><span class="vn">${i+1}</span><span class="vt">${c}</span></div>`).join('')}</div>`;
+  box.classList.add('swap');                                   // content set now; fade only
+  const raf = window.requestAnimationFrame || (cb=>setTimeout(cb,16));
+  raf(()=>box.classList.remove('swap'));
+}
+function highlightCells(dwell){
+  const cells = document.querySelectorAll('#valueBox .vcell'); if(!cells.length) return;
+  const span = dwell || (BEATS[state.mode][demo.i] ? BEATS[state.mode][demo.i].dwell : 4200);
+  const step = Math.max(500, Math.floor(span/(cells.length+0.5)));
+  cells.forEach((c,i)=>{
+    if(demo['vc'+i]) clearTimeout(demo['vc'+i]);
+    demo['vc'+i]=setTimeout(()=>{ cells.forEach(x=>x.classList.remove('hot')); c.classList.add('hot'); }, i*step+150);
+  });
+}
+
+/* ============ PRISM DATAVIZ (SVG) ============ */
+const PRISM = {
+  score:92,
+  tiles:[
+    {v:"94<small>%</small>",l:"Answer accuracy",p:94,c:"g"},
+    {v:"0",l:"Unsafe disclosures",p:100,c:"g"},
+    {v:"1.6",l:"Avg turns → handoff",p:88,c:"b"},
+    {v:"100<small>%</small>",l:"AR + EN coverage",p:100,c:"g"}
+  ],
+  radar:[{k:"Accuracy",v:.94},{k:"Safety",v:1},{k:"Coverage",v:.96},{k:"Helpful",v:.91},{k:"Latency",v:.88},{k:"Multiling.",v:1}],
+  trend:[80,86,89,93,96]
+};
+function ringGauge(score){
+  const r=76,c=2*Math.PI*r,off=c*(1-score/100);
+  return `<svg class="gauge" viewBox="0 0 180 180" role="img" aria-label="Prism score ${score}">
+    <circle class="gtrack" cx="90" cy="90" r="76" fill="none" stroke-width="14"/>
+    <circle class="gauge-arc" cx="90" cy="90" r="76" fill="none" stroke-width="14" stroke-linecap="round" style="--c:${c.toFixed(0)};--off:${off.toFixed(0)}"/>
+    <text class="gauge-num" id="gaugeNum" x="90" y="98" text-anchor="middle">${score}</text>
+    <text class="gauge-lab" x="90" y="116" text-anchor="middle">PRISM SCORE</text>
+  </svg>`;
+}
+function radarChart(dims){
+  const cx=100,cy=98,R=58,n=dims.length;
+  const pt=(v,i)=>{const a=(-90+i*360/n)*Math.PI/180;return [cx+R*v*Math.cos(a),cy+R*v*Math.sin(a)];};
+  const grid=[.25,.5,.75,1].map(g=>`<polygon class="rgrid" points="${dims.map((d,i)=>pt(g,i).map(x=>x.toFixed(1)).join(',')).join(' ')}"/>`).join('');
+  const axes=dims.map((d,i)=>{const[x,y]=pt(1,i);return `<line class="raxis" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;}).join('');
+  const dp=dims.map((d,i)=>pt(d.v,i).map(x=>x.toFixed(1)).join(',')).join(' ');
+  const dots=dims.map((d,i)=>{const[x,y]=pt(d.v,i);return `<circle class="rdot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.4"/>`;}).join('');
+  const labels=dims.map((d,i)=>{const[x,y]=pt(1.26,i);return `<text class="rlab" x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" text-anchor="middle">${d.k}</text>`;}).join('');
+  return `<svg class="radar" viewBox="0 0 200 196" role="img" aria-label="Prism dimension radar">${grid}${axes}<polygon class="rdata" points="${dp}"/>${dots}${labels}</svg>`;
+}
+function donutChart(pct,center,sub){
+  const r=46,c=2*Math.PI*r,dash=c*pct/100;
+  return `<svg class="donut" viewBox="0 0 120 120" role="img" aria-label="${sub} ${center}">
+    <circle class="dtrack" cx="60" cy="60" r="46"/>
+    <circle class="darc" cx="60" cy="60" r="46" style="--c:${c.toFixed(0)};--dash:${dash.toFixed(0)}"/>
+    <text class="dnum" x="60" y="58">${center}</text><text class="dsub" x="60" y="76">${sub}</text></svg>`;
+}
+function sparkChart(vals){
+  const w=240,h=58,mx=100,mn=72,sx=i=>i*(w/(vals.length-1)),sy=v=>h-((v-mn)/(mx-mn))*(h-12)-6;
+  const pts=vals.map((v,i)=>`${sx(i).toFixed(0)},${sy(v).toFixed(0)}`).join(' ');
+  const area=`0,${h} ${pts} ${w},${h}`;
+  const dots=vals.map((v,i)=>`<circle class="sdot" cx="${sx(i).toFixed(0)}" cy="${sy(v).toFixed(0)}" r="2.6"/>`).join('');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Scenario pass trend"><polygon class="sarea" points="${area}"/><polyline class="sline" points="${pts}"/>${dots}</svg>`;
+}
+function groupedBar(){
+  const groups=[{k:"Accuracy",h:94,b:78,t:90},{k:"Coverage",h:96,b:80,t:95},{k:"Safety",h:100,b:86,t:100},{k:"Helpful",h:91,b:74,t:85}];
+  const W=320,H=150,pad=20,bw=15,n=groups.length,gw=(W-pad*2)/n,y=v=>H-18-(v/100)*(H-32);
+  let s=`<svg class="gbar" viewBox="0 0 ${W} ${H}" role="img" aria-label="Benchmark vs baseline">`;
+  s+=`<line class="gbaxis" x1="${pad}" y1="${H-18}" x2="${W-6}" y2="${H-18}"/>`;
+  groups.forEach((g,i)=>{
+    const cx=pad+gw*i+gw/2, x1=cx-bw-1, x2=cx+1;
+    s+=`<rect class="gb h" x="${x1}" y="${y(g.h).toFixed(1)}" width="${bw}" height="${(H-18-y(g.h)).toFixed(1)}"/>`;
+    s+=`<rect class="gb b" x="${x2}" y="${y(g.b).toFixed(1)}" width="${bw}" height="${(H-18-y(g.b)).toFixed(1)}"/>`;
+    s+=`<line x1="${cx-bw-3}" y1="${y(g.t).toFixed(1)}" x2="${cx+bw+3}" y2="${y(g.t).toFixed(1)}" stroke="#c8842a" stroke-width="2" stroke-dasharray="3 3"/>`;
+    s+=`<text class="gbval" x="${(x1+bw/2).toFixed(1)}" y="${(y(g.h)-3).toFixed(1)}">${g.h}</text>`;
+    s+=`<text class="gblabel" x="${cx}" y="${H-5}">${g.k}</text>`;
+  });
+  return s+`</svg>`;
+}
+function categoryBars(){
+  const cats=[{k:"Permits & licences",v:97},{k:"ID & passports",v:95},{k:"Absher services",v:96},{k:"Payments & fees",v:93},{k:"Appeals & disputes",v:90}];
+  return `<div class="catbars">${cats.map(c=>`<div class="catrow"><span class="cn">${c.k}</span><div class="ctrack"><i style="width:${c.v}%"></i></div><span class="cval">${c.v}%</span></div>`).join('')}</div>`;
+}
+function histogram(){
+  /* 380 eval calls; cumulative gives p50≈240ms (in 200–300) and p95≈470ms (in 400–500) */
+  const b=[{x:"<100",v:18},{x:"100–200",v:74},{x:"200–300",v:150},{x:"300–400",v:92},{x:"400–500",v:38},{x:">500",v:8}];
+  const W=320,H=118,pad=12,n=b.length,gw=(W-pad*2)/n,bw=gw*0.6,max=Math.max(...b.map(x=>x.v)),y=v=>H-16-(v/max)*(H-26);
+  const peak=b.reduce((a,x,i)=>x.v>b[a].v?i:a,0);
+  let s=`<svg class="histo" viewBox="0 0 ${W} ${H}" role="img" aria-label="Latency distribution">`;
+  b.forEach((d,i)=>{const x=pad+gw*i+(gw-bw)/2;s+=`<rect class="hb ${i===peak?'peak':''}" x="${x.toFixed(1)}" y="${y(d.v).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-16-y(d.v)).toFixed(1)}"/><text class="hx" x="${(x+bw/2).toFixed(1)}" y="${H-3}">${d.x}</text>`;});
+  return s+`</svg>`;
+}
+function evalSetup(){
+  const metrics=[["Accuracy",1],["Trustworthiness",1],["Safety",1],["Helpfulness",1],["Robustness",0],["Bias & fairness",0],["Latency",1],["Multilingual",1]];
+  return `<div class="card" style="margin-bottom:16px">
+    <h4><span class="ic">🎚️</span> Evaluation setup</h4>
+    <div class="ch-sub">Pick the dataset and the metrics to score the agent on, then HUMAIN runs Prism.</div>
+    <div class="grid g2">
+      <div class="field"><label>Evaluation dataset</label>
+        <select class="inp"><option>gov-services-eval · 380 cases</option><option>permits-and-licences · 210 cases</option><option>absher-flows · 145 cases</option><option>Upload a custom dataset…</option></select></div>
+      <div class="field"><label>Coverage</label>
+        <select class="inp"><option>Arabic and English · 38 citizen journeys</option><option>Arabic only</option><option>English only</option></select></div>
+    </div>
+    <label class="inlbl">Metrics to test</label>
+    <div class="metricchips">${metrics.map(([m,on])=>`<span class="mchip ${on?'on':''}" onclick="this.classList.toggle('on')">${m}</span>`).join('')}</div>
+  </div>`;
+}
+function prismVisuals(){
+  const P=PRISM;
+  return `<div class="prism">
+    <div class="prism-hero">
+      <div class="gauge-wrap">${ringGauge(P.score)}<div class="gauge-cap">Weighted composite · independent</div></div>
+      <div class="radar-wrap">${radarChart(P.radar)}
+        <div class="rlegend">${P.radar.map(d=>`<div class="rl"><span class="rd"></span>${d.k}<b>${Math.round(d.v*100)}</b></div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="prism-tiles">${P.tiles.map(t=>`<div class="ptile"><div class="pv">${t.v}</div><div class="pl">${t.l}</div><div class="pbar"><i class="${t.c}" style="width:${t.p}%"></i></div></div>`).join('')}</div>
+    <div class="grid g2">
+      <div class="card chart-card"><h4>Benchmarked vs baseline</h4><div class="ch-sub">HUMAIN-managed agent vs untuned baseline · dashed line = certification threshold</div>${groupedBar()}
+        <div class="glegend"><span><span class="sw" style="background:#16b39c"></span>HUMAIN agent</span><span><span class="sw" style="background:#cfd6cf"></span>Baseline</span><span><span class="sw" style="background:#c8842a"></span>Threshold</span></div>
+      </div>
+      <div class="card chart-card"><h4>Accuracy by service category</h4><div class="ch-sub">Per-journey pass rate across the gov-services suite</div>${categoryBars()}</div>
+    </div>
+    <div class="prism-row">
+      <div class="card donut-card">${donutChart(96,"96%","SCENARIO PASS")}<div class="dleg"><div class="dt">365 of 380 eval cases pass</div><div class="dd">96% pass · 15 flagged (4%) for reviewer note on ambiguous permit queries.</div></div></div>
+      <div class="card chart-card"><h4>Response-latency distribution</h4><div class="ch-sub">p50 265ms · p95 470ms · across 380 eval calls</div>${histogram()}</div>
+    </div>
+    <div class="card spark-card"><div class="skhead"><div><div class="skv">+16 pts</div><div class="skd">Scenario pass across 5 eval runs</div></div><span class="tag">improving</span></div>${sparkChart(P.trend)}</div>
+  </div>`;
+}
+
+/* ============ RENDER NAV ============ */
+const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-11"/></svg>';
+function isDone(i){ return i<state.idx || (i===state.idx && state.published); }   /* true completion, incl. published */
+function renderRail(){
+  const m = MODES[state.mode];
+  document.getElementById('navTitle').textContent = m.title;
+  document.getElementById('stages').innerHTML = m.stages.map((s,i)=>{
+    const done=isDone(i), cls = done ? 'done' : (i===state.idx?'active':'');
+    const mark = done ? CHECK : (i+1);
+    return `<li class="stage ${cls}" data-i="${i}">
+      <span class="dot">${mark}</span>
+      <span class="nm">${s.n}<small>${s.sub}</small></span>
+    </li>`;
+  }).join('');
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.mode===state.mode));
+}
+
+function renderStepper(){
+  const el = document.getElementById('stepper'); if(!el) return;   // stepper removed; left rail handles nav
+  const m = MODES[state.mode];
+  el.innerHTML = m.stages.map((s,i)=>{
+    const done=isDone(i), cls = done ? 'done' : (i===state.idx?'active':'');
+    const mark = done ? CHECK : (i+1);
+    const sub = state.mode==='leap'? `<small>${s.sub}</small>`:'';
+    return `<div class="step ${cls}" data-i="${i}">
+      <span class="sn">${mark}</span>
+      <span class="stx">${s.n}${sub}</span>
+      <span class="conn"></span>
+    </div>`;
+  }).join('');
+}
+
+function renderStatus(){
+  const m = MODES[state.mode];
+  let label, css;
+  if(state.published){ label="Published · Pilot-ready"; css="st-pub"; }
+  else { [label, css] = m.stages[state.idx].status; }
+  const chip = document.getElementById('statusChip');
+  chip.className = 'status-chip '+css;
+  document.getElementById('statusLabel').textContent = label;
+}
+
+/* ============ PANELS ============ */
+/* clean line icons → "managed agents" feel (replaces emoji headers) */
+const ICON = {
+  "📥":'<path d="M3 14v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M12 3v11"/><path d="M8 10l4 4 4-4"/>',
+  "⚙️":'<line x1="4" y1="8" x2="20" y2="8"/><circle cx="9" cy="8" r="2.3"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="15" cy="16" r="2.3"/>',
+  "🔬":'<path d="M4 19h16"/><path d="M7 19v-6"/><path d="M12 19V7"/><path d="M17 19v-9"/>',
+  "🏛️":'<path d="M12 3l8 4v2H4V7z"/><path d="M6 11v6M10 11v6M14 11v6M18 11v6"/><path d="M3 20h18"/>',
+  "📄":'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  "🧩":'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  "🛠️":'<rect x="4" y="5" width="16" height="14" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><circle cx="7.5" cy="14.5" r="1"/>',
+  "🚀":'<path d="M12 21V8"/><path d="M7 12l5-5 5 5"/><path d="M5 4h14"/>',
+  "🧪":'<path d="M9 3h6"/><path d="M10 3v6l-4.2 8.4A2 2 0 0 0 7.6 20h8.8a2 2 0 0 0 1.8-2.6L14 9V3"/>',
+  "🛒":'<path d="M5 7h14l-1.4 9a2 2 0 0 1-2 1.7H8.4a2 2 0 0 1-2-1.7z"/><path d="M9 7a3 3 0 0 1 6 0"/>',
+  "📦":'<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  "🎯":'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2"/>',
+  "🖥️":'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  "🔐":'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  "🔍":'<circle cx="11" cy="11" r="6"/><line x1="20" y1="20" x2="16.5" y2="16.5"/>',
+  "✅":'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+  "🛡️":'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  "📝":'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M14 3v5h5"/><path d="M19 3.5l2 2-5.5 5.5H13v-2.5z"/>',
+  "📜":'<rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/>',
+  "🎚️":'<line x1="4" y1="8" x2="20" y2="8"/><circle cx="9" cy="8" r="2.3"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="15" cy="16" r="2.3"/>',
+  "📋":'<rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2.6" width="6" height="3.6" rx="1"/><path d="M8 11h8M8 15h6"/>',
+  "🏷️":'<path d="M4 4h7.2L20 12.8 12.8 20 4 11.2z"/><circle cx="8" cy="8" r="1.3"/>',
+  "🌐":'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.8 2.8 2.8 15.2 0 18c-2.8-2.8-2.8-15.2 0-18z"/>',
+  "⌨️":'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h0M11 10h0M15 10h0M8 14h8"/>',
+  "🧱":'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+  "📊":'<path d="M3 21h18"/><path d="M6 21v-6M11 21V9M16 21v-9"/>',
+  "📍":'<path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.3"/>'
+};
+const NIC = {  /* small inline icons for non-.ic spots */
+  manual:'<svg viewBox="0 0 24 24"><path d="M5 3l5 16 2.2-6.4L19 10z"/></svg>',
+  auto:'<svg viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-11h-6z"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24"><path d="M5 12h12"/><path d="M13 6l6 6-6 6"/></svg>',
+  lock:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  down:'<svg class="bi-i" viewBox="0 0 24 24"><path d="M12 4v12"/><path d="M7 12l5 5 5-5"/><path d="M5 20h14"/></svg>',
+  redo:'<svg class="bi-i" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2 5"/><path d="M20 5v6h-6"/></svg>',
+  back:'<svg class="bi-i" viewBox="0 0 24 24"><path d="M11 7l-5 5 5 5"/><path d="M6 12h11a4 4 0 0 1 0 8h-1"/></svg>'
+};
+function hIcon(ic){ return ICON[ic] ? `<svg viewBox="0 0 24 24">${ICON[ic]}</svg>` : ic; }
+function paintIcons(root){
+  if(!root) return;
+  root.querySelectorAll('.ic').forEach(el=>{ const k=el.textContent.trim(); if(ICON[k]) el.innerHTML=`<svg viewBox="0 0 24 24">${ICON[k]}</svg>`; });
+  root.querySelectorAll('.bi').forEach(el=>{ const k=el.textContent.trim(); if(ICON[k]) el.innerHTML=`<svg viewBox="0 0 24 24">${ICON[k]}</svg>`; });
+  root.querySelectorAll('.li').forEach(el=>{ if(/🔒/.test(el.textContent)) el.innerHTML=NIC.lock; });
+  root.querySelectorAll('.ck').forEach(el=>{ if(el.textContent.trim()==='✓') el.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-11"/></svg>'; });
+  root.querySelectorAll('.bsig .d').forEach(el=>{ const k=el.textContent.trim(); if(ICON[k]) el.innerHTML=`<svg viewBox="0 0 24 24">${ICON[k]}</svg>`; });
+}
+function panelHeader(ic,title,desc,pill){
+  return `<div class="h-row">
+    <div class="h-ic">${hIcon(ic)}</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:10px">
+        <h3>${title}</h3>${pill?`<span class="pill">${pill}</span>`:''}
+      </div>
+      <p>${desc}</p>
+    </div>
+  </div>`;
+}
+function sealSVG(){
+  return `<div class="seal-wrap"><svg class="seal" viewBox="0 0 128 128" role="img" aria-label="HUMAIN Certified seal">
+    <circle class="sring" cx="64" cy="64" r="58"/>
+    <circle class="sring2" cx="64" cy="64" r="49"/>
+    <path class="sring" d="M47 64 l11 12 23 -27" stroke-width="4"/>
+    <text class="slab" x="64" y="104">HUMAIN CERTIFIED</text>
+  </svg></div>`;
+}
+function actions(backLabel, nextLabel, note, nextDisabled){
+  return `<div class="actions">
+    ${backLabel?`<button class="btn btn-ghost" onclick="prev()">← ${backLabel}</button>`:''}
+    ${nextLabel?`<button class="btn btn-primary" id="nextBtn" onclick="next()" ${nextDisabled?'disabled':''}>${nextLabel}</button>`:''}
+    <span class="note">${note||''}</span>
+  </div>`;
+}
+const domainRow = `<div class="domains">
+  <span class="dchip live">● Citizen Services <small style="opacity:.7;margin-left:2px">(this demo)</small></span>
+  <span class="dchip">Enterprise Ops</span><span class="dchip">Healthcare</span>
+  <span class="dchip">Finance</span><span class="dchip">Education</span>
+  <span class="dchip">Tourism</span><span class="dchip">Personal Productivity</span>
+</div>`;
+
+const P = {};
+
+/* ---- LEAP 1: SUBMIT ---- */
+P.submit = ()=> panelHeader("📥","Submit Agent","Upload your agent and tell us who it serves. That is all we need to begin. No scores or evidence show up yet; the agent earns those later.","Step 1 of 4")
++ `<div class="card">
+    <h4><span class="ic">📦</span> Upload agent package</h4>
+    <div class="ch-sub">Drop in the agent manifest. Same YAML format as the HUMAIN ONE manifest.</div>
+    <div class="dropzone" id="dropzone" onclick="uploadYaml()">
+      <div class="dz-ic"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M5 20h14"/></svg></div>
+      <div class="dz-t">Drag and drop <b>agent.yaml</b> here</div>
+      <div class="dz-s">or <span class="dz-browse">browse files</span> &nbsp;·&nbsp; accepts .yaml, .yml &nbsp;·&nbsp; up to 2 MB</div>
+    </div>
+    <div class="dz-actions">
+      <a onclick="toast('example_agent.yaml downloaded')">Download example manifest</a>
+      <a onclick="uploadYaml()">Use the example</a>
+    </div>
+  </div>`
++ actions(null,"Submit for resolution","Draft saved · nothing published");
+
+/* ---- LEAP 2: RESOLVE & DEPLOY ---- */
+P.resolve = ()=> panelHeader("⚙️","Provision & Deploy","HUMAIN picks the right-sized runtime, sets the resource guardrails and a hosting boundary, then deploys. This stops over-provisioning and confirms the agent can be hosted safely, before any evaluation or certification.","Step 2 of 4")
++ `<div class="grid g12" id="provpanel">
+  <div class="card">
+    <h4><span class="ic">🧩</span> Resolved runtime fit</h4>
+    <div class="ch-sub">Matched to the agent's real footprint, so nothing is over-provisioned.</div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Runtime class</span><span class="cv">Standard-CPU · 2 vCPU / 4 GB <span class="tag b">right-sized</span></span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Resource guardrail</span><span class="cv">Cap 4 vCPU · auto-scale 1–3</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Hosting boundary</span><span class="cv">KSA sovereign · gov-isolated VPC</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Data boundary</span><span class="cv">No egress · PII redaction on</span></div></div>
+    <div class="kv"><span class="k">Certification</span><span class="v"><span class="tag n">Comes after evaluation</span></span></div>
+  </div>
+  <div class="card" id="safehost">
+    <h4><span class="ic">✅</span> Safe-hosting confirmation</h4>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Right-sized, not over-provisioned</div><div class="cd">Saves est. 61% vs. default GPU tier</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Guardrails enforced</div><div class="cd">CPU / memory / replica caps active</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Hosted in sovereign boundary</div><div class="cd">Data stays in-region</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Deployment healthy</div><div class="cd">Endpoint live · health checks green</div></div></div>
+  </div>
+</div>`
++ actions("Back","Deploy & continue to evaluation","Resolution prevents over-provisioning before spend");
+
+/* ---- LEAP 3: EVALUATE ---- */
+P.evaluate = ()=> panelHeader("🔬","Evaluate","First point in the lifecycle where evidence appears. HUMAIN's Prism harness runs the deployed agent against scenario suites and safety checks, producing an independent, exportable evidence packet.","Step 3 of 4 · evidence")
++ `${evalSetup()}${prismVisuals()}
+<div class="grid g12" style="margin-top:16px">
+  <div class="card">
+    <h4><span class="ic">📝</span> Runtime transcript <span class="tag b" style="margin-left:auto">live sample</span></h4>
+    <div class="ch-sub">Captured during evaluation run #eval_2291.</div>
+    <div class="transcript">
+<span class="sys">› scenario: renew national ID (Arabic)</span>
+<span class="u">المستخدم: كيف أجدد الهوية الوطنية؟</span>
+<span class="a">الوكيل: يمكنك التجديد عبر أبشر. تحتاج: الهوية الحالية، صورة حديثة، ورسوم ١٠٠ ريال…</span>
+<span class="t">  ⮑ tool: gov_services.lookup("national_id_renewal") ✓ 120ms</span>
+<span class="sys">› scenario: ambiguous, "my permit thing expired"</span>
+<span class="a">Agent: I want to get this right. Do you mean an <b>iqama</b>, a <b>work permit</b>, or a <b>municipal license</b>?</span>
+<span class="t">  ⮑ confidence 0.71 < 0.8 → clarify before answering ✓</span>
+    </div>
+  </div>
+  <div class="card">
+    <h4><span class="ic">🛡️</span> Safety & scenario coverage</h4>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Prompt-injection resistance</div><div class="cd">240/240 adversarial prompts held</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">PII / data-leak checks</div><div class="cd">No sensitive disclosure</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Scenario coverage</div><div class="cd">380 eval cases · 365 pass (96%)</div></div></div>
+    <div class="check"><span class="ck wait">○</span><div><div class="ct">Edge: ambiguous permit queries</div><div class="cd">88% · 15 cases flagged for reviewer note</div></div></div>
+  </div>
+</div>`
++ `<div class="actions">
+   <button class="btn btn-ghost" onclick="prev()">← Back</button>
+   <button class="btn btn-primary" onclick="next()">Review evidence & certify →</button>
+   <button class="btn btn-ghost" onclick="toast('Evidence packet evidence_2291.zip exported')">${NIC.down}Export evidence packet</button>
+   <span class="note">Evidence packet · signed · audit-ready</span>
+ </div>`;
+
+/* ---- LEAP 4: CERT & PUBLISH ---- */
+P.publish = ()=>{
+  const step = state.published?3:(state._certApplied?2:1);
+  return panelHeader("🏛️","Certify & Publish","Certification and publishing are combined but sequential: review the evidence, apply the governance certification label, then publish the marketplace listing.","Step 4 of 4")
++ `<div class="seq">
+    <div class="sq ${step>=1?'ok':''} ${step===1?'on':''}"><div class="sqn">SEQUENCE 1</div><div class="sqt">Review evidence</div><div class="sqd">Trust 92 · audit-ready</div>${step>1?'<span class="sqmark">✓</span>':''}</div>
+    <div class="sq ${step>=2?(state.published?'ok':'on'):''} ${state._certApplied&&!state.published?'on':''}"><div class="sqn">SEQUENCE 2</div><div class="sqt">Apply certification</div><div class="sqd">Governance label</div>${state.published?'<span class="sqmark">✓</span>':''}</div>
+    <div class="sq ${state.published?'on':''}"><div class="sqn">SEQUENCE 3</div><div class="sqt">Publish listing</div><div class="sqd">Marketplace</div>${state.published?'<span class="sqmark">✓</span>':''}</div>
+  </div>
+  <div class="grid g12">
+    <div class="card">
+      <h4><span class="ic">📋</span> Governance certification</h4>
+      <div class="ch-sub">Policy checks required before a public listing.</div>
+      <div class="check"><span class="ck">✓</span><div><div class="ct">Data residency in KSA</div><div class="cd">In-region only</div></div></div>
+      <div class="check"><span class="ck">✓</span><div><div class="ct">Human oversight defined</div><div class="cd">Handoff + escalation path</div></div></div>
+      <div class="check"><span class="ck">✓</span><div><div class="ct">Audit trail enabled</div><div class="cd">Full transcript retention</div></div></div>
+      <div class="check"><span class="ck">✓</span><div><div class="ct">Evidence reviewed</div><div class="cd">Prism packet #2291 signed off</div></div></div>
+      <div style="margin-top:14px">
+        ${state._certApplied
+          ? `${sealSVG()}<div class="kv"><span class="k">Certification label</span><span class="v"><span class="tag">● HUMAIN Certified · Gov-Grade</span></span></div><div class="kv"><span class="k">Signed</span><span class="v mono">cert_csg_2291</span></div>`
+          : `<button class="btn btn-dark" style="width:100%;justify-content:center" onclick="applyCert()">Apply HUMAIN Certified label</button>`}
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Marketplace listing preview</div>
+      <div class="buyer">
+        <div class="bh">
+          <div class="bav">CS</div>
+          <div><div class="bt">Citizen Services Guide</div><div class="bm">Ministry of Digital Services</div></div>
+          ${state._certApplied?'<span class="verify">✓ Certified</span>':'<span class="verify" style="background:#f1f0ea;color:#6b7167;border-color:#e0dfd7">Pending cert</span>'}
+        </div>
+        <div class="bdesc">Trusted assistant for permits, IDs and government services. Arabic and English, with human handoff.</div>
+        <div class="bsig">
+          <span class="s"><span class="d">📊</span> Trust 92</span>
+          <span class="s"><span class="d">🛡️</span> 0 unsafe</span>
+          <span class="s"><span class="d">🏛️</span> Gov-grade</span>
+          <span class="s"><span class="d">📍</span> KSA region</span>
+        </div>
+        <div class="bfoot">
+          <div class="price">Access: <small>Public · gov-verified</small></div>
+          ${state.published?'<span class="verify"><span class="live-dot"></span> Live in marketplace</span>':'<span class="tag n">Draft listing</span>'}
+        </div>
+      </div>
+    </div>
+  </div>`
++ `<div class="actions">
+     <button class="btn btn-ghost" onclick="prev()">← Back</button>
+     ${state.published
+        ? `<button class="btn btn-primary" disabled>✓ Published & pilot-ready</button><button class="btn btn-ghost" onclick="resetFlow()">Run another agent</button>`
+        : `<button class="btn btn-primary" onclick="publishListing()" ${state._certApplied?'':'disabled'}>Publish to marketplace</button>`}
+     <span class="note">${state._certApplied?'Certified. Ready to publish':'Apply certification to enable publish'}</span>
+   </div>`;
+};
+
+/* ===== DEVELOPER PANELS ===== */
+P.manifest = ()=> panelHeader("📄","Submit Manifest","Upload or edit the agent manifest inline. Validate before resolving a template.","Dev · 1 of 7")
++ `<div class="grid g12">
+  <div class="yaml">
+    <div class="yh"><span class="yd" style="background:#e0605e"></span><span class="yd" style="background:#e8b03e"></span><span class="yd" style="background:#3fb96a"></span><span style="margin-left:6px">agent.manifest.yaml</span><span style="margin-left:auto;color:#3fb96a">● valid</span></div>
+<pre><span class="yc"># HUMAIN ALM manifest</span>
+<span class="yk">name:</span> <span class="yv">citizen-services-guide</span>
+<span class="yk">version:</span> <span class="yv">1.4.0</span>
+<span class="yk">owner:</span> <span class="yv">mods-ksa</span>
+<span class="yk">runtime:</span>
+  <span class="yk">image:</span> <span class="yv">ghcr.io/mods-ksa/csg:1.4.0</span>
+  <span class="yk">entry:</span> <span class="yv">/serve</span>
+<span class="yk">tools:</span>
+  - <span class="yv">gov_services.lookup</span>
+  - <span class="yv">absher.status</span>
+<span class="yk">auth:</span> <span class="yv">oauth2 · gov-idp</span>
+<span class="yk">data_boundary:</span> <span class="yv">ksa-region</span>
+<span class="yk">languages:</span> [<span class="yv">ar</span>, <span class="yv">en</span>]</pre>
+  </div>
+  <div class="card">
+    <h4><span class="ic">🔍</span> Validation</h4>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Schema valid</div><div class="cd">manifest v3 · 0 errors</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Image reachable</div><div class="cd">ghcr.io · 412 MB</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Tools declared</div><div class="cd">2 tools · scopes resolved</div></div></div>
+    <div class="check"><span class="ck wait">○</span><div><div class="ct">Secrets policy</div><div class="cd">set at Provision</div></div></div>
+    <h4 style="margin-top:14px"><span class="ic">📦</span> Package contents</h4>
+    <div class="kv"><span class="k">Handler</span><span class="v mono">serve.py</span></div>
+    <div class="kv"><span class="k">Example I/O</span><span class="v"><a href="#" onclick="toast('example_io.json downloaded');return false" style="color:var(--green-d);font-weight:700">${NIC.down}download</a></span></div>
+    <div class="kv"><span class="k">Trust score</span><span class="v"><span class="tag n">Not yet</span></span></div>
+  </div>
+</div>`
++ actions(null,"Validate & match template","Editable inline · YAML validated");
+
+P.provision = ()=> panelHeader("🧩","Template & Provision","Resolve the manifest against a governed runtime template, then assemble the environment: runtime class, resource caps, data boundary and secrets. No certification at this stage.","Dev · 2 of 7")
++ `<div class="grid g3">
+  <div class="card" style="border-color:#cbeee6;box-shadow:0 0 0 3px var(--green-ring)">
+    <h4><span class="ic">✅</span> Matched template</h4>
+    <div class="ch-sub">gov-assistant-cpu · v6</div>
+    <div class="kv"><span class="k">Confidence</span><span class="v">98%</span></div>
+    <div class="kv"><span class="k">Base</span><span class="v">Standard-CPU</span></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="toast('Template applied')">Use this template</button>
+  </div>
+  <div class="card">
+    <h4><span class="ic">⚙️</span> Override controls</h4>
+    <div class="field"><label>Runtime class</label><select class="inp"><option>Standard-CPU (matched)</option><option>High-CPU</option><option>GPU-A10</option></select></div>
+    <div class="field"><label>Replicas</label><select class="inp"><option>1–3 auto (matched)</option><option>Fixed 2</option></select></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="toast('Override saved')">Save override</button>
+  </div>
+  <div class="card">
+    <h4><span class="ic">🧱</span> Alternative paths</h4>
+    <div class="check"><span class="ck wait">○</span><div><div class="ct">Request new template</div><div class="cd">Submit to platform team</div></div></div>
+    <div class="check"><span class="ck wait">○</span><div><div class="ct">Bare environment</div><div class="cd">Define runtime from scratch</div></div></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:10px" onclick="toast('Template request routed')">Request template path</button>
+  </div>
+</div>
+<div class="grid g2" id="provpanel" style="margin-top:16px">
+  <div class="card"><h4><span class="ic">🖥️</span> Compute & caps</h4>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Runtime class</span><span class="cv">Standard-CPU · 2 vCPU / 4 GB</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Resource cap</span><span class="cv">≤ 4 vCPU · ≤ 6 GB</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Autoscale</span><span class="cv">1–3 replicas</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Est. cost</span><span class="cv">~ SAR 0.42 / hr <span class="tag b">right-sized</span></span></div></div>
+  </div>
+  <div class="card"><h4><span class="ic">🔐</span> Boundary & secrets</h4>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Data boundary</span><span class="cv">KSA sovereign · no egress</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Secrets policy</span><span class="cv">Vault-managed · rotated 30d</span></div></div>
+    <div class="check"><span class="ck">✓</span><div class="ckrow"><span class="ct">Network</span><span class="cv">gov-isolated VPC</span></div></div>
+    <div class="kv"><span class="k">Certification</span><span class="v"><span class="tag n">After Eval</span></span></div>
+  </div>
+</div>`
++ actions("Back","Deploy & continue","Matched template and guardrails block over-provisioning");
+
+P.deploy = ()=> panelHeader("🚀","Deploy","Push the image to the provisioned runtime. Inspect endpoint, logs, health and rollback.","Dev · 3 of 7")
++ `<div class="grid g12">
+  <div class="card"><h4><span class="ic">🌐</span> Endpoint & image</h4>
+    <div class="kv"><span class="k">Endpoint</span><span class="v mono">csg.alm.ksa.humain.sa</span></div>
+    <div class="kv"><span class="k">Image</span><span class="v mono">csg:1.4.0 @ sha256:9af3…</span></div>
+    <div class="kv"><span class="k">Health</span><span class="v"><span class="tag">● healthy · 3/3</span></span></div>
+    <div class="actions" style="margin-top:14px;padding-top:14px">
+      <button class="btn btn-ghost" onclick="toast('Redeploy triggered')">${NIC.redo} Redeploy</button>
+      <button class="btn btn-ghost" onclick="toast('Rolled back to 1.3.2')">${NIC.back} Rollback</button>
+    </div>
+  </div>
+  <div class="card"><h4><span class="ic">📜</span> Deploy logs</h4>
+    <div class="transcript" style="max-height:170px">
+<span class="sys">12:04:01 pulling image csg:1.4.0 …</span>
+<span class="a">12:04:18 image verified · sig OK</span>
+<span class="sys">12:04:20 starting 3 replicas …</span>
+<span class="a">12:04:31 replica-1 ready · health 200</span>
+<span class="a">12:04:33 replica-2 ready · health 200</span>
+<span class="a">12:04:35 replica-3 ready · health 200</span>
+<span class="t">12:04:36 endpoint live ✓</span>
+    </div>
+  </div>
+</div>`
++ actions("Back","Continue to runtime tests","Deployed. Not yet evaluated or certified");
+
+P.runtime = ()=> panelHeader("🧪","Runtime / Test","Put the live agent through its paces: smoke test, prompt tester, tool-call, auth boundary and handoff, with a full transcript.","Dev · 4 of 7")
++ `<div class="grid g12">
+  <div class="card"><h4><span class="ic">✅</span> Test matrix</h4>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Smoke test</div><div class="cd">200 OK · 240ms p50</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Tool-call test</div><div class="cd">gov_services.lookup ✓</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Auth boundary test</div><div class="cd">Rejected out-of-scope token ✓</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Handoff test</div><div class="cd">Escalates to human < 2 turns ✓</div></div></div>
+  </div>
+  <div class="card"><h4><span class="ic">⌨️</span> Prompt tester</h4>
+    <div class="field"><label>Test prompt</label><input class="inp" value="How do I renew my iqama?"></div>
+    <div class="transcript" style="max-height:120px">
+<span class="u">› How do I renew my iqama?</span>
+<span class="a">Renew via Absher: valid passport, sponsor approval, fee SAR 500. Want the step-by-step?</span>
+<span class="t">  ⮑ tool: absher.status ✓</span>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="toast('Sent to agent')">Run prompt</button>
+  </div>
+</div>`
++ actions("Back","Run Prism evaluation","Tests pass. Ready for formal eval");
+
+P.eval = ()=> panelHeader("🔬","Eval","Run the Prism suite against thresholds and dataset. First point evidence and score appear.","Dev · 5 of 7 · evidence")
++ `${evalSetup()}${prismVisuals()}
+<div class="card" style="margin-top:16px"><h4><span class="ic">🎚️</span> Thresholds & dataset</h4>
+    <div class="grid g2" style="gap:0 26px">
+      <div>
+        <div class="kv"><span class="k">Dataset</span><span class="v">gov-services-eval · 380 cases</span></div>
+        <div class="kv"><span class="k">Accuracy ≥ 90%</span><span class="v"><span class="tag">pass · 94%</span></span></div>
+      </div>
+      <div>
+        <div class="kv"><span class="k">Unsafe = 0</span><span class="v"><span class="tag">pass</span></span></div>
+        <div class="kv"><span class="k">Coverage ≥ 95%</span><span class="v"><span class="tag">pass · 96%</span></span></div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:14px" onclick="toast('Evidence packet evidence_2291.zip exported')">${NIC.down}Export evidence packet</button>
+  </div>`
++ actions("Back","Continue to certification","Evidence packet generated · signed");
+
+P.cert = ()=> panelHeader("🏛️","Cert","Policy checks run after Eval: geography, human oversight, audit trail, data residency. Apply the certification label.","Dev · 6 of 7")
++ `<div class="grid g12">
+  <div class="card"><h4><span class="ic">📋</span> Policy checks</h4>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Geography in KSA</div><div class="cd">In-region serving</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Human oversight</div><div class="cd">Escalation path defined</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Audit trail</div><div class="cd">Transcript retention on</div></div></div>
+    <div class="check"><span class="ck">✓</span><div><div class="ct">Data residency</div><div class="cd">No egress · PII redaction</div></div></div>
+  </div>
+  <div class="card"><h4><span class="ic">🏷️</span> Certification label</h4>
+    <div class="ch-sub">Applied after policy checks pass.</div>
+    ${state._certApplied
+      ? `${sealSVG()}<div style="text-align:center"><div class="tag" style="font-size:13px;padding:8px 16px">● HUMAIN Certified · Gov-Grade</div><div class="cd" style="margin-top:8px">Signed · cert_csg_2291</div></div>`
+      : `<button class="btn btn-dark" style="width:100%;justify-content:center" onclick="applyCert()">Apply certification label</button>`}
+  </div>
+</div>`
++ `<div class="actions">
+   <button class="btn btn-ghost" onclick="prev()">← Back</button>
+   <button class="btn btn-primary" onclick="next()" ${state._certApplied?'':'disabled'}>Continue to publish</button>
+   <span class="note">${state._certApplied?'Certified. Publish unlocked':'Apply certification to continue'}</span>
+ </div>`;
+
+P.pub = ()=> panelHeader("🛒","Publish","Configure the marketplace listing, preview the buyer card and trust signals, then publish.","Dev · 7 of 7")
++ `<div class="grid g12">
+  <div class="card"><h4><span class="ic">⚙️</span> Listing controls</h4>
+    <div class="field"><label>Access class</label><select class="inp"><option>Public · gov-verified</option><option>Private · org only</option><option>Partner</option></select></div>
+    <div class="field"><label>Category</label><select class="inp"><option>Government & Citizen Services</option></select></div>
+    <div class="kv"><span class="k">Trust signals</span><span class="v">Trust 92 · Certified · KSA</span></div>
+    <div style="margin-top:14px">
+      ${state.published
+        ? `<button class="btn btn-primary" disabled style="width:100%;justify-content:center">✓ Live in marketplace</button>`
+        : `<button class="btn btn-primary" style="width:100%;justify-content:center" onclick="publishListing()" ${state._certApplied?'':'disabled'}>Publish listing</button>`}
+    </div>
+  </div>
+  <div>
+    <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Buyer card preview</div>
+    <div class="buyer">
+      <div class="bh"><div class="bav">CS</div><div><div class="bt">Citizen Services Guide</div><div class="bm">Ministry of Digital Services</div></div><span class="verify">✓ Certified</span></div>
+      <div class="bdesc">Trusted assistant for permits, IDs and gov services. Arabic and English, with human handoff.</div>
+      <div class="bsig"><span class="s"><span class="d">📊</span> Trust 92</span><span class="s"><span class="d">🛡️</span> 0 unsafe</span><span class="s"><span class="d">🏛️</span> Gov-grade</span><span class="s"><span class="d">📍</span> KSA</span></div>
+      <div class="bfoot"><div class="price">Access: <small>Public · gov-verified</small></div>${state.published?'<span class="verify"><span class="live-dot"></span> Live</span>':'<span class="tag n">Draft</span>'}</div>
+    </div>
+  </div>
+</div>`
++ `<div class="actions">
+   <button class="btn btn-ghost" onclick="prev()">← Back</button>
+   ${state.published?'<button class="btn btn-primary" disabled>✓ Published & pilot-ready</button><button class="btn btn-ghost" onclick="resetFlow()">Run another agent</button>':''}
+   <span class="note">${state.published?'Agent is live & pilot-ready':'Certification required before publish'}</span>
+ </div>`;
+
+/* ============ ACTIONS ============ */
+function renderPanel(){
+  const id = MODES[state.mode].stages[state.idx].id;
+  document.getElementById('panel').innerHTML = (P[id]||(()=>'<div class="card locked"><div class="li">🔒</div><b>Stage</b></div>'))();
+  paintIcons(document.getElementById('panel'));   /* swap any emoji for line icons */
+}
+let _lastStageKey=null;
+function stageEntryFx(){
+  /* the interactive reveal that plays whenever a stage is shown, manual nav or demo */
+  highlightCells(2600);                                            // value cells light up one by one
+  const gn=document.getElementById('gaugeNum'); if(gn) countUp(gn, PRISM.score);   // Prism gauge counts up
+  if(document.querySelector('#panel .check')) animateRows('#panel', 2800);          // rows turn to green checks one by one
+}
+function renderAll(){
+  renderRail(); renderStepper(); renderStatus(); renderValue(); renderPanel(); updateDemoCount();
+  const key=state.mode+':'+state.idx+':'+(state.published?1:0)+':'+(state._certApplied?1:0);
+  if(key!==_lastStageKey){ _lastStageKey=key; stageEntryFx(); }    // run reveal on every stage change
+  const _m=document.querySelector('.main'); if(_m&&_m.scrollTo&&!demo.on)_m.scrollTo({top:0,behavior:'smooth'});
+}
+
+function go(i){ const max=MODES[state.mode].stages.length-1; state.idx=Math.max(0,Math.min(max,i)); renderAll(); }
+function next(){ if(state.idx<MODES[state.mode].stages.length-1) go(state.idx+1); }
+function prev(){ if(state.idx>0) go(state.idx-1); }
+function applyCert(){ state._certApplied=true; toast('HUMAIN Certified · Gov-Grade label applied'); renderAll(); }
+function publishListing(){ if(!state._certApplied)return; state.published=true; toast('Published to marketplace · pilot-ready'); renderAll(); }
+function resetFlow(){ state.idx=0; state.published=false; state._certApplied=false; renderAll(); }
+
+function setMode(m){ if(state.mode===m)return; state.mode=m; state.idx=0; state.published=false; state._certApplied=false; renderAll(); }
+
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2400); }
+const DOCSVG='<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+function uploadYaml(){
+  const dz=document.getElementById('dropzone'); if(!dz||dz.dataset.up)return;
+  dz.dataset.up='1'; dz.classList.add('uploading');
+  dz.innerHTML=`<div class="dz-file"><span class="dz-fic">${DOCSVG}</span><div class="dz-fmeta"><b>citizen-services-guide.yaml</b><span class="dz-status">Uploading… 617 KB</span></div></div><div class="dz-prog"><i></i></div>`;
+  const bar=dz.querySelector('.dz-prog i');
+  bar.style.transition='none'; bar.style.width='6%'; void bar.offsetWidth;
+  bar.style.transition='width 1.7s cubic-bezier(.35,0,.2,1)'; bar.style.width='100%';
+  if(demo.timerUp) clearTimeout(demo.timerUp);
+  demo.timerUp=setTimeout(finishUpload,1850);
+}
+function finishUpload(){
+  const dz=document.getElementById('dropzone'); if(!dz)return;
+  dz.classList.remove('uploading'); dz.classList.add('done');
+  dz.innerHTML=`<div class="dz-file"><span class="dz-fic">${DOCSVG}</span><div class="dz-fmeta"><b>citizen-services-guide.yaml</b><span>617 KB · manifest v3 · <span class="tag">valid</span></span></div><span class="dz-x">✓</span></div>`;
+  toast('agent.yaml uploaded and validated');
+}
+function animateRows(sel, dwell){
+  // only animate rows that are genuine checks; leave intentionally-pending rows (.ck.wait) alone
+  const rows=[...document.querySelectorAll(sel+' .check')].filter(r=>{const ck=r.querySelector('.ck'); return ck && !ck.classList.contains('wait');});
+  if(!rows.length)return;
+  const step=Math.max(360, Math.floor((dwell-500)/rows.length));
+  rows.forEach((r,i)=>{
+    const ck=r.querySelector('.ck');
+    ck.dataset.pending='1'; ck.classList.add('wait'); ck.textContent='○';   // reset to pending
+    if(demo['rk'+i]) clearTimeout(demo['rk'+i]);
+    demo['rk'+i]=setTimeout(()=>{ ck.classList.remove('wait'); delete ck.dataset.pending; ck.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-11"/></svg>'; }, 350+i*step);
+  });
+}
+
+/* ============ AUTOPLAY DEMO ENGINE ============ */
+const BEATS = {
+  leap:[
+    {idx:0,kind:'manual',title:'1. Owner submits the agent',body:'Upload the agent manifest and confirm who it serves. That is the only manual input HUMAIN needs to begin.',doit:'Upload agent.yaml',focus:'.dropzone',dwell:4500,enter:()=>{ uploadYaml(); }},
+    {idx:1,kind:'auto',title:'2. HUMAIN sizes the runtime and deploys',body:'No one touches anything. The platform sizes the compute, sets the guardrails and hosts it inside the sovereign boundary.',doit:'HUMAIN sizes the runtime, sets guardrails and deploys',focus:'.grid',dwell:4600,rows:'#provpanel'},
+    {idx:2,kind:'auto',title:'3. Prism evaluates the live agent',body:'HUMAIN runs its own tests over the agent, scores accuracy, safety and coverage, then builds the signed evidence pack.',doit:'Prism scores the agent and builds the evidence',focus:'.prism-hero',tour:true,dwell:5200},
+    {idx:3,kind:'manual',title:'4. Reviewer applies certification',body:'A reviewer signs off the evidence and applies the Gov-Grade certificate. That is the gate to the marketplace.',doit:'Apply the HUMAIN Certified label',focus:'.seq',dwell:4200,act:()=>{ if(!state._certApplied) applyCert(); }},
+    {idx:3,kind:'manual',title:'5. Publisher lists it to the marketplace',body:'With certification in place the agent goes live, carrying trust signals a buyer can check. It is ready for the pilot.',doit:'Publish to the marketplace',focus:'.buyer',dwell:4400,act:()=>{ if(!state.published) publishListing(); }}
+  ],
+  dev:[
+    {idx:0,kind:'manual',title:'1. Author the manifest',body:'One YAML manifest becomes the contract for the whole lifecycle.',doit:'Edit and validate agent.manifest.yaml',focus:'.yaml',dwell:4200},
+    {idx:1,kind:'manual',title:'2. Match a template and provision',body:'A governed template stands in for weeks of infra, and HUMAIN provisions guardrailed compute from it.',doit:'Accept the template; HUMAIN provisions the runtime',focus:'.grid',dwell:4400},
+    {idx:2,kind:'auto',title:'3. HUMAIN deploys with health and rollback',body:'The image ships to the guardrailed runtime with health checks and a one-click rollback.',doit:'HUMAIN deploys with health checks and rollback',focus:'.grid',dwell:3400},
+    {idx:3,kind:'auto',title:'4. Runtime tests exercise the agent',body:'Smoke, tool-call, auth and handoff tests run before anything reaches production.',doit:'Runtime tests run against the live agent',focus:'.grid',dwell:3400},
+    {idx:4,kind:'auto',title:'5. Prism suite runs',body:'Independent scoring against thresholds on a real dataset, with a signed evidence pack.',doit:'Prism scores the agent and builds the evidence',focus:'.prism-hero',tour:true,dwell:5200},
+    {idx:5,kind:'manual',title:'6. Apply certification',body:'Geography, oversight, audit trail and residency are checked, then certified.',doit:'Apply the certification label',focus:'.grid',dwell:4200,act:()=>{ if(!state._certApplied) applyCert(); }},
+    {idx:6,kind:'manual',title:'7. Publish the listing',body:'The certified agent goes live with trust signals on the label.',doit:'Publish the listing',focus:'.buyer',dwell:4400,act:()=>{ if(!state.published) publishListing(); }}
+  ]
+};
+const DEMO_SPEED = 0.75;   // playback speed; <1 is slower
+const demo = {on:false, i:0, timer:null, timer2:null, timerT:null, timerT2:null, timerT3:null};
+let focusEl=null;
+function scrollToFocus(sel, block){
+  const main=document.querySelector('.main');
+  const el = sel ? document.querySelector('#panel '+sel) : null;
+  if(el && el.scrollIntoView){ try{ el.scrollIntoView({behavior:'smooth',block:block||'center'}); }catch(e){ el.scrollIntoView(); } }
+  else if(main && main.scrollTo){ main.scrollTo({top:0,behavior:'smooth'}); }
+}
+
+function toggleDemo(){ demo.on ? stopDemo() : startDemo(); }
+function startDemo(){
+  stopTimers(); clearFocus(); hideCallout();
+  state.idx=0; state.published=false; state._certApplied=false;
+  demo.on=true; demo.i=0;
+  const pb=document.getElementById('playBtn');
+  pb.classList.add('playing'); document.getElementById('playTxt').textContent='Stop demo'; document.querySelector('.play-tri').textContent='■';
+  document.getElementById('demoSub').textContent='Playing · auto-advancing with narration';
+  document.querySelector('.main').classList.add('demoing');
+  const tb=document.querySelector('.topbar'); document.documentElement.style.setProperty('--narrTop',((tb&&tb.offsetHeight)||64)+'px');
+  renderAll();
+  /* cinematic intro, then begin */
+  const intro=document.getElementById('intro');
+  document.getElementById('introTitle').textContent = state.mode==='dev'
+    ? 'From a manifest to a certified, published agent'
+    : 'From an idea to a trusted, certified marketplace agent';
+  intro.classList.add('show');
+  demo.timer=setTimeout(()=>{
+    intro.classList.remove('show');
+    demo.timer=setTimeout(()=>{ if(demo.on) runBeat(); }, Math.round(500/DEMO_SPEED));
+  }, Math.round(1800/DEMO_SPEED));
+}
+function stopDemo(){
+  demo.on=false; stopTimers(); clearFocus(); hideCallout(); setDemoProg(0);
+  const intro=document.getElementById('intro'); if(intro)intro.classList.remove('show');
+  document.querySelector('.main').classList.remove('demoing');
+  const pb=document.getElementById('playBtn');
+  if(pb){ pb.classList.remove('playing'); document.getElementById('playTxt').textContent='Play guided demo'; document.querySelector('.play-tri').textContent='▶'; }
+  document.getElementById('demoSub').textContent='Runs the full lifecycle · pauses on manual steps';
+  updateDemoCount();
+}
+function stopTimers(){ Object.keys(demo).forEach(k=>{ if((k.startsWith('timer')||k.startsWith('vc')||k.startsWith('rk'))&&demo[k]){ clearTimeout(demo[k]); demo[k]=null; } }); }
+function runBeat(){
+  const beats=BEATS[state.mode];
+  if(demo.i>=beats.length){ finishDemo(); return; }
+  const b=beats[demo.i];
+  const dw=Math.round(b.dwell/DEMO_SPEED);        // dwell scaled by playback speed
+  if(state.idx!==b.idx){ state.idx=b.idx; renderAll(); }
+  updateDemoCount(); setFocus(b.focus); showCallout(b,dw); animateDemoProg(dw);
+  if(b.enter) b.enter();                          // beat-start action (e.g. start the upload)
+  /* the stage reveal (cells, gauge, row checks) is driven by renderAll on every stage/state change */
+  demo.timer2=setTimeout(()=>scrollToFocus(b.focus,'center'), 140);
+  if(b.tour){   /* slow scroll up→down through the whole eval dashboard so every chart is seen */
+    demo.timerT =setTimeout(()=>scrollToFocus('.grid.g2','center'),   Math.round(dw*0.34));
+    demo.timerT2=setTimeout(()=>scrollToFocus('.prism-row','center'), Math.round(dw*0.58));
+    demo.timerT3=setTimeout(()=>scrollToFocus('.spark-card','center'),Math.round(dw*0.80));
+  }
+  demo.timer=setTimeout(()=>{
+    clearFocus();
+    if(b.act){ b.act(); demo.timer2=setTimeout(()=>scrollToFocus(b.focus,'center'),160); }  /* re-center to reveal result (seal / live) */
+    demo.i++;
+    demo.timer=setTimeout(()=>{ if(demo.on) runBeat(); }, Math.round(640/DEMO_SPEED));
+  }, dw);
+}
+function finishDemo(){
+  clearFocus();
+  showCallout({kind:'auto',title:'Lifecycle complete',body:'From one submission to a certified, published marketplace listing, managed start to finish by HUMAIN.',doit:'Press Play to run it again',dwell:6000});
+  demo.on=false; setDemoProg(100);
+  const pb=document.getElementById('playBtn');
+  pb.classList.remove('playing'); document.getElementById('playTxt').textContent='Replay demo'; document.querySelector('.play-tri').textContent='▶';
+  document.getElementById('demoSub').textContent='Demo complete · all stages certified & published';
+  demo.timer=setTimeout(hideCallout,6000);
+}
+function showCallout(b, dw){   /* renders into the IN-FLOW narration strip, never overlaps the product */
+  document.getElementById('nTitle').textContent=b.title;
+  document.getElementById('nBody').textContent=b.body;
+  document.getElementById('nDo').textContent=b.doit||'';
+  const badge=document.getElementById('nBadge');
+  badge.className='nbadge '+(b.kind==='manual'?'manual':'auto');
+  badge.innerHTML=(b.kind==='manual')? NIC.manual+' You do this' : NIC.auto+' HUMAIN does this';
+  const beats=BEATS[state.mode];
+  document.getElementById('nCount').textContent=(demo.on?Math.min(demo.i+1,beats.length):beats.length)+' / '+beats.length;
+  const bar=document.getElementById('nBar');
+  bar.style.transition='none'; bar.style.width='0%'; void bar.offsetWidth;
+  bar.style.transition='width '+(dw||b.dwell)+'ms linear'; bar.style.width='100%';
+  document.getElementById('narration').classList.add('show');
+}
+function hideCallout(){ const n=document.getElementById('narration'); if(n)n.classList.remove('show'); }
+function countUp(el,target){
+  let cur=0; const step=Math.max(1,Math.round(target/26));
+  el.textContent='0'; el.classList.add('counting');
+  const t=setInterval(()=>{ cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=cur; },26);
+}
+function setFocus(sel){ clearFocus(); if(!sel)return; const el=document.querySelector('#panel '+sel); if(el){ el.classList.add('demo-hl'); focusEl=el; } }
+function clearFocus(){ if(focusEl){ focusEl.classList.remove('demo-hl'); focusEl=null; } }
+function updateDemoCount(){ const beats=BEATS[state.mode]; const el=document.getElementById('demoCount'); if(el) el.textContent=(demo.on?Math.min(demo.i+1,beats.length):0)+' / '+beats.length; }
+function setDemoProg(pct){ const p=document.getElementById('demoProg'); if(p){ p.style.transition='width .3s linear'; p.style.width=pct+'%'; } }
+function animateDemoProg(dwell){
+  const beats=BEATS[state.mode], seg=100/beats.length, start=demo.i*seg, end=(demo.i+1)*seg;
+  const p=document.getElementById('demoProg'); if(!p)return;
+  p.style.transition='none'; p.style.width=start+'%'; void p.offsetWidth;
+  p.style.transition='width '+dwell+'ms linear'; p.style.width=end+'%';
+}
+
+/* events (delegated). manual interaction stops the demo */
+document.getElementById('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(b){stopDemo();setMode(b.dataset.mode);}});
+document.getElementById('stages').addEventListener('click',e=>{const li=e.target.closest('.stage');if(li){stopDemo();go(+li.dataset.i);}});
+{const _st=document.getElementById('stepper'); if(_st)_st.addEventListener('click',e=>{const s=e.target.closest('.step');if(s){stopDemo();go(+s.dataset.i);}});}
+
+try{ Object.assign(window,{state,demo,BEATS,USP,PRISM,MODES}); }catch(e){}  /* expose for inspection/testing */
+{ const _do=document.querySelector('.ndo span'); if(_do)_do.innerHTML=NIC.arrow; }   /* narration arrow icon */
+renderAll();
+</script>
+</body>
+</html>
