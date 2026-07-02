@@ -497,8 +497,9 @@
       </div>
     </div>
 
-    <div class="nav-title">My Agents</div>
-    <ul class="agents" id="agentsList"></ul>
+    <ul class="agents" style="margin-top:10px">
+      <li class="arow" onclick="openMyAgents()"><span class="aav">☰</span><span class="anm">My Agents</span><span class="achip draft">3 agents</span></li>
+    </ul>
     <div class="nav-title" id="navTitle">Lifecycle</div>
     <ul class="stages" id="stages"></ul>
 
@@ -623,6 +624,12 @@ function selectAgent(id){
   const h2=document.querySelector('.agent-meta h2'); if(h2) h2.textContent=nxt.name;
   const row=document.querySelector('.agent-meta .row'); if(row) row.innerHTML=`<b>Owner</b> ${nxt.owner} · <b>ID</b> ${nxt.aid}`;
   renderAll();
+}
+function openMyAgents(){
+  try{
+    if(window.parent && window.parent!==window && typeof window.parent.go==='function'){ window.parent.go('agents'); return; }
+  }catch(e){}
+  toast('My Agents opens in the HUMAIN ONE shell');
 }
 function newAgent(){
   selectAgent('csg');
@@ -1339,7 +1346,7 @@ function stageEntryFx(){
   if(document.querySelector('#panel .check')) animateRows('#panel', 2800);          // rows turn to green checks one by one
 }
 function renderAll(){
-  renderRail(); renderAgents(); renderStepper(); renderStatus(); renderValue(); renderPanel(); updateDemoCount();
+  renderRail(); renderStepper(); renderStatus(); renderValue(); renderPanel(); updateDemoCount();
   const _tb=document.querySelector('.topbar'); if(_tb) _tb.style.display = (state.idx===0?'none':'flex');
   const key=state.mode+':'+state.idx+':'+(state.published?1:0)+':'+(state._certApplied?1:0);
   if(key!==_lastStageKey){ _lastStageKey=key; stageEntryFx(); } else if(isEvalStage()){ startPrismStream(); }    // run reveal on every stage change
