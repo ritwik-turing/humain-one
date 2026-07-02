@@ -456,6 +456,19 @@
   .vstat .vsn{font-size:22px;font-weight:800;color:var(--green-d);letter-spacing:-.5px}
   .vstat .vsn small{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:0;margin-left:4px}
   .vstat .vsl{font-size:10.5px;color:var(--ink3);font-weight:600;margin-top:3px;line-height:1.4}
+  .agents{list-style:none;padding:0 12px;margin-bottom:4px}
+  .agents .arow{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;cursor:pointer;transition:.13s;margin-bottom:2px}
+  .agents .arow:hover{background:#f4f8f6}
+  .agents .arow.on{background:var(--green-soft)}
+  .agents .aav{width:24px;height:24px;border-radius:7px;background:#0f211c;color:#fff;font-size:9.5px;font-weight:800;display:grid;place-items:center;flex-shrink:0}
+  .agents .arow.new .aav{background:var(--green-soft);color:var(--green-d);border:1px dashed var(--green-d)}
+  .agents .anm{font-size:12px;font-weight:600;color:var(--ink2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .agents .arow.on .anm{color:var(--ink)}
+  .agents .achip{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:2.5px 7px;flex-shrink:0}
+  .agents .achip.draft{background:#f1f0ea;color:#6b7167}
+  .agents .achip.evaling{background:var(--blue-soft);color:var(--blue)}
+  .agents .achip.pub{background:var(--green-soft);color:var(--green-d)}
+  .agents .achip.susp{background:#fdecea;color:#a33}
   .livechip{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;color:var(--green-d);background:var(--green-soft);border:1px solid #cbeee6;border-radius:9px;padding:9px 13px}
   .livechip .livedot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:livep 1.5s infinite}
   .plhidden{display:none}
@@ -484,6 +497,8 @@
       </div>
     </div>
 
+    <div class="nav-title">My Agents</div>
+    <ul class="agents" id="agentsList"></ul>
     <div class="nav-title" id="navTitle">Lifecycle</div>
     <ul class="stages" id="stages"></ul>
 
@@ -573,7 +588,48 @@ const MODES = {
   }
 };
 
-let state = { mode:"leap", idx:0, published:false };
+let state = { mode:"leap", idx:0, published:false, agentId:"csg" };
+const AGENTS = [
+  {id:"csg", name:"Citizen Services Guide", av:"CS", owner:"Ministry of Digital Services", aid:"agt_ksa_csg_014",
+   snap:{idx:0,published:false,_certApplied:false,evalDone:false,suspended:false}},
+  {id:"pra", name:"Permit Renewal Assistant", av:"PR", owner:"Ministry of Municipal Affairs", aid:"agt_ksa_pra_007",
+   snap:{idx:3,published:true,_certApplied:true,evalDone:true,suspended:false}},
+  {id:"tcc", name:"Tourism Concierge", av:"TC", owner:"Ministry of Tourism", aid:"agt_ksa_tcc_021",
+   snap:{idx:2,published:false,_certApplied:false,evalDone:false,suspended:false}}
+];
+const SNAPKEYS = ["idx","published","_certApplied","evalDone","suspended"];
+function agentById(id){ return AGENTS.find(a=>a.id===id); }
+function agentStage(a){
+  const t = a.id===state.agentId ? state : a.snap;
+  if(t.suspended) return ["Suspended","susp"];
+  if(t.published) return ["Published","pub"];
+  if(t.idx>=2) return ["In eval","evaling"];
+  return ["Draft","draft"];
+}
+function renderAgents(){
+  const el=document.getElementById('agentsList'); if(!el) return;
+  el.innerHTML = `<li class="arow new" onclick="newAgent()"><span class="aav">+</span><span class="anm">Submit new agent</span></li>`
+   + AGENTS.map(a=>{ const [lab,cls]=agentStage(a);
+     return `<li class="arow ${a.id===state.agentId?'on':''}" onclick="selectAgent('${a.id}')"><span class="aav">${a.av}</span><span class="anm">${a.name}</span><span class="achip ${cls}">${lab}</span></li>`;
+   }).join('');
+}
+function selectAgent(id){
+  if(id===state.agentId){ renderAgents(); return; }
+  stopDemo&&stopDemo();
+  const cur=agentById(state.agentId); if(cur) SNAPKEYS.forEach(k=>cur.snap[k]=state[k]);
+  const nxt=agentById(id); if(!nxt) return;
+  state.agentId=id; state.mode="leap"; SNAPKEYS.forEach(k=>state[k]=nxt.snap[k]);
+  const av=document.querySelector('.agent-av'); if(av) av.textContent=nxt.av;
+  const h2=document.querySelector('.agent-meta h2'); if(h2) h2.textContent=nxt.name;
+  const row=document.querySelector('.agent-meta .row'); if(row) row.innerHTML=`<b>Owner</b> ${nxt.owner} · <b>ID</b> ${nxt.aid}`;
+  renderAll();
+}
+function newAgent(){
+  selectAgent('csg');
+  state.idx=0; state.published=false; state._certApplied=false; state.evalDone=false; state.suspended=false;
+  const c=agentById('csg'); SNAPKEYS.forEach(k=>c.snap[k]=state[k]);
+  renderAll(); toast('New submission started');
+}
 
 /* ============ PER-STEP USP (black value box) ============ */
 /* Each step says what the product does for you AT THAT STEP, in plain language. */
@@ -1283,7 +1339,7 @@ function stageEntryFx(){
   if(document.querySelector('#panel .check')) animateRows('#panel', 2800);          // rows turn to green checks one by one
 }
 function renderAll(){
-  renderRail(); renderStepper(); renderStatus(); renderValue(); renderPanel(); updateDemoCount();
+  renderRail(); renderAgents(); renderStepper(); renderStatus(); renderValue(); renderPanel(); updateDemoCount();
   const _tb=document.querySelector('.topbar'); if(_tb) _tb.style.display = (state.idx===0?'none':'flex');
   const key=state.mode+':'+state.idx+':'+(state.published?1:0)+':'+(state._certApplied?1:0);
   if(key!==_lastStageKey){ _lastStageKey=key; stageEntryFx(); } else if(isEvalStage()){ startPrismStream(); }    // run reveal on every stage change
@@ -1378,7 +1434,7 @@ function scrollToFocus(sel, block){
 }
 
 function toggleDemo(){ demo.on ? stopDemo() : startDemo(); }
-function startDemo(){
+function startDemo(){ if(state.agentId!=='csg') selectAgent('csg');
   stopTimers(); clearFocus(); hideCallout();
   state.idx=0; state.published=false; state._certApplied=false;
   demo.on=true; demo.i=0;
