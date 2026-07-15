@@ -1485,11 +1485,15 @@
 #detailBody .verrow{padding:3px 0!important}
 #detailBody .badge{font-size:9.5px;padding:1.5px 7px}
 #detailBody .note{padding:8px 10px}
-#detailBody pre{max-height:92px;overflow:auto}
+#detailBody pre{max-height:64px;overflow:auto}
 #detailBody .obsgrid .card{margin-top:0!important}
 #detailBody .obsgrid .note{margin-top:0!important}
 #detailBody table th,#detailBody table td{padding:4px 6px!important}
-#detailBody .evcard{padding:8px 10px}
+#detailBody .evcard{padding:6px 10px}
+#detailBody .evscore{font-size:20px!important}
+#detailBody .evcard-meta{margin-top:2px!important}
+#detailBody .note .ni{display:none}
+#detailBody .small{font-size:11px}
 </style>
 </head>
 <body>
@@ -1979,7 +1983,7 @@ function panelState(a){ if(!a) return {kind:'healthy'}; if(PANEL_STATE[a.id]) re
   return {kind:'healthy'};
 }
 function statusBanner(a){var b=viewOf(a).banner;
-return '<div class="note '+b[0]+'" style="display:flex;gap:12px;align-items:flex-start;margin:2px 0 16px"><span class="ni"><i data-lucide="'+b[1]+'"></i></span><div style="flex:1"><div style="font-weight:700">'+b[2]+'</div><div class="small" style="margin-top:3px">'+b[3]+'</div><div style="margin-top:10px"><button class="btn sm" data-detailtab="'+b[4]+'">'+b[5]+'</button>'+(b[0]!=='gov'?'<button class="btn sm ghost" data-go="submit" style="margin-left:8px">Resume submission</button>':'')+'</div></div></div>';}
+return '<div class="note '+b[0]+'" style="display:flex;gap:12px;align-items:flex-start;margin:2px 0 10px"><span class="ni"><i data-lucide="'+b[1]+'"></i></span><div style="flex:1"><div style="font-weight:700">'+b[2]+'</div><div class="small" style="margin-top:3px">'+b[3]+'</div><div style="margin-top:10px"><button class="btn sm" data-detailtab="'+b[4]+'">'+b[5]+'</button>'+(b[0]!=='gov'?'<button class="btn sm ghost" data-go="submit" style="margin-left:8px">Resume submission</button>':'')+'</div></div></div>';}
 function detailKV(rows){return '<div class="bd">'+rows.map(function(r){return '<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span class="small">'+r[0]+'</span><span style="font-weight:600">'+r[1]+'</span></div>';}).join('')+'</div>';}
 function detailOverview(a){
   var retire='<div class="card" id="sec-retire-agent" style="margin-top:14px;scroll-margin-top:120px"><div class="hd"><h3>Retire agent</h3>'+badge('muted','ends the lifecycle')+'</div><div class="bd"><div class="small" style="margin-bottom:10px">Retiring stops the lifecycle. Sandboxes are torn down, secrets purged, and a teardown record is kept for the audit trail. No live logs or health after retirement.</div><div class="verrow"><span>1 · Drain traffic</span><span class="badge muted" data-tstep>pending</span></div><div class="verrow"><span>2 · Remove sandboxes</span><span class="badge muted" data-tstep>pending</span></div><div class="verrow"><span>3 · Purge secrets</span><span class="badge muted" data-tstep>pending</span></div><div class="verrow"><span>4 · Deregister and write teardown record</span><span class="badge muted" data-tstep>pending</span></div><div class="row" style="margin-top:10px"><button class="btn sm" data-obsretire>Retire agent</button></div><div class="retireDone"></div></div></div>';
@@ -2031,17 +2035,17 @@ function refusalAlert(status,code,opts){opts=opts||{};var r=refusalFrom(status,c
   return '<div class="note '+cls+'"><span class="ni">'+(r[2]?'↻':'!')+'</span><div><b>'+r[0]+'</b> '+codechip+'<div class="small" style="margin-top:2px">'+r[1]+'</div>'+fields+retry+ref+'</div></div>';
 }
 function obsRefusals(){
-  function sub(t){return '<div style="text-transform:uppercase;letter-spacing:.06em;font-size:10px;color:var(--muted);font-weight:700;margin:4px 0 0">'+t+'</div>';}
-  return '<div class="card" style="margin-top:14px"><div class="hd"><h3>Error and refusal handling</h3>'+badge('muted','shared display · one component on every action')+'</div><div class="bd" style="display:grid;gap:10px">'
-   +sub('Blocking · fix the cause first')
-   +refusalAlert('403','blocked-by-tenant',{ref:'req_5f21'})
-   +refusalAlert('422',null,{fields:[['deployment.resources.cpu','must be a positive whole CPU integer']],ref:'val_19cd'})
-   +sub('Transient · retry is safe')
-   +refusalAlert('409','blocked-by-state',{ref:'req_73aa'})
-   +refusalAlert('429',null,{ref:'req_82be'})
-   +refusalAlert('503',null,{ref:'req_9c04'})
-   +'<div class="small">Amber means transient or a state conflict; retry is safe and the button retries in place. Red means blocked; fix the cause first. Cross-tenant 403 reads as "Not found" so existence is not leaked. Stack traces are stripped. IDs are copy-only chips, never inline text.</div>'
-   +'</div></div>';
+ var td='padding:3px 6px;border-bottom:1px solid var(--line);font-size:11px;vertical-align:top';
+ function r(code,title,tone,ref,note){return '<tr><td style="'+td+';white-space:nowrap">'+badge('muted',code)+'</td><td style="'+td+'"><b>'+title+'</b>'+(note?'<div class="small" style="color:var(--muted);font-size:10px">'+note+'</div>':'')+'</td><td style="'+td+';white-space:nowrap">'+(tone==='amber'?badge('preview','amber'):badge('alert','red'))+'</td><td style="'+td+';white-space:nowrap">'+copyChip(ref)+'</td></tr>';}
+ return '<div class="card"><div class="hd"><h3>Error and refusal handling</h3>'+badge('muted','shared display')+'</div><div class="bd"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+  +r('404','Not found','red','req_5f21','Cross-tenant 403 reads as Not found; existence is not leaked')
+  +r('422','Validation error','red','val_19cd','Failing fields listed on the form')
+  +r('409','Action not available','amber','req_73aa','State conflict; resolves on refresh')
+  +r('429','Too many requests','amber','req_82be','')
+  +r('503','Service unavailable','amber','req_9c04','')
+  +'</table></div><div style="margin-top:8px">'+refusalAlert('429',null,{ref:'req_82be'})+'</div>'
+  +'<div class="small" style="margin-top:6px;color:var(--muted)">One component on every action. Amber is transient and retry is safe (live example above). Red is blocked; fix the cause first. Stack traces are stripped. IDs are copy-only chips.</div>'
+  +'</div></div>';
 }
 function detailObs(a){var s=panelState(a);var kind=s.kind;
   var PH=[['Network','network'],['Compute','cpu'],['Storage','hard-drive'],['Database','database'],['Secrets and identity','key-round'],['Registry','box']];
@@ -2077,7 +2081,7 @@ var eg=v.evals==='passed'?'pass':v.evals==='failed'?'failed':'pending';
 var gates=[['Evaluation passed',eg],['Certification signed',v.gate==='ready'?'pass':'pending'],['Policy checks passed',v.policy==='pass'?'pass':'pending'],['Trust threshold met',(v.gate==='ready')?'pass':'pending']];
 var blocked=gates.some(function(g){return g[1]!=='pass';});
 out.push('<div class="card"><div class="hd"><h3>Publish gate</h3>'+badge(blocked?'preview':'gov',blocked?'blocked':'ready')+'</div><div class="bd">'+gates.map(function(g){return evalGateRow(g[0],g[1]);}).join('')+'<div class="note '+(blocked?'preview':'gov')+'" style="margin-top:10px"><span class="ni">'+(blocked?'◷':'✓')+'</span><div>'+(blocked?'Publishing is blocked until all gates pass.':'All gates passed. This version can be submitted to the Marketplace.')+'</div></div></div></div>');
-return '<div style="display:grid;gap:14px">'+out.join('')+'</div>';}
+return out.map(function(c){return '<div style="break-inside:avoid;margin:0 0 10px">'+c+'</div>';}).join('');}
 function detailInfra(a){var v=viewOf(a);var list=SANDBOXES.filter(function(sb){return sb.agentId===a.id;});
 var matched=(v.sandbox==='none')?badge('preview','no template match, request raised'):badge('gov','template matched');
 var head='<div class="card"><div class="hd"><h3>Template match</h3>'+matched+'</div>'+detailKV([['Sandboxes',v.sandbox==='none'?'0':String(Math.max(1,list.length))],['Region','KSA, Riyadh']])+'</div>';
@@ -2138,34 +2142,31 @@ function obsErrorLog(a,v){var kind=obsKind(v);
  function w(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 10px;scroll-margin-top:120px">'+h+'</div>';}
  return w('<div class="card"><div class="hd"><h3>Errors · last 24h</h3>'+badge(E.length?'alert':'muted',String(E.length)+' open')+'</div><div class="bd">'+chips+body+'</div></div>','sec-error-log')+w(toolGrp)+w(obsRefusals());}
 function obsProvTable(a,v,kind){
- var region='KSA, Riyadh';var parked=(v.sandbox==='none');
- function st(dot,tag,tm){return {dot:dot,tag:tag,tm:tm||'—'};}
+ var parked=(v.sandbox==='none');
+ function st(dot,tag,tm){return {dot:dot,tag:tag,tm:tm||''};}
  var man=st('gov','done','09:12:04');
- var tpl=(kind==='parked')?st('alert','blocked · no template match'):st('gov','matched · 1 sandbox','09:12:37');
- var resState=parked?st('muted','awaiting approval'):
-   (kind==='progress')?st('preview','provisioning…','running…'):
-   ({ready:st('gov','ready','09:14:52'),connecting:st('preview','connecting','running…'),pending:st('muted','pending'),unhealthy:st('alert','unhealthy','09:14:52')}[v.tiles]||st('muted','pending'));
+ var tpl=(kind==='parked')?st('alert','blocked'):st('gov','matched','09:12:37');
+ var resState=parked?st('muted','awaiting approval'):(kind==='progress')?st('preview','provisioning…'):({ready:st('gov','ready','09:14:52'),connecting:st('preview','connecting'),pending:st('muted','pending'),unhealthy:st('alert','unhealthy','09:14:52')}[v.tiles]||st('muted','pending'));
  var img=(kind==='failDeploy')?st('alert','failed · image pull','09:16:20'):(kind==='healthy'||kind==='failEval')?st('gov','done','09:16:20'):st('muted','pending');
  var dep=(kind==='healthy'||kind==='failEval')?st('gov','done','09:16:58'):st('muted','pending');
  var hc=(kind==='healthy'||kind==='failEval')?st('gov','passing','09:17:03'):st('muted','pending');
- var R=[['Network','gov-isolated VPC · no egress · PII redaction on'],['Compute','2 vCPU / 4 GB · Standard-CPU · autoscale 1–3'],['Storage','20 GB SSD · encrypted at rest'],['Database','Postgres 15 · in-region'],['Secrets','3 keys · via Secret Manager'],['Registry','csg:'+(a.version||'1.4')+'.0 @ sha256:9af3…']];
- var td='padding:8px;border-bottom:1px solid var(--line);vertical-align:top';
- function row(name,detail,s,indent){return '<tr><td style="'+td+';white-space:nowrap'+(indent?';padding-left:26px':'')+'">'+badge(s.dot,'●')+' '+name+'</td><td class="small" style="'+td+';color:var(--muted)">'+detail+'</td><td class="small" style="'+td+';white-space:nowrap">'+s.tag+'</td><td class="small" style="'+td+';color:var(--muted);white-space:nowrap">'+s.tm+'</td></tr>';}
+ var R=[['Network','gov-isolated VPC · no egress · PII redaction'],['Compute','2 vCPU / 4 GB · autoscale 1–3'],['Storage','20 GB SSD · encrypted'],['Database','Postgres 15 · in-region'],['Secrets','3 keys · Secret Manager'],['Registry','csg:'+(a.version||'1.4')+'.0 @ sha256:9af3…']];
+ function row(name,detail,s,indent){return '<div style="padding:3px 0;border-bottom:1px solid var(--line)'+(indent?';padding-left:14px':'')+'"><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="white-space:nowrap;font-size:11.5px">'+badge(s.dot,'●')+' <b>'+name+'</b></span><span class="small" style="white-space:nowrap;color:var(--muted);font-size:10.5px">'+s.tag+(s.tm?' · '+s.tm:'')+'</span></div>'+(detail?'<div class="small" style="color:var(--muted);font-size:10.5px;margin-top:1px">'+detail+'</div>':'')+'</div>';}
  var rows=row('Manifest validated','schema v1 · package matches manifest',man)
-  +row('Template match',(kind==='parked'?'no sandbox template matches this package · request raised':'sandbox template · region '+region),tpl);
- if(parked){rows+='<tr><td colspan="4" class="small" style="padding:10px 8px 10px 26px;border-bottom:1px solid var(--line);color:var(--muted)">No resources provisioned yet. This agent is parked awaiting template approval.</td></tr>';}
+  +row('Template match',(kind==='parked'?'no sandbox template matches · request raised':'sandbox template · KSA, Riyadh'),tpl);
+ if(parked){rows+='<div class="small" style="padding:6px 0 6px 14px;color:var(--muted);border-bottom:1px solid var(--line)">No resources provisioned yet. Parked awaiting template approval.</div>';}
  else{rows+=R.map(function(r){return row(r[0],r[1],resState,true);}).join('');}
  rows+=row('Image built','container build from the tenant registry',img)
   +row('Deployed','v'+(a.version||'1.4')+' to the Sovereign Runtime',dep)
   +row('Health check','liveness and readiness probes',hc);
- return '<div class="card"><div class="hd"><h3>Timeline and resources</h3>'+badge('muted','stages · template · inventory · one view')+'</div><div class="bd" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr>'+['Step / resource','Detail','Status','Time'].map(function(h){return '<th style="text-align:left;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)">'+h+'</th>';}).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div></div>';}
+ return '<div class="card"><div class="hd"><h3>Timeline and resources</h3>'+badge('muted','one view')+'</div><div class="bd">'+rows+'</div></div>';}
 function secNav(S){return '<div class="secnav" style="position:sticky;top:58px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;padding:10px 2px 8px;background:var(--bg);border-bottom:1px solid var(--line);margin-bottom:4px">'+S.map(function(s,i){var on=i===0;return '<button type="button" data-secnav="'+s[0]+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer">'+s[1]+'</button>';}).join('')+'</div>';}
 function obsSectionNav(){return secNav([['sec-provisioning-infrastructure','Provisioning'],['sec-live-status-and-logs','Live status & logs'],['sec-test-results','Test results'],['sec-performance-marketplace-standing','Performance'],['sec-error-log','Error log']]);}
 function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;font-weight:700;font-size:10px;padding:2px 7px;border-radius:6px;margin-right:8px">OBS</span>';function r(k,v){return '<div class="verrow"><span class="small">'+k+'</span><span class="small" style="color:var(--muted)">'+v+'</span></div>';}return '<div class="card" style="margin-top:12px;border:1px dashed #7c3aed"><div class="hd"><h3>'+OBS+'Runtime health and diagnostics</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd">'+r('Heartbeat','expected every 30s · not wired')+r('Diagnostics','runs when a heartbeat is missed · not wired')+r('Auto-restart','after failed diagnostics · not wired')+'<div class="small" style="margin-top:8px;color:var(--muted)">Held with the runtime work. Heartbeat, diagnostics and restart wire up here once the run loop lands.</div></div></div>';}
 function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
  function it(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 10px;scroll-margin-top:120px">'+h+'</div>':'';}
  var longrun=(kind==='progress')?'<div class="note preview"><span class="ni">◷</span><div><b>Long-running step.</b> Provisioning continues in the background. You can leave and return; the state is saved so you can resume or debug here.</div></div>':'';
- return '<div class="obsgrid" style="columns:3 320px;column-gap:10px;margin-top:10px">'
+ return '<div class="obsgrid" style="columns:4 300px;column-gap:10px;margin-top:8px">'
   +it(obsProvTable(a,v,kind),'sec-provisioning-infrastructure')
   +it(obsProvActions(a,v,kind))
   +it(longrun)
@@ -2174,7 +2175,7 @@ function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
   +it(obsLogPanel('Deploy logs',v.dlog))
   +it(obsLogPanel('Runtime logs',v.rlog))
   +it(obsRuntimeStub())
-  +it(detailEvals(a),'sec-test-results')
+  +'<div id="sec-test-results" style="scroll-margin-top:120px"></div>'+detailEvals(a)
   +obsCompetitive(a)
   +obsErrorLog(a,v)
   +'</div>';}
@@ -2189,11 +2190,11 @@ function lifeStrip(a){var v=viewOf(a);var kind=obsKind(v);
   return (i?'<span style="width:18px;height:2px;background:'+(k==='pending'?'#e5e1d8':'#c9c3b6')+';display:inline-block"></span>':'')+'<button type="button" data-lifejump="'+s[1]+':'+s[2]+'" title="'+s[0]+' · '+k+' · click to inspect" style="appearance:none;display:inline-flex;align-items:center;gap:6px;border:1px solid '+(k==='pending'?'#e0dbd0':c[0])+';background:'+c[0]+';color:'+c[1]+';font-weight:600;font-size:11px;padding:4px 10px;border-radius:999px;cursor:pointer">'+mark+' '+s[0]+'</button>';}).join('')+'</div>';}
 function scrDetail(){var a=panelAgent(state.agentId);var tab=state.detailTab||'overview';var _ids=AGENTS_INDEX.map(function(x){return x.id;});var _i=_ids.indexOf(state.agentId);var agnav=_i<0?'':'<div class="row" style="gap:6px;align-items:center;margin-left:10px"><button class="btn sm ghost" data-agnav="prev" title="Previous agent"><i data-lucide="chevron-left"></i></button><span class="small" style="color:var(--muted);white-space:nowrap">'+(_i+1)+' of '+_ids.length+'</span><button class="btn sm ghost" data-agnav="next" title="Next agent"><i data-lucide="chevron-right"></i></button><button class="btn sm ghost" data-cmdk title="Quick jump — Cmd+K / Ctrl+K">⌘K</button><button class="btn sm ghost" data-kbhelp title="Keyboard shortcuts — press ?">?</button></div>';
   var TABS=[['overview','Overview'],['health','Observability'],['evidence','Evidence']];
-  var tabs=TABS.map(function(t){var on=t[0]===tab;return '<button type="button" data-detailtab="'+t[0]+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:13px;padding:9px 18px;border-radius:8px;cursor:pointer">'+t[1]+'</button>';}).join('');
+  var tabs=TABS.map(function(t){var on=t[0]===tab;return '<button type="button" data-detailtab="'+t[0]+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:12.5px;padding:6px 14px;border-radius:8px;cursor:pointer">'+t[1]+'</button>';}).join('');
   var body=tab==='health'?detailHealth(a):tab==='evidence'?detailEvidence(a):detailOverview(a);
-  return '<div class="row" style="margin-bottom:12px;align-items:center;gap:12px"><button class="btn ghost" data-go="agents"><i data-lucide="arrow-left"></i> Back</button><div class="small" style="color:var(--muted)"><a data-crumb="agents" style="color:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Agent Lifecycle</a> / '+a.name+' / '+TABS.filter(function(t){return t[0]===tab;})[0][1]+'</div></div>'+'<div class="row" style="align-items:center;gap:12px;margin-bottom:8px"><div class="agent-av" style="width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--subtle);font-weight:700">'+(a.code||'A')+'</div><div style="flex:1"><h2 style="margin:0">'+a.name+'</h2><div class="small">'+(a.tenant||'')+'</div></div>'+((a.trustScore&&a.trustScore!=='--')?trustBadge(a):badge('muted','not yet evaluated'))+agnav+'</div>'
+  return '<div class="row" style="margin-bottom:8px;align-items:center;gap:12px"><button class="btn sm ghost" data-go="agents"><i data-lucide="arrow-left"></i> Back</button><div class="small" style="color:var(--muted)"><a data-crumb="agents" style="color:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Agent Lifecycle</a> / '+a.name+' / '+TABS.filter(function(t){return t[0]===tab;})[0][1]+'</div></div>'+'<div class="row" style="align-items:center;gap:12px;margin-bottom:8px"><div class="agent-av" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--subtle);font-weight:700">'+(a.code||'A')+'</div><div style="flex:1"><h2 style="margin:0;font-size:17px">'+a.name+'</h2><div class="small">'+(a.tenant||'')+'</div></div>'+((a.trustScore&&a.trustScore!=='--')?trustBadge(a):badge('muted','not yet evaluated'))+agnav+'</div>'
    +statusBanner(a)
-   +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:10px 0;position:sticky;top:0;z-index:6;background:var(--bg)">'+tabs+'</div>'
+   +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;padding:6px 0;position:sticky;top:0;z-index:6;background:var(--bg)">'+tabs+'</div>'
    +'<div id="detailBody">'+body+'</div>';
 }
 function validateManifest(src){const ub=$("#upBadge");if(ub){ub.className='badge gov';ub.textContent='◆ validated';}
