@@ -1482,11 +1482,11 @@
 #detailBody .hd{padding:6px 10px!important}
 #detailBody .hd h3{font-size:12.5px}
 #detailBody .bd{padding:6px 10px!important}
-#detailBody .bd .row{padding:2px 0!important}
+#detailBody .bd .row{padding:1px 0!important}
 #detailBody .verrow{padding:2px 0!important}
 #detailBody .badge{font-size:9.5px;padding:1.5px 7px}
 #detailBody .note{padding:8px 10px}
-#detailBody pre{max-height:56px;overflow:auto}
+#detailBody pre{max-height:44px;overflow:auto}
 #detailBody .obsgrid .card{margin-top:0!important}
 #detailBody .obsgrid{font-size:11px;line-height:1.35}
 #detailBody .obsgrid .small{font-size:10px}
@@ -2092,7 +2092,7 @@ var eg=v.evals==='passed'?'pass':v.evals==='failed'?'failed':'pending';
 var gates=[['Evaluation passed',eg],['Certification signed',v.gate==='ready'?'pass':'pending'],['Policy checks passed',v.policy==='pass'?'pass':'pending'],['Trust threshold met',(v.gate==='ready')?'pass':'pending']];
 var blocked=gates.some(function(g){return g[1]!=='pass';});
 out.push('<div class="card"><div class="hd"><h3>Publish gate</h3>'+badge(blocked?'preview':'gov',blocked?'blocked':'ready')+'</div><div class="bd">'+gates.map(function(g){return evalGateRow(g[0],g[1]);}).join('')+'<div class="small" style="margin-top:6px;color:var(--muted)">'+(blocked?'Publishing is blocked until all gates pass.':'All gates passed. Ready for the Marketplace.')+'</div></div></div>');
-return out.map(function(c){return '<div style="break-inside:avoid;margin:0 0 6px">'+c+'</div>';}).join('');}
+return out.map(function(c){return '<div style="break-inside:avoid;margin:0 0 5px">'+c+'</div>';}).join('');}
 function detailInfra(a){var v=viewOf(a);var list=SANDBOXES.filter(function(sb){return sb.agentId===a.id;});
 var matched=(v.sandbox==='none')?badge('preview','no template match, request raised'):badge('gov','template matched');
 var head='<div class="card"><div class="hd"><h3>Template match</h3>'+matched+'</div>'+detailKV([['Sandboxes',v.sandbox==='none'?'0':String(Math.max(1,list.length))],['Region','KSA, Riyadh']])+'</div>';
@@ -2127,7 +2127,7 @@ function obsProvActions(a,v,kind){
  if(kind==='failDeploy')return '<div class="note alert"><span class="ni">!</span><div><b>Deploy failed at image-pull.</b> Base image not found in the registry.<div class="small" style="margin-top:2px">Fix: point <code>deployment.image</code> at an image published in your tenant registry.</div><div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-obsdeploy="retry">Restart provisioning</button><button class="btn sm ghost" data-go="submit">Re-upload YAML</button></div></div></div>';
  return '';}
 function obsCompetitive(a){
- function it(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>';}
+ function it(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 5px;scroll-margin-top:120px">'+h+'</div>';}
  var sp=[['Marketplace rank','#3 of 18 in Citizen Services'],['Trust score','92 · category median 86'],['30-day invocations','12,480'],['Reuse across ministries','4 tenants'],['p95 latency','470 ms · median 610 ms'],['Task completion','97% · median 92%'],['Cost per outcome','≈ 0.41 SAR · median 0.55 SAR']];
  var fb=[['Accepted as-is','88%'],['Edited','9%'],['Discarded','3%']];
  return it('<div class="card"><div class="hd"><h3>Standing & performance</h3>'+badge('gov','indicative')+'</div>'+detailKV(sp)+'</div>','sec-performance-marketplace-standing')
@@ -2145,7 +2145,7 @@ function obsErrorLog(a,v){var kind=obsKind(v);
  if(!E.length){body='<div class="note gov"><span class="ni">✓</span><div>No errors in the last 24h for this version.</div></div>';}
  else{body=E.map(function(x){return '<div data-egrp="'+x.grp+'" style="padding:4px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline"><b style="font-size:11px">'+x.src+' · <code>'+x.what+'</code></b>'+(x.sev===0?badge('alert','red'):badge('preview','amber'))+'</div><div class="small" style="color:var(--muted);font-size:10px;margin:1px 0 3px">'+x.t+' · '+x.detail+'</div><div class="row" style="gap:6px;align-items:center">'+copyChip(x.ref)+x.act+'</div></div>';}).join('');}
  var toolGrp='<div class="card"><div class="hd"><h3>Tool calling</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd"><div class="small" style="color:var(--muted);font-size:10px">Tool-call and tool-object errors bundle here for triage once the runtime work lands.</div></div></div>';
- function w(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>';}
+ function w(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 5px;scroll-margin-top:120px">'+h+'</div>';}
  return w('<div class="card"><div class="hd"><h3>Errors · last 24h</h3>'+badge(E.length?'alert':'muted',String(E.length)+' open')+'</div><div class="bd">'+chips+body+'</div></div>','sec-error-log')+w(toolGrp)+w(obsRefusals());}
 function obsProvTable(a,v,kind){
  var parked=(v.sandbox==='none');
@@ -2157,7 +2157,7 @@ function obsProvTable(a,v,kind){
  var dep=(kind==='healthy'||kind==='failEval')?st('gov','done','09:16:58'):st('muted','pending');
  var hc=(kind==='healthy'||kind==='failEval')?st('gov','passing','09:17:03'):st('muted','pending');
  var R=[['Network','gov-isolated VPC · no egress · PII redaction'],['Compute','2 vCPU / 4 GB · autoscale 1–3'],['Storage','20 GB SSD · encrypted'],['Database','Postgres 15 · in-region'],['Secrets','3 keys · Secret Manager'],['Registry','csg:'+(a.version||'1.4')+'.0 @ sha256:9af3…']];
- function line(name,tip,s){return '<div title="'+tip+'" style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:3px 0;border-bottom:1px solid var(--line)"><span style="white-space:nowrap;font-size:11.5px">'+badge(s.dot,'●')+' <b>'+name+'</b></span><span class="small" style="white-space:nowrap;color:var(--muted);font-size:10.5px">'+s.tag+(s.tm?' · '+s.tm:'')+'</span></div>';}
+ function line(name,tip,s){return '<div title="'+tip+'" style="display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:2px 0;border-bottom:1px solid var(--line)"><span style="white-space:nowrap;font-size:11.5px">'+badge(s.dot,'●')+' <b>'+name+'</b></span><span class="small" style="white-space:nowrap;color:var(--muted);font-size:10.5px">'+s.tag+(s.tm?' · '+s.tm:'')+'</span></div>';}
  var rows=line('Manifest validated','schema v1 · package matches manifest',man)
   +line('Template match',(kind==='parked'?'no sandbox template matches · request raised to tenant admin':'sandbox template · KSA, Riyadh'),tpl);
  if(parked){rows+='<div class="small" style="padding:4px 0 4px 12px;color:var(--muted);border-bottom:1px solid var(--line);font-size:10.5px">No resources provisioned yet. Parked awaiting template approval.</div>';}
@@ -2171,7 +2171,7 @@ function secNav(S){return '<div class="secnav" style="position:sticky;top:58px;z
 function obsSectionNav(){return secNav([['sec-provisioning-infrastructure','Provisioning'],['sec-live-status-and-logs','Live status & logs'],['sec-test-results','Test results'],['sec-performance-marketplace-standing','Performance'],['sec-error-log','Error log']]);}
 function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;font-weight:700;font-size:9px;padding:1px 6px;border-radius:6px;margin-right:6px">OBS</span>';function r(k,v){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid var(--line)"><span style="font-size:11px"><b>'+k+'</b></span><span class="small" style="color:var(--muted);font-size:10px;white-space:nowrap">'+v+'</span></div>';}return '<div class="card" style="border:1px dashed #7c3aed"><div class="hd"><h3>'+OBS+'Runtime health & diagnostics</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd">'+r('Heartbeat','every 30s · not wired')+r('Diagnostics','on missed heartbeat · not wired')+r('Auto-restart','after failed diagnostics · not wired')+'</div></div>';}
 function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
- function it(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>':'';}
+ function it(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 5px;scroll-margin-top:120px">'+h+'</div>':'';}
  var longrun=(kind==='progress')?'<div class="note preview"><span class="ni">◷</span><div><b>Long-running step.</b> Provisioning continues in the background. You can leave and return; the state is saved so you can resume or debug here.</div></div>':'';
  return '<div class="obsgrid" style="columns:4 260px;column-gap:8px;margin-top:6px">'
   +it(obsProvTable(a,v,kind),'sec-provisioning-infrastructure')
@@ -3315,7 +3315,7 @@ $("#scrim").addEventListener('click',closeModal);
   var order=items.map(function(c,i2){return {i:i2,h:hs[i2]};});
   order.sort(function(a,b){return b.h-a.h;});
   var assign=new Array(items.length);
-  order.forEach(function(o){var m=0;for(var j=1;j<N;j++)if(cols[j]<cols[m])m=j;assign[o.i]=m;cols[m]+=o.h+6;});
+  order.forEach(function(o){var m=0;for(var j=1;j<N;j++)if(cols[j]<cols[m])m=j;assign[o.i]=m;cols[m]+=o.h+5;});
   items.forEach(function(c,idx){wraps[assign[idx]].appendChild(c);});
   wraps.forEach(function(w){g.appendChild(w);});}
  var mo=new MutationObserver(function(){repack();});
