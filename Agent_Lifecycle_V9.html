@@ -2046,16 +2046,16 @@ function refusalAlert(status,code,opts){opts=opts||{};var r=refusalFrom(status,c
   return '<div class="note '+cls+'"><span class="ni">'+(r[2]?'↻':'!')+'</span><div><b>'+r[0]+'</b> '+codechip+'<div class="small" style="margin-top:2px">'+r[1]+'</div>'+fields+retry+ref+'</div></div>';
 }
 function obsRefusals(){
- var td='padding:3px 6px;border-bottom:1px solid var(--line);font-size:11px;vertical-align:top';
- function r(code,title,tone,ref,note){return '<tr><td style="'+td+';white-space:nowrap">'+badge('muted',code)+'</td><td style="'+td+'"><b>'+title+'</b>'+(note?'<div class="small" style="color:var(--muted);font-size:10px">'+note+'</div>':'')+'</td><td style="'+td+';white-space:nowrap">'+(tone==='amber'?badge('preview','amber'):badge('alert','red'))+'</td><td style="'+td+';white-space:nowrap">'+copyChip(ref)+'</td></tr>';}
+ var td='padding:3px 4px;border-bottom:1px solid var(--line);font-size:10.5px;vertical-align:top';
+ function r(code,tone,title,ref,note){return '<tr><td style="'+td+';white-space:nowrap">'+(tone==='amber'?badge('preview',code):badge('alert',code))+'</td><td style="'+td+'"><b>'+title+'</b>'+(note?'<div class="small" style="color:var(--muted);font-size:9.5px">'+note+'</div>':'')+'</td><td style="'+td+';white-space:nowrap">'+copyChip(ref)+'</td></tr>';}
  return '<div class="card"><div class="hd"><h3>Error and refusal handling</h3>'+badge('muted','shared display')+'</div><div class="bd"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
-  +r('404','Not found','red','req_5f21','Cross-tenant 403 reads as Not found; existence is not leaked')
-  +r('422','Validation error','red','val_19cd','Failing fields listed on the form')
-  +r('409','Action not available','amber','req_73aa','State conflict; resolves on refresh')
-  +r('429','Too many requests','amber','req_82be','')
-  +r('503','Service unavailable','amber','req_9c04','')
+  +r('404','red','Not found','req_5f21','Cross-tenant 403 reads as Not found; existence is not leaked')
+  +r('422','red','Validation error','val_19cd','Failing fields listed on the form')
+  +r('409','amber','Action not available','req_73aa','State conflict; resolves on refresh')
+  +r('429','amber','Too many requests','req_82be','')
+  +r('503','amber','Service unavailable','req_9c04','')
   +'</table></div>'
-  +'<div class="small" style="margin-top:6px;color:var(--muted);font-size:10px">One component on every action. Amber is transient; retry is safe. Red is blocked; fix the cause first. Stack traces are stripped. IDs are copy-only chips. Live retry: see the error table action buttons.</div>'
+  +'<div class="small" style="margin-top:5px;color:var(--muted);font-size:9.5px">One component on every action. Amber is transient; retry is safe. Red is blocked; fix the cause first. Stack traces stripped. IDs are copy-only chips. Live retry: see the error actions.</div>'
   +'</div></div>';
 }
 function detailObs(a){var s=panelState(a);var kind=s.kind;
@@ -2135,19 +2135,16 @@ function obsCompetitive(a){
 function obsErrorLog(a,v){var kind=obsKind(v);
  var E=[];
  if(kind==='failDeploy'){E.push({t:'09:16:20',grp:'Service',src:'Registry',what:'GET registry/base-image',detail:'404 · base image not found in the tenant registry',sev:0,ref:'dr_9f2a',act:'<button class="btn sm" data-elact="retry">Retry deploy</button>'});
-  E.push({t:'09:16:21',grp:'Platform',src:'Orchestrator',what:'deploy.image_pull',detail:'ImagePullBackOff · 3 attempts · platform side, not your agent',sev:0,ref:'inc_40e7',act:'<button class="btn sm ghost" data-secnav="sec-live-status-and-logs">View deploy logs</button>'});}
+  E.push({t:'09:16:21',grp:'Platform',src:'Orchestrator',what:'deploy.image_pull',detail:'ImagePullBackOff · 3 attempts · platform side',sev:0,ref:'inc_40e7',act:'<button class="btn sm ghost" data-secnav="sec-live-status-and-logs">Deploy logs</button>'});}
  if(kind==='parked')E.push({t:'09:12:37',grp:'Service',src:'Provisioning',what:'POST /provision',detail:'no sandbox template matches · request with tenant admin',sev:1,ref:'TR-2481',act:'<button class="btn sm ghost" data-secnav="sec-provisioning-infrastructure">View request</button>'});
  if(kind==='failEval')E.push({t:'09:21:05',grp:'Validation',src:'Evaluation dataset',what:'dataset.column \u201clabel\u201d',detail:'expected string, got int · schema mismatch',sev:0,ref:'val_22c8',act:'<button class="btn sm" data-go="submit">Fix and resubmit</button>'});
  var groups=['All','Validation','Service','Platform'];
  var counts={All:E.length};E.forEach(function(x){counts[x.grp]=(counts[x.grp]||0)+1;});
- var chips=E.length?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'+groups.map(function(g,i){var on=i===0;return '<button type="button" data-elfilter="'+g+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:11px;padding:4px 10px;border-radius:999px;cursor:pointer">'+g+' ('+(counts[g]||0)+')</button>';}).join('')+'</div>':'';
- var td='padding:8px;border-bottom:1px solid var(--line);vertical-align:top';
+ var chips=E.length>1?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">'+groups.map(function(g,i){var on=i===0;return '<button type="button" data-elfilter="'+g+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:10px;padding:2px 8px;border-radius:999px;cursor:pointer">'+g+' ('+(counts[g]||0)+')</button>';}).join('')+'</div>':'';
  var body;
  if(!E.length){body='<div class="note gov"><span class="ni">✓</span><div>No errors in the last 24h for this version.</div></div>';}
- else{body='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr>'+['Time','Error','Severity','Reference','Action'].map(function(h){return '<th style="text-align:left;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)">'+h+'</th>';}).join('')+'</tr></thead><tbody>'
-  +E.map(function(x){return '<tr data-egrp="'+x.grp+'"><td class="small" style="'+td+';white-space:nowrap;color:var(--muted)">'+x.t+'</td><td style="'+td+'"><b style="font-size:12.5px">'+x.src+' · <code>'+x.what+'</code></b><div class="small" style="color:var(--muted);margin-top:2px">'+x.detail+'</div></td><td style="'+td+';white-space:nowrap">'+(x.sev===0?badge('alert','red · blocking'):badge('preview','amber · transient'))+'</td><td style="'+td+';white-space:nowrap">'+copyChip(x.ref)+'</td><td style="'+td+';white-space:nowrap">'+x.act+'</td></tr>';}).join('')
-  +'</tbody></table></div>';}
- var toolGrp='<div class="card" style="margin-top:12px"><div class="hd"><h3>Tool calling</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd"><div class="small" style="color:var(--muted)">Tool-call and tool-object errors from the run loop will bundle here for triage. Wiring depends on the runtime work.</div></div></div>';
+ else{body=E.map(function(x){return '<div data-egrp="'+x.grp+'" style="padding:4px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline"><b style="font-size:11px">'+x.src+' · <code>'+x.what+'</code></b>'+(x.sev===0?badge('alert','red'):badge('preview','amber'))+'</div><div class="small" style="color:var(--muted);font-size:10px;margin:1px 0 3px">'+x.t+' · '+x.detail+'</div><div class="row" style="gap:6px;align-items:center">'+copyChip(x.ref)+x.act+'</div></div>';}).join('');}
+ var toolGrp='<div class="card"><div class="hd"><h3>Tool calling</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd"><div class="small" style="color:var(--muted);font-size:10px">Tool-call and tool-object errors bundle here for triage once the runtime work lands.</div></div></div>';
  function w(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>';}
  return w('<div class="card"><div class="hd"><h3>Errors · last 24h</h3>'+badge(E.length?'alert':'muted',String(E.length)+' open')+'</div><div class="bd">'+chips+body+'</div></div>','sec-error-log')+w(toolGrp)+w(obsRefusals());}
 function obsProvTable(a,v,kind){
@@ -3304,6 +3301,21 @@ document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>go
   wd.addEventListener('pointermove',function(e){if(!dragging)return;var r=ws.getBoundingClientRect();var w=Math.max(240,Math.min(640,e.clientX-r.left));ws.style.setProperty('--qs-w',w+'px');});
   wd.addEventListener('pointerup',function(e){if(!dragging)return;dragging=false;wd.classList.remove('dragging');try{sessionStorage.setItem('h1-qsw',getComputedStyle(ws).getPropertyValue('--qs-w').trim());}catch(e){}});})();
 $("#scrim").addEventListener('click',closeModal);
+(function(){
+ function repack(){var g=document.querySelector('.obsgrid');if(!g||g.dataset.packed)return;
+  if((g.clientWidth||0)<900)return;
+  g.dataset.packed='1';
+  var items=[].slice.call(g.children);
+  var hs=items.map(function(c){return (c.getBoundingClientRect().height||c.offsetHeight||0);});
+  var N=4,cols=[],wraps=[],i;
+  for(i=0;i<N;i++){cols.push(0);var d=document.createElement('div');d.style.cssText='flex:1;min-width:0';wraps.push(d);}
+  g.style.columns='auto';g.style.display='flex';g.style.gap='8px';g.style.alignItems='flex-start';
+  items.forEach(function(c,idx){var m=0;for(var j=1;j<N;j++)if(cols[j]<cols[m])m=j;wraps[m].appendChild(c);cols[m]+=hs[idx]+6;});
+  wraps.forEach(function(w){g.appendChild(w);});}
+ var mo=new MutationObserver(function(){repack();});
+ mo.observe(document.body,{childList:true,subtree:true});
+ window.__repack=repack;
+})();
 (function(){
  var sh=null;
  function kbd(k){return '<span style="display:inline-block;border:1px solid #d8d2c4;border-radius:6px;padding:2px 9px;font-family:ui-monospace,monospace;font-size:12px;background:#f5f2ea;color:#4a4640;margin-right:6px">'+k+'</span>';}
