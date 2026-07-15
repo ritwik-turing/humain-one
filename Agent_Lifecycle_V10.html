@@ -2170,11 +2170,20 @@ function obsProvTable(a,v,kind){
 function secNav(S){return '<div class="secnav" style="position:sticky;top:58px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;padding:10px 2px 8px;background:var(--bg);border-bottom:1px solid var(--line);margin-bottom:4px">'+S.map(function(s,i){var on=i===0;return '<button type="button" data-secnav="'+s[0]+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer">'+s[1]+'</button>';}).join('')+'</div>';}
 function obsSectionNav(){return secNav([['sec-provisioning-infrastructure','Provisioning'],['sec-live-status-and-logs','Live status & logs'],['sec-test-results','Test results'],['sec-performance-marketplace-standing','Performance'],['sec-error-log','Error log']]);}
 function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;font-weight:700;font-size:9px;padding:1px 6px;border-radius:6px;margin-right:6px">OBS</span>';function r(k,v){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid var(--line)"><span style="font-size:11px"><b>'+k+'</b></span><span class="small" style="color:var(--muted);font-size:10px;white-space:nowrap">'+v+'</span></div>';}return '<div class="card" style="border:1px dashed #7c3aed"><div class="hd"><h3>'+OBS+'Runtime health & diagnostics</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd">'+r('Heartbeat','every 30s · not wired')+r('Diagnostics','on missed heartbeat · not wired')+r('Auto-restart','after failed diagnostics · not wired')+'</div></div>';}
+function sandboxCfgCard(a,v,kind){
+ var blocked=(kind==='progress')?'mid-provisioning':(kind==='parked')?'parked awaiting template approval':null;
+ var stateBadge=blocked?badge('preview','update unavailable'):'<span class="badge gov" data-sbxstate>● active</span>';
+ function r2(k,val,attr){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid var(--line)"><span class="small">'+k+'</span><span style="font-weight:600;font-size:10.5px;text-align:right"'+(attr?' data-sbxfield="'+attr+'"':'')+'>'+val+'</span></div>';}
+ var body=r2('Template','gov-standard-s · v3')+r2('Compute','2 vCPU / 4 GB · autoscale 1–3','compute')+r2('Config values','log_level=info · 2 more','config')+r2('Last config update','never','updated');
+ var action=blocked
+  ?'<div class="small" style="margin-top:6px;color:var(--muted);font-size:10px">Updates are refused while the sandbox is '+blocked+'. Nothing is queued silently; try again when it is active.</div>'
+  :'<div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-sbxcfg="open">Update configuration</button></div>';
+ return '<div class="card" id="sec-sandbox-configuration" style="scroll-margin-top:120px"><div class="hd"><h3>Sandbox configuration</h3>'+stateBadge+'</div><div class="bd">'+body+action+'<div class="sbxout"></div></div></div>';}
 function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
  function itm(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 8px;scroll-margin-top:20px">'+h+'</div>':'';}
  function cols(inner,n){return '<div style="columns:'+n+' 280px;column-gap:8px">'+inner+'</div>';}
  var longrun=(kind==='progress')?'<div class="note preview"><span class="ni">◷</span><div><b>Long-running step.</b> Provisioning continues in the background. You can leave and return; the state is saved.</div></div>':'';
- var healthInner=itm(obsDeploySection(v.deploy,a),'sec-live-status-and-logs')+itm(obsProvActions(a,v,kind))+itm(longrun)+(v.tl==='blocked'?itm(requestTracker()):'')+itm(obsProvTable(a,v,kind),'sec-provisioning-infrastructure')+itm(obsLogPanel('Deploy logs',v.dlog))+itm(obsLogPanel('Runtime logs',v.rlog))+itm(obsRuntimeStub());
+ var healthInner=itm(obsDeploySection(v.deploy,a),'sec-live-status-and-logs')+itm(obsProvActions(a,v,kind))+itm(longrun)+(v.tl==='blocked'?itm(requestTracker()):'')+itm(obsProvTable(a,v,kind),'sec-provisioning-infrastructure')+itm(obsLogPanel('Deploy logs',v.dlog))+itm(obsLogPanel('Runtime logs',v.rlog))+itm(sandboxCfgCard(a,v,kind))+itm(obsRuntimeStub());
  var parts=detailEvals(a);
  function has(c,t){return c.indexOf('<h3>'+t)>=0;}
  var errPieces=obsErrorLog(a,v);
@@ -3325,6 +3334,61 @@ document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>go
   wd.addEventListener('pointermove',function(e){if(!dragging)return;var r=ws.getBoundingClientRect();var w=Math.max(240,Math.min(640,e.clientX-r.left));ws.style.setProperty('--qs-w',w+'px');});
   wd.addEventListener('pointerup',function(e){if(!dragging)return;dragging=false;wd.classList.remove('dragging');try{sessionStorage.setItem('h1-qsw',getComputedStyle(ws).getPropertyValue('--qs-w').trim());}catch(e){}});})();
 $("#scrim").addEventListener('click',closeModal);
+(function(){
+ var ov=null;
+ function closeSbx(){if(ov){ov.remove();ov=null;}}
+ function fldRow(k,ctrl){return '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font-size:12px">'+k+'</span>'+ctrl+'</div>';}
+ function lockRow(k,why){return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;opacity:.65"><span style="font-size:12px">🔒 '+k+'</span><span style="font-size:10px;color:#8a857d;text-align:right">'+why+'</span></div>';}
+ var SEL='style="border:1px solid #d8d2c4;border-radius:8px;padding:4px 8px;font-size:12px;background:#fff"';
+ function openSbx(){if(ov)return;
+  ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:998;background:rgba(20,18,14,.45);display:flex;align-items:center;justify-content:center';
+  ov.innerHTML='<div style="width:540px;max-width:94vw;background:#fff;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.25);overflow:hidden">'
+   +'<div style="padding:12px 16px;border-bottom:1px solid #eee"><b style="font-size:14px">Update sandbox configuration</b><div class="small" style="color:#8a857d;font-size:11px">csg-sbx-01 · applied in place, no teardown · atomic: all fields commit together or none do</div></div>'
+   +'<div style="padding:12px 16px;display:grid;gap:8px">'
+   +'<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:#8a857d">UPDATABLE IN PLACE</div>'
+   +fldRow('Compute size','<select id="sbxComp" '+SEL+'><option>2 vCPU / 4 GB</option><option>4 vCPU / 8 GB</option></select>')
+   +fldRow('Autoscale max','<select id="sbxScale" '+SEL+'><option>3</option><option>5</option></select>')
+   +fldRow('log_level','<select id="sbxLog" '+SEL+'><option>info</option><option>debug</option></select>')
+   +'<div style="font-size:10px;font-weight:700;letter-spacing:.06em;color:#8a857d;margin-top:4px">LOCKED · REFUSED BEFORE THE OPERATION BEGINS</div>'
+   +lockRow('Template (gov-standard-s)','changing template requires a new sandbox')
+   +lockRow('Region / residency (KSA, Riyadh)','fixed by sovereign policy')
+   +lockRow('Database engine (Postgres 15)','data migration required · not in-place')
+   +'<div class="small" style="color:#8a857d;font-size:10px">Owner-only. Concurrent updates are serialized to one consistent outcome. If the update cannot be applied safely, nothing changes.</div>'
+   +'</div>'
+   +'<div style="padding:10px 16px;border-top:1px solid #eee;display:flex;gap:8px;justify-content:flex-end"><button class="btn sm ghost" data-sbxclose>Cancel</button><button class="btn sm ghost" data-sbxapply="fail" title="Demo the atomic-failure path">Apply · simulate failure</button><button class="btn sm" data-sbxapply="ok">Apply update</button></div></div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click',function(e){if(e.target===ov)closeSbx();});}
+ function applyCfg(fail){
+  var comp=document.getElementById('sbxComp'),sc=document.getElementById('sbxScale'),lg=document.getElementById('sbxLog');
+  var vals={comp:comp?comp.value:'4 vCPU / 8 GB',sc:sc?sc.value:'5',lg:lg?lg.value:'debug'};
+  closeSbx();
+  var card=document.getElementById('sec-sandbox-configuration');if(!card)return;
+  var st=card.querySelector('[data-sbxstate]'),out=card.querySelector('.sbxout'),btn=card.querySelector('[data-sbxcfg]');
+  if(st){st.className='badge preview';st.textContent='updating…';}
+  if(btn)btn.disabled=true;
+  if(out)out.innerHTML='<div class="small" style="color:var(--muted);font-size:10px;margin-top:4px">Update in flight. Values shown are pre-update; they change only when the update commits.</div>';
+  setTimeout(function(){
+   if(btn)btn.disabled=false;
+   if(fail){
+    if(st){st.className='badge alert';st.textContent='update failed';}
+    if(out)out.innerHTML='<div class="note alert" style="margin-top:6px;padding:6px 8px"><span class="ni">!</span><div style="font-size:10.5px">Provider rejected the sizing change. <b>Nothing was applied; the sandbox is unchanged.</b> '+copyChip('upd_51f2')+'</div></div>';
+    setTimeout(function(){var st2=card.querySelector('[data-sbxstate]');if(st2){st2.className='badge gov';st2.textContent='● active';}},2800);
+   } else {
+    var f1=card.querySelector('[data-sbxfield=\"compute\"]');if(f1)f1.textContent=vals.comp+' · autoscale 1–'+vals.sc;
+    var f2=card.querySelector('[data-sbxfield=\"config\"]');if(f2)f2.textContent='log_level='+vals.lg+' · 2 more';
+    var f3=card.querySelector('[data-sbxfield=\"updated\"]');if(f3)f3.textContent='just now · by you';
+    if(st){st.className='badge gov';st.textContent='● active · updated';}
+    if(out)out.innerHTML='<div class="small" style="color:var(--muted);font-size:10px;margin-top:4px">✓ Applied in place. Lifecycle event <code>sandbox.config_updated</code> '+copyChip('evt_7c31')+' recorded in lifecycle history.</div>';
+   }
+  },1600);}
+ document.addEventListener('click',function(e){
+  if(e.target.closest&&e.target.closest('[data-sbxcfg]')){openSbx();return;}
+  var ap=e.target.closest?e.target.closest('[data-sbxapply]'):null;
+  if(ap){applyCfg(ap.getAttribute('data-sbxapply')==='fail');return;}
+  if(e.target.closest&&e.target.closest('[data-sbxclose]'))closeSbx();});
+ window.__sbx={open:openSbx,apply:applyCfg,close:closeSbx};
+})();
 window.__obsSec='snapshot';
 window.__obsShow=function(key){window.__obsSec=key;
  document.querySelectorAll('[data-obssec]').forEach(function(p){p.style.display=p.getAttribute('data-obssec')===key?'block':'none';});
@@ -3393,7 +3457,7 @@ document.addEventListener('click',function(e){var t=e.target.closest?e.target.cl
  function buildIndex(){var ix=[{l:'Agent Lifecycle · all agents',k:'list',run:function(){go('agents');}},{l:'Keyboard shortcuts · cheat sheet',k:'help',run:function(){if(window.__kbsheet)window.__kbsheet.open();}}];
   AGENTS_INDEX.forEach(function(e){var nm=e.name;
    ix.push({l:'Open '+nm,k:'agent',run:(function(id){return function(){openAgentAt(id,'overview','');};})(e.id)});
-   [['Observability','health',''],['Evidence','evidence',''],['Error log','health','sec-error-log'],['Live status and logs','health','sec-live-status-and-logs'],['Test results','health','sec-test-results'],['Performance','health','sec-performance-marketplace-standing']].forEach(function(t){
+   [['Observability','health',''],['Evidence','evidence',''],['Error log','health','sec-error-log'],['Live status and logs','health','sec-live-status-and-logs'],['Test results','health','sec-test-results'],['Performance','health','sec-performance-marketplace-standing'],['Sandbox configuration','health','sec-sandbox-configuration']].forEach(function(t){
     ix.push({l:nm+' · '+t[0],k:'jump',run:(function(id,tb,anc){return function(){openAgentAt(id,tb,anc);};})(e.id,t[1],t[2])});});});
   return ix;}
  function filtered(q){q=(q||'').toLowerCase().trim();var toks=q.split(/[^a-z0-9]+/).filter(Boolean);var f=toks.length?items.filter(function(it){var s=it.l.toLowerCase();return toks.every(function(tk){return s.indexOf(tk)>=0;});}):items;return f.slice(0,9);}
