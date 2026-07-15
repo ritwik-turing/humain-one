@@ -2146,11 +2146,11 @@ function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;fo
 function sandboxCfgCard(a,v,kind){
  var blocked=(kind==='progress')?'mid-provisioning':(kind==='parked')?'parked awaiting template approval':null;
  var stateBadge=blocked?badge('preview','update unavailable'):'<span class="badge gov" data-sbxstate>● active</span>';
- function r2(k,val,attr){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid var(--line)"><span class="small">'+k+'</span><span style="font-weight:600;font-size:10.5px;text-align:right"'+(attr?' data-sbxfield="'+attr+'"':'')+'>'+val+'</span></div>';}
+ function r2(k,val,attr){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:1px 0;border-bottom:1px solid var(--line)"><span class="small">'+k+'</span><span style="font-weight:600;font-size:10.5px;text-align:right"'+(attr?' data-sbxfield="'+attr+'"':'')+'>'+val+'</span></div>';}
  var body=r2('Template','gov-standard-s · v3')+r2('Compute','2 vCPU / 4 GB · autoscale 1–3','compute')+r2('Config values','log_level=info · 2 more','config')+r2('Last config update','never','updated');
  var action=blocked
   ?'<div class="small" style="margin-top:6px;color:var(--muted);font-size:10px">Updates are refused while the sandbox is '+blocked+'. Nothing is queued silently; try again when it is active.</div>'
-  :'<div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-sbxcfg="open">Update configuration</button></div>';
+  :'<div class="row" style="gap:6px;margin-top:4px"><button class="btn sm" data-sbxcfg="open">Update configuration</button></div>';
  return '<div class="card" id="sec-sandbox-configuration" style="scroll-margin-top:120px"><div class="hd"><h3>Sandbox configuration</h3>'+stateBadge+'</div><div class="bd">'+body+action+'<div class="sbxout"></div></div></div>';}
 function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
  var longrun=(kind==='progress')?'<div class="note preview" style="margin-top:12px"><span class="ni">◷</span><div><b>Long-running step.</b> Provisioning continues in the background. You can leave and return; the state is saved so you can resume or debug here.</div></div>':'';
