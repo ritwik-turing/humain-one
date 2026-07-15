@@ -1482,12 +1482,14 @@
 #detailBody .hd{padding:6px 10px!important}
 #detailBody .hd h3{font-size:12.5px}
 #detailBody .bd{padding:6px 10px!important}
-#detailBody .bd .row{padding:3px 0!important}
-#detailBody .verrow{padding:3px 0!important}
+#detailBody .bd .row{padding:2px 0!important}
+#detailBody .verrow{padding:2px 0!important}
 #detailBody .badge{font-size:9.5px;padding:1.5px 7px}
 #detailBody .note{padding:8px 10px}
 #detailBody pre{max-height:64px;overflow:auto}
 #detailBody .obsgrid .card{margin-top:0!important}
+#detailBody .obsgrid{font-size:11px}
+#detailBody .obsgrid .small{font-size:10px}
 #detailBody .obsgrid .note{margin-top:0!important}
 #detailBody table th,#detailBody table td{padding:4px 6px!important}
 #detailBody .evcard{padding:5px 8px}
@@ -2016,7 +2018,7 @@ function obsLogPanel(title,st){
   return '<div class="card"><div class="hd"><h3>'+title+'</h3>'+badge(b[0],b[1])+'</div><div class="bd"><pre data-log="'+title.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'" style="margin:0;font-family:ui-monospace,monospace;font-size:11px;line-height:1.6;white-space:pre-wrap;color:var(--muted)">'+(body[st]||body.idle)+'</pre>'+act+'</div></div>';
 }
 function obsDeploySection(d,a){
-if(d==='deployed')return '<div class="card"><div class="hd"><h3>Deployment</h3>'+badge('gov','● deployed')+'</div><div class="bd"><div class="note gov"><span class="ni">✓</span><div>Agent is live. Deployed v'+(a.version||'1.4')+' to the Sovereign Runtime.</div></div><div class="row" style="gap:8px;margin-top:10px"><button class="btn sm" data-obsdeploy="redeploy">Redeploy</button><button class="btn sm" data-obsdeploy="destroy">Destroy</button></div><div class="small" style="margin-top:8px">Destroy requires typing the sandbox name to confirm. No dismissing toast.</div><div class="obsDeployOut"></div></div></div>';
+if(d==='deployed')return '<div class="card"><div class="hd"><h3>Deployment</h3>'+badge('gov','● deployed')+'</div><div class="bd"><div class="note gov"><span class="ni">✓</span><div>Agent is live. Deployed v'+(a.version||'1.4')+' to the Sovereign Runtime.</div></div><div class="row" style="gap:8px;margin-top:10px"><button class="btn sm" data-obsdeploy="redeploy">Redeploy</button><button class="btn sm" data-obsdeploy="destroy">Destroy</button></div><div class="obsDeployOut"></div></div></div>';
 if(d==='deploying')return '<div class="card"><div class="hd"><h3>Deployment</h3>'+badge('preview','deploying')+'</div><div class="bd"><div class="note preview"><span class="ni">◐</span><div>Deploying. The Sovereign Runtime is being assembled and the image built. Deploy actions unlock once provisioning completes.</div></div></div></div>';
 if(d==='failed')return '<div class="card"><div class="hd"><h3>Deployment</h3>'+badge('alert','deploy failed')+'</div><div class="bd"><div class="note alert"><span class="ni">!</span><div>Deploy failed at stage <b>image-pull</b>. Reason: base image not found in registry. <span class="badge muted" title="copy reference" style="cursor:pointer">⧉ dr_9f2a</span><div class="row" style="gap:8px;margin-top:10px"><button class="btn sm" data-obsdeploy="retry">Retry deploy</button><button class="btn sm">View deploy logs</button></div></div></div><div class="obsDeployOut"></div></div></div>';
 if(d==='unavailable')return '<div class="card"><div class="hd"><h3>Deployment</h3>'+badge('muted','unavailable')+'</div><div class="bd"><div class="note preview"><span class="ni">◷</span><div>Deploy unavailable. The sandbox is not in a deployable state yet, it is waiting for template approval.</div></div></div></div>';
@@ -2089,8 +2091,8 @@ out.push('<div class="card"><div class="hd"><h3>Secrets</h3>'+badge(v.secrets===
 var eg=v.evals==='passed'?'pass':v.evals==='failed'?'failed':'pending';
 var gates=[['Evaluation passed',eg],['Certification signed',v.gate==='ready'?'pass':'pending'],['Policy checks passed',v.policy==='pass'?'pass':'pending'],['Trust threshold met',(v.gate==='ready')?'pass':'pending']];
 var blocked=gates.some(function(g){return g[1]!=='pass';});
-out.push('<div class="card"><div class="hd"><h3>Publish gate</h3>'+badge(blocked?'preview':'gov',blocked?'blocked':'ready')+'</div><div class="bd">'+gates.map(function(g){return evalGateRow(g[0],g[1]);}).join('')+'<div class="note '+(blocked?'preview':'gov')+'" style="margin-top:10px"><span class="ni">'+(blocked?'◷':'✓')+'</span><div>'+(blocked?'Publishing is blocked until all gates pass.':'All gates passed. This version can be submitted to the Marketplace.')+'</div></div></div></div>');
-return out.map(function(c){return '<div style="break-inside:avoid;margin:0 0 8px">'+c+'</div>';}).join('');}
+out.push('<div class="card"><div class="hd"><h3>Publish gate</h3>'+badge(blocked?'preview':'gov',blocked?'blocked':'ready')+'</div><div class="bd">'+gates.map(function(g){return evalGateRow(g[0],g[1]);}).join('')+'<div class="small" style="margin-top:6px;color:var(--muted)">'+(blocked?'Publishing is blocked until all gates pass.':'All gates passed. Ready for the Marketplace.')+'</div></div></div>');
+return out.map(function(c){return '<div style="break-inside:avoid;margin:0 0 6px">'+c+'</div>';}).join('');}
 function detailInfra(a){var v=viewOf(a);var list=SANDBOXES.filter(function(sb){return sb.agentId===a.id;});
 var matched=(v.sandbox==='none')?badge('preview','no template match, request raised'):badge('gov','template matched');
 var head='<div class="card"><div class="hd"><h3>Template match</h3>'+matched+'</div>'+detailKV([['Sandboxes',v.sandbox==='none'?'0':String(Math.max(1,list.length))],['Region','KSA, Riyadh']])+'</div>';
@@ -2125,13 +2127,11 @@ function obsProvActions(a,v,kind){
  if(kind==='failDeploy')return '<div class="note alert" style="margin-top:12px"><span class="ni">!</span><div><b>Deploy failed at image-pull.</b> Base image not found in the registry.<div class="small" style="margin-top:4px">Suggested fix: point <code>deployment.image</code> at a base image published in your tenant registry, or switch runtime to a supported tag.</div><div class="row" style="gap:8px;margin-top:10px"><button class="btn sm" data-obsdeploy="retry">Restart provisioning</button><button class="btn sm" data-go="submit">Re-upload YAML</button><button class="btn sm" data-obsdeploy="retry">Auto-restart deployment</button></div></div></div>';
  return '';}
 function obsCompetitive(a){
- function it(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 8px;scroll-margin-top:120px">'+h+'</div>';}
- var std=[['Marketplace rank','#3 of 18 in Citizen Services'],['Trust score','92 · category median 86'],['30-day invocations','12,480'],['Reuse across ministries','4 tenants']];
- var perf=[['p95 latency','470 ms · category median 610 ms'],['Task completion','97% · median 92%'],['Cost per outcome','≈ 0.41 SAR · median 0.55 SAR']];
+ function it(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>';}
+ var sp=[['Marketplace rank','#3 of 18 in Citizen Services'],['Trust score','92 · category median 86'],['30-day invocations','12,480'],['Reuse across ministries','4 tenants'],['p95 latency','470 ms · median 610 ms'],['Task completion','97% · median 92%'],['Cost per outcome','≈ 0.41 SAR · median 0.55 SAR']];
  var fb=[['Accepted as-is','88%'],['Edited','9%'],['Discarded','3%']];
- return it('<div class="card"><div class="hd"><h3>Marketplace standing</h3>'+badge('gov','indicative')+'</div>'+detailKV(std)+'</div>','sec-performance-marketplace-standing')
-  +it('<div class="card"><div class="hd"><h3>Performance vs category</h3>'+badge('gov','indicative')+'</div>'+detailKV(perf)+'</div>')
-  +it('<div class="card"><div class="hd"><h3>End-user feedback</h3>'+badge('muted','last 30 days')+badge('gov','indicative')+'</div>'+detailKV(fb)+'<div class="small" style="margin:6px 12px 10px;color:var(--muted)">Collected from consumers in Chat and Sessions. Figures are indicative until this version has enough volume.</div></div>');}
+ return it('<div class="card"><div class="hd"><h3>Standing & performance</h3>'+badge('gov','indicative')+'</div>'+detailKV(sp)+'</div>','sec-performance-marketplace-standing')
+  +it('<div class="card"><div class="hd"><h3>End-user feedback</h3>'+badge('muted','last 30 days')+badge('gov','indicative')+'</div>'+detailKV(fb)+'<div class="small" style="margin:4px 10px 8px;color:var(--muted);font-size:10px">From Chat and Sessions. Indicative until this version has enough volume.</div></div>');}
 function obsErrorLog(a,v){var kind=obsKind(v);
  var E=[];
  if(kind==='failDeploy'){E.push({t:'09:16:20',grp:'Service',src:'Registry',what:'GET registry/base-image',detail:'404 · base image not found in the tenant registry',sev:0,ref:'dr_9f2a',act:'<button class="btn sm" data-elact="retry">Retry deploy</button>'});
@@ -2148,7 +2148,7 @@ function obsErrorLog(a,v){var kind=obsKind(v);
   +E.map(function(x){return '<tr data-egrp="'+x.grp+'"><td class="small" style="'+td+';white-space:nowrap;color:var(--muted)">'+x.t+'</td><td style="'+td+'"><b style="font-size:12.5px">'+x.src+' · <code>'+x.what+'</code></b><div class="small" style="color:var(--muted);margin-top:2px">'+x.detail+'</div></td><td style="'+td+';white-space:nowrap">'+(x.sev===0?badge('alert','red · blocking'):badge('preview','amber · transient'))+'</td><td style="'+td+';white-space:nowrap">'+copyChip(x.ref)+'</td><td style="'+td+';white-space:nowrap">'+x.act+'</td></tr>';}).join('')
   +'</tbody></table></div>';}
  var toolGrp='<div class="card" style="margin-top:12px"><div class="hd"><h3>Tool calling</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd"><div class="small" style="color:var(--muted)">Tool-call and tool-object errors from the run loop will bundle here for triage. Wiring depends on the runtime work.</div></div></div>';
- function w(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 8px;scroll-margin-top:120px">'+h+'</div>';}
+ function w(h,id){return '<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>';}
  return w('<div class="card"><div class="hd"><h3>Errors · last 24h</h3>'+badge(E.length?'alert':'muted',String(E.length)+' open')+'</div><div class="bd">'+chips+body+'</div></div>','sec-error-log')+w(toolGrp)+w(obsRefusals());}
 function obsProvTable(a,v,kind){
  var parked=(v.sandbox==='none');
@@ -2172,9 +2172,9 @@ function obsProvTable(a,v,kind){
  return '<div class="card"><div class="hd"><h3>Timeline and resources</h3>'+badge('muted','one view')+'</div><div class="bd">'+rows+'</div></div>';}
 function secNav(S){return '<div class="secnav" style="position:sticky;top:58px;z-index:5;display:flex;gap:6px;flex-wrap:wrap;padding:10px 2px 8px;background:var(--bg);border-bottom:1px solid var(--line);margin-bottom:4px">'+S.map(function(s,i){var on=i===0;return '<button type="button" data-secnav="'+s[0]+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer">'+s[1]+'</button>';}).join('')+'</div>';}
 function obsSectionNav(){return secNav([['sec-provisioning-infrastructure','Provisioning'],['sec-live-status-and-logs','Live status & logs'],['sec-test-results','Test results'],['sec-performance-marketplace-standing','Performance'],['sec-error-log','Error log']]);}
-function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;font-weight:700;font-size:10px;padding:2px 7px;border-radius:6px;margin-right:8px">OBS</span>';function r(k,v){return '<div class="verrow"><span class="small">'+k+'</span><span class="small" style="color:var(--muted)">'+v+'</span></div>';}return '<div class="card" style="margin-top:12px;border:1px dashed #7c3aed"><div class="hd"><h3>'+OBS+'Runtime health and diagnostics</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd">'+r('Heartbeat','expected every 30s · not wired')+r('Diagnostics','runs when a heartbeat is missed · not wired')+r('Auto-restart','after failed diagnostics · not wired')+'<div class="small" style="margin-top:8px;color:var(--muted)">Held with the runtime work. Heartbeat, diagnostics and restart wire up here once the run loop lands.</div></div></div>';}
+function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;font-weight:700;font-size:9px;padding:1px 6px;border-radius:6px;margin-right:6px">OBS</span>';function r(k,v){return '<div style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid var(--line)"><span style="font-size:11px"><b>'+k+'</b></span><span class="small" style="color:var(--muted);font-size:10px;white-space:nowrap">'+v+'</span></div>';}return '<div class="card" style="border:1px dashed #7c3aed"><div class="hd"><h3>'+OBS+'Runtime health & diagnostics</h3>'+badge('preview','stub · pending runtime')+'</div><div class="bd">'+r('Heartbeat','every 30s · not wired')+r('Diagnostics','on missed heartbeat · not wired')+r('Auto-restart','after failed diagnostics · not wired')+'</div></div>';}
 function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
- function it(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 8px;scroll-margin-top:120px">'+h+'</div>':'';}
+ function it(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 6px;scroll-margin-top:120px">'+h+'</div>':'';}
  var longrun=(kind==='progress')?'<div class="note preview"><span class="ni">◷</span><div><b>Long-running step.</b> Provisioning continues in the background. You can leave and return; the state is saved so you can resume or debug here.</div></div>':'';
  return '<div class="obsgrid" style="columns:4 260px;column-gap:8px;margin-top:6px">'
   +it(obsProvTable(a,v,kind),'sec-provisioning-infrastructure')
