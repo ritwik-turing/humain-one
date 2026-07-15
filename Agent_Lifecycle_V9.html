@@ -3312,7 +3312,11 @@ $("#scrim").addEventListener('click',closeModal);
   var N=4,cols=[],wraps=[],i;
   for(i=0;i<N;i++){cols.push(0);var d=document.createElement('div');d.style.cssText='flex:1;min-width:0';wraps.push(d);}
   g.style.columns='auto';g.style.display='flex';g.style.gap='8px';g.style.alignItems='flex-start';
-  items.forEach(function(c,idx){var m=0;for(var j=1;j<N;j++)if(cols[j]<cols[m])m=j;wraps[m].appendChild(c);cols[m]+=hs[idx]+6;});
+  var order=items.map(function(c,i2){return {i:i2,h:hs[i2]};});
+  order.sort(function(a,b){return b.h-a.h;});
+  var assign=new Array(items.length);
+  order.forEach(function(o){var m=0;for(var j=1;j<N;j++)if(cols[j]<cols[m])m=j;assign[o.i]=m;cols[m]+=o.h+6;});
+  items.forEach(function(c,idx){wraps[assign[idx]].appendChild(c);});
   wraps.forEach(function(w){g.appendChild(w);});}
  var mo=new MutationObserver(function(){repack();});
  mo.observe(document.body,{childList:true,subtree:true});
