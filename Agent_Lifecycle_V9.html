@@ -3302,11 +3302,13 @@ document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>go
   wd.addEventListener('pointerup',function(e){if(!dragging)return;dragging=false;wd.classList.remove('dragging');try{sessionStorage.setItem('h1-qsw',getComputedStyle(ws).getPropertyValue('--qs-w').trim());}catch(e){}});})();
 $("#scrim").addEventListener('click',closeModal);
 (function(){
+ var tries=0;
  function repack(){var g=document.querySelector('.obsgrid');if(!g||g.dataset.packed)return;
   if((g.clientWidth||0)<900)return;
-  g.dataset.packed='1';
   var items=[].slice.call(g.children);
   var hs=items.map(function(c){return (c.getBoundingClientRect().height||c.offsetHeight||0);});
+  if(hs.reduce(function(a,b){return a+b;},0)<200){if(tries++<40)requestAnimationFrame(repack);return;}
+  tries=0;g.dataset.packed='1';
   var N=4,cols=[],wraps=[],i;
   for(i=0;i<N;i++){cols.push(0);var d=document.createElement('div');d.style.cssText='flex:1;min-width:0';wraps.push(d);}
   g.style.columns='auto';g.style.display='flex';g.style.gap='8px';g.style.alignItems='flex-start';
