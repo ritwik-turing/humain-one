@@ -1477,6 +1477,7 @@
   .cacompose-hint svg{width:13px;height:13px;color:var(--teal-d)}
 </style>
 <style>
+.screen{padding:14px 24px 18px!important}
 #detailBody{font-size:12px}
 #detailBody .hd{padding:6px 10px!important}
 #detailBody .hd h3{font-size:12.5px}
@@ -1489,7 +1490,13 @@
 #detailBody .obsgrid .card{margin-top:0!important}
 #detailBody .obsgrid .note{margin-top:0!important}
 #detailBody table th,#detailBody table td{padding:4px 6px!important}
-#detailBody .evcard{padding:6px 10px}
+#detailBody .evcard{padding:5px 8px}
+#detailBody .evcard-ico{display:none}
+#detailBody .evcard-nm{font-size:11.5px}
+#detailBody .evcard-suite{font-size:10px}
+#detailBody .evmeta{font-size:10px}
+#detailBody .evscore-lbl{display:none}
+#detailBody .evcard-r{padding:4px 10px!important}
 #detailBody .evscore{font-size:17px!important}
 #detailBody .obsgrid .note{padding:6px 10px}
 #detailBody .obsgrid .btn{padding:4px 10px;font-size:11px}
@@ -2169,7 +2176,7 @@ function obsRuntimeStub(){var OBS='<span style="background:#7c3aed;color:#fff;fo
 function detailHealth(a){var v=viewOf(a);var S=obsStages(a,v);var kind=S.kind;
  function it(h,id){return h?'<div'+(id?' id="'+id+'"':'')+' style="break-inside:avoid;margin:0 0 8px;scroll-margin-top:120px">'+h+'</div>':'';}
  var longrun=(kind==='progress')?'<div class="note preview"><span class="ni">◷</span><div><b>Long-running step.</b> Provisioning continues in the background. You can leave and return; the state is saved so you can resume or debug here.</div></div>':'';
- return '<div class="obsgrid" style="columns:4 300px;column-gap:10px;margin-top:8px">'
+ return '<div class="obsgrid" style="columns:4 260px;column-gap:8px;margin-top:6px">'
   +it(obsProvTable(a,v,kind),'sec-provisioning-infrastructure')
   +it(obsProvActions(a,v,kind))
   +it(longrun)
@@ -2195,7 +2202,7 @@ function scrDetail(){var a=panelAgent(state.agentId);var tab=state.detailTab||'o
   var TABS=[['overview','Overview'],['health','Observability'],['evidence','Evidence']];
   var tabs=TABS.map(function(t){var on=t[0]===tab;return '<button type="button" data-detailtab="'+t[0]+'" style="appearance:none;border:1px solid '+(on?'#0e9b76':'#d8d2c4')+';background:'+(on?'#0e9b76':'#fff')+';color:'+(on?'#fff':'#4a4640')+';font-weight:600;font-size:12.5px;padding:6px 14px;border-radius:8px;cursor:pointer">'+t[1]+'</button>';}).join('');
   var body=tab==='health'?detailHealth(a):tab==='evidence'?detailEvidence(a):detailOverview(a);
-  return '<div class="row" style="margin-bottom:8px;align-items:center;gap:12px"><button class="btn sm ghost" data-go="agents"><i data-lucide="arrow-left"></i> Back</button><div class="small" style="color:var(--muted)"><a data-crumb="agents" style="color:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px">Agent Lifecycle</a> / '+a.name+' / '+TABS.filter(function(t){return t[0]===tab;})[0][1]+'</div></div>'+'<div class="row" style="align-items:center;gap:12px;margin-bottom:8px"><div class="agent-av" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--subtle);font-weight:700">'+(a.code||'A')+'</div><div style="flex:1"><h2 style="margin:0;font-size:17px">'+a.name+'</h2><div class="small">'+(a.tenant||'')+'</div></div>'+((a.trustScore&&a.trustScore!=='--')?trustBadge(a):badge('muted','not yet evaluated'))+agnav+'</div>'
+  return '<div class="row" style="align-items:center;gap:10px;margin-bottom:6px"><button class="btn sm ghost" data-go="agents" title="Back to Agent Lifecycle"><i data-lucide="arrow-left"></i></button><div class="agent-av" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--subtle);font-weight:700">'+(a.code||'A')+'</div><div style="flex:1"><h2 style="margin:0;font-size:17px">'+a.name+'</h2><div class="small">'+(a.tenant||'')+'</div></div>'+((a.trustScore&&a.trustScore!=='--')?trustBadge(a):badge('muted','not yet evaluated'))+agnav+'</div>'
    +statusBanner(a)
    +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;padding:6px 0;position:sticky;top:0;z-index:6;background:var(--bg)">'+tabs+'</div>'
    +'<div id="detailBody">'+body+'</div>';
