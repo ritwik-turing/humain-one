@@ -117,8 +117,8 @@ h3.sec{font-size:14px;margin:20px 0 10px}
 const CATS=['All','Citizen services','Back office','Finance','HR','Travel','Language'];
 const AGENTS=[
  {id:'translate',nm:'Translation Agent',pub:'Turing Labs',vrf:1,cat:'Language',ds:'Arabic–English document and live-chat translation with legal-register support.',use:'18.2k',trust:94,mo:499,task:0.35,kingdom:1,cert:1,feat:1},
- {id:'meeting',nm:'Meeting Manager',pub:'Turing Labs',vrf:1,cat:'Back office',ds:'Schedules, briefs, and follows up on meetings across your org calendar.',use:'12.4k',trust:91,mo:299,task:0.20,kingdom:0,cert:1,feat:1},
- {id:'citizen',nm:'Citizen Support Agent',pub:'Ministry of Social Affairs',vrf:1,cat:'Citizen services',ds:'Answers citizen queries on benefits and services, escalates with full context.',use:'9.1k',trust:92,mo:899,task:0.55,kingdom:1,cert:1,feat:1},
+ {id:'meeting',nm:'Meeting Manager',pub:'Turing Labs',vrf:1,cat:'Back office',ds:'Schedules, briefs, and follows up on meetings across your org calendar.',use:'8.6k',trust:91,mo:299,task:0.20,kingdom:0,cert:1,feat:1},
+ {id:'citizen',nm:'Citizen Support Agent',pub:'Ministry of Social Affairs',vrf:1,cat:'Citizen services',ds:'Answers citizen queries on benefits and services, escalates with full context.',use:'12.4k',trust:92,mo:899,task:0.55,kingdom:1,cert:1,feat:1},
  {id:'trip',nm:'Trip Planner',pub:'Turing Labs',vrf:1,cat:'Travel',ds:'Plans compliant business travel: flights, hotels, visas, per-diem rules.',use:'7.8k',trust:88,mo:249,task:0.18,kingdom:0,cert:1,feat:0},
  {id:'invoice',nm:'Invoice Chaser',pub:'Riyadh FinTech Works',vrf:1,cat:'Finance',ds:'Follows up unpaid invoices in Arabic and English, reconciles on payment.',use:'6.3k',trust:87,mo:399,task:0.25,kingdom:0,cert:1,feat:0},
  {id:'contract',nm:'Contract Summarizer',pub:'Jeddah Legal AI',vrf:1,cat:'Back office',ds:'Summarizes and red-flags contracts against your playbook. Sharia-clause aware.',use:'4.9k',trust:90,mo:1299,task:0.90,kingdom:1,cert:1,feat:0},
@@ -141,7 +141,7 @@ function badge(c,t){return '<span class="badge '+c+'">'+t+'</span>';}
 function copychip(id){return '<span class="copychip" data-copy="'+id+'" title="Copy to clipboard">⧉ '+id+'</span>';}
 function av(a){return '<div class="av">'+a.nm.split(' ').map(w=>w[0]).slice(0,2).join('')+'</div>';}
 function publine(a){return '<span class="pub">'+a.pub+(a.vrf?' <span class="vrf" title="Verified publisher">✓ verified</span>':'')+'</span>';}
-function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' active tenants')+(a.cert?' '+badge('blue','certified'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
+function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' monthly runs')+(a.cert?' '+badge('blue','certified'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
 function qr(){let s='';for(let i=0;i<49;i++){s+='<i class="'+(((i*7)%13<6)?'':'o')+'"></i>';}return '<div class="qr">'+s+'</div>';}
 function sideNav(cur){
  const S=[['Discover','Browse & search','store'],['Evaluate','Trust & evidence','listing'],['Try & choose','Sandbox · plan · tier','listing'],['Checkout','SAR · VAT · ZATCA e-invoice',''],['Entitle','Instant · org attach',''],['First use','Run in your workspace','work']];
@@ -194,7 +194,7 @@ function scrListing(){
   overview:`<div class="card" style="padding:14px">
    <div class="kv"><span>Publisher</span><b>${a.pub}${a.vrf?' ✓':''}</b></div>
    <div class="kv"><span>Category</span><b>${a.cat}</b></div>
-   <div class="kv"><span>Active tenants</span><b>${a.use}</b></div>
+   <div class="kv"><span>Monthly runs</span><b>${a.use}</b></div><div class="kv"><span>Reuse</span><b>4 tenant organizations</b></div>
    <div class="kv"><span>Agent card (A2A)</span><b>${copychip('a2a_'+a.id+'_v1')}</b></div>
    <div class="kv"><span>Protocols</span><b>MCP · A2A</b></div>
    <div class="kv"><span>Last updated</span><b>Jul 2026</b></div></div>
@@ -213,12 +213,12 @@ function scrListing(){
   cert:`<div class="card" style="padding:14px">
    <div class="kv"><span>Certification profile</span><b>${a.cert?'gov-citizen-v1 · signed':'not yet certified'}</b></div>
    <div class="kv"><span>Hosting assessment</span><b>NCA ECC + CCC-2:2024 assessed (CST Class C)</b></div>
-   <div class="kv"><span>Data residency</span><b>${a.kingdom?'In-Kingdom dedicated tier available (KSA, Dammam)':'HUMAIN-hosted (KSA region)'}</b></div>
+   <div class="kv"><span>Data residency</span><b>${a.kingdom?'In-Kingdom dedicated tier available (KSA, Riyadh)':'HUMAIN-hosted (KSA region)'}</b></div>
    <div class="kv"><span>Evidence reference</span><b>${copychip('cert_'+a.id+'_71a2')}</b></div></div>`,
   perf:`<div class="card" style="padding:14px">
    <div class="kv"><span>Task completion</span><b>97% · category median 92%</b></div>
    <div class="kv"><span>p95 latency</span><b>470 ms</b></div>
-   <div class="kv"><span>Cost per outcome</span><b>≈ ${fmt(a.task)} · median ${fmt(a.task*1.35)}</b></div></div>
+   <div class="kv"><span>Cost per outcome</span><b>≈ ${fmt(a.task*0.75)} · median ${fmt(a.task)}</b></div></div>
    <div class="small" style="margin-top:8px">${badge('gov','indicative')} Figures are indicative until this version has enough volume.</div>`,
  }[state.tab];
  return `<div class="crumb"><a data-go="store">Marketplace</a> / ${a.cat} / ${a.nm}</div>
