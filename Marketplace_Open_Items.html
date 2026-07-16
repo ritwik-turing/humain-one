@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public Marketplace — Open Items & Decisions</title>
+<style>
+:root{--bg:#faf9f5;--ink:#1f1c18;--muted:#6f6a61;--line:#e5e1d8;--green:#0e9b76;--greenbg:#eef7f2;--amber:#b45309;--amberbg:#fdf6e7;--red:#b91c1c;--redbg:#f6ebe9;--card:#fff;--blue:#155f9e;--bluebg:#e8f1fa;--purple:#6b3fa0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 26px 90px}
+h1{font-size:25px;margin:0 0 4px}
+h2{font-size:18px;margin:32px 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 6px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 6px}
+.chip{background:var(--greenbg);border:1px solid var(--green);color:var(--green);font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px}
+.chip.warn{background:var(--amberbg);border-color:var(--amber);color:var(--amber)}
+.chip.blue{background:var(--bluebg);border-color:var(--blue);color:var(--blue)}
+.callout{border-left:4px solid var(--green);background:var(--greenbg);border-radius:0 10px 10px 0;padding:11px 15px;margin:14px 0;font-size:13px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 4px;font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.03em;padding:2px 8px;border-radius:9px;white-space:nowrap}
+.own-h{background:#efe7f6;color:var(--purple)}
+.own-t{background:var(--bluebg);color:var(--blue)}
+.own-j{background:#eaf3ee;color:var(--green)}
+.own-l{background:#f3ece4;color:var(--amber)}
+.b-demo{background:var(--redbg);color:var(--red)}
+.b-build{background:var(--amberbg);color:var(--amber)}
+.b-defer{background:#f0ede6;color:var(--muted)}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0 0;overflow:hidden}
+.sec-h{display:flex;align-items:center;gap:10px;padding:11px 16px;background:#fbfaf7;border-bottom:1px solid var(--line);font-weight:800;font-size:14px}
+.sec-h .n{width:22px;height:22px;border-radius:6px;background:var(--ink);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+tr:last-child td{border-bottom:none}
+td.q{width:26%;font-weight:700}
+td.a{width:30%;color:var(--muted)}
+td.d{width:30%}
+td.tags{width:14%;white-space:nowrap}
+.tags .tag{margin:0 0 3px}
+.summ{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.summ th,.summ td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
+.summ td.c{text-align:center;font-weight:700}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+.small{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Public Marketplace — Open Items &amp; Decisions</h1>
+<p class="sub">What has to be decided before we can call the marketplace UI done · companion to the V1 mockup and the market research · Sprint 6</p>
+<div class="meta">
+  <span class="chip">33 open items</span>
+  <span class="chip warn">9 block the LEAP demo</span>
+  <span class="chip blue">14 need HUMAIN alignment</span>
+</div>
+
+<div class="callout">
+<b>How to read this.</b> V1 is a clickable mock: it makes a working assumption at every fork so the journey holds together for a demo. This register lists every one of those forks that is actually an open decision, not a settled design. Payments is the obvious one, and there are 32 others. On the call I will walk the flow once, then step through the items tagged <span class="tag b-demo">DEMO</span> first, since those gate what we can honestly show HUMAIN.
+</div>
+
+<div class="legend">
+  <b style="color:var(--ink)">Owner:</b>
+  <span><span class="tag own-t">TURING</span> ours to decide/build</span>
+  <span><span class="tag own-h">HUMAIN</span> theirs to decide</span>
+  <span><span class="tag own-j">JOINT</span> needs both</span>
+  <span><span class="tag own-l">LEGAL</span> compliance / counsel</span>
+</div>
+<div class="legend">
+  <b style="color:var(--ink)">Blocks:</b>
+  <span><span class="tag b-demo">DEMO</span> gates the LEAP demo</span>
+  <span><span class="tag b-build">BUILD</span> gates real build, not the demo</span>
+  <span><span class="tag b-defer">DEFER</span> can mock now, decide later</span>
+</div>
+
+<!-- 1 PAYMENTS -->
+<div class="sec">
+<div class="sec-h"><span class="n">1</span>Payments &amp; billing</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">Payment rails &amp; PSP</td><td class="a">A card form (mada / Visa / Mastercard), no real processor</td><td class="d">Which payment service provider? mada is mandatory in KSA. Who integrates it?</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-demo">DEMO</span></td></tr>
+<tr><td class="q">Merchant of record</td><td class="a">Unspecified — the store just "takes payment"</td><td class="d">Who is the legal seller: HUMAIN, Turing, or the agent publisher? Determines who holds funds, issues invoices, owns chargebacks.</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Builder revenue share &amp; payout</td><td class="a">Not shown at all</td><td class="d">What split do publishers get, and how are they paid in SAR? (Research: Poe excludes all GCC builders — a SAR payout rail is greenfield.)</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Credits / commitment draw-down</td><td class="a">Every purchase is a fresh card charge</td><td class="d">Can agent purchases draw down an existing HUMAIN ONE platform commitment (the Azure MACC pattern)? Big B2B accelerant if yes.</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Refunds &amp; cancellation billing</td><td class="a">Cancel deprovisions atomically; no refund logic</td><td class="d">Refund policy, proration on mid-cycle cancel, trial-to-paid boundary.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Failed payment / dunning</td><td class="a">A single "declined" state, atomic (nothing created)</td><td class="d">Retry cadence, grace period, what happens to a running agent when a renewal fails.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+</table>
+</div>
+
+<!-- 2 TAX & COMPLIANCE -->
+<div class="sec">
+<div class="sec-h"><span class="n">2</span>Tax, invoicing &amp; regulatory</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">ZATCA e-invoicing integration</td><td class="a">Shows a "ZATCA-cleared" invoice with QR — visual only</td><td class="d">Who is the onboarded e-invoice generation solution (EGS) that clears B2B invoices via FATOORA? Real integration, not UI.</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">VAT handling</td><td class="a">Flat 15% line; a hardcoded VAT number field</td><td class="d">Capture &amp; validate buyer VAT registration; VAT treatment for non-KSA buyers; reverse charge cases.</td><td class="tags"><span class="tag own-l">LEGAL</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Data residency legal position</td><td class="a">"In-Kingdom tier" presented as a product feature</td><td class="d">PDPL cross-border transfer rules for agent-processed business data are unresolved (research refuted the "mandatory localization" claim). Needs a HUMAIN legal read before we make residency claims on a listing.</td><td class="tags"><span class="tag own-l">LEGAL</span><span class="tag b-demo">DEMO</span></td></tr>
+<tr><td class="q">Certification / trust badge basis</td><td class="a">"certified" and "NCA ECC + CCC-2:2024" badges shown</td><td class="d">HUMAIN Guardian (certification) is out of LEAP scope. What actually backs the "certified" badge for the demo, and who signs it?</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-demo">DEMO</span></td></tr>
+<tr><td class="q">Terms / EULA acceptance</td><td class="a">No terms step</td><td class="d">Per-agent terms of use, platform terms, acceptance capture and storage.</td><td class="tags"><span class="tag own-l">LEGAL</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Government procurement path</td><td class="a">Everyone self-serves with a card</td><td class="d">Government buyers may be unable to card-checkout. Do we need an Etimad / PO / private-offer lane for public-sector buyers?</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-defer">DEFER</span></td></tr>
+</table>
+</div>
+
+<!-- 3 IDENTITY & ENTITLEMENTS -->
+<div class="sec">
+<div class="sec-h"><span class="n">3</span>Identity, tenancy &amp; entitlements</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">Buyer identity &amp; auth</td><td class="a">A fixed signed-in org ("Al-Noor Trading Co.")</td><td class="d">Sign-in via Keycloak/OIDC control plane (HUMAIN-1107)? Is a marketplace buyer the same identity as a developer-portal tenant?</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Entitlement service</td><td class="a">Purchase flips an in-memory "owned" flag</td><td class="d">A real entitlement layer: purchase → quantified entitlement (seats / tasks) → runtime checks before every run. This is the backbone; ties to Group 4 L0.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Seats vs usage metering</td><td class="a">"25 seats · 5,000 tasks" shown as static text</td><td class="d">How seats map to users, how tasks are metered and reported, overage behavior.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Who can buy vs assign</td><td class="a">One buyer does everything</td><td class="d">Roles: who purchases, who assigns to users, who can block/remove. Ties to org admin model.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Dual-path activation guardrails</td><td class="a">Buyer assigns "Entire organization" in one click</td><td class="d">Research shows admin-assign AND user self-install both exist. What are the guardrails so users self-serve without breaking IT control?</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-defer">DEFER</span></td></tr>
+</table>
+</div>
+
+<!-- 4 PROVISIONING & RUNTIME -->
+<div class="sec">
+<div class="sec-h"><span class="n">4</span>Provisioning &amp; runtime</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">What "instant activation" does</td><td class="a">Instantly shows the agent in the workspace</td><td class="d">On purchase, what actually provisions? A sandbox spin-up (ties to Sandbox Lifecycle 524)? A tenant attach? Timing and failure handling.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Runtime tiers — real infra</td><td class="a">"HUMAIN-hosted" vs "in-Kingdom dedicated (+40%)"</td><td class="d">Does the in-Kingdom dedicated tier exist as infra, and what is the real cost delta? The +40% is a placeholder.</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Cancel = deprovision</td><td class="a">One action stops billing and tears down runtime</td><td class="d">Confirm the runtime actually deprovisions atomically (ties to lifecycle retire). Data retention / teardown record policy.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+</table>
+</div>
+
+<!-- 5 CATALOG & LISTINGS -->
+<div class="sec">
+<div class="sec-h"><span class="n">5</span>Catalog, listings &amp; evidence</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">Evidence layer is shared, not copied</td><td class="a">Listing metrics are hand-matched to the V9 observability numbers</td><td class="d">In the real build the listing's certification / performance sections must read from the same Group 4 L0 projection the developer portal uses — one evidence service, not two. Architectural, but it shapes the UI contract.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Who sets the price, in what unit</td><td class="a">Prices are invented per listing (SAR/mo, SAR/task)</td><td class="d">Do publishers set price, or does HUMAIN? Currency, allowed models per listing, price-change rules.</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Quality gate for "agent"</td><td class="a">Everything in the catalog is an "agent"</td><td class="d">The bar for what may list as an agent vs a tool, and who enforces it at submission.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Verified-publisher criteria</td><td class="a">Most listings show a "verified" badge</td><td class="d">What earns the verified badge, who grants it, how it is revoked.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Ratings / reviews</td><td class="a">No star reviews; usage counts + verified badges only</td><td class="d">Confirm the launch decision to omit open reviews (research-backed). If added later, gate to verified purchasers.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Usage-count source</td><td class="a">"12.4k monthly runs · 4 tenants" as static text</td><td class="d">Where the public usage number comes from and how often it refreshes (privacy: no per-tenant leakage).</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+</table>
+</div>
+
+<!-- 6 PUBLISHER SIDE -->
+<div class="sec">
+<div class="sec-h"><span class="n">6</span>Publisher / supply side</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">How agents get onto the store</td><td class="a">The catalog just exists</td><td class="d">Is there a publisher onboarding + listing-submission flow for LEAP, or is the catalog curated by HUMAIN/Turing by hand? Whole surface not yet designed.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Listing review / approval</td><td class="a">No review step</td><td class="d">Two-stage review (content + operational validation) is the market norm. Who runs it, especially with Guardin out of LEAP.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-defer">DEFER</span></td></tr>
+</table>
+</div>
+
+<!-- 7 DISCOVERY -->
+<div class="sec">
+<div class="sec-h"><span class="n">7</span>Discovery &amp; localization</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">Arabic / RTL</td><td class="a">English-only, left-to-right</td><td class="d">A KSA storefront almost certainly needs full Arabic + RTL. This is a large UI decision, not a translation pass. When does it land?</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-demo">DEMO</span></td></tr>
+<tr><td class="q">Search: keyword vs semantic</td><td class="a">Simple keyword filter</td><td class="d">Do we ship intent/semantic search ("automate invoice follow-up in Arabic")? Market leaders do.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Category taxonomy owner</td><td class="a">Seven invented categories</td><td class="d">Who owns the official taxonomy, and does it match the developer-side categories.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Featured / curation process</td><td class="a">Three hand-picked featured agents</td><td class="d">Editorial process for the featured row: who decides, how often, any paid placement.</td><td class="tags"><span class="tag own-h">HUMAIN</span><span class="tag b-defer">DEFER</span></td></tr>
+</table>
+</div>
+
+<!-- 8 TRIALS -->
+<div class="sec">
+<div class="sec-h"><span class="n">8</span>Trials &amp; demos</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">Trial mechanic</td><td class="a">14-day per-tenant trial, hard stop, no auto-charge</td><td class="d">Confirm duration and that it needs real entitlement + metering support (one trial per tenant, not per user).</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Pre-purchase sandbox</td><td class="a">A scripted "sandbox" modal with canned replies</td><td class="d">Does a no-signup sandbox run real compute on sample data? Isolation, cost, and abuse controls if so.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-defer">DEFER</span></td></tr>
+</table>
+</div>
+
+<!-- 9 POST-PURCHASE -->
+<div class="sec">
+<div class="sec-h"><span class="n">9</span>Post-purchase &amp; lifecycle</div>
+<table>
+<tr><th>Open item</th><th>What V1 assumes</th><th>Decision needed</th><th>Tags</th></tr>
+<tr><td class="q">Subscription management</td><td class="a">Only cancel exists</td><td class="d">Upgrade/downgrade, add seats, switch tier, renewal reminders, invoice history.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-build">BUILD</span></td></tr>
+<tr><td class="q">Feedback → standing loop</td><td class="a">"Accepted / Edited" buttons, no wiring</td><td class="d">How buyer feedback feeds the agent's marketplace standing, and how that stays consistent with the observability layer.</td><td class="tags"><span class="tag own-t">TURING</span><span class="tag b-defer">DEFER</span></td></tr>
+<tr><td class="q">Support &amp; disputes</td><td class="a">None</td><td class="d">Who supports a bought agent — publisher or platform? Dispute / SLA path.</td><td class="tags"><span class="tag own-j">JOINT</span><span class="tag b-defer">DEFER</span></td></tr>
+</table>
+</div>
+
+<!-- SUMMARY -->
+<h2>Summary — what gates the demo</h2>
+<p class="small">The nine <span class="tag b-demo">DEMO</span> items are the ones to align before we show HUMAIN a marketplace we can stand behind. Everything else can stay mocked for the demo and be decided during build scoping.</p>
+<table class="summ">
+<tr><th>Blocks LEAP demo (align first)</th><th>Owner</th></tr>
+<tr><td>Payment rails &amp; PSP (mada)</td><td><span class="tag own-j">JOINT</span></td></tr>
+<tr><td>Data-residency legal position</td><td><span class="tag own-l">LEGAL</span></td></tr>
+<tr><td>What backs the certification / trust badge (Guardian is out of LEAP)</td><td><span class="tag own-j">JOINT</span></td></tr>
+<tr><td>Arabic / RTL — is it in the demo or after</td><td><span class="tag own-j">JOINT</span></td></tr>
+</table>
+<p class="small" style="margin-top:10px">Then the big build-blocking backbone, none of which shows on screen but all of which the UI depends on: the <b>entitlement service</b>, the <b>ZATCA integration</b>, the <b>shared evidence layer</b>, and <b>merchant-of-record + revenue share</b>. These are where the marketplace stops being a mock.</p>
+
+<p class="small" style="margin-top:24px">Companion docs: <a href="https://ritwik-turing.github.io/humain-one/Marketplace_Research.html">market research</a> · <a href="https://ritwik-turing.github.io/humain-one/Public_Marketplace_V1.html">V1 mockup</a>. Open questions carried from the research (PDPL enforcement, practitioner criticism corpus, GPT Store/ServiceNow specifics) remain unresolved and are folded into the items above where relevant.</p>
+
+</div>
+</body>
+</html>
