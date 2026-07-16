@@ -56,11 +56,23 @@ button{font-family:inherit}
 .copychip{display:inline-block;font-size:10px;font-weight:700;background:#f0ede6;color:var(--muted);padding:2px 8px;border-radius:999px;cursor:pointer}
 .crumb{font-size:12px;color:var(--muted);margin-bottom:10px}
 .crumb a{color:var(--blue);cursor:pointer;text-decoration:none}
-.steps{display:flex;gap:0;align-items:center;flex-wrap:wrap;margin:4px 0 16px}
-.stepp{font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;background:#f0ede6;color:var(--muted)}
-.stepp.on{background:var(--green);color:#fff}
-.stepp.done{background:var(--greenbg);color:var(--green)}
-.stepline{width:16px;height:2px;background:var(--line)}
+.jwrap{display:grid;grid-template-columns:225px 1fr;gap:18px;align-items:start}
+@media(max-width:900px){.jwrap{grid-template-columns:1fr}}
+.jnav{position:sticky;top:64px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 12px 4px}
+.jnav .jt{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin:0 0 10px 4px}
+.jitem{display:flex;gap:10px;padding:0 4px;border-radius:10px}
+.jitem.click{cursor:pointer}
+.jitem.click:hover .jl{color:var(--green)}
+.jrail{display:flex;flex-direction:column;align-items:center}
+.jdot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:#f0ede6;color:var(--muted);flex:none}
+.jitem.done .jdot{background:var(--greenbg);color:var(--green)}
+.jitem.on .jdot{background:var(--green);color:#fff;box-shadow:0 0 0 3px var(--greenbg)}
+.jline{width:2px;flex:1;background:var(--line);min-height:14px;margin:2px 0}
+.jitem.done .jline{background:var(--green)}
+.jbody{padding:2px 0 14px}
+.jl{font-weight:700;font-size:12.5px}
+.jitem.on .jl{color:var(--green)}
+.js{font-size:10.5px;color:var(--muted)}
 .chat{display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:11px;min-height:200px;max-height:320px;overflow:auto}
 .msg{max-width:78%;padding:8px 12px;border-radius:12px;font-size:12.5px}
 .msg.me{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:4px}
@@ -131,8 +143,15 @@ function av(a){return '<div class="av">'+a.nm.split(' ').map(w=>w[0]).slice(0,2)
 function publine(a){return '<span class="pub">'+a.pub+(a.vrf?' <span class="vrf" title="Verified publisher">✓ verified</span>':'')+'</span>';}
 function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' active tenants')+(a.cert?' '+badge('blue','certified'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
 function qr(){let s='';for(let i=0;i<49;i++){s+='<i class="'+(((i*7)%13<6)?'':'o')+'"></i>';}return '<div class="qr">'+s+'</div>';}
-function steps(cur){const S=['Discover','Evaluate','Try & choose','Checkout','Entitle','First use'];const ix=S.indexOf(cur);
- return '<div class="steps">'+S.map((s,i)=>'<span class="stepp '+(i<ix?'done':i===ix?'on':'')+'">'+(i<ix?'✓ ':'')+s+'</span>'+(i<S.length-1?'<span class="stepline"></span>':'')).join('')+'</div>';}
+function sideNav(cur){
+ const S=[['Discover','Browse & search','store'],['Evaluate','Trust & evidence','listing'],['Try & choose','Sandbox · plan · tier','listing'],['Checkout','SAR · VAT · ZATCA e-invoice',''],['Entitle','Instant · org attach',''],['First use','Run in your workspace','work']];
+ const ix=S.findIndex(s=>s[0]===cur);
+ return '<div class="jnav"><div class="jt">YOUR JOURNEY</div>'+S.map((s,i)=>{
+  const st=i<ix?'done':i===ix?'on':'';
+  const clickable=(st==='done'&&s[2]&&(s[2]!=='listing'||state.agentId))||(s[0]==='First use'&&st!=='on'&&state.owned&&!state.owned.cancelled);
+  return '<div class="jitem '+st+(clickable?' click':'')+'"'+(clickable?' data-jnav="'+s[2]+'"':'')+'><div class="jrail"><div class="jdot">'+(st==='done'?'✓':(i+1))+'</div>'+(i<S.length-1?'<div class="jline"></div>':'')+'</div><div class="jbody"><div class="jl">'+s[0]+'</div><div class="js">'+s[1]+'</div></div></div>';
+ }).join('')+'</div>';
+}
 function planPrice(a,plan,tier){
  let base=0,label='';
  if(plan==='trial'){base=0;label='14-day free trial · then '+fmt(a.mo)+'/mo';}
@@ -203,7 +222,6 @@ function scrListing(){
    <div class="small" style="margin-top:8px">${badge('gov','indicative')} Figures are indicative until this version has enough volume.</div>`,
  }[state.tab];
  return `<div class="crumb"><a data-go="store">Marketplace</a> / ${a.cat} / ${a.nm}</div>
- ${steps('Evaluate')}
  <div class="two">
  <div>
   <div class="frow" style="gap:12px">${av(a)}<div><div class="nm" style="font-size:17px">${a.nm}</div>${publine(a)}</div><span style="margin-left:auto">${trustline(a)}</span></div>
@@ -235,7 +253,6 @@ function scrCheckout(){
  const a=A(state.agentId);const p=planPrice(a,state.plan,state.tier);
  const vat=p.base*VAT, total=p.base+vat;
  return `<div class="crumb"><a data-go="store">Marketplace</a> / <a data-open="${a.id}">${a.nm}</a> / Checkout</div>
- ${steps('Checkout')}
  <div class="two">
  <div class="card" style="padding:16px">
   <div style="font-weight:700;margin-bottom:10px">Billing details</div>
@@ -260,8 +277,7 @@ function scrCheckout(){
 
 function scrInvoice(){
  const a=A(state.agentId);const o=state.owned;
- return `${steps('Checkout')}
- <div class="card" style="max-width:640px;margin:0 auto;padding:18px">
+ return `<div class="card" style="max-width:640px;margin:0 auto;padding:18px">
   <div class="frow" style="justify-content:space-between"><div style="font-weight:800;font-size:15px">Payment confirmed</div>${badge('gov','ZATCA cleared')}</div>
   <div class="note gov" style="margin:10px 0"><span>✓</span><div>Tax invoice was cleared with ZATCA via FATOORA <b>before issuance</b>. The cryptographic stamp and QR below were applied by ZATCA, not the seller.</div></div>
   <div class="frow" style="gap:16px;align-items:flex-start">
@@ -279,8 +295,7 @@ function scrInvoice(){
 
 function scrEntitle(){
  const a=A(state.agentId);const o=state.owned;
- return `${steps('Entitle')}
- <div class="card" style="max-width:640px;margin:0 auto;padding:18px">
+ return `<div class="card" style="max-width:640px;margin:0 auto;padding:18px">
   <div class="frow" style="justify-content:space-between"><div style="font-weight:800;font-size:15px">Activated instantly</div>${badge('gov','entitlement live')}</div>
   <div class="kv"><span>Agent</span><b>${a.nm}</b></div>
   <div class="kv"><span>Entitlement</span><b>${o.plan==='usage'?'Metered per task':o.seats+' seats · '+o.cap.toLocaleString()+' tasks / month'}</b></div>
@@ -298,15 +313,14 @@ function scrEntitle(){
 
 function scrWork(){
  const o=state.owned;
- if(!o||o.cancelled)return `${steps('First use')}<div class="card" style="max-width:560px;margin:0 auto;padding:18px">
+ if(!o||o.cancelled)return `<div class="card" style="max-width:560px;margin:0 auto;padding:18px">
   <div style="font-weight:800;font-size:15px">My agents</div>
   <div class="note ${o&&o.cancelled?'warn':'gov'}" style="margin-top:10px"><span>${o&&o.cancelled?'◷':'i'}</span><div>${o&&o.cancelled?'<b>Subscription cancelled.</b> Billing stopped and the runtime was deprovisioned in the same action — nothing keeps charging in the background. A teardown record was kept for audit.':'No agents yet. Acquire one from the marketplace to see it here.'}</div></div>
   <button class="btn" style="margin-top:12px" data-go="store">Browse the marketplace</button></div>`;
  const a=A(o.agentId);
  const pct=Math.min(100,Math.round(o.used/o.cap*100));
  const dis=o.blocked||o.exhausted;
- return `${steps('First use')}
- <div class="two">
+ return `<div class="two">
  <div class="card" style="padding:16px">
   <div class="frow" style="justify-content:space-between">${av(a)}<div style="flex:1;margin-left:10px"><div class="nm">${a.nm}</div><span class="small">running in alnoor-trading · ${o.tier==='kingdom'?'in-Kingdom dedicated':'HUMAIN-hosted'}</span></div>${o.blocked?badge('alert','blocked by admin'):o.exhausted?badge('preview','entitlement exhausted'):badge('gov','● live')}</div>
   <div class="chat" id="chat">
@@ -347,7 +361,11 @@ function scrWork(){
 function go(scr){state.screen=scr;render();}
 function render(){
  const app=$('#app');
- app.innerHTML={store:scrStore,listing:scrListing,checkout:scrCheckout,invoice:scrInvoice,entitle:scrEntitle,work:scrWork}[state.screen]();
+ const inner={store:scrStore,listing:scrListing,checkout:scrCheckout,invoice:scrInvoice,entitle:scrEntitle,work:scrWork}[state.screen]();
+ const NAVFOR={listing:'Evaluate',checkout:'Checkout',invoice:'Entitle',entitle:'Entitle',work:'First use'};
+ let nv=NAVFOR[state.screen];
+ if(state.screen==='work'&&(!state.owned||state.owned.cancelled))nv=null;
+ app.innerHTML = nv ? '<div class="jwrap">'+sideNav(nv)+'<div>'+inner+'</div></div>' : inner;
  window.scrollTo(0,0);
 }
 document.addEventListener('click',e=>{
@@ -355,6 +373,7 @@ document.addEventListener('click',e=>{
  let n;
  if(n=t('[data-copy]')){if(navigator.clipboard)navigator.clipboard.writeText(n.getAttribute('data-copy'));const o=n.textContent;n.textContent='copied';setTimeout(()=>n.textContent=o,1100);return;}
  if(n=t('[data-open]')){state.agentId=n.getAttribute('data-open');state.tab='overview';state.plan='trial';state.tier='hosted';state.checkoutErr=false;go('listing');return;}
+ if(n=t('[data-jnav]')){go(n.getAttribute('data-jnav'));return;}
  if(n=t('[data-go]')){go(n.getAttribute('data-go'));return;}
  if(n=t('[data-cat]')){state.cat=n.getAttribute('data-cat');render();return;}
  if(n=t('[data-tab]')){state.tab=n.getAttribute('data-tab');render();return;}
