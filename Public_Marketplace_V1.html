@@ -150,7 +150,7 @@ function scrStore(){
  const list=AGENTS.filter(a=>(state.cat==='All'||a.cat===state.cat)&&(!state.q||((a.nm+' '+a.ds+' '+a.pub+' '+a.cat).toLowerCase().includes(state.q.toLowerCase()))));
  const feat=AGENTS.filter(a=>a.feat);
  return `
- <div class="hero"><h2>Sovereign AI agents for Saudi business</h2>
+ <div class="hero"><h2>Sovereign AI agents for the Kingdom of Saudi Arabia</h2>
  <p>Certified agents · SAR billing with ZATCA e-invoicing · optional in-Kingdom dedicated runtime. Every listing is security-reviewed before it appears here.</p></div>
  ${state.q?'':`<h3 class="sec">Featured</h3><div class="grid">${feat.map(cardA).join('')}</div>`}
  <h3 class="sec">Browse</h3>
