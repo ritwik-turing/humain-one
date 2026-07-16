@@ -98,7 +98,7 @@ h3.sec{font-size:14px;margin:20px 0 10px}
 <body>
 <div class="top">
   <div class="logo" data-go="store">HUMAIN <span>ONE</span> · Marketplace</div>
-  <div class="searchbox"><span style="color:var(--muted)">⌕</span><input id="q" placeholder="Search agents, use cases… (⌘K)"/></div>
+  <div class="searchbox"><span style="color:var(--muted)">⌕</span><input id="q" aria-label="Search agents" placeholder="Search agents, use cases… (⌘K)"/></div>
   <div class="topright">
     <span class="badge blue" title="Signed in as a business buyer">Al-Noor Trading Co. · buyer</span>
     <button class="btn sm" data-go="work" id="myagentsBtn">My agents</button>
@@ -106,11 +106,12 @@ h3.sec{font-size:14px;margin:20px 0 10px}
 </div>
 <div class="wrap" id="app"></div>
 <div id="toastbar"></div>
-<div class="demobar"><b style="color:var(--amber)">DEMO CONTROLS</b><div class="small" style="font-size:10.5px">Failure paths for the walkthrough:</div>
+<div class="demobar"><button class="btn sm ghost" data-demotoggle style="border:none;padding:2px 4px;font-weight:800;color:var(--amber)">⚙ Demo controls</button>
+<div id="demobody" style="display:none"><div class="small" style="font-size:10.5px">Failure paths for the walkthrough:</div>
 <div class="frow" style="margin-top:5px;gap:5px">
 <button class="btn sm ghost" data-demo="exhaust">Exhaust entitlement</button>
 <button class="btn sm ghost" data-demo="block">Admin-block</button>
-</div></div>
+</div></div></div>
 
 <script>
 /* ============ catalog ============ */
@@ -261,7 +262,7 @@ function scrCheckout(){
   <div class="small">B2B tax invoice is cleared with ZATCA (FATOORA) before issuance — you receive the cleared XML / PDF A-3 with ZATCA's cryptographic stamp and QR.</div>
   ${state.checkoutErr?'<div class="note bad" style="margin-top:10px"><span>!</span><div><b>Payment declined by the issuer.</b> Nothing was charged and no entitlement was created — your account is exactly as before. '+copychip('pay_51c9')+'</div></div>':''}
   <div class="frow" style="margin-top:14px">
-   <button class="btn pri" data-pay="ok">Pay ${fmt(total)}</button>
+   <button class="btn pri" data-pay="ok">${state.plan==='trial'?'Start free trial — SAR 0 today':'Pay '+fmt(total)}</button>
    <button class="btn ghost" data-pay="fail" title="Demo the atomic failure path">Simulate declined payment</button>
   </div>
  </div>
@@ -330,7 +331,7 @@ function scrWork(){
   ${o.blocked?'<div class="note bad" style="margin-top:8px"><span>!</span><div><b>This agent was blocked by your admin.</b> Runs are refused; your data and history are kept. '+copychip('adm_7b31')+'</div></div>':''}
   ${o.exhausted?'<div class="note warn" style="margin-top:8px"><span>◷</span><div><b>Monthly entitlement used up.</b> Runs pause until renewal — or upgrade the plan. Nothing is silently billed beyond your entitlement. '+copychip('ent_over_44c1')+'</div></div>':''}
   <div class="frow" style="margin-top:10px">
-   <input class="f" id="chatin" style="flex:1" placeholder="${dis?'Runs are paused':'Ask the agent to do something…'}" ${dis?'disabled':''}/>
+   <input class="f" id="chatin" aria-label="Message the agent" style="flex:1" placeholder="${dis?'Runs are paused':'Ask the agent to do something…'}" ${dis?'disabled':''}/>
    <button class="btn pri" data-send="1" ${dis?'disabled':''}>Run</button>
   </div>
  </div>
@@ -359,14 +360,18 @@ function scrWork(){
 
 /* ============ render + wiring ============ */
 function go(scr){state.screen=scr;render();}
+let lastScreen=null;
 function render(){
  const app=$('#app');
+ const keepY=(lastScreen===state.screen)?window.scrollY:0;
  const inner={store:scrStore,listing:scrListing,checkout:scrCheckout,invoice:scrInvoice,entitle:scrEntitle,work:scrWork}[state.screen]();
  const NAVFOR={listing:'Evaluate',checkout:'Checkout',invoice:'Entitle',entitle:'Entitle',work:'First use'};
  let nv=NAVFOR[state.screen];
  if(state.screen==='work'&&(!state.owned||state.owned.cancelled))nv=null;
  app.innerHTML = nv ? '<div class="jwrap">'+sideNav(nv)+'<div>'+inner+'</div></div>' : inner;
- window.scrollTo(0,0);
+ const ch=$('#chat'); if(ch)ch.scrollTop=ch.scrollHeight;
+ window.scrollTo(0,keepY);
+ lastScreen=state.screen;
 }
 document.addEventListener('click',e=>{
  const t=x=>e.target.closest?e.target.closest(x):null;
@@ -385,13 +390,16 @@ document.addEventListener('click',e=>{
    if(n.getAttribute('data-pay')==='fail'){state.checkoutErr=true;render();toast('Declined — nothing charged, nothing created');return;}
    const a=A(state.agentId);const p=planPrice(a,state.plan,state.tier);
    state.owned={agentId:a.id,plan:state.plan,tier:state.tier,seats:25,cap:state.plan==='trial'?200:5000,used:0,blocked:false,exhausted:false,cancelled:false,firstRun:false,scope:'org',msgs:[],total:p.base*(1+VAT),invoice:'inv_ZATCA_8842'};
-   go('invoice');toast('Payment cleared · entitlement created');return;}
+   if(state.plan==='trial'){go('entitle');toast('Trial started · entitlement live · hard stop in 14 days');}
+   else{go('invoice');toast('Payment cleared · entitlement created');}
+   return;}
  if(n=t('[data-scope]')){state.owned.scope=n.getAttribute('data-scope');document.querySelectorAll('[data-scope]').forEach(b=>b.classList.toggle('on',b===n));return;}
  if(n=t('[data-send]')){sendMsg();return;}
  if(n=t('[data-fb]')){toast('Feedback recorded — feeds the agent\'s marketplace standing');return;}
  if(n=t('[data-cancel]')){
    if(!state.owned)return;
    state.owned.cancelled=true;toast('Cancelled: billing stopped + runtime deprovisioned');render();return;}
+ if(n=t('[data-demotoggle]')){const b=document.getElementById('demobody');b.style.display=b.style.display==='none'?'block':'none';return;}
  if(n=t('[data-demo]')){
    if(!state.owned||state.owned.cancelled){toast('Acquire an agent first (demo controls act on your workspace)');return;}
    if(n.getAttribute('data-demo')==='exhaust'){state.owned.exhausted=true;state.owned.used=state.owned.cap;}
@@ -407,8 +415,10 @@ function sendMsg(){
  const inp=$('#chatin');if(!inp||!inp.value.trim())return;
  const o=state.owned;const a=A(o.agentId);
  o.msgs.push({who:'me',tx:inp.value.trim()});o.used+=1;render();
+ const f1=$('#chatin');if(f1)f1.focus();
  setTimeout(()=>{
   o.msgs.push({who:'ag',tx:demoReply(a)});o.used+=2;o.firstRun=true;render();
+  const f2=$('#chatin');if(f2)f2.focus();
  },700);
 }
 function demoReply(a){
@@ -428,9 +438,11 @@ function openSandbox(){
   <div class="small" style="margin-top:8px">Liked it? Start the 14-day trial — one per tenant, hard stop, no auto-charge.</div>
   <div class="frow" style="margin-top:10px;justify-content:flex-end"><button class="btn" data-x="1">Close</button><button class="btn pri" data-trybuy="1">Start free trial</button></div></div>`;
  document.body.appendChild(ov);
+ function esc(e){if(e.key==='Escape'){ov.remove();document.removeEventListener('keydown',esc);}}
+ document.addEventListener('keydown',esc);
  ov.addEventListener('click',e=>{
-  if(e.target===ov||e.target.closest('[data-x]')){ov.remove();return;}
-  if(e.target.closest('[data-trybuy]')){ov.remove();state.plan='trial';go('checkout');}
+  if(e.target===ov||e.target.closest('[data-x]')){ov.remove();document.removeEventListener('keydown',esc);return;}
+  if(e.target.closest('[data-trybuy]')){ov.remove();document.removeEventListener('keydown',esc);state.plan='trial';go('checkout');}
  });
 }
 window.__mk={state,go,render,A};
