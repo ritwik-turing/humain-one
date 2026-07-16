@@ -138,7 +138,10 @@ function planPrice(a,plan,tier){
  if(plan==='trial'){base=0;label='14-day free trial · then '+fmt(a.mo)+'/mo';}
  if(plan==='sub'){base=a.mo;label=fmt(a.mo)+' / month · 25 seats · 5,000 tasks';}
  if(plan==='usage'){base=a.task*1000;label=fmt(a.task)+' per task · billed monthly (est. 1,000 tasks)';}
- if(tier==='kingdom')base=base*1.4;
+ if(tier==='kingdom'){base=base*1.4;
+  if(plan==='sub')label=fmt(base)+' / month · 25 seats · 5,000 tasks · in-Kingdom dedicated';
+  if(plan==='usage')label=fmt(a.task*1.4)+' per task · in-Kingdom dedicated · billed monthly';
+  if(plan==='trial')label='14-day free trial · then '+fmt(a.mo*1.4)+'/mo on the in-Kingdom tier';}
  return {base,label};
 }
 
