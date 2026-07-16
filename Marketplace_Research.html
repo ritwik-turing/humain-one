@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Marketplace Market Research — HUMAIN ONE Public Marketplace</title>
+<style>
+:root{--bg:#faf9f5;--ink:#1f1c18;--muted:#6f6a61;--line:#e5e1d8;--green:#0e9b76;--amber:#b45309;--red:#b91c1c;--card:#fff;--chip:#eef7f2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:36px 28px 80px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:36px 0 10px;border-bottom:2px solid var(--line);padding-bottom:6px}
+h3{font-size:15px;margin:20px 0 6px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 6px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.chip{background:var(--chip);border:1px solid var(--green);color:var(--green);font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px}
+.chip.warn{background:#fdf6e7;border-color:var(--amber);color:var(--amber)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0}
+th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:7px 9px;border-bottom:2px solid var(--line);vertical-align:bottom}
+td{padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+td b{font-weight:700}
+.conf{font-size:9.5px;font-weight:800;letter-spacing:.04em;padding:1px 7px;border-radius:9px;white-space:nowrap}
+.conf.hi{background:var(--chip);color:var(--green)}
+.conf.med{background:#fdf6e7;color:var(--amber)}
+.conf.low{background:#f6ebe9;color:var(--red)}
+ol,ul{margin:6px 0;padding-left:22px}
+li{margin-bottom:6px}
+a{color:#155f9e;text-decoration:none}
+a:hover{text-decoration:underline}
+.small{font-size:12px;color:var(--muted)}
+.kbd{background:#f0ede6;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-family:ui-monospace,monospace;font-size:12px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0}
+.step{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:600}
+.step b{display:block;font-size:11px;color:var(--green);letter-spacing:.04em}
+.arr{color:var(--muted);font-weight:700}
+.callout{border-left:4px solid var(--green);background:var(--chip);border-radius:0 10px 10px 0;padding:10px 14px;margin:12px 0;font-size:13px}
+.callout.warn{border-color:var(--amber);background:#fdf6e7}
+.r2{display:inline-block;background:#155f9e;color:#fff;font-size:9px;font-weight:800;letter-spacing:.05em;padding:1px 7px;border-radius:9px;vertical-align:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>AI Agent Marketplaces — Market Research</h1>
+<p class="sub">Version 2 (two research rounds) · Input to the HUMAIN ONE Public Marketplace scope &amp; design · self-serve business buyer · SAR pricing · journey ends at first successful agent use</p>
+<div class="meta">
+  <span class="chip">52 sources fetched over 2 rounds</span>
+  <span class="chip">238 claims extracted</span>
+  <span class="chip">50 adversarially verified · 45 confirmed · 5 refuted</span>
+  <span class="chip warn">Prepared 15 Jul 2026 · fast-moving space</span>
+</div>
+
+<div class="callout">
+<b>The one-line takeaway:</b> the winning B2B agent marketplaces converge on the same skeleton — trust evidence as first-class listing sections, a quality gate on what may call itself an "agent", a full pricing menu with entitlements decoupled from checkout, and admin-mediated activation ending inside the buyer's workspace. The sovereignty angle (run in-customer-environment, bill through the store) is already codified by AWS and Microsoft and is HUMAIN ONE's natural differentiator: <b>SAR billing through the storefront, execution in-Kingdom.</b>
+</div>
+
+<h2>1 · Comparison matrix (verified platforms)</h2>
+<p class="small">Every cell below traces to primary vendor documentation that survived 3-vote adversarial verification. GPT Store, ServiceNow, Agentspace-specific and independent directories did not produce claims that survived verification — see Coverage gaps.</p>
+<div style="overflow-x:auto">
+<table>
+<tr><th style="width:12%"></th><th>Microsoft (M365 Agent Store + Azure Marketplace)</th><th>AWS Marketplace (AI Agents &amp; Tools)</th><th>Google Cloud Marketplace / Gemini Enterprise</th><th>Salesforce AgentExchange</th></tr>
+<tr><td><b>Discovery IA</b></td>
+<td>Curated collections; publisher-type and channel filters; agents surface across Teams, Outlook, Word, Excel, PowerPoint</td>
+<td>Category taxonomy separating true AI Agents from MCP Servers, Knowledge bases, Guardrails; standardized listing fields and keywords</td>
+<td>Agents discoverable through Gemini Enterprise; Producer Portal submission path</td>
+<td>One unified storefront (merged AppExchange + Slack Marketplace + Agentforce); semantic search inside Agentforce Builder recommending agents by business intent</td></tr>
+<tr><td><b>Listing anatomy</b></td>
+<td>Named tabs: Overview (publisher, channel, last updated) · Users · Data &amp; tools · <b>Security &amp; compliance</b> · <b>Certification</b> · Activity (usage)</td>
+<td>Logo, short/long description, video, 1–3 highlights, 1–3 categories, keywords, usage instructions incl. API schema, rate limits, examples, auth method</td>
+<td>Machine-readable A2A Agent Card (JSON per the A2A spec) required per listing</td>
+<td>Curated listings with capability detail; component-type categories (agent actions, topics, prompt templates, agent templates, third-party agents)</td></tr>
+<tr><td><b>Trust &amp; verification</b></td>
+<td>Publisher verification + certification/attestation tab; security documentation (data-flow diagrams, secret management, scopes) required at certification; "differentiated value beyond native Copilot" is a must-fix listing gate</td>
+<td>Quality gate: seller must attest the agent uses reasoning LLMs and demonstrates autonomy — otherwise it lists as a tool; MCP and A2A protocol declarations</td>
+<td>Gated behind AI Principles compliance, Model Garden-hosted models by default, A2A interoperability, marketplace review + operations validation</td>
+<td>Mandatory adversarial security review — Salesforce Product Security actively attacks the submission; pass requires them failing to break in</td></tr>
+<tr><td><b>Commercial model</b></td>
+<td>Three offer types: SaaS (multi-tenant), Container (in-tenant runtime), Azure Application (deployable template); nine licensing options on Container offers; purchases draw down existing Azure commitments (MACC)</td>
+<td>Subscription/PAYG, contract, contract+PAYG; free trials; private offers; dedicated Entitlement Service (capacity units, GetEntitlements) decoupling checkout from activation; Quick Launch delivers API keys on subscribe</td>
+<td>Free, flat subscription (prorated), usage-based (vendor metering), combined — exactly four models for agent listings</td>
+<td>Private offers with transparent pricing; unified billing into the Salesforce account; <b>instant automated provisioning the moment an offer is accepted</b>; Flex Credits per-action consumption pricing</td></tr>
+<tr><td><b>Activation</b></td>
+<td>Dual-path: admins assign to "Just me / Entire org / Specific groups" with Block/Remove; users can also self-install from the store (the claim that it is IT-only was <b>refuted 0-3</b>)</td>
+<td>Quick Launch → credentials in the buyer's account; container option runs in the customer's own environment</td>
+<td>Post-review publication into Gemini Enterprise discovery</td>
+<td>Access granted at offer acceptance; admin control over data boundaries and API scopes post-install</td></tr>
+<tr><td><b>Sovereignty answer</b></td>
+<td>Explicit architecture: Azure Application deploys into the customer's tenant while a linked Container offer meters and bills — "decoupling deployment from monetization" for data-residency buyers</td>
+<td>Two deployment options; container positioned for "data that cannot leave the customer's environment" and stricter regulatory adaptation</td>
+<td>Model Garden default hosting; A2A interop as the portability story</td>
+<td>Walled-garden: runs inside Salesforce; critics flag lock-in</td></tr>
+</table>
+</div>
+
+<h2>1b · Round 2 — consumer-grade stores and directories <span class="r2">NEW</span></h2>
+<div style="overflow-x:auto">
+<table>
+<tr><th style="width:14%"></th><th>Google Gemini Enterprise (ex-Agentspace)</th><th>Smithery (largest MCP directory)</th><th>Poe (consumer bot store)</th></tr>
+<tr><td><b>Discovery</b></td>
+<td>Four supply-side categories (Google-built · organization-shared · self-built · marketplace) rather than an open ranked storefront</td>
+<td>Usage counts, Verified badge filters, editorially curated Featured row</td>
+<td>Pricing itself is a ranking lever: higher or frequently changed prices reduce store distribution</td></tr>
+<tr><td><b>Ratings / reviews</b></td>
+<td>Admin-approval gate between discovery and activation: users request access, admin grants</td>
+<td><b>No star ratings or reviews at all</b> — trust = per-server usage counts + binary verified badge; the listing API exposes verified/useCount and no review score</td>
+<td>Compute-points abstraction hides per-message cost from users</td></tr>
+<tr><td><b>Builder monetization</b></td>
+<td>—</td>
+<td>No revenue share; bring-your-own billing (some servers charge per-call via x402 USDC crypto micropayments)</td>
+<td>Creator-set per-message price (not a fixed rev-share %); payouts limited to 23 Stripe countries — <b>Saudi Arabia and all GCC/MENA excluded, USD only</b></td></tr>
+</table>
+</div>
+<div class="callout">
+<b>Two implications for HUMAIN ONE:</b> (1) launch with usage/verification trust signals and curated rows, not open star reviews — the strongest stores in this space deliberately omit them at low volume; (2) a SAR-native billing and payout rail for agent builders is a genuinely unserved market — the leading consumer store structurally excludes Saudi and GCC builders.
+</div>
+
+<h2>2 · The 10 design patterns that repeat across winners</h2>
+<ol>
+<li><b>Trust sections are named listing anatomy, not marketing copy.</b> Security &amp; Compliance and Certification get their own tabs next to capabilities and usage. <span class="conf hi">HIGH</span></li>
+<li><b>Mandatory pre-listing security review + certification badging.</b> Salesforce attacks submissions; Microsoft demands security documentation; Google runs review + operations validation. <span class="conf hi">HIGH</span></li>
+<li><b>Machine-readable agent cards and protocol declarations (MCP / A2A).</b> Google requires an A2A Agent Card; AWS listings declare protocol support. <span class="conf hi">HIGH</span></li>
+<li><b>A quality gate on the word "agent".</b> AWS makes sellers attest to reasoning LLMs + autonomy or list as a tool; Microsoft requires differentiated value beyond native Copilot. <span class="conf hi">HIGH</span></li>
+<li><b>The full pricing menu at launch:</b> free · flat subscription (prorated) · usage-metered · combined · private offers for negotiated enterprise deals. <span class="conf hi">HIGH</span></li>
+<li><b>An entitlement service decoupling checkout from activation.</b> Purchases become quantified, checkable capacity units (seats, usage) the product must honor. <span class="conf hi">HIGH</span></li>
+<li><b>Instant automated provisioning on offer acceptance.</b> No fulfillment lag between paying and having. <span class="conf hi">HIGH</span></li>
+<li><b>Admin scope assignment with a self-serve lane.</b> Assign to me / org / groups, Block/Remove — but users can still self-install inside admin guardrails. Do not design IT-only. <span class="conf hi">HIGH</span></li>
+<li><b>An in-customer-environment deployment tier for sovereignty buyers,</b> billed through the marketplace. <span class="conf hi">HIGH</span></li>
+<li><b>In-workspace, intent-based discovery</b> — semantic search where the buyer already works ("automate invoice follow-up in Arabic"), not only a marketing storefront. <span class="conf hi">HIGH</span></li>
+</ol>
+
+<h2>3 · The 5 failure modes to avoid</h2>
+<ol>
+<li><b>Self-attested quality bars without audit.</b> Attestation-only gates invite category pollution. <span class="conf med">MEDIUM</span></li>
+<li><b>Vetting that cannot scale with listing growth.</b> Critics already question whether Salesforce's review keeps pace with 104% listing growth. GPT Store's spam problem (TechCrunch, Mar 2024) is the cautionary tale — quality collapse from light-touch moderation. <span class="conf med">MEDIUM · criticism evidence directional</span></li>
+<li><b>Fulfillment methods frozen at publication.</b> AWS locks Quick-Launch-vs-redirect at publish; build ours to be changeable. <span class="conf hi">HIGH</span></li>
+<li><b>Conflating store visibility with actual activation.</b> Deployed ≠ used; instrument first-use, not installs. <span class="conf med">MEDIUM</span></li>
+<li><b>Hosting-only models that ignore data-residency buyers.</b> SOC 2 / ISO 27001 badges alone do not cover agent-behavioral risk (prompt-injection misuse) — infrastructure certs are necessary, not sufficient. <span class="conf med">MEDIUM</span></li>
+<li><b>Cancellation that does not deprovision. <span class="r2">NEW</span></b> The sharpest documented buyer pain found: canceling an AWS Marketplace subscription does not stop charges until instances are separately terminated in every region, across two consoles. HUMAIN ONE rule: <b>cancel = full deprovision, atomically</b> — one action ends billing and tears down the runtime, mirroring our lifecycle mock's retire flow. <span class="conf hi">HIGH</span></li>
+</ol>
+
+<h2>4 · Recommendations for the HUMAIN ONE Public Marketplace</h2>
+<div class="card">
+<h3 style="margin-top:0">Storefront &amp; discovery</h3>
+<ul>
+<li>One public storefront (separate URL, per Andrew alignment) with an agent-vs-tool taxonomy and a stated quality bar for the "agent" label.</li>
+<li>Category browse + semantic use-case search; curated collections ("For ministries", "Citizen services", "Back office").</li>
+<li>Each listing backed by a machine-readable agent card (A2A-aligned) — this also future-proofs interop.</li>
+</ul>
+<h3>Listing page</h3>
+<ul>
+<li>Named sections mirroring the Microsoft pattern and our approved V9 lifecycle surface: Overview · Capabilities &amp; data access · <b>Security &amp; Compliance</b> · <b>Certification</b> (gov-citizen-v1 profile, in-Kingdom residency) · Performance &amp; standing (Trust Score, indicative labelling) · Reviews &amp; usage.</li>
+<li>Trust evidence rendered exactly like the developer side — same Trust Score, same evidence chips — so the seller-side story and buyer-side story are one system.</li>
+</ul>
+<h3>Commerce (SAR)</h3>
+<ul>
+<li>Ship the standard menu: free tier · flat monthly SAR subscription (prorated) · SAR-metered usage · combined · private offers.</li>
+<li>Mock checkout shows SAR pricing with 15% VAT line and ZATCA e-invoice issuance (flag: exact ZATCA/PDPL requirements are open homework — no source covered SAR tax handling; treat as inference to validate).</li>
+<li>Entitlement service between checkout and activation: purchase → entitlement record (seats / invocations) → workspace checks entitlements before agent runs. Purchases can draw down platform credits (the MACC pattern) later.</li>
+</ul>
+<h3>Ratings &amp; reviews design <span class="r2">NEW</span></h3>
+<ul>
+<li>Launch with: verified-publisher badge · install/active-tenant count · curated Featured collections. No open star reviews at launch (Smithery and Gemini Enterprise both omit them; GPT Store shows what light-touch moderation does at volume).</li>
+<li>If reviews ship later, gate them to verified purchasers only.</li>
+</ul>
+<h3>Sovereignty tier (corrected in round 2)</h3>
+<ul>
+<li>Offer two runtime tiers on the listing: <b>HUMAIN-hosted</b> (fastest) and <b>in-Kingdom dedicated / in-tenant</b> (the AWS-container / Azure-Application pattern) — billed through the storefront either way.</li>
+<li><b>Correction <span class="r2">R2</span>:</b> present in-Kingdom residency as a <b>hosting-tier feature</b>, not a blanket legal mandate — the 2024 CCC revision actually relaxed in-CCC localization requirements and shifted residency oversight toward NDMO/SDAIA, and PDPL transfer-rule enforcement claims did not survive verification.</li>
+<li>Trust badge wording: cite <b>NCA CCC-2:2024 / ECC assessment</b> (the scheme behind CST Class C cloud licensing — the pattern Google, Oracle, and Huawei use for their Saudi regions). Do not cite the superseded CCC-1:2020.</li>
+</ul>
+<h3>KSA checkout compliance checklist <span class="r2">NEW</span></h3>
+<ul>
+<li>15% VAT as an explicit line item on the order summary; capture the buyer's VAT registration number.</li>
+<li>B2B tax invoices follow ZATCA Phase 2 <b>Clearance</b>: invoice generated as XML, submitted to the FATOORA platform pre-issuance; <b>ZATCA (not the seller) applies the cryptographic stamp and QR code</b>; the cleared invoice is delivered to the buyer as XML or PDF/A-3 with embedded XML. A plain emailed PDF is non-compliant. (Wave 24 enforcement deadline: 30 Jun 2026.)</li>
+<li>For the mock: after payment, show "ZATCA-cleared tax invoice" with a QR and an e-invoice reference chip — that is the defensible detail Andrew's side will recognize.</li>
+</ul>
+<h3>Trials <span class="r2">NEW</span></h3>
+<ul>
+<li>Proven B2B mechanic: AWS-style seller-configurable free trial (7–90 days, one per account). Recommended HUMAIN ONE default: <b>14–30 day per-tenant trial, one per tenant, automatic hard stop</b> — no silent conversion to paid — converting into a SAR contract offer.</li>
+<li>Plus an always-available, no-signup interactive sandbox on the listing for lightweight agents (the GPT Store / Poe try-immediately pattern) — the conversion lever enterprise stores lack.</li>
+</ul>
+<h3>Activation &amp; first use</h3>
+<ul>
+<li>Instant provisioning at payment acceptance (Salesforce pattern): "acquired" state within seconds.</li>
+<li>Dual-path activation: org admin assigns (me / org / groups, block/remove) and individual users can self-acquire within guardrails.</li>
+<li>The journey must end at <b>first successful use in the buyer's workspace</b> — a chat/session with the agent plus a first-run checklist (connect data, set scope, invite team). Instrument first-use as the success metric, not acquisition.</li>
+</ul>
+</div>
+
+<h2>5 · The end-to-end journey for the mockup</h2>
+<div class="flow">
+<span class="step"><b>1 · DISCOVER</b>Browse / semantic search / collections</span><span class="arr">→</span>
+<span class="step"><b>2 · EVALUATE</b>Listing: capabilities · certification · residency · Trust Score · reviews</span><span class="arr">→</span>
+<span class="step"><b>3 · TRY &amp; CHOOSE</b>Sandbox demo · 14–30d tenant trial · SAR plan · runtime tier</span><span class="arr">→</span>
+<span class="step"><b>4 · CHECKOUT</b>SAR + 15% VAT · ZATCA-cleared e-invoice (QR)</span><span class="arr">→</span>
+<span class="step"><b>5 · ENTITLE</b>Instant entitlement · org attach · seat scope</span><span class="arr">→</span>
+<span class="step"><b>6 · FIRST USE</b>Run in workspace · first-run checklist · rate it</span>
+</div>
+<p class="small">Failure paths to design (same discipline as the lifecycle mock): payment declined (atomic — no entitlement created), entitlement exhausted mid-use, admin-blocked agent, listing delisted after purchase, and <b>cancel = full deprovision in one action</b>.</p>
+
+<h2>6 · Coverage gaps &amp; open questions</h2>
+<div class="callout warn">
+<b>What round 2 fixed:</b> Gemini Enterprise, Smithery, and Poe are now covered (ratings, monetization, gating); the KSA checkout checklist (ZATCA Phase 2, VAT, CCC-2:2024, CST Class C) is verified against ZATCA and NCA primary documents; the trial mechanic is verified against AWS docs; and one concrete buyer-pain (cancellation ≠ deprovision) is documented from AWS's own knowledge base. Round 2 also <b>refuted</b> four claims, correcting the residency framing (feature, not mandate) and the CCC version.
+</div>
+<div class="callout warn">
+<b>Still open after two rounds:</b> (1) PDPL cross-border transfer rules and their current enforcement — the sourced claims were refuted, so this stays unresolved; get a compliance read before staging. (2) The practitioner-criticism corpus (G2/Reddit/HN on review-gaming and discovery quality) remains thin — surviving criticism evidence is from vendor knowledge bases. (3) GPT Store and ServiceNow specifics (ranking, payouts, try-before-use) still produced no verifiable claims — treat GPT Store lessons as directional only.</b>
+</div>
+
+<h2>7 · Sources (all verified 3-0 unless noted)</h2>
+<ul class="small">
+<li><a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/copilot-agent-store">Microsoft Learn — Agent Store in M365 Copilot</a> (primary; also source of the one refuted claim: the store is NOT IT-only)</li>
+<li><a href="https://learn.microsoft.com/en-us/startups/build/ai/agents/monetizing-agents">Microsoft Learn — Monetizing agents (offer types, MACC, deployment/monetization decoupling)</a> (primary)</li>
+<li><a href="https://learn.microsoft.com/en-us/partner-center/marketplace-offers/artificial-intelligence-app-agent-certification">Microsoft Partner Center — AI app/agent certification</a> (primary)</li>
+<li><a href="https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/appsource/prepare/review-copilot-validation-guidelines">Microsoft — Copilot agent validation guidelines</a> (primary)</li>
+<li><a href="https://docs.aws.amazon.com/marketplace/latest/userguide/ai-agents-tools.html">AWS Marketplace — AI Agents &amp; Tools (deployment options)</a> (primary)</li>
+<li><a href="https://docs.aws.amazon.com/marketplace/latest/userguide/listing-saas-ai-agents.html">AWS Marketplace — Listing SaaS AI agents (pricing, fulfillment, listing fields)</a> (primary)</li>
+<li><a href="https://docs.aws.amazon.com/marketplace/latest/APIReference/entitlement-apis.html">AWS Marketplace — Entitlement Service APIs</a> (primary)</li>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2025/10/aws-marketplace-pricing-ai-agents-tools/">AWS — New pricing for AI agents (Oct 2025)</a> (primary)</li>
+<li><a href="https://docs.cloud.google.com/marketplace/docs/partners/ai-agents">Google Cloud Marketplace — AI agent listings (A2A card, trust gates, pricing)</a> (primary)</li>
+<li><a href="https://www.salesforce.com/agentforce/agentexchange/">Salesforce AgentExchange</a> (vendor, corroborated by Trailhead security-review module, Salesforce Ben, SalesforceDevops.net)</li>
+<li><a href="https://www.salesforce.com/blog/flex-credits/">Salesforce — Flex Credits consumption pricing</a> (primary)</li>
+<li><a href="https://techcrunch.com/2024/03/20/openais-chatbot-store-is-filling-up-with-spam/">TechCrunch — GPT Store spam</a> (secondary; directional for failure mode 2)</li>
+<li><a href="https://www.cleartax.com/sa/ksa-einvoicing">ClearTax — KSA e-invoicing overview</a> (secondary; context only)</li>
+<li><a href="https://docs.cloud.google.com/gemini/enterprise/docs/agent-gallery">Google — Gemini Enterprise Agent Gallery (categories, admin gating)</a> <span class="r2">R2</span> (primary)</li>
+<li><a href="https://smithery.ai/servers">Smithery — server directory (usage counts, verified badges, no reviews)</a> <span class="r2">R2</span> (primary, live-page verified)</li>
+<li><a href="https://help.poe.com/hc/en-us/articles/21921312368020-Poe-Creator-Monetization-FAQs">Poe — creator monetization FAQs (per-message pricing, KSA excluded)</a> <span class="r2">R2</span> (primary)</li>
+<li><a href="https://repost.aws/knowledge-center/marketplace-subscription-charge">AWS re:Post — charges after Marketplace cancellation</a> <span class="r2">R2</span> (primary)</li>
+<li><a href="https://zatca.gov.sa/en/E-Invoicing/Introduction/Guidelines/Documents/E-Invoicing_Detailed__Guideline.pdf">ZATCA — E-Invoicing Detailed Guideline (Phase 2 Clearance)</a> <span class="r2">R2</span> (primary)</li>
+<li><a href="https://nca.gov.sa/en/regulatory-documents/controls-list/ccc/">NCA — Cloud Cybersecurity Controls CCC-2:2024</a> <span class="r2">R2</span> (primary)</li>
+<li><a href="https://cloud.google.com/security/compliance/ksa">Google Cloud — KSA compliance (CST Class C, ECC+CCC assessment)</a> <span class="r2">R2</span> (primary)</li>
+<li><a href="https://docs.aws.amazon.com/marketplace/latest/userguide/saas-free-trials.html">AWS Marketplace — SaaS free trials (7–90 days)</a> <span class="r2">R2</span> (primary)</li>
+</ul>
+
+<p class="small" style="margin-top:26px">Method: two research rounds, 11 search angles total → 52 sources fetched → 238 falsifiable claims extracted → 50 adversarially verified by 3 independent votes each (2/3 refutes kills a claim) → 45 confirmed, 5 refuted, synthesized to 20 findings. Round 2 deliberately targeted round 1's self-identified gaps. Prepared for the Public Marketplace scope &amp; design week, Sprint 6.</p>
+
+</div>
+</body>
+</html>
