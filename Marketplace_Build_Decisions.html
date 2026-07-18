@@ -104,24 +104,24 @@ a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 
 <!-- 5 -->
 <div class="sec">
-<div class="sec-h"><span class="n">5</span><h3>Level-2 research: acquisition metrics for the Listings card <span class="tag t-us">IN PROGRESS</span></h3></div>
+<div class="sec-h"><span class="n">5</span><h3>Level-2 research: acquisition metrics for the Listings card <span class="tag t-us">DONE · 18 Jul</span></h3></div>
 <div class="body">
 <p style="margin:2px 0 8px">Research the right acquisition and usage metrics for org acquisition vs retail acquisition, to put the correct signals on the listing card (beyond the current placeholders, which are aligned to the observability layer).</p>
 <div class="row2">
-  <div><div class="lbl">WHY</div><div class="box">A business buyer and a retail buyer weigh different signals; the listing should show what actually drives an org acquisition decision.</div></div>
-  <div><div class="lbl">OWNER</div><div class="box">Turing (Ritwik) — findings fold into the listing card and this log.</div></div>
+  <div><div class="lbl">FINDINGS (verified, 24 claims)</div><div class="box">B2B cards are metric-sparse — no major platform shows install/deployment counts on cards. What drives org acquisition: transparent pricing (72% more likely to buy), free trials (#1 influence, 77%), time-to-value (57% expect ROI in 3 months), security posture (81% weigh breach history). Card set shipped: cert-tier badge, Trust score, go-live time, trial line, transparent SAR price, residency tag. Usage stays at detail level only.</div></div>
+  <div><div class="lbl">APPLIED</div><div class="box">Listing cards rebuilt in the V1 mock accordingly; usage counts removed from cards, kept on detail pages where AWS-style evaluation evidence lives.</div></div>
 </div>
 </div>
 </div>
 
 <!-- 6 -->
 <div class="sec">
-<div class="sec-h"><span class="n">6</span><h3>Certification metrics research (benchmarking + Guardian) <span class="tag t-us">IN PROGRESS</span></h3></div>
+<div class="sec-h"><span class="n">6</span><h3>Certification metrics research (benchmarking + Guardian) <span class="tag t-us">DONE · 18 Jul</span></h3></div>
 <div class="body">
 <p style="margin:2px 0 8px">Define the certification metrics for the listing's Certification section through competitive benchmarking and by analysing the Guardian endpoints. Guardian documentation shared by Tirthankar.</p>
 <div class="row2">
-  <div><div class="lbl">WHY</div><div class="box">The certification section needs real, defensible metrics. Guardian is the source of truth for what we can actually certify against.</div></div>
-  <div><div class="lbl">CONFIRM WITH HUMAIN</div><div class="box hum">HUMAIN Guardian is out of LEAP scope — align on what backs the "certified" badge for the demo vs the real certification post-LEAP.</div></div>
+  <div><div class="lbl">FINDINGS</div><div class="box">Benchmark: Microsoft's two-tier model (independently audited Certification vs self-declared Publisher Attestation, published verbatim); Salesforce publishes the security-review pass date on the listing. No incumbent publishes AI-quality numbers (accuracy, prompt-injection results, hallucination rates) — publishing measured ones from our own harness, labelled with method + version, is a differentiator. Platform reality (from the team's certification API): 5 automated checks (package structure, security scan, config, dependencies, eval validation), states pending → certifying → pending_approval → certified; Guardian auto-certs in the dev flow but is unavailable for LEAP (stubbed per 17 Jul scope).</div></div>
+  <div><div class="lbl">APPLIED + CONFIRM WITH HUMAIN</div><div class="box hum">Two-tier certification panel shipped in the V1 mock: MEASURED (eval harness: task completion, prompt-injection, latency SLO) vs PUBLISHER-ATTESTED (data handling, compliance, disclosure), plus security-review date and the 5 platform checks. Still to align: what signs the badge for the demo while Guardian is stubbed. Note: Guardian Drive folder needs Google sign-in — analysed via the platform's live certification API surface instead.</div></div>
 </div>
 </div>
 </div>
