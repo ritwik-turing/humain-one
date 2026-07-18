@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public Marketplace — Build Decisions</title>
+<style>
+:root{--bg:#faf9f5;--ink:#1f1c18;--muted:#6f6a61;--line:#e5e1d8;--green:#0e9b76;--greenbg:#eef7f2;--amber:#b45309;--amberbg:#fdf6e7;--red:#b91c1c;--card:#fff;--blue:#155f9e;--bluebg:#e8f1fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:34px 26px 90px}
+h1{font-size:25px;margin:0 0 4px}
+h2{font-size:18px;margin:30px 0 6px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 6px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 6px}
+.chip{background:var(--greenbg);border:1px solid var(--green);color:var(--green);font-weight:700;font-size:11px;padding:3px 10px;border-radius:999px}
+.chip.blue{background:var(--bluebg);border-color:var(--blue);color:var(--blue)}
+.callout{border-left:4px solid var(--green);background:var(--greenbg);border-radius:0 10px 10px 0;padding:11px 15px;margin:14px 0;font-size:13px}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden}
+.sec-h{display:flex;align-items:center;gap:10px;padding:12px 16px 6px}
+.sec-h .n{width:24px;height:24px;border-radius:7px;background:var(--green);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+.sec-h h3{margin:0;font-size:15px}
+.body{padding:0 16px 14px 50px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}
+@media(max-width:720px){.row2{grid-template-columns:1fr}}
+.lbl{font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--muted);margin-bottom:2px}
+.box{background:#fbfaf7;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:12.5px}
+.box.wed{border-color:var(--amber);background:var(--amberbg)}
+.box.hum{border-color:var(--blue);background:var(--bluebg)}
+.tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.03em;padding:2px 8px;border-radius:9px}
+.t-wed{background:var(--amberbg);color:var(--amber)}
+.t-hum{background:var(--bluebg);color:var(--blue)}
+.t-us{background:var(--greenbg);color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+th{text-align:left;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+tr:last-child td{border-bottom:none}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+.small{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Public Marketplace — Build Decisions</h1>
+<p class="sub">Decisions made for the LEAP build, with what stays mocked for Wednesday and what we confirm with HUMAIN. To share the post-LEAP decisions with HUMAIN later.</p>
+<div class="meta">
+  <span class="chip">7 decisions logged</span>
+  <span class="chip blue">4 to confirm with HUMAIN on Wednesday</span>
+  <span class="chip">aligned internally incl. Pronojit</span>
+</div>
+
+<div class="callout">
+<b>Purpose.</b> The V1 mock makes a working choice at every fork so the journey holds together. This log records the choices we have now committed to for the LEAP build, the reasoning, and the specific things we will put to HUMAIN. It is the artifact we share with them post-LEAP so the mocked decisions become jointly owned, not silently assumed.
+</div>
+
+<!-- 1 -->
+<div class="sec">
+<div class="sec-h"><span class="n">1</span><h3>Tenant acquisition flow for LEAP <span class="tag t-us">DECIDED</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">The buyer is a company executive acquiring an agent for their tenant, not an individual retail user. The mock now signs in as an exec ("Nora Al-Qahtani · Exec · Al-Noor Trading Co.") acquiring for the organization.</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">Company executives are the likely LEAP audience, so the journey should read as an org buying for its tenant.</div></div>
+  <div><div class="lbl">CONFIRM WITH HUMAIN</div><div class="box hum">The primary LEAP buyer persona (exec / IT admin / procurement), so listing copy and the acquisition path match who they put in the room.</div></div>
+</div>
+</div>
+</div>
+
+<!-- 2 -->
+<div class="sec">
+<div class="sec-h"><span class="n">2</span><h3>mada as the default payment flow <span class="tag t-wed">DEMO</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">Checkout shows mada as the default method for Wednesday's demo, with Visa / Mastercard as secondary options.</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">mada is the mandatory domestic rail in KSA; leading with it reads as correct to a Saudi audience.</div></div>
+  <div><div class="lbl">CONFIRM WITH HUMAIN</div><div class="box hum">Ask Andrew which payment channels HUMAIN wants supported for LEAP, and who is the merchant of record.</div></div>
+</div>
+</div>
+</div>
+
+<!-- 3 -->
+<div class="sec">
+<div class="sec-h"><span class="n">3</span><h3>Mock FATOORA / ZATCA invoice in the mockup <span class="tag t-wed">DEMO</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">Added a mock standard B2B tax invoice to the checkout: seller / buyer VAT details, line items, 15% VAT, invoice number + UUID, ZATCA cryptographic stamp reference, QR, and XML / PDF-A/3 formats. It is labelled as a mock layout.</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">A recognizable ZATCA-cleared invoice makes the SAR checkout land as real to a KSA audience, without claiming the integration is built.</div></div>
+  <div><div class="lbl">CONFIRM WITH HUMAIN</div><div class="box hum">Ask HUMAIN for the actual FATOORA invoice format and required fields so we match it in the real build.</div></div>
+</div>
+</div>
+</div>
+
+<!-- 4 -->
+<div class="sec">
+<div class="sec-h"><span class="n">4</span><h3>Provisioned access via magic link + credentials <span class="tag t-us">DECIDED</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">For the initial versions we expose an agent-specific magic link plus client ID / secret for provisioned access, instead of building a full tenant agent-distribution flow (assign to users / groups, SSO). The entitle step now issues the link and credentials.</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">This meaningfully cuts post-acquisition complexity for launch — no org directory, group management, or SSO wiring needed to get an agent into a buyer's hands.</div></div>
+  <div><div class="lbl">CONFIRM WITH HUMAIN</div><div class="box hum">Confirm the approach; full tenant-wide distribution (assign to users / groups, SSO) is explicitly post-LEAP.</div></div>
+</div>
+</div>
+</div>
+
+<!-- 5 -->
+<div class="sec">
+<div class="sec-h"><span class="n">5</span><h3>Level-2 research: acquisition metrics for the Listings card <span class="tag t-us">IN PROGRESS</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">Research the right acquisition and usage metrics for org acquisition vs retail acquisition, to put the correct signals on the listing card (beyond the current placeholders, which are aligned to the observability layer).</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">A business buyer and a retail buyer weigh different signals; the listing should show what actually drives an org acquisition decision.</div></div>
+  <div><div class="lbl">OWNER</div><div class="box">Turing (Ritwik) — findings fold into the listing card and this log.</div></div>
+</div>
+</div>
+</div>
+
+<!-- 6 -->
+<div class="sec">
+<div class="sec-h"><span class="n">6</span><h3>Certification metrics research (benchmarking + Guardian) <span class="tag t-us">IN PROGRESS</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">Define the certification metrics for the listing's Certification section through competitive benchmarking and by analysing the Guardian endpoints. Guardian documentation shared by Tirthankar.</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">The certification section needs real, defensible metrics. Guardian is the source of truth for what we can actually certify against.</div></div>
+  <div><div class="lbl">CONFIRM WITH HUMAIN</div><div class="box hum">HUMAIN Guardian is out of LEAP scope — align on what backs the "certified" badge for the demo vs the real certification post-LEAP.</div></div>
+</div>
+</div>
+</div>
+
+<!-- 7 -->
+<div class="sec">
+<div class="sec-h"><span class="n">7</span><h3>Capture &amp; share cadence <span class="tag t-us">DECIDED</span></h3></div>
+<div class="body">
+<p style="margin:2px 0 8px">All of the above live in this decision log. We share the post-LEAP decisions with HUMAIN after the demo, rather than blocking Wednesday on them. Approach aligned with Pronojit.</p>
+<div class="row2">
+  <div><div class="lbl">WHY</div><div class="box">Keeps Wednesday achievable on mocked assumptions while giving HUMAIN a clean list to sign off later — the mocked decisions become jointly owned instead of silently assumed.</div></div>
+  <div><div class="lbl">OWNER</div><div class="box">Turing (Ritwik), aligned with Pronojit.</div></div>
+</div>
+</div>
+</div>
+
+<h2>To put to HUMAIN on Wednesday</h2>
+<table>
+<tr><th>Ask</th><th>Owner there</th></tr>
+<tr><td>Which payment channels to support for LEAP (mada default now) + merchant of record</td><td>Andrew</td></tr>
+<tr><td>The actual FATOORA invoice format and required fields</td><td>HUMAIN finance / platform</td></tr>
+<tr><td>What backs the "certified" badge for the demo, since Guardian is out of LEAP scope</td><td>HUMAIN + Tirthankar</td></tr>
+<tr><td>The primary LEAP buyer persona (exec / admin / procurement)</td><td>Andrew</td></tr>
+</table>
+
+<p class="small" style="margin-top:22px">Companion docs: <a href="https://ritwik-turing.github.io/humain-one/Public_Marketplace_V1.html">V1 mockup</a> · <a href="https://ritwik-turing.github.io/humain-one/Marketplace_Research.html">market research</a> · <a href="https://ritwik-turing.github.io/humain-one/Marketplace_Open_Items.html">full open-items register</a>. This log covers the decisions we have taken; the register lists the 37 open forks behind them.</p>
+
+</div>
+</body>
+</html>
