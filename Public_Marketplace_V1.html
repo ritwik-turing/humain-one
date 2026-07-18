@@ -100,7 +100,7 @@ h3.sec{font-size:14px;margin:20px 0 10px}
   <div class="logo" data-go="store">HUMAIN <span>ONE</span> · Marketplace</div>
   <div class="searchbox"><span style="color:var(--muted)">⌕</span><input id="q" aria-label="Search agents" placeholder="Search agents, use cases… (⌘K)"/></div>
   <div class="topright">
-    <span class="badge blue" title="Signed in as a business buyer">Al-Noor Trading Co. · buyer</span>
+    <span class="badge blue" title="Signed in as a company executive acquiring for the tenant">Nora Al-Qahtani · Exec · Al-Noor Trading Co.</span>
     <button class="btn sm" data-go="work" id="myagentsBtn">My agents</button>
   </div>
 </div>
@@ -278,19 +278,37 @@ function scrCheckout(){
 
 function scrInvoice(){
  const a=A(state.agentId);const o=state.owned;
- return `<div class="card" style="max-width:640px;margin:0 auto;padding:18px">
-  <div class="frow" style="justify-content:space-between"><div style="font-weight:800;font-size:15px">Payment confirmed</div>${badge('gov','ZATCA cleared')}</div>
-  <div class="note gov" style="margin:10px 0"><span>✓</span><div>Tax invoice was cleared with ZATCA via FATOORA <b>before issuance</b>. The cryptographic stamp and QR below were applied by ZATCA, not the seller.</div></div>
-  <div class="frow" style="gap:16px;align-items:flex-start">
-   ${qr()}
-   <div style="flex:1">
-    <div class="kv"><span>Invoice</span><b>${copychip(o.invoice)}</b></div>
-    <div class="kv"><span>Buyer</span><b>Al-Noor Trading Co. · VAT 3101…0003</b></div>
-    <div class="kv"><span>Total incl. 15% VAT</span><b>${fmt(o.total)}</b></div>
-    <div class="kv"><span>Formats</span><b><span class="copychip">XML</span> <span class="copychip">PDF/A-3 (embedded XML)</span></b></div>
-   </div>
+ const sub=o.total/(1+VAT), vat=o.total-sub;
+ const planName=o.plan==='sub'?'Standard subscription':o.plan==='usage'?'Usage (metered)':'Trial';
+ return `<div class="card" style="max-width:680px;margin:0 auto;padding:0;overflow:hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#0e3d31;color:#fff">
+   <div><div style="font-weight:800;font-size:15px">Tax Invoice · Standard (B2B)</div><div style="font-size:11px;opacity:.85">HUMAIN ONE Marketplace · FATOORA e-invoice</div></div>
+   ${badge('gov','ZATCA cleared')}
   </div>
-  <button class="btn pri" style="width:100%;margin-top:14px" data-go="entitle">Continue — activate for your organization</button>
+  <div style="padding:16px 18px">
+   <div class="note gov" style="margin:0 0 12px"><span>✓</span><div>Cleared with ZATCA via the FATOORA platform <b>before issuance</b>. The cryptographic stamp and QR were applied by ZATCA, not the seller. <span class="small">Mock layout — the exact FATOORA fields/format are to be confirmed with HUMAIN.</span></div></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px">
+    <div><div class="small" style="font-weight:800;color:var(--muted)">SELLER</div>Turing Marketplace Services<div class="small">VAT 300000000000003 · Riyadh, KSA</div></div>
+    <div><div class="small" style="font-weight:800;color:var(--muted)">BUYER (tenant)</div>Al-Noor Trading Co.<div class="small">VAT 310123456700003 · Riyadh, KSA</div></div>
+   </div>
+   <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:6px">
+    <tr><th style="text-align:left;padding:6px 0;font-size:10px;color:var(--muted);border-bottom:1px solid var(--line)">DESCRIPTION</th><th style="text-align:right;padding:6px 0;font-size:10px;color:var(--muted);border-bottom:1px solid var(--line)">AMOUNT</th></tr>
+    <tr><td style="padding:6px 0">${a.nm} — ${planName}${o.tier==='kingdom'?' · in-Kingdom dedicated':''}</td><td style="text-align:right">${fmt(sub)}</td></tr>
+    <tr><td style="padding:6px 0;color:var(--muted)">VAT (15%)</td><td style="text-align:right">${fmt(vat)}</td></tr>
+    <tr><td style="padding:6px 0;font-weight:800;border-top:1px solid var(--line)">Total</td><td style="text-align:right;font-weight:800;font-size:14px;border-top:1px solid var(--line)">${fmt(o.total)}</td></tr>
+   </table>
+   <div class="frow" style="gap:16px;align-items:flex-start;border-top:1px solid var(--line);padding-top:12px;margin-top:6px">
+    ${qr()}
+    <div style="flex:1">
+     <div class="kv"><span>Invoice #</span><b>${copychip(o.invoice)}</b></div>
+     <div class="kv"><span>Invoice UUID</span><b>${copychip('3cf1a7d2-8842')}</b></div>
+     <div class="kv"><span>Issued</span><b>2026-07-15 09:24 AST</b></div>
+     <div class="kv"><span>ZATCA cryptographic stamp</span><b>${copychip('csr_9f21a7')}</b></div>
+     <div class="kv"><span>Formats</span><b><span class="copychip">XML</span> <span class="copychip">PDF/A-3</span></b></div>
+    </div>
+   </div>
+   <button class="btn pri" style="width:100%;margin-top:14px" data-go="entitle">Continue — provision access</button>
+  </div>
  </div>`;
 }
 
@@ -302,13 +320,14 @@ function scrEntitle(){
   <div class="kv"><span>Entitlement</span><b>${o.plan==='usage'?'Metered per task':o.seats+' seats · '+o.cap.toLocaleString()+' tasks / month'}</b></div>
   <div class="kv"><span>Tenant</span><b>alnoor-trading (your organization)</b></div>
   <div class="kv"><span>Record</span><b>${copychip('ent_'+a.id+'_2209')}</b></div>
-  <div style="font-weight:700;margin:12px 0 6px">Who can use it? <span class="small" style="font-weight:400">(you can change this later; Block/Remove any time)</span></div>
-  <div class="frow">
-   <button class="chipbtn" data-scope="me">Just me</button>
-   <button class="chipbtn on" data-scope="org">Entire organization</button>
-   <button class="chipbtn" data-scope="groups">Specific groups</button>
+  <div style="font-weight:700;margin:14px 0 6px">Provisioned access</div>
+  <div class="note gov"><span>🔗</span><div><b>Agent magic link</b><div class="small" style="word-break:break-all;margin-top:2px">https://one.humain.sa/a/${a.id}/#tok_${a.id}9f2a…c71 &nbsp;${copychip('copy link')}</div></div></div>
+  <div class="frow" style="gap:8px;margin-top:8px;align-items:stretch">
+   <div style="flex:1"><div class="small" style="font-weight:800;color:var(--muted)">CLIENT ID</div>${copychip('cid_'+a.id+'_44a1')}</div>
+   <div style="flex:1"><div class="small" style="font-weight:800;color:var(--muted)">SECRET · shown once</div>${copychip('sk_live_7c31')}</div>
   </div>
-  <button class="btn pri" style="width:100%;margin-top:14px" data-go="work">Open in my workspace — first run</button>
+  <div class="small" style="margin-top:8px;color:var(--muted)">For the initial launch we hand out an agent-specific magic link + credentials for provisioned access. Full tenant-wide distribution (assign to users / groups, SSO) is post-LEAP.</div>
+  <button class="btn pri" style="width:100%;margin-top:14px" data-go="work">Open via magic link — first run</button>
  </div>`;
 }
 
@@ -340,7 +359,7 @@ function scrWork(){
    <div style="font-weight:700;margin-bottom:6px">First-run checklist</div>
    <div class="kv"><span>Connect a data source</span><b style="color:var(--green)">✓ SharePoint connected</b></div>
    <div class="kv"><span>Run your first task</span><b>${o.firstRun?'<span style="color:var(--green)">✓ recorded</span>':'pending'}</b></div>
-   <div class="kv"><span>Invite your team</span><b>${o.scope==='org'?'org-wide access on':'pending'}</b></div>
+   <div class="kv"><span>Share the magic link</span><b style="color:var(--green)">✓ link generated</b></div>
    ${o.firstRun?'<div class="note gov" style="margin-top:8px"><span>✓</span><div><b>First successful use recorded.</b> This is the activation metric — not the install.</div></div>':''}
   </div>
   <div class="card" style="padding:14px">
