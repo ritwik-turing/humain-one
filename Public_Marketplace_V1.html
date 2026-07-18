@@ -117,6 +117,8 @@ h3.sec{font-size:14px;margin:20px 0 10px}
 /* ============ catalog ============ */
 const CATS=['All','Citizen services','Back office','Finance','HR','Travel','Language'];
 const AGENTS=[
+ {id:'invoiceapp',nm:'Invoice Processing App',pub:'Turing Labs',vrf:1,cat:'Finance',ds:'Multi-agent app: an orchestrator with extraction, validation, and posting agents processing invoices end to end.',use:'3.4k',trust:89,mo:1499,task:1.10,kingdom:1,cert:1,feat:1,multi:['Orchestrator','Extraction Agent','Validation Agent','Posting Agent']},
+ {id:'covey',nm:'Franklin Covey Coach',pub:'Franklin Covey · via Turing',vrf:1,cat:'HR',ds:'Multi-agent leadership coach: goal planning, habit tracking, and session-prep agents working as one team.',use:'2.1k',trust:86,mo:999,task:0.80,kingdom:0,cert:1,feat:0,multi:['Coach Orchestrator','Goal Planner','Habit Tracker']},
  {id:'translate',nm:'Translation Agent',pub:'Turing Labs',vrf:1,cat:'Language',ds:'Arabic–English document and live-chat translation with legal-register support.',use:'18.2k',trust:94,mo:499,task:0.35,kingdom:1,cert:1,feat:1},
  {id:'meeting',nm:'Meeting Manager',pub:'Turing Labs',vrf:1,cat:'Back office',ds:'Schedules, briefs, and follows up on meetings across your org calendar.',use:'8.6k',trust:91,mo:299,task:0.20,kingdom:0,cert:1,feat:1},
  {id:'citizen',nm:'Citizen Support Agent',pub:'Ministry of Social Affairs',vrf:1,cat:'Citizen services',ds:'Answers citizen queries on benefits and services, escalates with full context.',use:'12.4k',trust:92,mo:899,task:0.55,kingdom:1,cert:1,feat:1},
@@ -142,7 +144,8 @@ function badge(c,t){return '<span class="badge '+c+'">'+t+'</span>';}
 function copychip(id){return '<span class="copychip" data-copy="'+id+'" title="Copy to clipboard">⧉ '+id+'</span>';}
 function av(a){return '<div class="av">'+a.nm.split(' ').map(w=>w[0]).slice(0,2).join('')+'</div>';}
 function publine(a){return '<span class="pub">'+a.pub+(a.vrf?' <span class="vrf" title="Verified publisher">✓ verified</span>':'')+'</span>';}
-function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' monthly runs')+(a.cert?' '+badge('blue','certified'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
+function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' monthly runs')+(a.cert?' '+badge('blue','certified'):'')+(a.multi?' '+badge('alert','multi-agent · roadmap'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
+function cardline(a){return badge('gov','Trust '+a.trust)+' '+(a.cert?badge('blue','certified · audited'):badge('muted','attested · self-declared'))+' '+badge('muted','go-live < 1 day')+(a.multi?' '+badge('alert','multi-agent · roadmap'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
 function qr(){let s='';for(let i=0;i<49;i++){s+='<i class="'+(((i*7)%13<6)?'':'o')+'"></i>';}return '<div class="qr">'+s+'</div>';}
 function sideNav(cur){
  const S=[['Discover','Browse & search','store'],['Evaluate','Trust & evidence','listing'],['Try & choose','Sandbox · plan · tier','listing'],['Checkout','SAR · VAT · ZATCA e-invoice',''],['Entitle','Instant · magic link + creds',''],['First use','Run in your workspace','work']];
@@ -180,10 +183,10 @@ function scrStore(){
 }
 function cardA(a){
  return `<div class="card acard" data-open="${a.id}">
- <div class="frow" style="justify-content:space-between">${av(a)}<span class="price" style="font-size:12px">from ${fmt(a.mo)}<span class="small">/mo</span></span></div>
+ <div class="frow" style="justify-content:space-between">${av(a)}<span style="text-align:right"><span class="price" style="font-size:12px">from ${fmt(a.mo)}<span class="small">/mo</span></span><span class="small" style="display:block;font-size:10px;color:var(--green);font-weight:700">14-day free trial</span></span></div>
  <div><div class="nm">${a.nm}</div>${publine(a)}</div>
  <div class="small" style="min-height:32px">${a.ds}</div>
- <div>${trustline(a)}</div></div>`;
+ <div>${cardline(a)}</div></div>`;
 }
 
 function scrListing(){
@@ -198,8 +201,10 @@ function scrListing(){
    <div class="kv"><span>Monthly runs</span><b>${a.use}</b></div><div class="kv"><span>Reuse</span><b>4 tenant organizations</b></div>
    <div class="kv"><span>Agent card (A2A)</span><b>${copychip('a2a_'+a.id+'_v1')}</b></div>
    <div class="kv"><span>Protocols</span><b>MCP · A2A</b></div>
+   ${a.multi?`<div class="kv"><span>Agent team</span><b>${a.multi.join(' · ')}</b></div>`:''}
    <div class="kv"><span>Last updated</span><b>Jul 2026</b></div></div>
-   <div class="note gov" style="margin-top:10px"><span>✓</span><div>${a.ds} Works in Arabic and English out of the box.</div></div>`,
+   <div class="note gov" style="margin-top:10px"><span>✓</span><div>${a.ds} Works in Arabic and English out of the box.</div></div>
+   ${a.multi?'<div class="note warn" style="margin-top:8px"><span>◐</span><div><b>Multi-agent application.</b> Shown here as a product-roadmap showcase — initial launch supports single-agent submissions; multi-agent orchestration lands next.</div></div>':''}`,
   capab:`<div class="card" style="padding:14px">
    <div class="kv"><span>Actions</span><b>12 declared actions</b></div>
    <div class="kv"><span>Data access</span><b>Read: your connected sources · Write: drafts only</b></div>
@@ -212,10 +217,25 @@ function scrListing(){
    <div class="kv"><span>Prompt-injection posture</span><b>Behavioral testing on every version</b></div></div>
    <div class="small" style="margin-top:8px">Infrastructure certificates alone don't cover agent behaviour; every version is re-reviewed.</div>`,
   cert:`<div class="card" style="padding:14px">
-   <div class="kv"><span>Certification profile</span><b>${a.cert?'gov-citizen-v1 · signed':'not yet certified'}</b></div>
-   <div class="kv"><span>Hosting assessment</span><b>NCA ECC + CCC-2:2024 assessed (CST Class C)</b></div>
+   <div class="frow" style="justify-content:space-between;margin-bottom:6px"><b style="font-size:13px">Certification</b>${a.cert?badge('gov','● Certified · independently audited'):badge('preview','Publisher attestation · self-declared')}</div>
+   <div class="kv"><span>Profile</span><b>${a.cert?'gov-citizen-v1 · signed':'—'}</b></div>
+   <div class="kv"><span>Security review passed</span><b>${a.cert?'02 Jul 2026 · valid 1 year':'not audited'}</b></div>
+   <div class="kv"><span>Automated platform checks</span><b>5 of 5 passed</b></div>
+   <div style="padding:4px 0 2px 10px">
+    ${['Package structure','Security scan','Config check','Dependencies','Evaluation validation'].map(c=>`<div class="kv" style="border-bottom:none;padding:2px 0"><span class="small">${c}</span><b style="color:var(--green);font-size:11px">✓ pass</b></div>`).join('')}
+   </div>
+   <div style="font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--green);margin:8px 0 2px">MEASURED · EVALUATION HARNESS (eval set gov-tasks-v3 · Prism ${copychip('pj_8812')})</div>
+   <div class="kv"><span>Task completion (published eval set)</span><b>97% · 24 checks</b></div>
+   <div class="kv"><span>Prompt-injection resistance</span><b>tested · pass</b></div>
+   <div class="kv"><span>Latency SLO (p95)</span><b>470 ms · met</b></div>
+   <div style="font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--amber);margin:8px 0 2px">PUBLISHER-ATTESTED · PUBLISHED AS DECLARED, NOT AUDITED</div>
+   <div class="kv"><span>Data handling</span><b>tenant-scoped · stored in KSA · 90-day retention</b></div>
+   <div class="kv"><span>Compliance declared</span><b>PDPL · ISO 27001 (claimed)</b></div>
+   <div class="kv"><span>Vulnerability disclosure</span><b>process on file</b></div>
+   <div class="kv"><span>Hosting assessment</span><b>NCA ECC + CCC-2:2024 (CST Class C)</b></div>
    <div class="kv"><span>Data residency</span><b>${a.kingdom?'In-Kingdom dedicated tier available (KSA, Riyadh)':'HUMAIN-hosted (KSA region)'}</b></div>
-   <div class="kv"><span>Evidence reference</span><b>${copychip('cert_'+a.id+'_71a2')}</b></div></div>`,
+   <div class="kv"><span>Evidence reference</span><b>${copychip('cert_'+a.id+'_71a2')}</b></div></div>
+   <div class="small" style="margin-top:8px">Two-tier trust, mirroring the strongest incumbent model: <b>measured</b> numbers come from the platform's evaluation harness with method and version attached; <b>attested</b> fields are the publisher's own declarations, published verbatim. Guardian integration is stubbed for LEAP — these checks mirror the platform's certification pipeline.</div>`,
   perf:`<div class="card" style="padding:14px">
    <div class="kv"><span>Task completion</span><b>97% · category median 92%</b></div>
    <div class="kv"><span>p95 latency</span><b>470 ms</b></div>
@@ -243,7 +263,8 @@ function scrListing(){
    <div class="planbox ${state.tier==='hosted'?'on':''}" data-tier="hosted"><span><b>HUMAIN-hosted</b><div class="small">KSA region · fastest start</div></span><span class="small">included</span></div>
    <div class="planbox ${state.tier==='kingdom'?'on':''}" data-tier="kingdom" ${a.kingdom?'':'style="opacity:.45;pointer-events:none"'}><span><b>In-Kingdom dedicated</b><div class="small">Runs in your tenant · NCA-assessed · data never leaves</div></span><span class="small">+40%</span></div>
   </div>
-  <div class="small" style="margin:10px 0 4px">${p.label}</div>
+  <div class="small" style="margin:10px 0 2px">${p.label}</div>
+  <div class="small" style="margin:0 0 4px;color:var(--green);font-weight:700">Instant provisioning · typical go-live &lt; 1 day</div>
   <button class="btn pri" style="width:100%" data-buy="1">${state.plan==='trial'?'Start free trial':'Continue to checkout'}</button>
   <button class="btn ghost" style="width:100%;margin-top:6px" data-sandbox="1">Try in sandbox — no sign-up</button>
   <div class="small" style="margin-top:8px">Instant activation on payment. Cancel any time: one action ends billing and deprovisions the runtime.</div>`}
@@ -441,7 +462,9 @@ function sendMsg(){
  },700);
 }
 function demoReply(a){
- const R={translate:'Done — translated your document to English (legal register), 4 pages. Draft saved to your workspace for review.',
+ const R={invoiceapp:'Orchestrator: routed your invoice to Extraction → line items parsed (12) → Validation Agent flagged 1 mismatch against the PO → Posting Agent held it for your review. 11 posted, 1 pending your call.',
+  covey:'Coach Orchestrator: Goal Planner drafted your Q3 leadership goals, Habit Tracker scheduled weekly check-ins, and I prepared your first session brief. Review when ready.',
+  translate:'Done — translated your document to English (legal register), 4 pages. Draft saved to your workspace for review.',
   meeting:'Scheduled your steering review for Sunday 10:00, brief circulated to 6 attendees, and I\'ll chase confirmations tomorrow.',
   citizen:'I found the applicable benefit: housing support, eligibility confirmed. Drafted the citizen reply in Arabic for your review.',
   trip:'Riyadh → Jeddah, Tue–Thu: flights held within policy, hotel at corporate rate, per-diem calculated. Approval sent to your manager.'};
