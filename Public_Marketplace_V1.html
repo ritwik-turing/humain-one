@@ -145,7 +145,7 @@ function publine(a){return '<span class="pub">'+a.pub+(a.vrf?' <span class="vrf"
 function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' monthly runs')+(a.cert?' '+badge('blue','certified'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
 function qr(){let s='';for(let i=0;i<49;i++){s+='<i class="'+(((i*7)%13<6)?'':'o')+'"></i>';}return '<div class="qr">'+s+'</div>';}
 function sideNav(cur){
- const S=[['Discover','Browse & search','store'],['Evaluate','Trust & evidence','listing'],['Try & choose','Sandbox · plan · tier','listing'],['Checkout','SAR · VAT · ZATCA e-invoice',''],['Entitle','Instant · org attach',''],['First use','Run in your workspace','work']];
+ const S=[['Discover','Browse & search','store'],['Evaluate','Trust & evidence','listing'],['Try & choose','Sandbox · plan · tier','listing'],['Checkout','SAR · VAT · ZATCA e-invoice',''],['Entitle','Instant · magic link + creds',''],['First use','Run in your workspace','work']];
  const ix=S.findIndex(s=>s[0]===cur);
  return '<div class="jnav"><div class="jt">YOUR JOURNEY</div>'+S.map((s,i)=>{
   const st=i<ix?'done':i===ix?'on':'';
