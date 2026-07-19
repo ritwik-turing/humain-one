@@ -155,10 +155,10 @@ function planPrice(a,plan,tier){
  let base=0,label='';
  if(plan==='trial'){base=0;label='14-day free trial · no payment details · hard stop';}
  if(plan==='sub'){base=a.mo;label=fmt(a.mo)+' / month · 25 seats · 5,000 tasks';}
- if(plan==='usage'){base=a.task*1000;label=fmt(a.task)+' per task · billed monthly (est. 1,000 tasks)';}
+ if(plan==='usage'){base=0;label=fmt(a.task)+' per task · SAR 0 today · billed monthly in arrears';}
  if(tier==='kingdom'){base=base*1.4;
   if(plan==='sub')label=fmt(base)+' / month · 25 seats · 5,000 tasks · in-Kingdom dedicated';
-  if(plan==='usage')label=fmt(a.task*1.4)+' per task · in-Kingdom dedicated · billed monthly';
+  if(plan==='usage')label=fmt(a.task*1.4)+' per task · in-Kingdom dedicated · SAR 0 today · in arrears';
   if(plan==='trial')label='14-day free trial · no payment details · then in-Kingdom tier pricing';}
  const m=offerPct(a.id);
  if(m<1&&plan!=='trial'){base=base*m;label=label+' · private offer −15% applied';}
@@ -267,10 +267,12 @@ function scrListing(){
  <div class="card" style="padding:14px;position:sticky;top:64px">
   ${owned?`<div class="note gov"><span>✓</span><div><b>Your tenant owns this agent.</b> ${o.status==='trial'?'On trial · '+o.trialDays+' days left.':'Active · v'+o.version+'.'}</div></div>
    <button class="btn pri" style="width:100%;margin-top:10px" data-openwork="${a.id}">Open in my workspace</button>
+   ${o.status==='trial'?'<button class="btn" style="width:100%;margin-top:6px" data-convert="1">Convert to paid</button>':''}
    <button class="btn ghost" style="width:100%;margin-top:6px" data-go="portfolio">All my agents</button>`
   :`<div style="font-weight:700;margin-bottom:8px">Try first, then choose a plan</div>
-  <div class="note gov" style="margin-bottom:8px"><span>1</span><div><b>Start free</b> — 14-day tenant trial, no payment details, hard stop. Convert only if it earns it.</div></div>
-  <button class="btn pri" style="width:100%" data-trial="1">Start free trial — no card</button>
+  ${o&&o.status==='cancelled'?'<div class="note warn" style="margin-bottom:8px"><span>◷</span><div><b>Trial already used by your tenant</b> (one per tenant). Your previous data was deprovisioned; buying re-activates fresh.</div></div>'
+  :`<div class="note gov" style="margin-bottom:8px"><span>1</span><div><b>Start free</b> — 14-day tenant trial, no payment details, hard stop. Convert only if it earns it.</div></div>
+  <button class="btn pri" style="width:100%" data-trial="1">Start free trial — no card</button>`}
   <button class="btn ghost" style="width:100%;margin-top:6px" data-sandbox="1">60-second sandbox — no sign-up</button>
   <div style="font-weight:700;margin:14px 0 6px">Or buy now</div>
   <div style="display:grid;gap:8px">
@@ -294,7 +296,8 @@ function scrCheckout(){
  const a=A(state.agentId);
  const conv=state.checkoutMode==='convert';
  const plan=conv?'sub':state.plan;
- const p=planPrice(a,plan,state.tier);
+ const tier=conv?(own()?own().tier:state.tier):state.tier;
+ const p=planPrice(a,plan,tier);
  const vat=p.base*VAT, total=p.base+vat;
  return `<div class="crumb"><a data-go="store">Marketplace</a> / <a data-open="${a.id}">${a.nm}</a> / Checkout</div>
  ${conv?'<div class="note gov" style="margin-bottom:10px"><span>↑</span><div><b>Converting your trial to a paid plan.</b> Your workspace, history, and entitlement record carry over — nothing is re-provisioned.</div></div>':''}
@@ -306,7 +309,7 @@ function scrCheckout(){
   <div class="small">B2B tax invoice is cleared with ZATCA (FATOORA) before issuance — you receive the cleared XML / PDF A-3 with ZATCA's cryptographic stamp and QR.</div>
   ${state.checkoutErr?'<div class="note bad" style="margin-top:10px"><span>!</span><div><b>Payment declined by the issuer.</b> Nothing was charged and no entitlement was created — your account is exactly as before. '+copychip('pay_51c9')+'</div></div>':''}
   <div class="frow" style="margin-top:14px">
-   <button class="btn pri" data-pay="ok">Pay ${fmt(total)}</button>
+   <button class="btn pri" data-pay="ok">${plan==='usage'&&!conv?'Activate — SAR 0 today, metered in arrears':'Pay '+fmt(total)}</button>
    <button class="btn ghost" data-pay="fail" title="Demo the atomic failure path">Simulate declined payment</button>
   </div>
  </div>
@@ -314,10 +317,10 @@ function scrCheckout(){
   <div style="font-weight:700;margin-bottom:8px">Order summary</div>
   <div class="kv"><span>${a.nm} · ${plan==='sub'?'Standard':'Usage'}${conv?' (trial conversion)':''}</span><b>${fmt(p.base)}</b></div>
   ${offerPct(a.id)<1?'<div class="kv"><span>Private offer</span><b>−15% applied · '+'po_'+a.id+'_7741</b></div>':''}
-  <div class="kv"><span>Runtime</span><b>${state.tier==='kingdom'?'In-Kingdom dedicated':'HUMAIN-hosted'}</b></div>
+  <div class="kv"><span>Runtime</span><b>${tier==='kingdom'?'In-Kingdom dedicated':'HUMAIN-hosted'}</b></div>
   <div class="kv"><span>VAT (15%)</span><b>${fmt(vat)}</b></div>
   <div class="kv"><span style="font-weight:800">Total today</span><b style="font-size:15px">${fmt(total)}</b></div>
-  <div class="small" style="margin-top:8px">Prorated monthly. Entitlements activate the moment payment clears.</div>
+  <div class="small" style="margin-top:8px">${plan==='usage'&&!conv?'Metered usage bills monthly in arrears — the ZATCA e-invoice issues at month-end for actual usage.':'Prorated monthly. Entitlements activate the moment payment clears.'}</div>
  </div></div>`;
 }
 
@@ -398,13 +401,13 @@ function scrPortfolio(){
 function scrWork(){
  const o=own();
  if(!o)return scrPortfolio();
- const a=A(o===own()?state.agentId:null)||A(state.agentId);
+ const a=A(state.agentId);
  if(o.status==='cancelled')return scrPortfolio();
  const pct=Math.min(100,Math.round(o.used/o.cap*100));
  const trialOver=o.status==='trial'&&o.trialDays<=0;
  const dis=o.blocked||o.exhausted||trialOver;
  return `<div class="crumb"><a data-go="portfolio">My agents</a> / ${a.nm}</div>
- ${o.updateAvailable?`<div class="note warn" style="margin-bottom:10px"><span>↑</span><div style="flex:1"><b>Update available: v1.5</b> — published by ${a.pub}, re-certified (Guardian re-audit, cycle 3, verdict ready · 0 critical). Changes: faster extraction, Arabic OCR improvements. Your current v${o.version} keeps running until you approve.</div><span class="frow" style="gap:6px"><button class="btn sm pri" data-approveupdate="1">Approve update</button><button class="btn sm ghost" data-holdupdate="1">Hold</button></span></div>`:''}
+ ${o.updateAvailable?`<div class="note warn" style="margin-bottom:10px"><span>↑</span><div style="flex:1"><b>Update available: v1.5</b> — published by ${a.pub}, re-certified (Guardian re-audit, cycle 3, verdict ready · 0 critical). Changes: ${a.id==='invoiceapp'?'faster extraction, Arabic OCR improvements':'quality and safety improvements (changelog attached)'}. Your current v${o.version} keeps running until you approve.</div><span class="frow" style="gap:6px"><button class="btn sm pri" data-approveupdate="1">Approve update</button><button class="btn sm ghost" data-holdupdate="1">Hold</button></span></div>`:''}
  ${trialOver?'<div class="note warn" style="margin-bottom:10px"><span>◷</span><div style="flex:1"><b>Trial ended — hard stop, nothing was charged.</b> Your workspace and history are kept. Convert to keep going.</div><button class="btn sm pri" data-convert="1">Convert to paid</button></div>':''}
  <div class="two">
  <div class="card" style="padding:16px">
@@ -414,7 +417,9 @@ function scrWork(){
    ${ (o.msgs||[]).map(m=>`<div class="msg ${m.who}">${m.tx}</div>`).join('') }
   </div>
   ${o.blocked?'<div class="note bad" style="margin-top:8px"><span>!</span><div><b>This agent was blocked by your admin.</b> Runs are refused; your data and history are kept. '+copychip('adm_7b31')+'</div></div>':''}
-  ${o.exhausted?'<div class="note warn" style="margin-top:8px"><span>◷</span><div style="flex:1"><b>Monthly entitlement used up.</b> Runs pause — nothing is silently billed beyond your entitlement. '+copychip('ent_over_44c1')+'</div><button class="btn sm pri" data-upgrade="1">Upgrade — add 5,000 tasks</button></div>':''}
+  ${o.exhausted?(o.status==='trial'
+    ?'<div class="note warn" style="margin-top:8px"><span>◷</span><div style="flex:1"><b>Trial allowance used up (200 tasks).</b> Runs pause — no card on file, nothing can be billed. '+copychip('ent_over_44c1')+'</div><button class="btn sm pri" data-convert="1">Convert to paid</button></div>'
+    :'<div class="note warn" style="margin-top:8px"><span>◷</span><div style="flex:1"><b>Monthly entitlement used up.</b> Runs pause — nothing is silently billed beyond your entitlement. '+copychip('ent_over_44c1')+'</div><button class="btn sm pri" data-upgrade="1">Upgrade — add 5,000 tasks</button></div>'):''}
   <div class="frow" style="margin-top:10px">
    <input class="f" id="chatin" aria-label="Message the agent" style="flex:1" placeholder="${dis?'Runs are paused':'Ask the agent to do something…'}" ${dis?'disabled':''}/>
    <button class="btn pri" data-send="1" ${dis?'disabled':''}>Run</button>
@@ -443,8 +448,8 @@ function scrWork(){
   </div>
   <div class="card" style="padding:14px">
    <div style="font-weight:700;margin-bottom:6px">Manage</div>
-   <button class="btn" style="width:100%" data-cancel="1">Cancel — one action, full deprovision</button>
-   <div class="small" style="margin-top:6px">Ends billing AND tears down the runtime atomically. Other agents in your tenant are untouched.</div>
+   <button class="btn" style="width:100%" data-cancel="1">${o.status==='trial'?'End trial — deprovision':'Cancel — one action, full deprovision'}</button>
+   <div class="small" style="margin-top:6px">${o.status==='trial'?'Nothing was billed — there is no card on file. Tears down the trial runtime; history kept for audit.':'Ends billing AND tears down the runtime atomically. Other agents in your tenant are untouched.'}</div>
   </div>
  </div></div>`;
 }
@@ -485,6 +490,7 @@ function renderDemoBar(){
 
 /* ============ actions ============ */
 function startTrial(a){
+ if(state.portfolio[a.id]){toast('One trial per tenant — this agent was already trialled. Buy to re-activate.');go('listing');return;}
  state.portfolio[a.id]={plan:'sub',tier:state.tier,status:'trial',trialDays:14,seats:5,cap:200,used:0,blocked:false,exhausted:false,firstRun:false,msgs:[],version:'1.0',updateAvailable:false,invoices:[]};
  toast('Trial started — no payment details, hard stop in 14 days');
  go('entitle');
@@ -492,15 +498,21 @@ function startTrial(a){
 function completePurchase(conv){
  const a=A(state.agentId);
  const plan=conv?'sub':state.plan;
- const p=planPrice(a,plan,state.tier);
+ const tier=conv?(own()?own().tier:state.tier):state.tier;
+ const p=planPrice(a,plan,tier);
  const sub=p.base, vat=sub*VAT, total=sub+vat;
  let o=own();
  if(conv&&o){ o.status='active'; o.plan='sub'; o.cap=5000; o.seats=25; o.exhausted=false; }
  else{
-  o={plan:plan,tier:state.tier,status:'active',trialDays:0,seats:25,cap:plan==='usage'?100000:5000,used:0,blocked:false,exhausted:false,firstRun:false,msgs:[],version:'1.0',updateAvailable:false,invoices:[]};
+  o={plan:plan,tier:tier,status:'active',trialDays:0,seats:25,cap:plan==='usage'?100000:5000,used:0,blocked:false,exhausted:false,firstRun:false,msgs:[],version:'1.0',updateAvailable:false,invoices:[]};
   state.portfolio[state.agentId]=o;
  }
- o.invoices.push({no:'inv_ZATCA_'+(8842+o.invoices.length),desc:a.nm+' — '+(plan==='sub'?'Standard subscription':'Usage (metered)')+(state.tier==='kingdom'?' · in-Kingdom dedicated':'')+(conv?' · trial conversion':''),sub:sub,vat:vat,total:total});
+ if(plan==='usage'&&!conv){
+  toast('Usage plan active · SAR 0 today · metered billing in arrears, first invoice at month-end');
+  go('entitle');
+  return;
+ }
+ o.invoices.push({no:'inv_ZATCA_'+(8842+o.invoices.length),desc:a.nm+' — '+(plan==='sub'?'Standard subscription':'Usage (metered)')+(tier==='kingdom'?' · in-Kingdom dedicated':'')+(conv?' · trial conversion':''),sub:sub,vat:vat,total:total});
  toast(conv?'Trial converted · everything carried over':'Payment cleared · entitlement created');
  go('invoice');
 }
@@ -538,7 +550,7 @@ document.addEventListener('click',e=>{
  if(n=t('[data-upgrade]')){const o=own();o.cap+=5000;o.exhausted=false;const a=A(state.agentId);const add=a.mo*0.5*offerPct(a.id);o.invoices.push({no:'inv_ZATCA_'+(8842+o.invoices.length),desc:a.nm+' — add-on 5,000 tasks (prorated)',sub:add,vat:add*VAT,total:add*1.15});toast('Entitlement upgraded: +5,000 tasks · prorated '+fmt(add*1.15)+' incl. VAT');go('work');return;}
  if(n=t('[data-send]')){sendMsg();return;}
  if(n=t('[data-fb]')){toast('Feedback recorded — feeds the agent\'s marketplace standing');return;}
- if(n=t('[data-cancel]')){const o=own();o.status='cancelled';toast('Cancelled: billing stopped + runtime deprovisioned · other agents untouched');go('portfolio');return;}
+ if(n=t('[data-cancel]')){const o=own();const wasTrial=o.status==='trial';o.status='cancelled';toast(wasTrial?'Trial ended and deprovisioned — nothing was ever billed':'Cancelled: billing stopped + runtime deprovisioned · other agents untouched');go('portfolio');return;}
 });
 document.addEventListener('input',e=>{ if(e.target.id==='q'){state.q=e.target.value;if(state.screen!=='store')state.screen='store';render();const q=$('#q');q.value=state.q;q.focus();q.setSelectionRange(q.value.length,q.value.length);} });
 document.addEventListener('keydown',e=>{
