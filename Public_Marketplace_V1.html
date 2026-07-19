@@ -217,14 +217,19 @@ function scrListing(){
    <div class="kv"><span>Prompt-injection posture</span><b>Behavioral testing on every version</b></div></div>
    <div class="small" style="margin-top:8px">Infrastructure certificates alone don't cover agent behaviour; every version is re-reviewed.</div>`,
   cert:`<div class="card" style="padding:14px">
-   <div class="frow" style="justify-content:space-between;margin-bottom:6px"><b style="font-size:13px">Certification</b>${a.cert?badge('gov','● Certified · independently audited'):badge('preview','Publisher attestation · self-declared')}</div>
-   <div class="kv"><span>Profile</span><b>${a.cert?'gov-citizen-v1 · signed':'—'}</b></div>
-   <div class="kv"><span>Security review passed</span><b>${a.cert?'02 Jul 2026 · valid 1 year':'not audited'}</b></div>
+   <div class="frow" style="justify-content:space-between;margin-bottom:6px"><b style="font-size:13px">Certification</b>${a.cert?badge('gov','● Certified · gov-citizen-v1'):badge('preview','Publisher attestation · self-declared')}</div>
+   ${a.cert?`<div class="small" style="margin-bottom:6px">HUMAIN ONE certification policy: Guardian verdict <b>ready</b> + zero critical findings + 5/5 platform checks. The decision is the platform's, applied to Guardian's evidence.</div>`:''}
+   <div style="font-size:10px;font-weight:800;letter-spacing:.04em;color:#6b3fa0;margin:6px 0 2px">GUARDIAN AUDIT · embedded_audit.v1 ${a.cert?copychip('thr_'+a.id+'_c2'):''}</div>
+   <div class="kv"><span>Verdict band</span><b>${a.cert?'ready · ship opinion attached':'not audited'}</b></div>
+   <div class="kv"><span>Findings</span><b>${a.cert?'0 critical · 2 medium (resolved, re-audited cycle 2)':'—'}</b></div>
+   <div class="kv"><span>Domains audited</span><b>${a.cert?'security · reliability · functionality · api_contracts':'—'}</b></div>
+   <div class="kv"><span>Source integrity</span><b>${a.cert?'SHA-256 digest · server-verified '+copychip('sha_9af3d1'):'—'}</b></div>
+   <div class="small" style="margin:2px 0 4px">Guardian issues no scores, pass/fail flags, or gates by design — it reports findings with severity, confidence bands, and evidence. Artifacts: HTML report · Excel · JSON findings · evidence archive.</div>
    <div class="kv"><span>Automated platform checks</span><b>5 of 5 passed</b></div>
    <div style="padding:4px 0 2px 10px">
     ${['Package structure','Security scan','Config check','Dependencies','Evaluation validation'].map(c=>`<div class="kv" style="border-bottom:none;padding:2px 0"><span class="small">${c}</span><b style="color:var(--green);font-size:11px">✓ pass</b></div>`).join('')}
    </div>
-   <div style="font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--green);margin:8px 0 2px">MEASURED · EVALUATION HARNESS (eval set gov-tasks-v3 · Prism ${copychip('pj_8812')})</div>
+   <div style="font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--green);margin:8px 0 2px">MEASURED · PRISM EVALUATION (eval set gov-tasks-v3 · ${copychip('pj_8812')})</div>
    <div class="kv"><span>Task completion (published eval set)</span><b>97% · 24 checks</b></div>
    <div class="kv"><span>Prompt-injection resistance</span><b>tested · pass</b></div>
    <div class="kv"><span>Latency SLO (p95)</span><b>470 ms · met</b></div>
@@ -235,7 +240,7 @@ function scrListing(){
    <div class="kv"><span>Hosting assessment</span><b>NCA ECC + CCC-2:2024 (CST Class C)</b></div>
    <div class="kv"><span>Data residency</span><b>${a.kingdom?'In-Kingdom dedicated tier available (KSA, Riyadh)':'HUMAIN-hosted (KSA region)'}</b></div>
    <div class="kv"><span>Evidence reference</span><b>${copychip('cert_'+a.id+'_71a2')}</b></div></div>
-   <div class="small" style="margin-top:8px">Two-tier trust, mirroring the strongest incumbent model: <b>measured</b> numbers come from the platform's evaluation harness with method and version attached; <b>attested</b> fields are the publisher's own declarations, published verbatim. Guardian integration is stubbed for LEAP — these checks mirror the platform's certification pipeline.</div>`,
+   <div class="small" style="margin-top:8px">Three evidence tiers: <b>Guardian audit</b> (qualitative verdict + findings, per the frozen embedded_audit.v1 contract), <b>measured</b> Prism numbers with method and version, and <b>publisher attestations</b> published verbatim. Guardian integration is stubbed for LEAP; this panel mirrors the real v1 contract shapes.</div>`,
   perf:`<div class="card" style="padding:14px">
    <div class="kv"><span>Task completion</span><b>97% · category median 92%</b></div>
    <div class="kv"><span>p95 latency</span><b>470 ms</b></div>
