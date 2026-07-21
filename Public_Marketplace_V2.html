@@ -147,8 +147,11 @@ function badge(c,t){return '<span class="badge '+c+'">'+t+'</span>';}
 function copychip(id){return '<span class="copychip" data-copy="'+id+'" title="Copy to clipboard">⧉ '+id+'</span>';}
 function av(a){return '<div class="av">'+a.nm.split(' ').map(w=>w[0]).slice(0,2).join('')+'</div>';}
 function publine(a){return '<span class="pub">'+a.pub+(a.vrf?' <span class="vrf" title="Verified publisher">✓ verified</span>':'')+'</span>';}
-function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' monthly runs')+(a.cert?' '+badge('blue','certified'):'')+(a.multi?' '+badge('alert','multi-agent · roadmap'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
-function cardline(a){return badge('gov','Trust '+a.trust)+' '+(a.cert?badge('blue','certified · audited'):badge('muted','attested · self-declared'))+' '+badge('muted','go-live < 1 day')+(a.multi?' '+badge('alert','multi-agent · roadmap'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
+function trustline(a){return badge('gov','Trust '+a.trust)+' '+badge('muted',a.use+' monthly runs')+(a.cert?' '+badge('blue','Guardian: ready · 0 critical · 5/5 checks'):' '+badge('muted','attested · not audited'))+(a.multi?' '+badge('alert','multi-agent · roadmap'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
+function cardline(a){const u=um(a);return badge('gov','Trust '+a.trust)+' '+(a.cert?badge('blue','Guardian: ready · 0 critical'):badge('muted','attested · not audited'))+' '+badge('muted',fmtK(u.t30)+' tasks · 30d')+(a.multi?' '+badge('alert','multi-agent · roadmap'):'')+(a.kingdom?' '+badge('preview','in-Kingdom tier'):'');}
+function um(a){const m=Math.round(parseFloat(a.use)*1000);
+ return {m:m, ltRuns:m*14, ltTasks:Math.round(m*14*2.6), t30:Math.round(m*2.6)};}
+function fmtK(n){return n>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,'')+'M':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'k':String(n);}
 function qr(){let s='';for(let i=0;i<49;i++){s+='<i class="'+(((i*7)%13<6)?'':'o')+'"></i>';}return '<div class="qr">'+s+'</div>';}
 function offerPct(id){return state.offers[id]==='accepted'?0.85:1;}
 function planPrice(a,plan,tier){
@@ -208,7 +211,10 @@ function scrListing(){
   overview:`<div class="card" style="padding:14px">
    <div class="kv"><span>Publisher</span><b>${a.pub}${a.vrf?' ✓':''}</b></div>
    <div class="kv"><span>Category</span><b>${a.cat}</b></div>
-   <div class="kv"><span>Monthly runs</span><b>${a.use}</b></div><div class="kv"><span>Reuse</span><b>4 tenant organizations</b></div>
+   <div class="kv"><span>Lifetime runs</span><b>${fmtK(um(a).ltRuns)}</b></div>
+   <div class="kv"><span>Lifetime tasks completed</span><b>${fmtK(um(a).ltTasks)}</b></div>
+   <div class="kv"><span>Tasks completed · last 30 days</span><b>${fmtK(um(a).t30)}</b></div>
+   <div class="kv"><span>Reuse</span><b>4 tenant organizations</b></div>
    <div class="kv"><span>Agent card (A2A)</span><b>${copychip('a2a_'+a.id+'_v1')}</b></div>
    <div class="kv"><span>Protocols</span><b>MCP · A2A</b></div>
    ${a.multi?`<div class="kv"><span>Agent team</span><b>${a.multi.join(' · ')}</b></div>`:''}
@@ -255,6 +261,10 @@ function scrListing(){
    <div class="kv"><span>Task completion</span><b>97% · category median 92%</b></div>
    <div class="kv"><span>p95 latency</span><b>470 ms</b></div>
    <div class="kv"><span>Cost per outcome</span><b>≈ ${fmt(a.task*0.75)} · median ${fmt(a.task)}</b></div></div>
+   <div class="card" style="padding:14px;margin-top:10px">
+   <div class="frow" style="justify-content:space-between;margin-bottom:6px"><b style="font-size:13px">Buyer feedback on responses</b>${badge('muted','last 30 days')}</div>
+   ${[['Thumbs up',88,'var(--green)'],['Edited before use',9,'var(--amber)'],['Thumbs down',3,'var(--red)']].map(r=>`<div class="kv" style="border-bottom:none;padding:3px 0"><span class="small">${r[0]}</span><b>${r[1]}%</b></div><div class="meter" style="margin:0 0 4px"><i style="width:${r[1]}%;background:${r[2]}"></i></div>`).join('')}
+   <div class="small" style="margin-top:4px">Collected from thumbs on each agent response in buyer workspaces. Feeds this agent's marketplace standing.</div></div>
    <div class="small" style="margin-top:8px">${badge('gov','indicative')} Figures are indicative until this version has enough volume.</div>`,
  }[state.tab];
  return `<div class="crumb"><a data-go="store">Marketplace</a> / ${a.cat} / ${a.nm}</div>
@@ -285,7 +295,7 @@ function scrListing(){
    <div class="planbox ${state.tier==='kingdom'?'on':''}" data-tier="kingdom" ${a.kingdom?'':'style="opacity:.45;pointer-events:none"'}><span><b>In-Kingdom dedicated</b><div class="small">Runs in your tenant · NCA-assessed · data never leaves</div></span><span class="small">+40%</span></div>
   </div>
   <div class="small" style="margin:10px 0 2px">${planPrice(a,state.plan==='trial'?'sub':state.plan,state.tier).label}</div>
-  <div class="small" style="margin:0 0 4px;color:var(--green);font-weight:700">Instant provisioning · typical go-live &lt; 1 day</div>
+  <div class="small" style="margin:0 0 4px;color:var(--green);font-weight:700">${fmtK(um(a).ltRuns)} lifetime runs · ${fmtK(um(a).ltTasks)} tasks completed · ${fmtK(um(a).t30)} in the last 30 days</div>
   <button class="btn" style="width:100%" data-buy="1">Continue to checkout</button>
   ${(a.kingdom||a.mo>=900)?(offer==='pending'?'<div class="note warn" style="margin-top:8px"><span>◷</span><div><b>Private offer requested.</b> HUMAIN sales responds within 2 business days. '+copychip('po_'+a.id+'_7741')+'</div></div>':offer==='accepted'?'<div class="note gov" style="margin-top:8px"><span>✓</span><div><b>Private offer accepted: −15%.</b> Discount is applied to the prices above and at checkout.</div></div>':'<button class="btn ghost" style="width:100%;margin-top:8px" data-reqoffer="1">Request a private offer (procurement / PO buyers)</button>'):''}
   <div class="small" style="margin-top:8px">Cancel any time: one action ends billing and deprovisions the runtime.</div>`}
@@ -414,7 +424,7 @@ function scrWork(){
   <div class="frow" style="justify-content:space-between">${av(a)}<div style="flex:1;margin-left:10px"><div class="nm">${a.nm} <span class="small">v${o.version}</span></div><span class="small">running in alnoor-trading · ${o.tier==='kingdom'?'in-Kingdom dedicated':'HUMAIN-hosted'}</span></div>${o.blocked?badge('alert','blocked by admin'):o.exhausted?badge('preview','entitlement exhausted'):trialOver?badge('preview','trial ended'):o.status==='trial'?badge('preview','trial · '+o.trialDays+'d left'):badge('gov','● live')}</div>
   <div class="chat" id="chat">
    <div class="msg ag">Marhaba! I'm ${a.nm}. ${o.firstRun?'':'This is your first run — try me with a real task.'}</div>
-   ${ (o.msgs||[]).map(m=>`<div class="msg ${m.who}">${m.tx}</div>`).join('') }
+   ${ (o.msgs||[]).map((m,i)=>`<div class="msg ${m.who}">${m.tx}${m.who==='ag'?`<div style="margin-top:5px;display:flex;gap:6px"><button data-mfb="up:${i}" style="appearance:none;border:1px solid ${m.fb==='up'?'var(--green)':'var(--line)'};background:${m.fb==='up'?'var(--greenbg)':'#fff'};border-radius:999px;font-size:11px;padding:1px 9px;cursor:pointer">👍</button><button data-mfb="down:${i}" style="appearance:none;border:1px solid ${m.fb==='down'?'var(--red)':'var(--line)'};background:${m.fb==='down'?'var(--redbg)':'#fff'};border-radius:999px;font-size:11px;padding:1px 9px;cursor:pointer">👎</button></div>`:''}</div>`).join('') }
   </div>
   ${o.blocked?'<div class="note bad" style="margin-top:8px"><span>!</span><div><b>This agent was blocked by your admin.</b> Runs are refused; your data and history are kept. '+copychip('adm_7b31')+'</div></div>':''}
   ${o.exhausted?(o.status==='trial'
@@ -444,7 +454,7 @@ function scrWork(){
    <div class="meter" style="margin:6px 0"><i style="width:${pct}%"></i></div>
    <div class="kv"><span>Plan</span><b>${o.status==='trial'?'Trial · no card on file':o.plan==='sub'?'Standard · '+fmt(A(state.agentId).mo*offerPct(state.agentId)*(o.tier==='kingdom'?1.4:1))+'/mo':'Usage-metered'}</b></div>
    ${o.invoices.length?`<div class="kv"><span>Invoices</span><b>${o.invoices.map(i=>copychip(i.no)).join(' ')}</b></div>`:''}
-   <div class="kv"><span>Feedback</span><b><button class="btn sm" data-fb="up">Accepted</button> <button class="btn sm ghost" data-fb="edit">Edited</button></b></div>
+
   </div>
   <div class="card" style="padding:14px">
    <div style="font-weight:700;margin-bottom:6px">Manage</div>
@@ -549,7 +559,7 @@ document.addEventListener('click',e=>{
  if(n=t('[data-holdupdate]')){const o=own();o.updateAvailable=false;toast('Update held — you stay on v'+o.version+'; re-approve any time from the listing');go('work');return;}
  if(n=t('[data-upgrade]')){const o=own();o.cap+=5000;o.exhausted=false;const a=A(state.agentId);const add=a.mo*0.5*offerPct(a.id);o.invoices.push({no:'inv_ZATCA_'+(8842+o.invoices.length),desc:a.nm+' — add-on 5,000 tasks (prorated)',sub:add,vat:add*VAT,total:add*1.15});toast('Entitlement upgraded: +5,000 tasks · prorated '+fmt(add*1.15)+' incl. VAT');go('work');return;}
  if(n=t('[data-send]')){sendMsg();return;}
- if(n=t('[data-fb]')){toast('Feedback recorded — feeds the agent\'s marketplace standing');return;}
+ if(n=t('[data-mfb]')){const p=n.getAttribute('data-mfb').split(':');const o=own();if(o&&o.msgs[+p[1]]){o.msgs[+p[1]].fb=(o.msgs[+p[1]].fb===p[0]?null:p[0]);render();toast(p[0]==='up'?'Thanks — counted toward this agent\'s standing':'Noted — flagged for the publisher, counted in standing');}return;}
  if(n=t('[data-cancel]')){const o=own();const wasTrial=o.status==='trial';o.status='cancelled';toast(wasTrial?'Trial ended and deprovisioned — nothing was ever billed':'Cancelled: billing stopped + runtime deprovisioned · other agents untouched');go('portfolio');return;}
 });
 document.addEventListener('input',e=>{ if(e.target.id==='q'){state.q=e.target.value;if(state.screen!=='store')state.screen='store';render();const q=$('#q');q.value=state.q;q.focus();q.setSelectionRange(q.value.length,q.value.length);} });
