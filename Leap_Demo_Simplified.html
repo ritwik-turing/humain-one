@@ -458,22 +458,40 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
 .sealtext .btn{margin-top:18px}
 
 /* ═══════════ S6 · handoff ═══════════ */
-#s6 .inner{max-width:min(880px,80vw);text-align:center}
-.handoff{display:flex;align-items:center;justify-content:center;gap:clamp(24px,5vw,72px);margin-top:40px}
-.hp{display:flex;flex-direction:column;align-items:center;gap:12px;transition:all .9s var(--ease)}
-.hp .hav{width:66px;height:66px;border-radius:19px;display:flex;align-items:center;justify-content:center;
-  font-size:19px;font-weight:600;letter-spacing:.02em}
-.hp .hn{font-size:14px;font-weight:600}
-.hp .hr{font-size:11.5px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.06em}
-.hp.dev .hav{background:linear-gradient(140deg,var(--tl-deep),var(--tl));color:#eafffb}
+/* The whole point of the scene is one motion: the agent leaves the person who built
+   it and arrives at the person who will use it. Everything else waits on that. */
+#s6 .inner{max-width:min(940px,84vw);text-align:center}
+.handoff{display:flex;align-items:center;justify-content:center;
+  gap:clamp(16px,3.2vw,42px);margin-top:38px}
+.hp{display:flex;flex-direction:column;align-items:center;gap:10px;flex:none;
+  opacity:.3;filter:grayscale(.6);transition:opacity .8s var(--ease),filter .8s var(--ease)}
+.hp.lit{opacity:1;filter:none}
+.hp.dim{opacity:.2;filter:grayscale(.85)}
+.hav{width:60px;height:60px;border-radius:18px;display:flex;align-items:center;
+  justify-content:center;font-size:17px;font-weight:700;letter-spacing:.03em}
+.hp.dev .hav{background:linear-gradient(140deg,var(--tl-deep),var(--tl));color:#03211c}
 .hp.buy .hav{background:linear-gradient(140deg,var(--gd-deep),var(--gd));color:#241503}
-.hp.out{opacity:.22;filter:grayscale(.7);transform:scale(.92)}
-.hp.in{opacity:0;transform:scale(.92) translateY(8px)}
-.hp.in.on{opacity:1;transform:none}
-.hflow{flex:none;width:clamp(60px,9vw,120px);height:1px;background:var(--line2);position:relative}
-.hflow::after{content:'';position:absolute;top:-2.5px;left:0;width:6px;height:6px;border-radius:50%;
-  background:var(--tl);box-shadow:0 0 10px var(--tl-glow);animation:travel 2.1s var(--ease) infinite}
-@keyframes travel{0%{left:0;opacity:0}18%{opacity:1}82%{opacity:1}100%{left:calc(100% - 6px);opacity:0}}
+.hn{font-size:14px;font-weight:600}
+.hr{font-size:10.5px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.07em}
+
+.track{position:relative;flex:1;max-width:330px;min-width:130px;padding-top:30px}
+.tracklbl{position:absolute;top:0;left:50%;white-space:nowrap;
+  transform:translateX(-50%) translateY(5px);opacity:0;transition:all .55s var(--ease);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint)}
+.tracklbl.on{opacity:1;transform:translateX(-50%)}
+.trackline{position:relative;height:1px;background:var(--line2)}
+.trackfill{position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,var(--tl),var(--gd));transition:width 1.5s var(--ease)}
+.miatok{position:absolute;top:15px;left:0;width:30px;height:30px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-size:15px;color:#eafffb;
+  background:linear-gradient(140deg,var(--tl-deep),var(--tl));
+  box-shadow:0 0 0 5px var(--bg),0 0 22px rgba(22,179,156,.45);
+  transition:left 1.5s var(--ease),background .9s var(--ease),box-shadow .9s var(--ease)}
+.miatok.moved{left:calc(100% - 30px)}
+.miatok.arrived{background:linear-gradient(140deg,var(--gd-deep),var(--gd));color:#241503;
+  box-shadow:0 0 0 5px var(--bg),0 0 26px rgba(224,166,75,.5)}
 
 /* ═══════════ S7 · marketplace ═══════════ */
 .persona{display:inline-flex;align-items:center;gap:11px;margin-bottom:18px;
@@ -814,19 +832,25 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
 <section class="scene" id="s6">
   <div class="inner">
     <div class="kicker" style="justify-content:center">Part two · The buyer <span class="ar">المشتري</span></div>
-    <h1>Rashid’s work is done.<br>Someone else’s <span class="gd">begins</span>.</h1>
-    <p class="sub" style="margin-inline:auto;text-align:center">Everything from here happens in a different company, on the same platform.</p>
+    <h1>The agent <em>changes hands</em>.</h1>
+    <p class="sub" style="margin-inline:auto;text-align:center">Rashid published Mia and moved on. He never meets the company that ends up running her.</p>
     <div class="handoff">
       <div class="hp dev" id="hpDev">
         <div class="hav">RC</div>
-        <div class="hn">Rashid · Builder</div>
-        <div class="hr">PUBLISHED MIA</div>
+        <div class="hn">Rashid</div>
+        <div class="hr">BUILT &amp; PUBLISHED</div>
       </div>
-      <div class="hflow"></div>
-      <div class="hp buy in" id="hpBuy">
+
+      <div class="track">
+        <div class="tracklbl" id="trackLbl">HUMAIN Marketplace</div>
+        <div class="trackline"><i class="trackfill" id="trackFill"></i></div>
+        <div class="miatok" id="miaTok">M</div>
+      </div>
+
+      <div class="hp buy" id="hpBuy">
         <div class="hav">SA</div>
         <div class="hn">Sara Al-Rashid</div>
-        <div class="hr">HEAD OF PROCUREMENT</div>
+        <div class="hr">ACQUIRES &amp; RUNS</div>
       </div>
     </div>
   </div>
@@ -984,8 +1008,10 @@ ACTS.forEach((act, ai) => {
 });
 function paintRail(){
   railEl.classList.toggle('hide', current <= 0);
-  const eff = current === 6 ? 7 : current;   // the handoff is a transition, not a step
   const done = current === 8;                // finale: show the whole arc complete
+  /* On the handoff scene the builder's act is over but the buyer's has not begun until
+     the agent actually arrives — eff 6 matches no step, so nothing is lit in between. */
+  const eff = current === 6 ? (actor === 'buyer' ? 7 : 6) : current;
   $$('.rail .rstep').forEach(b => {
     const i = +b.dataset.i;
     b.classList.toggle('now',  !done && i === eff);
@@ -993,14 +1019,27 @@ function paintRail(){
   });
   $$('.rail .rline').forEach(l => l.classList.toggle('done', done));
   $$('.rail .act').forEach(a => a.classList.toggle('live',
-    !done && (a.dataset.act === 'buyer' ? current >= 6 : current < 6)));
+    !done && (a.dataset.act === 'buyer' ? actor === 'buyer' : actor === 'builder')));
 }
 
 /* ── context bar: keeps the actor and the originating sentence on screen all demo,
       so the handoff reads as a role change and "one prompt" is shown, not claimed ── */
 let originPrompt = 'Build Mia — an agent that automates enterprise procurement';
+/* Who the interface currently belongs to. Every buyer-facing cue — the gold accent, the
+   context bar, the ribbon's active act — reads this one value, so they can never
+   disagree with what the scene is showing. The handoff scene flips it mid-sequence. */
+let actor = 'builder';
+/* Token-guarded: only the sequence that currently owns the stage may change hands.
+   Without this a handoff still in flight when the presenter arrows onward lands its
+   late write on the next scene and shows the wrong person in the chrome. */
+function setActor(a, token){
+  if(token !== undefined && token !== run) return;
+  actor = a;
+  document.body.classList.toggle('market', a === 'buyer');
+  paintCtx(); paintRail();
+}
 function paintCtx(){
-  const buyer = current >= 6;
+  const buyer = actor === 'buyer';
   $('#ctxbar').classList.toggle('on', current >= 1 && current <= 7);
   $('#ctxWho').innerHTML = buyer
     ? '<span class="ctxav">SA</span><span><b>Sara Al-Rashid</b> · Buyer</span>'
@@ -1021,7 +1060,9 @@ function go(n){
   current = n; run++;
   $$('.scene').forEach((s, i) => s.classList.toggle('on', i === n));
   document.body.classList.toggle('working', n === 3 || n === 5);
-  document.body.classList.toggle('market',  n === 6 || n === 7);
+  /* scene 6 always opens as the builder and earns the switch on screen */
+  actor = n >= 7 ? 'buyer' : 'builder';
+  document.body.classList.toggle('market', actor === 'buyer');
   paintRail(); paintCtx();
   STARTERS[n] && STARTERS[n](run);
 }
@@ -1399,14 +1440,28 @@ $('#toMarketBtn').onclick = () => go(6);
 
 /* ══════════ S6 · HANDOFF ══════════ */
 STARTERS[6] = async token => {
-  const dev = $('#hpDev'), buy = $('#hpBuy');
-  dev.classList.remove('out'); buy.classList.remove('on');
-  await wait(900); if(!alive(token)) return;
-  buy.classList.add('on');
-  await wait(500); if(!alive(token)) return;
-  dev.classList.add('out');
+  const dev = $('#hpDev'), buy = $('#hpBuy'), tok = $('#miaTok'), fill = $('#trackFill');
+  setActor('builder', token);                // the scene opens still belonging to Rashid
+  dev.className = 'hp dev lit';
+  buy.className = 'hp buy';
+  tok.className = 'miatok';
+  fill.style.width = '0';
+  $('#trackLbl').classList.remove('on');
+
+  await wait(750); if(!alive(token)) return;
+  $('#trackLbl').classList.add('on');        // it goes to the marketplace…
+  await wait(600); if(!alive(token)) return;
+
+  tok.classList.add('moved');                // …and travels, 1.5s, in full view
+  fill.style.width = '100%';
+  await wait(1550); if(!alive(token)) return;
+
+  tok.classList.add('arrived');              // arrival is the moment everything turns over
+  buy.classList.add('lit');
+  dev.classList.add('dim');
+  setActor('buyer', token);
   await wait(1700); if(!alive(token)) return;
-  go(7);                                   // always auto-advances: it is a transition, not a step
+  go(7);                                     // a transition, not a step — always auto-advances
 };
 
 /* ══════════ S7 · MARKETPLACE ══════════ */
