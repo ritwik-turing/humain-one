@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turing's Marketplace — powered by HUMAIN ONE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#080c0b;--bg2:#0e1413;--panel:#121a18;--panel2:#172120;
+ --line:rgba(255,255,255,.085);--line2:rgba(255,255,255,.05);
+ --ink:#edf3f0;--muted:#93a09a;--faint:#6d7a75;
+ --acc:#2fd39b;--acc2:#19b381;--acc-dim:rgba(47,211,155,.13);--acc-line:rgba(47,211,155,.34);
+ --gold:#d9ad5c;--gold-dim:rgba(217,173,92,.13);
+ --blue:#63aef0;--blue-dim:rgba(99,174,240,.13);
+ --amber:#e6a94e;--amber2:#e6a94e;--amber-dim:rgba(230,169,78,.13);
+ --red:#f0736a;--red-dim:rgba(240,115,106,.13);
+ --sans:"Onest",-apple-system,"Segoe UI",sans-serif;
+ --disp:"Sora",var(--sans);
+ --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+ --sh:0 18px 50px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;background-image:radial-gradient(90% 60% at 50% -10%,rgba(47,211,155,.10),transparent 62%),radial-gradient(60% 50% at 100% 0%,rgba(99,174,240,.055),transparent 55%)}
+button,input{font-family:inherit}
+::selection{background:rgba(47,211,155,.26)}
+*:focus{outline:none}
+.fv:focus-visible,button:focus-visible,input:focus-visible{box-shadow:0 0 0 3px rgba(47,211,155,.32)!important;border-color:var(--acc-line)!important}
+
+/* ---------- chrome ---------- */
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:14px 28px;background:rgba(8,12,11,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line2)}
+.brand{display:flex;align-items:center;gap:12px;cursor:pointer;white-space:nowrap}
+.lg-t{font-family:var(--disp);font-weight:600;font-size:17px;letter-spacing:-.03em;color:#fff}
+.lg-t i{font-style:normal;position:relative}
+.lg-t i::after{content:"";position:absolute;left:50%;top:-.44em;transform:translateX(-50%);width:.14em;height:.14em;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}
+.lg-m{font-weight:400;color:var(--muted)}
+.lg-sep{width:1px;height:18px;background:var(--line)}
+.lg-h{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12px;letter-spacing:.24em;color:#cfe3da}
+.lg-one{font-size:8.5px;letter-spacing:.13em;color:#04120d;background:var(--acc);padding:2px 6px;border-radius:5px;font-weight:700}
+.topright{margin-left:auto;display:flex;align-items:center;gap:10px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px 90px}
+
+/* ---------- ask screen ---------- */
+.ask{min-height:calc(100vh - 230px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px 0 40px;position:relative}
+.aurora{position:absolute;top:44%;left:50%;width:min(940px,96vw);height:520px;pointer-events:none;background:radial-gradient(closest-side,rgba(47,211,155,.19),transparent 72%);filter:blur(52px);animation:breathe 9s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
+.ask>*{position:relative;z-index:1}
+.eyebrow{font-size:10.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);display:inline-flex;align-items:center;gap:11px;margin-bottom:20px}
+.eyebrow::before,.eyebrow::after{content:"";height:1px;width:34px;background:linear-gradient(90deg,transparent,rgba(47,211,155,.5))}
+.eyebrow::after{background:linear-gradient(90deg,rgba(47,211,155,.5),transparent)}
+.ask h1{font-family:var(--disp);font-size:clamp(30px,4.6vw,50px);font-weight:600;letter-spacing:-.035em;line-height:1.08;margin:0 0 14px;max-width:16ch;background:linear-gradient(175deg,#ffffff 30%,#9fd9c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ask .lede{font-size:15px;color:var(--muted);max-width:56ch;margin:0 0 34px}
+.askbox{width:min(700px,94vw);position:relative}
+.askfield{display:flex;align-items:center;gap:13px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:5px 6px 5px 20px;box-shadow:var(--sh);transition:border-color .2s,box-shadow .2s}
+.askfield:focus-within{border-color:var(--acc-line);box-shadow:var(--sh),0 0 0 4px rgba(47,211,155,.11)}
+.askfield input{flex:1;min-width:0;border:none;background:transparent;color:var(--ink);font-size:16px;padding:16px 0;outline:none}
+.askfield input::placeholder{color:var(--faint)}
+.askicon{color:var(--acc);font-size:15px;flex:none}
+.suggests{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:22px;max-width:720px}
+.sug{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.028);color:#c6d3ce;font-size:12.5px;font-weight:500;padding:8px 15px;border-radius:999px;cursor:pointer;transition:border-color .18s,background .18s,color .18s,transform .08s}
+.sug:hover{border-color:var(--acc-line);background:var(--acc-dim);color:var(--ink)}
+.sug:active{transform:translateY(1px)}
+.askfoot{margin-top:36px;font-size:12.5px;color:var(--faint);display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.linkish{color:var(--acc);cursor:pointer;font-weight:500;background:none;border:none;font-size:inherit;padding:0}
+.linkish:hover{text-decoration:underline}
+.dot{width:3px;height:3px;border-radius:50%;background:var(--faint);display:inline-block}
+
+/* ---------- results ---------- */
+.qbar{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:5px 6px 5px 17px;margin:26px 0 8px;transition:border-color .2s,box-shadow .2s}
+.qbar:focus-within{border-color:var(--acc-line);box-shadow:0 0 0 4px rgba(47,211,155,.1)}
+.qbar input{flex:1;min-width:0;border:none;background:transparent;color:var(--ink);font-size:15px;padding:12px 0;outline:none}
+.rmeta{font-size:12.5px;color:var(--faint);margin-bottom:20px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.res{display:flex;gap:17px;padding:20px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(180deg,rgba(255,255,255,.022),transparent);margin-bottom:13px;transition:border-color .2s,transform .2s,box-shadow .2s;animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+.res:hover{border-color:rgba(255,255,255,.16);transform:translateY(-2px);box-shadow:0 12px 34px rgba(0,0,0,.36)}
+.res.best{border-color:var(--acc-line);background:linear-gradient(180deg,rgba(47,211,155,.075),transparent 70%)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.res:nth-child(1){animation-delay:.02s}.res:nth-child(2){animation-delay:.07s}.res:nth-child(3){animation-delay:.12s}.res:nth-child(4){animation-delay:.17s}.res:nth-child(5){animation-delay:.22s}.res:nth-child(6){animation-delay:.27s}
+.av{width:48px;height:48px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:600;font-size:14px;color:var(--acc);background:linear-gradient(155deg,rgba(47,211,155,.19),rgba(47,211,155,.05));box-shadow:inset 0 0 0 1px rgba(47,211,155,.22)}
+.res .body{flex:1;min-width:0}
+.rtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rname{font-family:var(--disp);font-size:17px;font-weight:600;letter-spacing:-.02em;color:#fff}
+.rpub{font-size:12.5px;color:var(--muted);margin-top:1px}
+.why{margin:11px 0 0;padding:11px 13px;border-radius:11px;background:rgba(47,211,155,.065);border-left:2px solid var(--acc-line);font-size:13px;color:#c8ded5}
+.why b{color:var(--acc);font-weight:600}
+.sigs{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.ractions{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}
+
+/* ---------- badges + buttons ---------- */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap;letter-spacing:.01em}
+.badge.acc{background:var(--acc-dim);color:var(--acc)}
+.badge.blue{background:var(--blue-dim);color:var(--blue)}
+.badge.gold{background:var(--gold-dim);color:var(--gold)}
+.badge.amber{background:var(--amber-dim);color:var(--amber2)}
+.badge.red{background:var(--red-dim);color:var(--red)}
+.badge.mut{background:rgba(255,255,255,.055);color:var(--muted)}
+.btn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.045);color:var(--ink);font-weight:600;font-size:13px;padding:10px 18px;border-radius:11px;cursor:pointer;transition:background .17s,border-color .17s,transform .07s,box-shadow .17s}
+.btn:hover{background:rgba(255,255,255,.085);border-color:rgba(255,255,255,.17)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#04130e;font-weight:700}
+.btn.pri:hover{background:#42e3ab;border-color:#42e3ab;box-shadow:0 8px 26px rgba(47,211,155,.24)}
+.btn.sm{padding:8px 14px;font-size:12.5px}
+.btn.gh{background:transparent}
+
+/* ---------- evidence ---------- */
+.back{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:13px;cursor:pointer;background:none;border:none;padding:0;margin:24px 0 18px}
+.back:hover{color:var(--acc)}
+.ehead{display:flex;gap:18px;align-items:flex-start;margin-bottom:22px}
+.ehead .av{width:58px;height:58px;font-size:16px;border-radius:17px}
+.ehead h1{font-family:var(--disp);font-size:28px;font-weight:600;letter-spacing:-.028em;margin:0 0 3px;color:#fff;line-height:1.12}
+.two{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.verdict{display:flex;align-items:center;gap:15px;padding:17px 18px;border-radius:16px;background:linear-gradient(120deg,rgba(47,211,155,.11),rgba(47,211,155,.02));border:1px solid var(--acc-line)}
+.verdict.warn{background:linear-gradient(120deg,rgba(230,169,78,.11),rgba(230,169,78,.02));border-color:rgba(230,169,78,.32)}
+.vmark{width:44px;height:44px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;background:var(--acc);color:#04130e;box-shadow:0 0 0 5px rgba(47,211,155,.13)}
+.verdict.warn .vmark{background:var(--amber2);color:#221501;box-shadow:0 0 0 5px rgba(230,169,78,.13)}
+.vt{font-weight:600;font-size:14.5px;color:#fff}
+.vs{font-size:12.5px;color:var(--muted);margin-top:2px}
+.sec{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.022);padding:17px 19px;margin-top:14px}
+.sech{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;color:var(--muted)}
+.tag::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sec.guard .tag{color:#a98bea}.sec.prism .tag{color:var(--acc)}.sec.att .tag{color:var(--amber2)}
+.secmeta{margin-left:auto;font-size:11px;color:var(--faint);display:flex;align-items:center;gap:8px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13px}
+.kv:last-child{border-bottom:none}
+.kv span{color:var(--muted)}
+.kv b{text-align:right;font-weight:500;color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+@media(max-width:560px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:13px;padding:14px}
+.stat .n{font-family:var(--disp);font-size:25px;font-weight:600;line-height:1;color:#fff}
+.stat .l{font-size:11.5px;color:var(--muted);margin-top:7px}
+.stat .s{font-size:10.5px;color:var(--acc);margin-top:3px;font-weight:500}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+@media(max-width:560px){.checks{grid-template-columns:1fr}}
+.chk{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--line2)}
+.chk span{color:var(--muted)}.chk b{color:var(--acc);font-size:11.5px;font-weight:600}
+.note{font-size:12px;color:var(--faint);line-height:1.55;margin:11px 0 0}
+.mono{font-family:var(--mono);font-size:10.5px;background:rgba(255,255,255,.055);color:var(--muted);padding:3px 8px;border-radius:6px;cursor:pointer;transition:background .15s,color .15s}
+.mono:hover{background:rgba(255,255,255,.1);color:var(--ink)}
+.rail{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.028);padding:18px;position:sticky;top:84px}
+.railtop{display:flex;align-items:center;gap:14px;padding-bottom:15px;margin-bottom:14px;border-bottom:1px solid var(--line2)}
+.tnum{font-family:var(--disp);font-size:33px;font-weight:600;line-height:1;color:var(--acc)}
+.tlbl{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ---------- browse ---------- */
+.bhead{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;margin:30px 0 4px}
+.bhead h2{font-family:var(--disp);font-size:21px;font-weight:600;letter-spacing:-.02em;margin:0;color:#fff}
+.bhead .sub{font-size:12.5px;color:var(--faint)}
+.row{display:flex;align-items:center;gap:15px;padding:15px 17px;border:1px solid var(--line);border-radius:14px;margin-top:10px;background:rgba(255,255,255,.018);transition:border-color .18s,background .18s}
+.row:hover{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.035)}
+.row .av{width:40px;height:40px;font-size:12.5px;border-radius:12px}
+.row .rn{font-weight:600;font-size:14.5px;color:#fff}
+.row .rd{font-size:12.5px;color:var(--muted);margin-top:1px}
+.rowacts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---------- runtime ---------- */
+.chat{display:flex;flex-direction:column;gap:10px;padding:16px;background:rgba(0,0,0,.28);border:1px solid var(--line2);border-radius:15px;min-height:220px;max-height:360px;overflow:auto}
+.msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55}
+.msg.me{align-self:flex-end;background:var(--acc);color:#04130e;font-weight:500;border-bottom-right-radius:5px}
+.msg.ag{align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid var(--line2);border-bottom-left-radius:5px}
+.fin{flex:1;min-width:0;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);border-radius:11px;padding:11px 14px;font-size:13.5px;outline:none;transition:border-color .17s,box-shadow .17s}
+.fin:focus{border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(47,211,155,.12)}
+.fb{appearance:none;border:1px solid var(--line);background:transparent;border-radius:999px;font-size:11px;padding:2px 10px;cursor:pointer;color:var(--muted)}
+.fb.on{border-color:var(--acc-line);background:var(--acc-dim);color:var(--acc)}
+
+#toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(10px);background:#eef3f0;color:#0a0f0d;font-size:13px;font-weight:600;padding:12px 22px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:99;box-shadow:var(--sh)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:760px){.top{padding:12px 16px}.wrap{padding:0 16px 70px}.lg-sep,.lg-h{display:none}.ask{min-height:auto;padding:34px 0}.ehead .av{width:46px;height:46px}}
+</style>
+</head>
+<body>
+<div class="top" id="topbar">
+  <div class="brand fv" tabindex="0" data-go="ask" title="Turing's Marketplace, powered by HUMAIN ONE">
+    <span class="lg-t">Tur<i>i</i>ng's <span class="lg-m">Marketplace</span></span>
+    <span class="lg-sep"></span>
+    <span class="lg-h">HUMAIN<span class="lg-one">ONE</span></span>
+  </div>
+  <div class="topright" id="topright">
+    <button class="btn sm gh" data-go="browse">All agents</button>
+  </div>
+</div>
+<div class="wrap" id="app"></div>
+<div id="toast"></div>
+
+<script>
+/* ================= catalog ================= */
+/* origin: internal = built inside the tenant/Turing · external = third-party, certified before listing */
+const AGENTS=[
+ {id:'invoiceapp',nm:'Invoice Processing App',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Finance',cap:'Reads supplier invoices end to end and posts them, holding anything that fails validation',
+  ds:'Multi-agent app: an orchestrator with extraction, validation, and posting agents processing invoices end to end.',
+  tags:['invoice','invoices','supplier','finance','accounts','payable','extraction','validation','posting','ocr','arabic','billing','ap'],
+  use:'3.4k',trust:89,kingdom:1,cert:1,multi:['Orchestrator','Extraction Agent','Validation Agent','Posting Agent']},
+ {id:'translate',nm:'Translation Agent',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Language',cap:'Translates documents and live chat between Arabic and English, including legal register',
+  ds:'Arabic-English document and live-chat translation with legal-register support.',
+  tags:['translate','translation','arabic','english','language','document','legal','localise','localize','bilingual'],
+  use:'18.2k',trust:94,kingdom:1,cert:1},
+ {id:'meeting',nm:'Meeting Manager',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Back office',cap:'Schedules meetings, circulates briefs, and chases follow-ups across the org calendar',
+  ds:'Schedules, briefs, and follows up on meetings across your org calendar.',
+  tags:['meeting','meetings','calendar','schedule','scheduling','brief','minutes','follow','agenda'],
+  use:'8.6k',trust:91,kingdom:0,cert:1},
+ {id:'trip',nm:'Trip Planner',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Travel',cap:'Books policy-compliant business travel including visas and per-diem rules',
+  ds:'Plans compliant business travel: flights, hotels, visas, per-diem rules.',
+  tags:['travel','trip','flight','flights','hotel','visa','per-diem','booking','itinerary','policy'],
+  use:'7.8k',trust:88,kingdom:0,cert:1},
+ {id:'hr',nm:'HR Onboarder',pub:'Turing Labs',origin:'internal',vrf:1,cat:'HR',cap:'Runs the full new-hire sequence from contract to GOSI registration and equipment',
+  ds:'Runs new-hire onboarding: contracts, GOSI registration, equipment, buddy plan.',
+  tags:['hr','onboarding','onboard','hire','hiring','employee','contract','gosi','equipment','people','joiner'],
+  use:'3.7k',trust:85,kingdom:0,cert:1},
+ {id:'research',nm:'Research Assistant',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Back office',cap:'Gathers sources, synthesizes findings, and drafts a fully cited brief',
+  ds:'Single-agent research: gathers sources, synthesizes, and drafts a cited brief.',
+  tags:['research','sources','synthesize','brief','cited','analysis','report','market','summary','study'],
+  use:'5.1k',trust:90,kingdom:0,cert:1},
+ {id:'covey',nm:'Franklin Covey Coach',pub:'Franklin Covey · via Turing',origin:'external',vrf:1,cat:'HR',cap:'Coaches leaders through goal planning, habit tracking, and session prep',
+  ds:'Multi-agent leadership coach: goal planning, habit tracking, and session-prep agents working as one team.',
+  tags:['coach','coaching','leadership','goals','habits','development','training','manager','performance'],
+  use:'2.1k',trust:86,kingdom:0,cert:1,multi:['Coach Orchestrator','Goal Planner','Habit Tracker']},
+ {id:'citizen',nm:'Citizen Support Agent',pub:'Ministry of Social Affairs',origin:'external',vrf:1,cat:'Citizen services',cap:'Answers citizen benefit and service queries in Arabic, escalating with full context',
+  ds:'Answers citizen queries on benefits and services, escalates with full context.',
+  tags:['citizen','benefits','government','public','services','support','queries','escalation','arabic','welfare','housing'],
+  use:'12.4k',trust:92,kingdom:1,cert:1},
+ {id:'invoice',nm:'Invoice Chaser',pub:'Riyadh FinTech Works',origin:'external',vrf:1,cat:'Finance',cap:'Chases unpaid invoices in Arabic and English and reconciles once payment lands',
+  ds:'Follows up unpaid invoices in Arabic and English, reconciles on payment.',
+  tags:['invoice','unpaid','collections','receivable','chase','chasing','reconcile','payment','finance','dunning','arabic'],
+  use:'6.3k',trust:87,kingdom:0,cert:1},
+ {id:'contract',nm:'Contract Summarizer',pub:'Jeddah Legal AI',origin:'external',vrf:1,cat:'Back office',cap:'Summarizes contracts and red-flags clauses against your playbook, Sharia-clause aware',
+  ds:'Summarizes and red-flags contracts against your playbook. Sharia-clause aware.',
+  tags:['contract','contracts','legal','summarize','summarise','red-flag','playbook','sharia','clause','review','agreement'],
+  use:'4.9k',trust:90,kingdom:1,cert:1},
+ {id:'procure',nm:'Procurement Copilot',pub:'Riyadh FinTech Works',origin:'external',vrf:1,cat:'Finance',cap:'Drafts RFQs, compares supplier quotes, and tracks Etimad tender deadlines',
+  ds:'Drafts RFQs, compares supplier quotes, and tracks Etimad tender deadlines.',
+  tags:['procurement','rfq','supplier','quotes','tender','etimad','sourcing','vendor','purchase','bid'],
+  use:'2.9k',trust:83,kingdom:0,cert:0},
+ {id:'triage',nm:'Support Triage',pub:'Dammam Cloud Co.',origin:'external',vrf:0,cat:'Back office',cap:'Classifies inbound support tickets and routes them with SLA awareness',
+  ds:'Classifies and routes inbound support tickets with SLA awareness.',
+  tags:['support','ticket','tickets','triage','routing','sla','helpdesk','classify','queue','customer'],
+  use:'1.2k',trust:78,kingdom:0,cert:0},
+];
+const A=id=>AGENTS.find(a=>a.id===id);
+const INTENTS=[
+ 'Process supplier invoices end to end',
+ 'Translate a legal document into Arabic',
+ 'Chase our unpaid invoices',
+ 'Onboard a new employee',
+ 'Summarize a supplier contract',
+ 'Answer citizen benefit queries',
+];
+
+/* ================= state ================= */
+const state={screen:'ask',q:'',agentId:null,sessions:{}};
+const STANDALONE=(()=>{const id=new URLSearchParams(location.search).get('agent');return id&&A(id)?id:null;})();
+const shareUrl=id=>location.origin+location.pathname+'?agent='+id;
+
+/* ================= matching =================
+   ponytail: deterministic keyword scorer, no model call. Scores name > tags > capability > category,
+   and returns the terms that actually hit so the UI can explain the match honestly. */
+const STOP=new Set(['a','an','and','the','to','for','of','in','on','my','our','we','i','need','want','help','with','me','can','you','please','some','is','are','it','that','this','how','do','get','find','agent','agents']);
+function terms(q){return q.toLowerCase().replace(/[^a-z0-9\s-]/g,' ').split(/\s+/).filter(w=>w.length>2&&!STOP.has(w));}
+function stem(w){return w.replace(/(ing|ies|es|s)$/,'');}
+// word-start match, so "invoice" hits "invoices" but "book" never hits "playbook"
+const rx=w=>new RegExp('\\b'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+function score(a,ts){
+ let s=0;const hit=new Set();
+ ts.forEach(t=>{
+  const st=stem(t),r=rx(st.length>3?st:t);
+  if(a.tags.some(g=>g===t||g===st||stem(g)===st)){s+=10;hit.add(t);}
+  if(r.test(a.nm)){s+=8;hit.add(t);}
+  if(r.test(a.cat)){s+=5;hit.add(t);}
+  if(r.test(a.cap)||r.test(a.ds)){s+=4;hit.add(t);}
+ });
+ if(s>0&&a.cert)s+=2;           // certified agents rank above uncertified on equal relevance
+ return {score:s,hit:[...hit]};
+}
+function search(q){
+ const ts=terms(q);
+ if(!ts.length)return {ts:[],ranked:[],weak:true};
+ const ranked=AGENTS.map(a=>({a,...score(a,ts)})).filter(r=>r.score>0).sort((x,y)=>y.score-x.score||y.a.trust-x.a.trust);
+ return {ts,ranked,weak:ranked.length===0||ranked[0].score<8};
+}
+// ponytail: one runnable check — the shipped intents must each return a sensible top match
+(function(){
+ const expect={'Process supplier invoices end to end':'invoiceapp','Translate a legal document into Arabic':'translate','Chase our unpaid invoices':'invoice','Onboard a new employee':'hr','Summarize a supplier contract':'contract','Answer citizen benefit queries':'citizen'};
+ Object.entries(expect).forEach(([q,id])=>{const r=search(q);console.assert(r.ranked.length&&r.ranked[0].a.id===id,'intent "'+q+'" expected '+id+' got '+(r.ranked[0]||{a:{}}).a.id);});
+ console.assert(AGENTS.every(a=>a.origin==='internal'||a.origin==='external'),'every agent needs an origin');
+})();
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._x);toast._x=setTimeout(()=>t.classList.remove('show'),2600);}
+function badge(c,t){return '<span class="badge '+c+'">'+t+'</span>';}
+function mono(id){return '<span class="mono" data-copy="'+id+'">'+id+'</span>';}
+function av(a){return '<div class="av">'+a.nm.split(' ').map(w=>w[0]).slice(0,2).join('')+'</div>';}
+function fmtK(n){return n>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,'')+'M':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'k':String(n);}
+function um(a){const m=Math.round(parseFloat(a.use)*1000);return {ltRuns:m*14,ltTasks:Math.round(m*14*2.6),t30:Math.round(m*2.6)};}
+function originBadge(a){return a.origin==='internal'?badge('blue','Internal'):badge('mut','External');}
+function sigs(a){return originBadge(a)+(a.cert?badge('acc','Guardian: ready'):badge('amber','Not audited'))+badge('mut',fmtK(um(a).t30)+' tasks · 30d')+(a.kingdom?badge('gold','In-Kingdom'):'')+(a.multi?badge('red','Multi-agent · roadmap'):'');}
+function gmet(a){const c=Math.min(99,a.trust+6),l=380+(a.trust%9)*15;return {comp:c,lat:l};}
+
+/* ================= screens ================= */
+function scrAsk(){
+ const n=AGENTS.length,i=AGENTS.filter(a=>a.origin==='internal').length;
+ return `<div class="ask">
+  <div class="aurora"></div>
+  <div class="eyebrow">Turing workspace · powered by HUMAIN ONE</div>
+  <h1>What do you need done?</h1>
+  <p class="lede">Describe the work in your own words. Your workspace matches it to a certified agent and tells you why, so you can evaluate the evidence or launch it straight away.</p>
+  <div class="askbox"><div class="askfield">
+    <span class="askicon">&#9679;</span>
+    <input id="q" autocomplete="off" aria-label="Describe what you need done" placeholder="e.g. chase our unpaid invoices in Arabic" value="${esc(state.q)}"/>
+    <button class="btn pri" data-ask="1">Find an agent</button>
+  </div></div>
+  <div class="suggests">${INTENTS.map(t=>`<button class="sug" data-intent="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+  <div class="askfoot"><span>${n} certified agents ready in this workspace</span><span class="dot"></span><span>${i} internal · ${n-i} external</span><span class="dot"></span><button class="linkish" data-go="browse">Browse all agents</button></div>
+ </div>`;
+}
+
+function resultCard(r,best){
+ const a=r.a,g=gmet(a);
+ const matched=r.hit.length?`Matched on <b>${r.hit.map(esc).join('</b>, <b>')}</b>. ` : '';
+ const ev=a.cert?`Certified: Guardian verdict ready, 0 critical, ${g.comp}% task completion.`:`Publisher-attested only, no independent audit on file.`;
+ const kd=a.kingdom?' Runs on the in-Kingdom dedicated tier.':'';
+ return `<div class="res${best?' best':''}">
+  ${av(a)}
+  <div class="body">
+   <div class="rtop"><span class="rname">${esc(a.nm)}</span>${best?badge('acc','Best match'):''}${originBadge(a)}</div>
+   <div class="rpub">${esc(a.pub)}${a.vrf?' &#10003; verified':''}</div>
+   <div class="why">${matched}${esc(a.cap)}. ${ev}${kd}</div>
+   <div class="sigs">${badge('mut','Trust '+a.trust)}${a.cert?badge('acc','0 critical · 5/5 checks'):badge('amber','Not audited')}${badge('mut',fmtK(um(a).t30)+' tasks · 30d')}${a.kingdom?badge('gold','In-Kingdom'):''}${a.multi?badge('red','Multi-agent · roadmap'):''}</div>
+   <div class="ractions">
+    <button class="btn pri sm" data-launch="${a.id}">Launch</button>
+    <button class="btn sm" data-eval="${a.id}">Evaluate</button>
+    <button class="btn sm gh" data-share="${a.id}">Copy share link</button>
+   </div>
+  </div></div>`;
+}
+
+function scrResults(){
+ const {ts,ranked,weak}=search(state.q);
+ // relevance floor: drop long-tail noise that only clipped one weak term
+ const cut=ranked.length?ranked[0].score*0.35:0;
+ const top=ranked.filter(r=>r.score>=cut).slice(0,6);
+ return `<div class="qbar">
+   <span class="askicon">&#9679;</span>
+   <input id="q" autocomplete="off" aria-label="Describe what you need done" value="${esc(state.q)}"/>
+   <button class="btn pri" data-ask="1">Update</button>
+  </div>
+  <div class="rmeta">${top.length?`${top.length} agent${top.length>1?'s':''} matched`:'No agent matched'}${ts.length?` <span class="dot"></span> ranked by relevance, then certification and trust`:''}</div>
+  ${weak?`<div class="verdict warn" style="margin-bottom:16px"><div class="vmark">?</div><div style="flex:1"><div class="vt">${top.length?'No strong match for that request':'Nothing in this workspace matches that yet'}</div><div class="vs">${top.length?'The closest agents are below. Try naming the task, for example "chase unpaid invoices" or "onboard a new hire".':'Try different wording, or browse the full catalog of certified agents.'}</div></div><button class="btn sm" data-go="browse">Browse all</button></div>`:''}
+  ${top.map((r,i)=>resultCard(r,i===0&&!weak)).join('')}
+  <div class="askfoot" style="justify-content:flex-start;margin-top:22px"><button class="linkish" data-go="browse">Browse all ${AGENTS.length} agents</button><span class="dot"></span><button class="linkish" data-go="ask">New request</button></div>`;
+}
+
+function scrBrowse(){
+ const grp=o=>AGENTS.filter(a=>a.origin===o).map(a=>`<div class="row">${av(a)}
+   <div style="min-width:0"><div class="rn">${esc(a.nm)}</div><div class="rd">${esc(a.cap)}</div></div>
+   <div class="rowacts">${a.cert?badge('acc','Guardian: ready'):badge('amber','Not audited')}${a.kingdom?badge('gold','In-Kingdom'):''}
+    <button class="btn sm" data-eval="${a.id}">Evaluate</button><button class="btn pri sm" data-launch="${a.id}">Launch</button></div></div>`).join('');
+ return `<button class="back" data-go="ask">&#8592; Back to request</button>
+  <div class="bhead"><h2>Internal agents</h2><span class="sub">built inside your organization</span></div>${grp('internal')}
+  <div class="bhead"><h2>External agents</h2><span class="sub">third-party publishers, certified before listing</span></div>${grp('external')}`;
+}
+
+function scrEvidence(){
+ const a=A(state.agentId),g=gmet(a),u=um(a);
+ return `<button class="back" data-back="1">&#8592; Back to results</button>
+ <div class="ehead">${av(a)}<div style="flex:1;min-width:0">
+   <h1>${esc(a.nm)}</h1><div class="rpub">${esc(a.pub)}${a.vrf?' &#10003; verified':''}</div>
+   <div class="sigs" style="margin-top:11px">${sigs(a)}</div></div></div>
+ <div class="two"><div>
+  <div class="verdict${a.cert?'':' warn'}"><div class="vmark">${a.cert?'&#10003;':'!'}</div><div style="flex:1">
+   <div class="vt">${a.cert?'Certified &#183; Guardian verdict: ready':'Not audited &#183; publisher attestation only'}</div>
+   <div class="vs">${a.cert?'Zero critical findings, 5 of 5 platform checks, policy gov-citizen-v1':'Self-declared by the publisher. No independent Guardian audit or Prism evaluation on file.'}</div>
+  </div>${a.cert?badge('acc','Certified'):badge('amber','Attested')}</div>
+  ${a.cert?`
+  <div class="sec guard"><div class="sech"><span class="tag">Guardian audit</span><span class="secmeta">embedded_audit.v1 ${mono('thr_'+a.id+'_c2')}</span></div>
+   <div class="kv"><span>Verdict band</span><b>ready &#183; ship opinion attached</b></div>
+   <div class="kv"><span>Findings</span><b>0 critical &#183; 2 medium (resolved, re-audited cycle 2)</b></div>
+   <div class="kv"><span>Domains audited</span><b>security &#183; reliability &#183; functionality &#183; api_contracts</b></div>
+   <div class="kv"><span>Source integrity</span><b>SHA-256 &#183; server-verified ${mono('sha_9af3d1')}</b></div>
+   <p class="note">Guardian issues no scores, pass/fail flags, or gates by design. It reports findings with severity, confidence bands, and evidence. Artifacts: HTML report, Excel, JSON findings, evidence archive.</p></div>
+  <div class="sec guard"><div class="sech"><span class="tag">Platform checks</span><span class="secmeta">5 of 5 passed</span></div>
+   <div class="checks">${['Package structure','Security scan','Config check','Dependencies','Evaluation validation'].map(c=>`<div class="chk"><span>${c}</span><b>&#10003; pass</b></div>`).join('')}</div></div>
+  <div class="sec prism"><div class="sech"><span class="tag">Measured &#183; Prism</span><span class="secmeta">eval set gov-tasks-v3 &#183; ${mono('pj_8812')}</span></div>
+   <div class="stats">
+    <div class="stat"><div class="n">${g.comp}%</div><div class="l">Task completion</div><div class="s">24 checks</div></div>
+    <div class="stat"><div class="n">Pass</div><div class="l">Prompt-injection</div><div class="s">tested</div></div>
+    <div class="stat"><div class="n">${g.lat}<span style="font-size:13px"> ms</span></div><div class="l">Latency &#183; p95</div><div class="s">SLO met</div></div>
+   </div></div>`:''}
+  <div class="sec att"><div class="sech"><span class="tag">Publisher-attested</span><span class="secmeta">as declared, not audited</span></div>
+   <div class="kv"><span>Data handling</span><b>tenant-scoped &#183; stored in KSA &#183; 90-day retention</b></div>
+   <div class="kv"><span>Compliance declared</span><b>PDPL &#183; ISO 27001 (claimed)</b></div>
+   <div class="kv"><span>Data residency</span><b>${a.kingdom?'In-Kingdom dedicated tier (KSA, Riyadh)':'HUMAIN-hosted (KSA region)'}</b></div>
+   <div class="kv"><span>Evidence reference</span><b>${mono('cert_'+a.id+'_71a2')}</b></div></div>
+  <div class="sec"><div class="sech"><span class="tag">Capabilities &amp; usage</span></div>
+   <div class="kv"><span>What it does</span><b>${esc(a.cap)}</b></div>
+   <div class="kv"><span>Actions</span><b>12 declared actions</b></div>
+   <div class="kv"><span>Data access</span><b>Read: connected sources &#183; Write: drafts only</b></div>
+   <div class="kv"><span>Protocols</span><b>MCP &#183; A2A &#183; ${mono('a2a_'+a.id+'_v1')}</b></div>
+   ${a.multi?`<div class="kv"><span>Agent team</span><b>${a.multi.join(' &#183; ')}</b></div>`:''}
+   <div class="kv"><span>Lifetime tasks</span><b>${fmtK(u.ltTasks)} across ${fmtK(u.ltRuns)} runs</b></div></div>
+  <p class="note">Three evidence tiers: Guardian audit (qualitative verdict and findings, per the frozen embedded_audit.v1 contract), measured Prism numbers with method and version, and publisher attestations published verbatim. Guardian integration is stubbed for LEAP; this panel mirrors the real v1 contract shapes.</p>
+ </div>
+ <div class="rail">
+  <div class="railtop"><div><div class="tnum">${a.trust}</div><div class="tlbl">Trust score</div></div>
+   <div style="margin-left:auto;text-align:right">${a.cert?badge('acc','Guardian: ready'):badge('amber','Attested')}<div class="note" style="margin-top:6px">${a.cert?'0 critical &#183; 5/5 checks':'not independently audited'}</div></div></div>
+  <button class="btn pri" style="width:100%" data-launch="${a.id}">Launch &#183; run live</button>
+  <button class="btn" style="width:100%;margin-top:9px" data-share="${a.id}">Copy share link</button>
+  <p class="note">Launch opens this agent in its own web container window. Share the link to give a teammate direct access. No checkout, no sign-up.</p>
+  <div class="kv" style="margin-top:6px"><span>Origin</span><b>${a.origin==='internal'?'Internal':'External'}</b></div>
+  <div class="kv"><span>Category</span><b>${esc(a.cat)}</b></div>
+  <div class="kv"><span>Runtime</span><b>${a.kingdom?'In-Kingdom available':'HUMAIN-hosted (KSA)'}</b></div>
+  <div class="kv"><span>Last updated</span><b>Jul 2026</b></div>
+ </div></div>`;
+}
+
+function scrRun(standalone){
+ const a=A(state.agentId),s=state.sessions[state.agentId]||{msgs:[],firstRun:false};
+ return `${standalone?'':'<button class="back" data-back="1">&#8592; Back</button>'}
+ <div class="verdict" style="margin:${standalone?'24px':'0'} 0 16px"><div class="vmark">&#9654;</div><div style="flex:1">
+  <div class="vt">Live runtime</div><div class="vs">${esc(a.nm)} is running in its own web container inside your Turing workspace.</div></div>${badge('acc','Live')}</div>
+ <div class="two"><div class="sec" style="margin-top:0;padding:19px">
+   <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px">${av(a)}
+    <div style="flex:1;min-width:0"><div class="rname" style="font-size:16px">${esc(a.nm)}</div><div class="rpub">running in Turing workspace &#183; ${a.kingdom?'in-Kingdom dedicated':'HUMAIN-hosted'}</div></div></div>
+   <div class="chat" id="chat">
+    <div class="msg ag">Marhaba! I am ${esc(a.nm)}. ${s.firstRun?'':'This is your first run, try me with a real task.'}</div>
+    ${(s.msgs||[]).map((m,i)=>`<div class="msg ${m.who}">${m.tx}${m.who==='ag'?`<div style="margin-top:7px;display:flex;gap:7px"><button class="fb ${m.fb==='up'?'on':''}" data-mfb="up:${i}">&#128077;</button><button class="fb ${m.fb==='down'?'on':''}" data-mfb="down:${i}">&#128078;</button></div>`:''}</div>`).join('')}
+   </div>
+   <div style="display:flex;gap:9px;margin-top:12px"><input class="fin" id="chatin" aria-label="Message the agent" placeholder="Ask the agent to do something..."/><button class="btn pri" data-send="1">Run</button></div>
+  </div>
+  <div>
+   <div class="sec" style="margin-top:0"><div class="sech"><span class="tag">Session</span></div>
+    <div class="kv"><span>Agent</span><b>${esc(a.nm)}</b></div>
+    <div class="kv"><span>Origin</span><b>${a.origin==='internal'?'Internal':'External'}</b></div>
+    <div class="kv"><span>Runtime</span><b>${a.kingdom?'In-Kingdom dedicated':'HUMAIN-hosted (KSA)'}</b></div>
+    <div class="kv"><span>Certification</span><b>${a.cert?'Guardian: ready &#183; 0 critical':'attested &#183; not audited'}</b></div>
+    <div class="kv"><span>First task</span><b>${s.firstRun?'<span style="color:var(--acc)">recorded</span>':'pending'}</b></div></div>
+   <div class="sec"><div class="sech"><span class="tag">Share this agent</span></div>
+    <div class="note" style="word-break:break-all;margin:0 0 10px">${shareUrl(a.id)}</div>
+    <button class="btn pri" style="width:100%" data-share="${a.id}">Copy share link</button>
+    <p class="note">Anyone with the link opens this agent in its own web container window.</p></div>
+   ${standalone?'':`<div class="sec"><button class="btn" style="width:100%" data-eval="${a.id}">View evaluation evidence</button><button class="btn gh" style="width:100%;margin-top:9px" data-go="ask">New request</button></div>`}
+  </div></div>`;
+}
+
+/* ================= render ================= */
+let prev='ask';
+function go(s){if(s!=='evidence'&&s!=='run')prev=s;state.screen=s;render();}
+function render(){
+ const app=$('#app');
+ if(STANDALONE){
+  $('#topright').innerHTML=badge('acc','Live')+'<button class="btn sm" data-share="'+STANDALONE+'">Share link</button>';
+  app.innerHTML=scrRun(true);const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;return;
+ }
+ app.innerHTML={ask:scrAsk,results:scrResults,browse:scrBrowse,evidence:scrEvidence,run:()=>scrRun(false)}[state.screen]();
+ const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;
+ window.scrollTo(0,0);
+}
+
+/* ================= actions ================= */
+function ask(q){
+ const v=(q!==undefined?q:(($('#q')||{}).value||'')).trim();
+ if(!v){toast('Describe what you need done');const i=$('#q');if(i)i.focus();return;}
+ state.q=v;go('results');
+}
+function launch(id){
+ const w=window.open(shareUrl(id),'agent_'+id,'width=620,height=860');
+ if(!w){toast('Popup blocked. Allow popups to launch the agent window.');return;}
+ toast('Launched '+A(id).nm+' in its own window');
+}
+document.addEventListener('click',e=>{
+ const t=s=>e.target.closest?e.target.closest(s):null;let n;
+ if(n=t('[data-copy]')){if(navigator.clipboard)navigator.clipboard.writeText(n.getAttribute('data-copy'));const o=n.textContent;n.textContent='copied';setTimeout(()=>n.textContent=o,1100);return;}
+ if(n=t('[data-intent]')){ask(n.getAttribute('data-intent'));return;}
+ if(n=t('[data-ask]')){ask();return;}
+ if(n=t('[data-launch]')){launch(n.getAttribute('data-launch'));return;}
+ if(n=t('[data-share]')){const u=shareUrl(n.getAttribute('data-share'));if(navigator.clipboard)navigator.clipboard.writeText(u);toast('Share link copied. Opens the agent in its own window.');return;}
+ if(n=t('[data-eval]')){state.agentId=n.getAttribute('data-eval');go('evidence');return;}
+ if(n=t('[data-back]')){state.screen=prev;render();return;}
+ if(n=t('[data-go]')){go(n.getAttribute('data-go'));return;}
+ if(n=t('[data-send]')){send();return;}
+ if(n=t('[data-mfb]')){const p=n.getAttribute('data-mfb').split(':'),s=state.sessions[state.agentId];
+  if(s&&s.msgs[+p[1]]){s.msgs[+p[1]].fb=(s.msgs[+p[1]].fb===p[0]?null:p[0]);render();toast(p[0]==='up'?'Thanks, counted toward this agent standing':'Noted, flagged for the publisher');}return;}
+});
+document.addEventListener('keydown',e=>{
+ if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();const i=$('#q');if(i){i.focus();i.select();}else go('ask');return;}
+ if(e.key==='Enter'&&e.target.id==='q'){e.preventDefault();ask();return;}
+ if(e.key==='Enter'&&e.target.id==='chatin')send();
+ if(e.key==='Escape'&&(state.screen==='evidence'||state.screen==='run')&&!STANDALONE){state.screen=prev;render();}
+});
+function send(){
+ const i=$('#chatin');if(!i||!i.value.trim())return;
+ const id=STANDALONE||state.agentId;
+ if(!state.sessions[id])state.sessions[id]={msgs:[],firstRun:false};
+ const s=state.sessions[id],a=A(id);
+ s.msgs.push({who:'me',tx:esc(i.value.trim())});render();
+ const f=$('#chatin');if(f)f.focus();
+ setTimeout(()=>{s.msgs.push({who:'ag',tx:reply(a),fb:null});s.firstRun=true;render();const f2=$('#chatin');if(f2)f2.focus();},700);
+}
+function reply(a){
+ const R={invoiceapp:'Orchestrator: routed your invoice to Extraction, parsed 12 line items, Validation flagged 1 mismatch against the PO, Posting held it for your review. 11 posted, 1 pending your call.',
+  covey:'Coach Orchestrator: Goal Planner drafted your Q3 leadership goals, Habit Tracker scheduled weekly check-ins, and I prepared your first session brief.',
+  translate:'Done. Translated your document to English in legal register, 4 pages. Draft saved to your workspace for review.',
+  meeting:'Scheduled your steering review for Sunday 10:00, circulated the brief to 6 attendees, and I will chase confirmations tomorrow.',
+  citizen:'Found the applicable benefit: housing support, eligibility confirmed. Drafted the citizen reply in Arabic for your review.',
+  research:'Gathered 9 sources, synthesized the key findings, and drafted a cited brief in your workspace.',
+  invoice:'Sent bilingual reminders on 14 overdue invoices, 3 promised payment this week, and I will reconcile automatically when they land.',
+  contract:'Summarized the agreement and red-flagged 2 clauses against your playbook: unlimited liability and an auto-renew window.',
+  procure:'Drafted the RFQ, compared 4 supplier quotes, and flagged the Etimad deadline 6 days out.',
+  triage:'Classified 38 inbound tickets, routed 31 automatically, and escalated 7 that breached SLA thresholds.',
+  trip:'Riyadh to Jeddah, Tuesday to Thursday: flights held within policy, hotel at corporate rate, per-diem calculated.',
+  hr:'Started onboarding: contract issued, GOSI registration filed, laptop requested, and a buddy assigned for week one.'};
+ return R[a.id]||'Task completed. The draft result is in your workspace for review. I never send anything externally without your approval.';
+}
+window.__mk={state,go,render,A,search,STANDALONE};
+if(STANDALONE){state.agentId=STANDALONE;state.sessions[STANDALONE]={msgs:[],firstRun:false};state.screen='run';}
+render();
+if(!STANDALONE){const i=$('#q');if(i)i.focus();}
+</script>
+</body>
+</html>
