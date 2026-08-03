@@ -210,11 +210,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
 @keyframes spinslow{to{transform:rotate(405deg)}}
 .mark .core{font-size:26px;color:var(--tl);text-shadow:0 0 26px var(--tl-glow)}
 #s0 h1{font-size:clamp(38px,5.4vw,76px)}
-.opener-sub{margin:22px auto 0;color:var(--ink-dim);font-size:clamp(14px,1.15vw,17.5px);max-width:46ch;line-height:1.6}
-.opener-meta{margin-top:42px;font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;
-  color:var(--ink-faint);text-transform:uppercase;display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap}
-.opener-meta span{display:flex;align-items:center;gap:8px}
-.opener-meta em{font-style:normal;color:var(--tl)}
 .begin{margin-top:40px}
 .reveal{opacity:0;transform:translateY(12px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 .reveal.on{opacity:1;transform:none}
@@ -558,15 +553,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
 .bn .bnv small{font-size:.4em;color:var(--ink-dim)}
 .bn .bnk{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--ink-faint);margin-top:11px}
-.closer{margin:44px auto 0;font-family:var(--serif);font-size:clamp(19px,1.85vw,27px);
-  line-height:1.5;max-width:38ch}
-.closer .cl{display:block;opacity:0;transform:translateY(9px);
-  transition:opacity .6s var(--ease),transform .6s var(--ease)}
-.closer .cl.on{opacity:1;transform:none}
-.closer b{font-weight:400;font-style:italic;color:var(--tl-hi)}
-.closer b.gd{color:var(--gd-hi)}
-.closer .dim{color:var(--ink-dim);font-family:var(--sans);font-size:.58em;
-  line-height:1.6;margin-top:16px;font-style:normal}
 .finale-actions{margin-top:44px;display:flex;gap:12px;justify-content:center}
 
 /* ═══════════ responsive / a11y ═══════════ */
@@ -585,7 +571,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
 /* short stage screens (720p projectors): drop the garnish, keep the substance */
 @media (max-height:820px){
   .shelf{display:none}
-  #s4 .sub,#s2 .sub,#s7 .sub{display:none}
   .mktcard{margin-top:8px}
   .sub{margin-top:11px}
   .mkt-head{padding:16px 24px}
@@ -601,11 +586,8 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   .sactions{margin-top:14px}
   .evalcell .ev{font-size:26px}
   .evx{margin-top:5px}
-  .opener-meta{margin-top:28px}
   .begin{margin-top:26px}
   .bignums{margin-top:26px}
-  .closer{margin-top:24px;font-size:19px}
-  .closer .dim{margin-top:12px}
   #s8 .sub{display:none}
   .finale-actions{margin-top:24px}
   .mark{width:76px;height:76px;margin-bottom:24px}
@@ -670,11 +652,7 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="mark reveal" data-d="0"><span class="ring"></span><span class="ring"></span><span class="core">◆</span></div>
     <h1 class="reveal" data-d="1">From one sentence<br>to a <em>sovereign agent</em>.</h1>
-    <p class="opener-sub reveal" data-d="2">You describe the agent. HUMAIN ONE scopes it, builds it, certifies it and puts it to work — inside the Kingdom.</p>
-    <div class="opener-meta reveal" data-d="3">
-      <span><em>◆</em> Agent Lifecycle</span><span>·</span><span>Submit → Live → Marketplace</span><span>·</span><span>LEAP 2026</span>
-    </div>
-    <div class="begin reveal" data-d="4"><button class="btn btn-primary" id="beginBtn">Begin demo <span>→</span></button></div>
+    <div class="begin reveal" data-d="2"><button class="btn btn-primary" id="beginBtn">Begin demo <span>→</span></button></div>
   </div>
 </section>
 
@@ -683,15 +661,9 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="kicker">Part one · The builder <span class="ar">المطوّر</span></div>
     <h1>What should your<br><em>agent</em> do?</h1>
-    <p class="sub" style="margin-inline:auto;text-align:center">One sentence is the entire input. Everything after this belongs to the platform.</p>
     <div class="promptbox" id="promptbox">
       <input id="promptInput" type="text" placeholder="Describe the agent you want to build…" autocomplete="off" aria-label="Describe your agent">
       <button class="sendbtn" id="promptSend" aria-label="Create agent">↑</button>
-    </div>
-    <div class="chips">
-      <div class="chip lead" data-fill="Build Mia — an agent that automates enterprise procurement">Mia — procurement agent</div>
-      <div class="chip" data-fill="Build an HR onboarding agent for new employees across the Kingdom">HR onboarding agent</div>
-      <div class="chip" data-fill="Build a citizen-services agent that handles government service requests">Citizen services agent</div>
     </div>
   </div>
 </section>
@@ -701,7 +673,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="kicker">Step 01 · Scope <span class="ar">النطاق</span></div>
     <h1 id="scopeTitle">Scoping your agent<span class="cursor"></span></h1>
-    <p class="sub">Read out of your one sentence. Nothing else was specified, and nothing else will be.</p>
 
     <div class="card scopecard" id="scopecard">
       <div class="chead">
@@ -739,7 +710,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
     <div class="sactions" id="scopeActions">
       <button class="btn btn-primary" id="approveBtn">Approve &amp; build <span>→</span></button>
       <button class="btn btn-ghost" id="editBtn">Adjust scope</button>
-      <div class="fine">This is the only decision you make.</div>
     </div>
   </div>
 </section>
@@ -751,12 +721,10 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
       <div>
         <div class="kicker">Step 02 · Autonomous build <span class="ar">البناء</span></div>
         <h1>HUMAIN ONE is building <em>Mia</em></h1>
-        <p class="sub">Scope approved. Everything from here happens on its own.</p>
       </div>
       <div class="clock">
         <div class="cv" id="clock">0.0s</div>
         <div class="ck">Elapsed</div>
-        <div class="ck cost">no tickets · no config · no handoffs</div>
       </div>
     </div>
     <div class="buildwrap" id="buildwrap"></div>
@@ -774,7 +742,7 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
         <div class="mf-cell"><div class="mk">Residency</div><div class="mv">KSA-East · sovereign</div></div>
       </div>
       <div class="mf-foot">
-        <div class="fine"><b>Mia is live.</b> Registered, governed and serving traffic on sovereign infrastructure.</div>
+        <div class="fine"><b>Mia is live.</b></div>
         <button class="btn btn-primary" id="tryBtn">Try your agent <span>→</span></button>
       </div>
     </div>
@@ -786,7 +754,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="kicker">Step 03 · Test it live <span class="ar">الاختبار</span></div>
     <h1>Put <em>Mia</em> to work</h1>
-    <p class="sub">Thirty-seven seconds old, and already answering against real systems.</p>
     <div class="card chatframe">
       <div class="chat-top">
         <div class="avatar">M</div>
@@ -804,7 +771,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
       </div>
     </div>
     <div class="publish-cta" id="publishCta">
-      <div class="note">Mia works. Now put her in front of every enterprise in the Kingdom.</div>
       <button class="btn btn-primary" id="publishBtn">Publish to Marketplace <span>→</span></button>
     </div>
   </div>
@@ -815,13 +781,11 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="kicker">Step 04 · Certification <span class="ar">الاعتماد</span></div>
     <h1>HUMAIN <em>Guardian</em> evaluates the agent</h1>
-    <p class="sub">You asked to publish. Nothing reaches a buyer until the platform has independently proved it works.</p>
     <div class="pubwrap" id="pubwrap"></div>
     <div class="sealwrap" id="sealwrap">
       <div class="seal"><div class="d">◆</div><div class="t">HUMAIN</div><div class="t">CERTIFIED</div></div>
       <div class="sealtext">
         <div class="st">Mia is listed on the <em style="font-style:italic;color:var(--tl-hi)">Marketplace</em>.</div>
-        <div class="ss">Evaluation report, pricing and residency guarantees published with the listing.</div>
         <button class="btn btn-primary" id="toMarketBtn">See it as a buyer <span>→</span></button>
       </div>
     </div>
@@ -833,7 +797,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="kicker" style="justify-content:center">Part two · The buyer <span class="ar">المشتري</span></div>
     <h1>The agent <em>changes hands</em>.</h1>
-    <p class="sub" style="margin-inline:auto;text-align:center">Rashid published Mia and moved on. He never meets the company that ends up running her.</p>
     <div class="handoff">
       <div class="hp dev" id="hpDev">
         <div class="hav">RC</div>
@@ -861,7 +824,6 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
   <div class="inner">
     <div class="kicker">Step 05 · Acquire <span class="ar">السوق</span></div>
     <h1>Sara needs exactly this <span class="gd">agent</span></h1>
-    <p class="sub">She never met Rashid, never saw his code, and never had to trust him — the evaluation does that.</p>
     <div class="shelf" id="shelf">
       <div class="stile"><div class="sn">Noor</div><div class="sd">HR ONBOARDING</div></div>
       <div class="stile"><div class="sn">Sanad</div><div class="sd">CITIZEN SERVICES</div></div>
@@ -896,7 +858,7 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
           <div class="bar"><i data-w="93%"></i></div><div class="evx">category avg <b>SAR 0.39</b></div></div>
       </div>
       <div class="mkt-foot">
-        <div class="fine">Runs inside <b style="color:var(--ink-dim);font-weight:500">your own</b> sovereign workspace.<br>Your data never reaches the publisher.</div>
+        <div class="fine">Runs in your own sovereign workspace.</div>
         <button class="btn btn-gold" id="acquireBtn">Provision to my workspace <span>→</span></button>
       </div>
     </div>
@@ -916,13 +878,7 @@ h1 .gd{font-style:italic;color:var(--gd-hi)}
       <div class="bn"><div class="bnv">0</div><div class="bnk">Lines of config</div></div>
       <div class="bn"><div class="bnv">2</div><div class="bnk">Sovereign workspaces</div></div>
     </div>
-    <!-- the ribbon below already shows the arc; say the thing it cannot -->
-    <p class="closer" id="closer">
-      <span class="cl"><b>Rashid</b> wrote one sentence.</span>
-      <span class="cl"><b class="gd">Sara</b> is already using what it became.</span>
-      <span class="cl dim">Neither of them touched infrastructure, and neither had to trust the other.</span>
-    </p>
-    <p class="sub" style="margin:30px auto 0;text-align:center">Built, evaluated, distributed and run inside the Kingdom.</p>
+    <p class="sub" style="margin:34px auto 0;text-align:center">Built, evaluated, distributed and run inside the Kingdom.</p>
     <div class="finale-actions">
       <button class="btn btn-ghost" id="replayBtn">↺ Replay demo</button>
       <button class="btn btn-primary" id="againBtn">Build another agent <span>→</span></button>
@@ -1050,7 +1006,7 @@ function paintCtx(){
   $('#ctxsep').style.opacity = $('#ctxOrigin').style.opacity = showOrigin ? '' : '0';
   $('#ctxOrigin').innerHTML = buyer
     ? '<span class="dia">◆</span>Mia · HUMAIN Certified · <b>listed 4 minutes ago</b>'
-    : `<span class="dia">◆</span>built from one sentence: <b>“${originPrompt}”</b>`;
+    : `<span class="dia">◆</span><b>“${originPrompt}”</b>`;
 }
 
 /* ── scene switch ── */
@@ -1081,12 +1037,13 @@ STARTERS[0] = async token => {
 $('#beginBtn').onclick = () => go(1);
 
 /* ══════════ S1 · PROMPT ══════════ */
+const DEMO_PROMPT = 'Build Mia — an agent that automates enterprise procurement';
 const promptInput = $('#promptInput');
 STARTERS[1] = token => {
   promptInput.value = '';
   $('#promptbox').classList.remove('lit');
   setTimeout(() => { if(alive(token)) promptInput.focus({preventScroll:true}); }, 500);
-  if(auto) setTimeout(() => { if(alive(token) && auto) autotype($('#s1 .chip.lead').dataset.fill, token); }, 1300);
+  if(auto) setTimeout(() => { if(alive(token) && auto) autotype(DEMO_PROMPT, token); }, 1300);
 };
 async function autotype(text, token){
   promptInput.value = '';
@@ -1104,7 +1061,6 @@ async function autotype(text, token){
   originPrompt = text;
   if(alive(token)) go(2);
 }
-$$('#s1 .chip').forEach(c => c.onclick = () => autotype(c.dataset.fill, run));
 promptInput.addEventListener('input', () =>
   $('#promptbox').classList.toggle('lit', promptInput.value.length > 0));
 const submitPrompt = () => {
@@ -1518,17 +1474,12 @@ $('#acquireBtn').onclick = async function(){
 
 /* ══════════ S8 · FINALE ══════════ */
 STARTERS[8] = async token => {
-  const nums = $$('#bignums .bn'), lines = $$('#closer .cl');
-  [...nums, ...lines].forEach(b => b.classList.remove('on'));
+  const nums = $$('#bignums .bn');
+  nums.forEach(b => b.classList.remove('on'));
   await wait(380);
   for(const n of nums){
     if(!alive(token)) return;
     n.classList.add('on'); await wait(150);
-  }
-  await wait(320);
-  for(const l of lines){
-    if(!alive(token)) return;
-    l.classList.add('on'); await wait(560);
   }
   if(auto){ await wait(6500); if(alive(token) && auto) fullReset(); }
 };
