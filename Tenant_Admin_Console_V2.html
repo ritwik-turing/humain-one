@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUMAIN ALM — Tenant Console</title>
+<style>
+  :root{
+    --ink:#16201C; --muted:#697079; --muted2:#959BA4;
+    --line:#E7EAEE; --line2:#D7DCE2;
+    --bg:#F5F7F8; --card:#FFFFFF;
+    --green:#0E9B76; --green-dark:#0B6F54;
+    --tint:#E7F5EE; --tintline:#BFE3D3;
+    --amber:#B45309; --amber-tint:#FEF3E2; --amber-line:#F5D9AE;
+    --red:#B3261E; --red-tint:#FCEEED; --red-line:#F1C7C4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  a{color:var(--green-dark);text-decoration:none}
+
+  /* header */
+  .top{background:var(--card);border-bottom:1px solid var(--line);padding:0 28px;height:60px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10}
+  .brand{font-weight:700;font-size:16px;letter-spacing:.2px}
+  .brand span{color:var(--green)}
+  .divider{width:1px;height:22px;background:var(--line2)}
+  .console-tag{font-size:13px;color:var(--muted);font-weight:600}
+  .spacer{flex:1}
+  .tenant-badge{display:flex;align-items:center;gap:8px;background:var(--tint);border:1px solid var(--tintline);border-radius:20px;padding:6px 14px;font-size:12.5px;color:var(--green-dark);font-weight:600}
+  .tenant-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .role-pill{font-size:12px;color:var(--muted);border:1px solid var(--line2);border-radius:20px;padding:6px 12px}
+
+  /* layout */
+  .wrap{display:flex;min-height:calc(100vh - 60px)}
+  nav{width:224px;background:var(--card);border-right:1px solid var(--line);padding:20px 12px;flex-shrink:0}
+  .navlabel{font-size:10.5px;letter-spacing:1.2px;color:var(--muted2);font-weight:700;padding:8px 12px 6px}
+  .navitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500;margin-bottom:2px}
+  .navitem:hover{background:var(--bg)}
+  .navitem.active{background:var(--tint);color:var(--green-dark);font-weight:600}
+  .navitem .badge{margin-left:auto;background:var(--green);color:#fff;font-size:10.5px;font-weight:700;border-radius:10px;padding:1px 7px}
+  .navitem .soon{margin-left:auto;font-size:9.5px;color:var(--muted2);border:1px solid var(--line2);border-radius:8px;padding:1px 6px;letter-spacing:.4px}
+  main{flex:1;padding:26px 32px;max-width:1120px}
+
+  /* section switching */
+  section{display:none}
+  section.visible{display:block}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px}
+  .sub{color:var(--muted);margin-bottom:22px;font-size:13.5px}
+
+  /* cards + stats */
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .stat .k{font-size:26px;font-weight:700;letter-spacing:-.5px}
+  .stat .k small{font-size:13px;color:var(--muted);font-weight:500}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:3px}
+  .stat .warn{color:var(--amber);font-weight:600;font-size:11.5px;margin-top:5px}
+  .stat .ok{color:var(--green-dark);font-weight:600;font-size:11.5px;margin-top:5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;overflow:hidden}
+  .cardhead{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cardhead h2{font-size:14.5px;font-weight:700}
+  .cardhead .count{background:var(--tint);color:var(--green-dark);font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px}
+  .cardhead .hint{margin-left:auto;font-size:12px;color:var(--muted2)}
+
+  /* attention list */
+  .attn{padding:0}
+  .attn-item{padding:14px 20px;border-bottom:1px solid var(--line);cursor:pointer}
+  .attn-item:last-child{border-bottom:none}
+  .attn-item:hover{background:var(--bg)}
+  .attn-line{display:flex;align-items:center;gap:12px}
+  .attn-ico{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0}
+  .attn-name{font-weight:600}
+  .attn-why{color:var(--muted);font-size:13px}
+  .attn-chev{margin-left:auto;color:var(--muted2);font-size:12px;transition:transform .15s}
+  .attn-item.open .attn-chev{transform:rotate(90deg)}
+  .attn-detail{display:none;margin-top:12px;background:var(--amber-tint);border:1px solid var(--amber-line);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.55}
+  .attn-item.open .attn-detail{display:block}
+  .attn-detail b{display:block;margin-bottom:4px}
+  .attn-detail .path{margin-top:8px;color:var(--green-dark);font-weight:600;font-size:12.5px}
+
+  /* approvals */
+  .req{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:flex-start;transition:opacity .35s, transform .35s}
+  .req:last-child{border-bottom:none}
+  .req.done{opacity:0;transform:translateX(24px)}
+  .req .avatar{width:34px;height:34px;border-radius:50%;background:var(--tint);color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;border:1px solid var(--tintline)}
+  .req .body{flex:1}
+  .req .who{font-weight:600}
+  .req .what{color:var(--muted);font-size:13px;margin-top:2px;line-height:1.5}
+  .req .meta{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .chip{font-size:11px;font-weight:600;border-radius:12px;padding:2.5px 9px;border:1px solid var(--line2);color:var(--muted)}
+  .chip.type{background:var(--tint);border-color:var(--tintline);color:var(--green-dark)}
+  .chip.age-warn{background:var(--amber-tint);border-color:var(--amber-line);color:var(--amber)}
+  .chip.up{background:#EEF1F3;color:var(--muted)}
+  .req .actions{display:flex;gap:8px;flex-shrink:0;padding-top:2px}
+  .btn{border:1px solid var(--line2);background:var(--card);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit}
+  .btn:hover{background:var(--bg)}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.primary:hover{background:var(--green-dark)}
+  .btn.danger{border-color:var(--red-line);color:var(--red)}
+  .btn.danger:hover{background:var(--red-tint)}
+  .btn.small{padding:5px 10px;font-size:11.5px}
+
+  /* audit feed */
+  .audit{padding:6px 20px 12px}
+  .audit-line{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;align-items:baseline}
+  .audit-line:last-child{border-bottom:none}
+  .audit-time{color:var(--muted2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .audit-line.new{animation:fadeIn .5s ease}
+  @keyframes fadeIn{from{background:var(--tint)}to{background:transparent}}
+  .audit-line .evlink{color:var(--green-dark);font-weight:600;cursor:pointer;font-size:12px;margin-left:6px}
+  .audit-line .kind{font-size:10.5px;font-weight:700;border-radius:8px;padding:1px 7px;letter-spacing:.3px}
+  .kind.ap{background:var(--tint);color:var(--green-dark)}
+  .kind.dep{background:#EEF1F3;color:var(--muted)}
+  .kind.rb{background:var(--amber-tint);color:var(--amber)}
+  .kind.ret{background:var(--red-tint);color:var(--red)}
+
+  /* agents table */
+  .filterbar{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+  .fchip{font-size:12px;font-weight:600;border:1px solid var(--line2);border-radius:16px;padding:5px 12px;cursor:pointer;color:var(--muted);background:var(--card)}
+  .fchip:hover{background:var(--bg)}
+  .fchip.on{background:var(--tint);border-color:var(--tintline);color:var(--green-dark)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{font-size:11px;letter-spacing:.6px;color:var(--muted2);font-weight:700;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr.paused td{background:var(--red-tint)}
+  .aname{font-weight:600;white-space:nowrap}
+  .aver{color:var(--muted2);font-size:11.5px;font-weight:500}
+  .lchip{font-size:11px;font-weight:600;border-radius:12px;padding:2.5px 9px;white-space:nowrap}
+  .l-pub{background:var(--tint);color:var(--green-dark)}
+  .l-prog{background:#EEF1F3;color:var(--muted)}
+  .l-attn{background:var(--amber-tint);color:var(--amber)}
+  .l-paused{background:var(--red-tint);color:var(--red)}
+  .c-cert{color:var(--green-dark);font-weight:600;font-size:12px;white-space:nowrap}
+  .c-att{color:var(--amber);font-weight:600;font-size:12px;white-space:nowrap}
+  .trust{font-weight:700;font-variant-numeric:tabular-nums}
+  .num{font-variant-numeric:tabular-nums;color:var(--muted)}
+
+  /* quotas */
+  .quota{padding:16px 20px;border-bottom:1px solid var(--line)}
+  .quota:last-child{border-bottom:none}
+  .qtop{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+  .qname{font-weight:600}
+  .qnums{margin-left:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .qnums b{color:var(--ink)}
+  .qbar{position:relative;height:10px;background:#EEF1F3;border-radius:6px;overflow:visible}
+  .qbar .alloc{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(45deg,#E2E6EA,#E2E6EA 4px,#EEF1F3 4px,#EEF1F3 8px);border-radius:6px}
+  .qbar .used{position:absolute;left:0;top:0;bottom:0;background:var(--green);border-radius:6px}
+  .qbar .ceil{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--muted2)}
+  .qlegend{display:flex;gap:16px;margin-top:8px;font-size:11.5px;color:var(--muted2)}
+  .qlegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .policy-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .policy{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .policy h3{font-size:13.5px;margin-bottom:5px}
+  .policy p{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .roadtag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--muted2);border:1px solid var(--line2);border-radius:8px;padding:1.5px 7px;margin-left:8px;vertical-align:1px}
+
+  /* erasure record */
+  .erasure{display:none;margin:0 20px 16px;background:var(--tint);border:1px solid var(--tintline);border-radius:12px;padding:18px 20px;font-size:13px;line-height:1.6}
+  .erasure.openrec{display:block;animation:fadeIn .4s ease}
+  .erasure h4{font-size:13.5px;margin-bottom:10px}
+  .erasure table{font-size:12.5px}
+  .erasure td{padding:6px 10px;border-bottom:1px dashed var(--tintline)}
+  .erasure tr:last-child td{border-bottom:none}
+  .erasure .ok-line{margin-top:12px;color:var(--green-dark);font-weight:600}
+  .prov{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  /* placeholder sections */
+  .ph{background:var(--card);border:1px dashed var(--line2);border-radius:12px;padding:28px;text-align:left;color:var(--muted)}
+  .ph h3{color:var(--ink);font-size:15px;margin-bottom:6px}
+  .ph .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;color:var(--muted2);border:1px solid var(--line2);border-radius:10px;padding:2px 9px;margin-bottom:12px}
+  .ph ul{margin:10px 0 0 18px;line-height:1.9;font-size:13px}
+
+  .foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted2);display:flex;gap:18px;flex-wrap:wrap}
+  .toast{position:fixed;bottom:26px;right:26px;background:var(--ink);color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">HUMAIN <span>ALM</span></div>
+  <div class="divider"></div>
+  <div class="console-tag">Tenant Console</div>
+  <div class="spacer"></div>
+  <div class="tenant-badge"><span class="dot"></span>Turing workspace · alnoor-tenant</div>
+  <div class="role-pill">Tenant Administrator</div>
+</header>
+
+<div class="wrap">
+<nav>
+  <div class="navlabel">OPERATE</div>
+  <div class="navitem active" data-s="overview">Overview</div>
+  <div class="navitem" data-s="approvals">Approvals <span class="badge" id="navApprovalCount">3</span></div>
+  <div class="navitem" data-s="agents">Agents</div>
+  <div class="navlabel" style="margin-top:14px">GOVERN</div>
+  <div class="navitem" data-s="members">Members <span class="soon">PHASE 3</span></div>
+  <div class="navitem" data-s="quotas">Quotas &amp; Policies</div>
+  <div class="navitem" data-s="governance">Governance &amp; Audit</div>
+  <div class="navlabel" style="margin-top:14px">RESOURCES</div>
+  <div class="navitem" data-s="data">Tenant Data <span class="soon">PHASE 3</span></div>
+  <div class="navitem" data-s="cost">Cost <span class="soon">PHASE 3</span></div>
+</nav>
+
+<main>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview" class="visible">
+  <h1>Overview</h1>
+  <div class="sub">Monday, 10 August · Everything below is scoped to alnoor-tenant. No other tenant is visible from this console.</div>
+
+  <div class="statrow">
+    <div class="stat">
+      <div class="k">12</div>
+      <div class="l">Agents in workspace</div>
+      <div class="ok">6 internal · 6 external</div>
+    </div>
+    <div class="stat">
+      <div class="k">10<small> / 12</small></div>
+      <div class="l">Certified</div>
+      <div class="warn">2 attested, audit pending</div>
+    </div>
+    <div class="stat">
+      <div class="k" id="statApprovals">3</div>
+      <div class="l">Approvals waiting on you</div>
+      <div class="warn" id="statApprovalsNote">Oldest is 3 days old</div>
+    </div>
+    <div class="stat">
+      <div class="k">2</div>
+      <div class="l">Agents need attention</div>
+      <div class="warn">Action available on both</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Needs attention</h2><span class="count">2</span><span class="hint">Click a row for the reason and the next step</span></div>
+    <div class="attn">
+      <div class="attn-item" onclick="this.classList.toggle('open')">
+        <div class="attn-line">
+          <span class="attn-ico"></span>
+          <span class="attn-name">Trip Planner</span>
+          <span class="attn-why">Evaluation run interrupted</span>
+          <span class="attn-chev">▶</span>
+        </div>
+        <div class="attn-detail">
+          <b>What happened</b>
+          The evaluation run started 14:32 lost its connection at step 3 of 5. No result was recorded, and the agent's certification state is unchanged. Nothing is shown as passed that did not pass.
+          <div class="path">Next step: the run can be resumed from step 3. The developer (Layla Aboud) has been notified; you can also resume it from the agent's lifecycle page.</div>
+        </div>
+      </div>
+      <div class="attn-item" onclick="this.classList.toggle('open')">
+        <div class="attn-line">
+          <span class="attn-ico"></span>
+          <span class="attn-name">HR Onboarder</span>
+          <span class="attn-why">Deployment paused, missing configuration</span>
+          <span class="attn-chev">▶</span>
+        </div>
+        <div class="attn-detail">
+          <b>What happened</b>
+          A new version was submitted with two declared credentials that have no stored values (HR system access, document store). The platform paused the deployment rather than start an agent that cannot work. The current version keeps running untouched.
+          <div class="path">Next step: the developer supplies the two missing values in the submit flow. No action needed from you unless it stays paused past tomorrow.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Recent activity</h2><span class="hint">The full trail lives in Governance &amp; Audit</span></div>
+    <div class="audit" id="auditFeed">
+      <div class="audit-line"><span class="audit-time">Today 11:42</span><span><b>Translation Agent</b> completed evaluation · all metrics passed · certification renewed</span></div>
+      <div class="audit-line"><span class="audit-time">Today 09:15</span><span><b>Invoice Processing App</b> version 1.4 deployed · previous version retained for rollback</span></div>
+      <div class="audit-line"><span class="audit-time">Yesterday 17:03</span><span><b>Marwan Haddad</b> approved dataset access · Arabic legal corpus v2 · now selectable in evaluation setup</span></div>
+      <div class="audit-line"><span class="audit-time">Yesterday 14:26</span><span><b>Research Assistant</b> published to workspace · listing carries evaluation record</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>HUMAIN ALM · Tenant Console</span>
+    <span>All agents run in-Kingdom</span>
+    <span>Platform ceiling and policy set by HUMAIN · view in Quotas &amp; Policies</span>
+  </div>
+</section>
+
+<!-- ============ APPROVALS ============ -->
+<section id="approvals">
+  <h1>Approvals</h1>
+  <div class="sub">Requests from your developers and your marketplace, waiting on your decision. Every decision is recorded in the audit trail.</div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Waiting on you</h2><span class="count" id="qCount">3</span><span class="hint">Approve is live in this mock · try it</span></div>
+    <div id="queue">
+
+      <div class="req" id="req1">
+        <div class="avatar">LA</div>
+        <div class="body">
+          <div class="who">Layla Aboud · Developer</div>
+          <div class="what">Requests a governed environment to build and test a new agent: <b>Procurement Assistant</b>. The platform has resolved the request against tenant policy; everything fits inside your current quota.</div>
+          <div class="meta">
+            <span class="chip type">Environment request</span>
+            <span class="chip age-warn">Waiting 3 days</span>
+            <span class="chip">Within quota</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Review</button>
+          <button class="btn primary" onclick="approve('req1','Layla Aboud','environment request for Procurement Assistant approved · provisioning started')">Approve</button>
+        </div>
+      </div>
+
+      <div class="req" id="req2">
+        <div class="avatar">OK</div>
+        <div class="body">
+          <div class="who">Omar Khalid · Developer</div>
+          <div class="what">Requests access to the marketplace dataset <b>Invoice evaluation set v3</b> for evaluating Invoice Processing App. Dataset is platform-provided and validated; approval makes it selectable for this tenant.</div>
+          <div class="meta">
+            <span class="chip type">Dataset access</span>
+            <span class="chip">Waiting 1 day</span>
+            <span class="chip">Platform-validated</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Review</button>
+          <button class="btn primary" onclick="approve('req2','Omar Khalid','dataset access approved · Invoice evaluation set v3 now selectable for this tenant')">Approve</button>
+        </div>
+      </div>
+
+      <div class="req" id="req3">
+        <div class="avatar">RA</div>
+        <div class="body">
+          <div class="who">Research Assistant · Publish request</div>
+          <div class="what">Request to offer <b>Research Assistant</b> beyond this workspace as a cross-tenant listing. Your approval is step one of two: the platform then verifies the publisher before the listing goes live.</div>
+          <div class="meta">
+            <span class="chip type">Cross-tenant publish</span>
+            <span class="chip">Waiting 4 hours</span>
+            <span class="chip up">Step 1 of 2 · platform verifies after you</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Review</button>
+          <button class="btn primary" onclick="approve('req3','You','cross-tenant publish approved · sent to platform for publisher verification')">Approve</button>
+        </div>
+      </div>
+
+      <div id="emptyQueue" style="display:none;padding:34px 20px;text-align:center;color:var(--muted)">
+        Nothing waiting on you. Decisions you make appear in the audit trail below.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Decisions today</h2><span class="hint">Every entry carries actor, time, and outcome</span></div>
+    <div class="audit" id="decisionFeed">
+      <div class="audit-line"><span class="audit-time">Yesterday 17:03</span><span><b>Marwan Haddad</b> approved dataset access · Arabic legal corpus v2</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Requests from developers arrive here · your requests to the platform (quota increases) appear in Quotas &amp; Policies</span>
+  </div>
+</section>
+
+<!-- ============ AGENTS ============ -->
+<section id="agents">
+  <h1>Agents</h1>
+  <div class="sub">The tenant's full inventory. One active published version per agent, enforced by the platform. Pause is live in this mock.</div>
+
+  <div class="card">
+    <div class="filterbar">
+      <span class="fchip on" data-f="all" onclick="filterAgents(this)">All · 12</span>
+      <span class="fchip" data-f="published" onclick="filterAgents(this)">Published · 9</span>
+      <span class="fchip" data-f="progress" onclick="filterAgents(this)">In progress · 1</span>
+      <span class="fchip" data-f="attn" onclick="filterAgents(this)">Needs attention · 2</span>
+      <span style="margin-left:auto"></span>
+      <button class="btn danger small" id="pauseAllBtn" onclick="pauseAll()">Pause all agents</button>
+    </div>
+    <table id="agentTable">
+      <thead><tr>
+        <th>AGENT</th><th>ORIGIN</th><th>LIFECYCLE</th><th>CERTIFICATION</th><th>TRUST</th><th>TASKS 30D</th><th>P95</th><th></th>
+      </tr></thead>
+      <tbody>
+        <tr data-b="published"><td><div class="aname">Translation Agent</div><div class="aver">v2.3 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">96</span></td><td class="num">14,208</td><td class="num">1.9s</td><td><button class="btn small" onclick="togglePause(this,'Translation Agent')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Invoice Processing App</div><div class="aver">v1.4 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">94</span></td><td class="num">9,612</td><td class="num">2.4s</td><td><button class="btn small" onclick="togglePause(this,'Invoice Processing App')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Research Assistant</div><div class="aver">v3.1 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">92</span></td><td class="num">7,845</td><td class="num">3.1s</td><td><button class="btn small" onclick="togglePause(this,'Research Assistant')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Meeting Manager</div><div class="aver">v1.9 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">91</span></td><td class="num">5,410</td><td class="num">1.6s</td><td><button class="btn small" onclick="togglePause(this,'Meeting Manager')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Citizen Support Agent</div><div class="aver">v2.0 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">95</span></td><td class="num">21,077</td><td class="num">2.2s</td><td><button class="btn small" onclick="togglePause(this,'Citizen Support Agent')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Arabic Contracts Reviewer</div><div class="aver">v1.2 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">93</span></td><td class="num">3,988</td><td class="num">4.0s</td><td><button class="btn small" onclick="togglePause(this,'Arabic Contracts Reviewer')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Knowledge Search</div><div class="aver">v2.7 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">90</span></td><td class="num">11,530</td><td class="num">1.4s</td><td><button class="btn small" onclick="togglePause(this,'Knowledge Search')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Data Extraction Agent</div><div class="aver">v1.6 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-att">Attested · audit pending</span></td><td><span class="trust">88</span></td><td class="num">6,204</td><td class="num">2.8s</td><td><button class="btn small" onclick="togglePause(this,'Data Extraction Agent')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Expense Auditor</div><div class="aver">v1.1 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-att">Attested · audit pending</span></td><td><span class="trust">87</span></td><td class="num">2,441</td><td class="num">3.5s</td><td><button class="btn small" onclick="togglePause(this,'Expense Auditor')">Pause</button></td></tr>
+        <tr data-b="progress"><td><div class="aname">Procurement Assistant</div><div class="aver">v0.1 building</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-prog">In progress</span></td><td><span style="color:var(--muted2);font-size:12px">Not yet evaluated</span></td><td><span style="color:var(--muted2)">·</span></td><td class="num">·</td><td class="num">·</td><td></td></tr>
+        <tr data-b="attn"><td><div class="aname">Trip Planner</div><div class="aver">v1.8 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-attn">Needs attention</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">89</span></td><td class="num">4,116</td><td class="num">2.0s</td><td><button class="btn small" onclick="togglePause(this,'Trip Planner')">Pause</button></td></tr>
+        <tr data-b="attn"><td><div class="aname">HR Onboarder</div><div class="aver">v2.1 active · v2.2 paused</div></td><td><span class="chip">External</span></td><td><span class="lchip l-attn">Needs attention</span></td><td><span class="c-cert">Certified</span></td><td><span class="trust">90</span></td><td class="num">3,377</td><td class="num">2.6s</td><td><button class="btn small" onclick="togglePause(this,'HR Onboarder')">Pause</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="foot">
+    <span>Pause stops an agent's runtime in one click and records who did it · resume restores the same version</span>
+    <span>Each row links to the agent's lifecycle page in the developer portal</span>
+  </div>
+</section>
+
+<!-- ============ MEMBERS (PHASE 3) ============ -->
+<section id="members">
+  <h1>Members</h1>
+  <div class="sub">Who is in this workspace and what they can do.</div>
+  <div class="ph"><span class="tag">BUILT IN PHASE 3</span>
+    <h3>What lands here</h3>
+    <ul><li>Member list with roles, status, last active (read-only)</li><li>Invite flow, stubbed</li></ul>
+  </div>
+</section>
+
+<!-- ============ QUOTAS & POLICIES ============ -->
+<section id="quotas">
+  <h1>Quotas &amp; Policies</h1>
+  <div class="sub">Every quota shows two numbers: the ceiling HUMAIN set for this tenant, and the allocation you manage inside it. The ceiling is not yours to move; the request path is.</div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Capacity</h2><span class="hint">Grey stripes: your allocation · dark marker: platform ceiling · request increase is live in this mock</span></div>
+
+    <div class="quota">
+      <div class="qtop"><span class="qname">Sandboxes</span><span class="qnums"><b>12</b> in use · 15 allocated · ceiling 20</span></div>
+      <div class="qbar"><div class="alloc" style="width:75%"></div><div class="used" style="width:60%"></div><div class="ceil" style="left:99%"></div></div>
+    </div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">Compute (vCPU)</span><span class="qnums"><b>46</b> in use · 64 allocated · ceiling 96</span></div>
+      <div class="qbar"><div class="alloc" style="width:66%"></div><div class="used" style="width:48%"></div><div class="ceil" style="left:99%"></div></div>
+    </div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">Storage</span><span class="qnums"><b>121 GB</b> in use · 200 GB allocated · ceiling 250 GB</span></div>
+      <div class="qbar"><div class="alloc" style="width:80%"></div><div class="used" style="width:48%"></div><div class="ceil" style="left:99%"></div></div>
+    </div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">Evaluation runs / day</span><span class="qnums"><b>38</b> today · 50 allocated · ceiling 80</span></div>
+      <div class="qbar"><div class="alloc" style="width:62%"></div><div class="used" style="width:47%"></div><div class="ceil" style="left:99%"></div></div>
+      <div class="qlegend" style="margin-top:10px">
+        <span><i style="background:var(--green)"></i>In use</span>
+        <span><i style="background:#E2E6EA"></i>Your allocation</span>
+        <span><i style="background:var(--muted2)"></i>Platform ceiling · set by HUMAIN</span>
+        <span style="margin-left:auto"><button class="btn small" onclick="requestIncrease()">Request ceiling increase</button></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>My requests to HUMAIN</h2><span class="hint">The same request pattern your developers use with you, pointed upward</span></div>
+    <div class="audit" id="upFeed">
+      <div class="audit-line"><span class="audit-time">Jul 30</span><span>Storage allocation raised 150 to 200 GB · approved by platform in 2 days</span></div>
+    </div>
+  </div>
+
+  <div class="policy-grid">
+    <div class="policy"><h3>Region</h3><p>All workloads run in-Kingdom. Residency is provided by the sovereign substrate; it is a fact of the platform, not a tenant setting.</p></div>
+    <div class="policy"><h3>Egress</h3><p>Default deny. Outbound calls are limited to the allowlist declared per agent in its manifest and approved at submission.</p></div>
+    <div class="policy"><h3>Role bindings</h3><p>Least privilege. Developers act inside their own environments; only the tenant administrator approves requests and pauses agents.</p></div>
+    <div class="policy"><h3>Rate &amp; burst limits <span class="roadtag">ROADMAP</span></h3><p>Per-agent request rate and burst ceilings, visible next to the quotas above once the platform exposes them.</p></div>
+  </div>
+
+  <div class="foot">
+    <span>Ceilings and platform policy version are set by HUMAIN · provenance in Governance &amp; Audit</span>
+  </div>
+</section>
+
+<!-- ============ GOVERNANCE & AUDIT ============ -->
+<section id="governance">
+  <h1>Governance &amp; Audit</h1>
+  <div class="sub">Every decision on this tenant, provable, with the evidence one click away. The erasure record is live in this mock.</div>
+
+  <div class="statrow" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat">
+      <div class="k">10<small> / 12</small></div>
+      <div class="l">Certified agents</div>
+      <div class="warn">2 attested, audit pending</div>
+    </div>
+    <div class="stat">
+      <div class="k">100%</div>
+      <div class="l">Admin actions with an audit entry</div>
+      <div class="ok">Actor, time, outcome on every entry</div>
+    </div>
+    <div class="stat">
+      <div class="k">1</div>
+      <div class="l">Retirement this quarter</div>
+      <div class="ok">Erasure proven · record below</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead">
+      <h2>Audit trail</h2>
+      <span class="fchip on" data-k="all" onclick="filterAudit(this)">All</span>
+      <span class="fchip" data-k="ap" onclick="filterAudit(this)">Approvals</span>
+      <span class="fchip" data-k="dep" onclick="filterAudit(this)">Deployments</span>
+      <span class="fchip" data-k="rb" onclick="filterAudit(this)">Rollbacks</span>
+      <span class="fchip" data-k="ret" onclick="filterAudit(this)">Retirements</span>
+    </div>
+    <div class="audit" id="trail">
+      <div class="audit-line" data-k="dep"><span class="audit-time">Today 09:15</span><span class="kind dep">DEPLOY</span><span><b>Invoice Processing App</b> v1.4 deployed by Omar Khalid · previous version retained</span></div>
+      <div class="audit-line" data-k="rb"><span class="audit-time">Aug 7 16:40</span><span class="kind rb">ROLLBACK</span><span><b>Knowledge Search</b> v2.7 restored over v2.8 by Layla Aboud · one atomic change: rollback deployed, v2.8 listing unpublished, v2.7 promoted · versions, listing and My Agents agree</span></div>
+      <div class="audit-line" data-k="ap"><span class="audit-time">Aug 7 11:02</span><span class="kind ap">APPROVAL</span><span><b>Marwan Haddad</b> approved dataset access · Arabic legal corpus v2</span></div>
+      <div class="audit-line" data-k="ret"><span class="audit-time">Aug 4 15:19</span><span class="kind ret">RETIREMENT</span><span><b>Legacy Ticket Triage</b> retired by you · listing removed · sandbox torn down · data erased<span class="evlink" onclick="toggleErasure()">View erasure record</span></span></div>
+      <div class="audit-line" data-k="ap"><span class="audit-time">Aug 4 15:12</span><span class="kind ap">APPROVAL</span><span><b>You</b> approved retirement of Legacy Ticket Triage · requested by Omar Khalid</span></div>
+      <div class="audit-line" data-k="dep"><span class="audit-time">Aug 3 10:44</span><span class="kind dep">DEPLOY</span><span><b>Citizen Support Agent</b> v2.0 deployed by platform pipeline after certification</span></div>
+    </div>
+
+    <div class="erasure" id="erasureRec">
+      <h4>Erasure record · Legacy Ticket Triage · retirement of Aug 4, 15:19</h4>
+      <table>
+        <tr><td style="width:200px;color:var(--muted)">Preserved before erasure</td><td>Agent record, version history, evaluation results, audit entries · confirmed saved 15:19:04</td></tr>
+        <tr><td style="color:var(--muted)">Erased, in order</td><td>Agent code and package (15:19:11) · runtime stopped and removed (15:19:26) · images and artifacts (15:19:58)</td></tr>
+        <tr><td style="color:var(--muted)">Data categories held</td><td>Ticket text (operational), no special categories declared</td></tr>
+        <tr><td style="color:var(--muted)">Triggered by</td><td>Tenant administrator (you), on Omar Khalid's request</td></tr>
+        <tr><td style="color:var(--muted)">Not erased</td><td>Nothing withheld · no legal holds applied</td></tr>
+      </table>
+      <div class="ok-line">No recoverable data remains in storage the platform controls. This record is immutable and outlives the agent.</div>
+    </div>
+  </div>
+
+  <div class="prov">
+    <div class="policy">
+      <h3>Tenant provenance</h3>
+      <p>alnoor-tenant created by the platform on 12 March 2026 · operating under platform policy version 3.2 · policy set and versioned by HUMAIN.</p>
+    </div>
+    <div class="policy">
+      <h3>Agent identity <span class="roadtag">ROADMAP</span></h3>
+      <p>Every agent runs under a platform-issued identity, matching its registration with the evaluation service. Displayed here per agent once exposed.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="audit">
+      <div class="audit-line"><span style="font-weight:600;color:var(--green-dark)">No cross-tenant visibility exists on this platform.</span><span style="color:var(--muted)">This console sees alnoor-tenant and nothing else; the same boundary applies to every tenant.</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Every admin action lands here with actor, time, and outcome · the audit survives the resources it describes</span>
+  </div>
+</section>
+
+<!-- ============ TENANT DATA (PHASE 3) ============ -->
+<section id="data">
+  <h1>Tenant Data</h1>
+  <div class="sub">Agent memory, cache, and retention, governed.</div>
+  <div class="ph"><span class="tag">BUILT IN PHASE 3</span>
+    <h3>What lands here</h3>
+    <ul>
+      <li>Agent memory, platform-managed with a structured schema · usage per agent</li>
+      <li>Retention, TTL, and a verifiable delete path per agent (the PDPL guarantee)</li>
+      <li>Cache status per agent</li>
+      <li>Residency: provided by the sovereign substrate, shown as a fact, not a setting</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ COST (PHASE 3) ============ -->
+<section id="cost">
+  <h1>Cost</h1>
+  <div class="sub">What this tenant consumes.</div>
+  <div class="ph"><span class="tag">BUILT IN PHASE 3 · PRICING MODEL UNDER DECISION</span>
+    <h3>What lands here</h3>
+    <ul><li>Spend by agent and by sandbox, current period</li><li>Pricing model (tenant-priced vs bundled) shown once decided, honestly tagged until then</li></ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // nav switching
+  document.querySelectorAll('.navitem').forEach(item=>{
+    item.addEventListener('click',()=>{
+      document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('visible'));
+      document.getElementById(item.dataset.s).classList.add('visible');
+      window.scrollTo(0,0);
+    });
+  });
+
+  // live interaction 1: approve a request
+  let pending = 3;
+  function approve(id, actor, outcome){
+    const row = document.getElementById(id);
+    row.classList.add('done');
+    setTimeout(()=>{ row.style.display='none';
+      pending--;
+      document.getElementById('qCount').textContent = pending;
+      document.getElementById('navApprovalCount').textContent = pending;
+      document.getElementById('statApprovals').textContent = pending;
+      if(pending===2){ document.getElementById('statApprovalsNote').textContent='Oldest is 1 day old'; }
+      if(pending===0){
+        document.getElementById('emptyQueue').style.display='block';
+        document.getElementById('navApprovalCount').style.display='none';
+        document.getElementById('statApprovalsNote').textContent='All clear';
+        document.getElementById('statApprovalsNote').className='ok';
+      }
+      addAudit(actor, outcome, 'ap');
+      showToast('Approved · recorded in the audit trail');
+    }, 350);
+  }
+
+  // live interaction 2: erasure record drill-in
+  function toggleErasure(){
+    const el = document.getElementById('erasureRec');
+    el.classList.toggle('openrec');
+    if(el.classList.contains('openrec')) showToast('Erasure record opened · immutable, auditor-readable');
+  }
+
+  // live interaction 3: pause / resume + pause all
+  function togglePause(btn, name){
+    const tr = btn.closest('tr');
+    const chipCell = tr.querySelector('.lchip');
+    if(tr.classList.contains('paused')){
+      tr.classList.remove('paused');
+      chipCell.className = 'lchip ' + (tr.dataset.prev || 'l-pub');
+      chipCell.textContent = tr.dataset.prevText || 'Published';
+      btn.textContent = 'Pause';
+      addAudit('You', name + ' resumed · same version restored, no redeploy', 'dep');
+      showToast(name + ' resumed');
+    } else {
+      tr.dataset.prev = chipCell.className.replace('lchip ','');
+      tr.dataset.prevText = chipCell.textContent;
+      tr.classList.add('paused');
+      chipCell.className = 'lchip l-paused';
+      chipCell.textContent = 'Paused by you';
+      btn.textContent = 'Resume';
+      addAudit('You', name + ' paused · runtime stopped, version and data untouched', 'dep');
+      showToast(name + ' paused · recorded in the audit trail');
+    }
+  }
+  function pauseAll(){
+    const btn = document.getElementById('pauseAllBtn');
+    if(btn.dataset.armed !== '1'){
+      btn.dataset.armed = '1';
+      btn.textContent = 'Click again to confirm · pauses all 11 running agents';
+      setTimeout(()=>{ btn.dataset.armed=''; btn.textContent='Pause all agents'; }, 4000);
+      return;
+    }
+    btn.dataset.armed='';
+    btn.textContent='Pause all agents';
+    document.querySelectorAll('#agentTable tbody tr').forEach(tr=>{
+      const b = tr.querySelector('td:last-child .btn');
+      if(b && !tr.classList.contains('paused')){
+        const chipCell = tr.querySelector('.lchip');
+        tr.dataset.prev = chipCell.className.replace('lchip ','');
+        tr.dataset.prevText = chipCell.textContent;
+        tr.classList.add('paused');
+        chipCell.className='lchip l-paused';
+        chipCell.textContent='Paused by you';
+        b.textContent='Resume';
+      }
+    });
+    addAudit('You', 'emergency pause · all running agents stopped in one action · versions and data untouched', 'dep');
+    showToast('All agents paused · one audit entry, one click to reverse per agent');
+  }
+
+  // agents filter
+  function filterAgents(chip){
+    document.querySelectorAll('#agents .fchip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');
+    const f = chip.dataset.f;
+    document.querySelectorAll('#agentTable tbody tr').forEach(tr=>{
+      tr.style.display = (f==='all' || tr.dataset.b===f) ? '' : 'none';
+    });
+  }
+
+  // audit filter
+  function filterAudit(chip){
+    document.querySelectorAll('#governance .fchip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');
+    const k = chip.dataset.k;
+    document.querySelectorAll('#trail .audit-line').forEach(l=>{
+      l.style.display = (k==='all' || l.dataset.k===k) ? '' : 'none';
+    });
+  }
+
+  // shared: append audit entries everywhere relevant
+  function addAudit(actor, outcome, kind){
+    const t = new Date();
+    const hh = String(t.getHours()).padStart(2,'0'), mm = String(t.getMinutes()).padStart(2,'0');
+    const mk = ()=> {
+      const line = document.createElement('div');
+      line.className='audit-line new';
+      line.dataset.k = kind;
+      const tag = kind==='ap' ? '<span class="kind ap">APPROVAL</span>' : '<span class="kind dep">ACTION</span>';
+      line.innerHTML = '<span class="audit-time">Today '+hh+':'+mm+'</span>'+tag+'<span><b>'+actor+'</b> · '+outcome+'</span>';
+      return line;
+    };
+    const trail = document.getElementById('trail');
+    trail.insertBefore(mk(), trail.firstChild);
+    const feed = document.getElementById('auditFeed');
+    feed.insertBefore(mk(), feed.firstChild);
+    if(kind==='ap'){
+      const df = document.getElementById('decisionFeed');
+      df.insertBefore(mk(), df.firstChild);
+    }
+  }
+
+  function showToast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 2600);
+  }
+</script>
+</body>
+</html>
