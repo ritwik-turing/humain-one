@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent lifecycle — master flow</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#FAFAF8}
+  body{font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+       color:#16181D;-webkit-font-smoothing:antialiased}
+  .frame{padding:22px;min-height:100vh;display:flex;align-items:flex-start;justify-content:center}
+  .board{width:100%;max-width:1460px;background:#fff;border:1px solid #E4E4DE;border-radius:8px;
+         padding:20px;overflow-x:auto}
+  svg{display:block;width:100%;min-width:1180px;height:auto}
+
+  /* type used inside the diagram */
+  .s-col{font:700 9.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;letter-spacing:.1em}
+  .s-lane{font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;letter-spacing:.06em}
+  .s-lane2{font:500 9.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+  .s-blkb{font:700 10.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+  .s-tiny{font:500 8.6px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+  .s-num{font:700 9px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+  .s-node{font:600 8.4px ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  @media print{
+    body{background:#fff}
+    .frame{padding:0;display:block}
+    .board{max-width:none;border:0;border-radius:0;padding:0;overflow:visible}
+    svg{min-width:0;width:100%}
+    @page{size:A3 landscape;margin:10mm}
+  }
+</style>
+</head>
+<body>
+<div class="frame"><div class="board">
+<svg viewBox="0 0 1400 1096" role="img" aria-labelledby="t2"><title id="t2">Detailed swimlane of the agent lifecycle across HUMAIN, tenant admin, developer, verifier and Guardian</title>
+<defs>
+ <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6270"/></marker>
+ <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0F6E63"/></marker>
+ <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8A2F2F"/></marker>
+ <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2A5FC4"/></marker>
+</defs>
+<text x="235" y="26" text-anchor="middle" class="s-col" fill="#5B6270">0 · ONBOARD</text>
+<text x="425" y="26" text-anchor="middle" class="s-col" fill="#5B6270">1 · CONFIGURE</text>
+<line x1="330" y1="36" x2="330" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="655" y="26" text-anchor="middle" class="s-col" fill="#5B6270">2 · BUILD &amp; EVALUATE</text>
+<line x1="520" y1="36" x2="520" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="905" y="26" text-anchor="middle" class="s-col" fill="#5B6270">3 · VERIFY</text>
+<line x1="790" y1="36" x2="790" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="1110" y="26" text-anchor="middle" class="s-col" fill="#5B6270">4 · CERTIFY</text>
+<line x1="1020" y1="36" x2="1020" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="1296" y="26" text-anchor="middle" class="s-col" fill="#5B6270">5 · PUBLISH &amp; OPERATE</text>
+<line x1="1200" y1="36" x2="1200" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<line x1="140" y1="36" x2="140" y2="1024" stroke="#E4E4DE"/>
+<rect x="8" y="52" width="1384" height="176" rx="6" fill="#F3EEFB"/>
+<text x="20" y="78" class="s-lane" fill="#6B3FA0">HUMAIN</text>
+<text x="20" y="92" class="s-lane2" fill="#5B6270">platform · all tenants</text>
+<rect x="8" y="236" width="1384" height="176" rx="6" fill="#F1F2F4"/>
+<text x="20" y="262" class="s-lane" fill="#4A5568">TENANT ADMIN</text>
+<text x="20" y="276" class="s-lane2" fill="#5B6270">one tenant</text>
+<rect x="8" y="420" width="1384" height="230" rx="6" fill="#EEF3FD"/>
+<text x="20" y="446" class="s-lane" fill="#2A5FC4">DEVELOPER</text>
+<text x="20" y="460" class="s-lane2" fill="#5B6270">own agents</text>
+<rect x="8" y="658" width="1384" height="230" rx="6" fill="#FBF1E9"/>
+<text x="20" y="684" class="s-lane" fill="#9A4A14">VERIFIER</text>
+<text x="20" y="698" class="s-lane2" fill="#5B6270">one tenant</text>
+<rect x="8" y="896" width="1384" height="122" rx="6" fill="#E9F4F2"/>
+<text x="20" y="922" class="s-lane" fill="#0F6E63">GUARDIAN</text>
+<text x="20" y="936" class="s-lane2" fill="#5B6270">HUMAIN · independent audit</text>
+<rect x="152" y="62" width="166" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="167" cy="76" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="167" y="79.5" text-anchor="middle" class="s-num" fill="#6B3FA0">1</text>
+<text x="181" y="79" class="s-blkb" fill="#16181D">Create the tenant</text>
+<text x="181" y="91" class="s-tiny" fill="#5B6270">Keycloak realm · in-Kingdom</text>
+<text x="181" y="100" class="s-tiny" fill="#5B6270">one cost ledger · one quota</text>
+<rect x="152" y="116" width="166" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="167" cy="130" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="167" y="133.5" text-anchor="middle" class="s-num" fill="#6B3FA0">2</text>
+<text x="181" y="133" class="s-blkb" fill="#16181D">Set platform ceilings</text>
+<text x="181" y="145" class="s-tiny" fill="#5B6270">sandboxes · compute · storage</text>
+<text x="181" y="154" class="s-tiny" fill="#5B6270">evaluation runs per day</text>
+<rect x="152" y="170" width="166" height="48" rx="5" fill="#F1F1EC" stroke="#E4E4DE"/>
+<circle cx="167" cy="184" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="167" y="187.5" text-anchor="middle" class="s-num" fill="#6B3FA0">3</text>
+<text x="181" y="187" class="s-blkb" fill="#16181D">Attach policy baseline</text>
+<text x="181" y="199" class="s-tiny" fill="#5B6270">8 checks · 50% floor</text>
+<text x="181" y="208" class="s-tiny" fill="#5B6270">Guardian rule for this tenant</text>
+<text x="310" y="218" text-anchor="end" class="s-tiny" fill="#8A2F2F">locked · inherited</text>
+<rect x="342" y="62" width="166" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="357" cy="76" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="357" y="79.5" text-anchor="middle" class="s-num" fill="#6B3FA0">4</text>
+<text x="371" y="79" class="s-blkb" fill="#16181D">Issue first admin login</text>
+<text x="371" y="91" class="s-tiny" fill="#5B6270">the only role grant the tenant</text>
+<text x="371" y="100" class="s-tiny" fill="#5B6270">does not make for itself</text>
+<rect x="342" y="246" width="166" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="357" cy="260" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="357" y="263.5" text-anchor="middle" class="s-num" fill="#4A5568">5</text>
+<text x="371" y="263" class="s-blkb" fill="#16181D">Create logins &amp; roles</text>
+<text x="371" y="275" class="s-tiny" fill="#5B6270">developer · verifier · co-admin</text>
+<text x="371" y="284" class="s-tiny" fill="#5B6270">separable; admin is a superset</text>
+<rect x="342" y="300" width="166" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="357" cy="314" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="357" y="317.5" text-anchor="middle" class="s-num" fill="#4A5568">6</text>
+<text x="371" y="317" class="s-blkb" fill="#16181D">Set the pass bar and SLA</text>
+<text x="371" y="329" class="s-tiny" fill="#5B6270">at or above the 50% floor</text>
+<text x="371" y="338" class="s-tiny" fill="#5B6270">turnaround target for decisions</text>
+<rect x="342" y="354" width="166" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="357" cy="368" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="357" y="371.5" text-anchor="middle" class="s-num" fill="#4A5568">7</text>
+<text x="371" y="371" class="s-blkb" fill="#16181D">Add checks · templates</text>
+<text x="371" y="383" class="s-tiny" fill="#5B6270">tenant checks above baseline</text>
+<text x="371" y="392" class="s-tiny" fill="#5B6270">sandbox templates to match</text>
+<rect x="532" y="430" width="246" height="48" rx="5" fill="#fff" stroke="#C6D8F6"/>
+<circle cx="547" cy="444" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="447.5" text-anchor="middle" class="s-num" fill="#2A5FC4">8</text>
+<text x="561" y="447" class="s-blkb" fill="#16181D">Author agent.yaml</text>
+<text x="561" y="459" class="s-tiny" fill="#5B6270">the manifest is the agent; a source field</text>
+<text x="561" y="468" class="s-tiny" fill="#5B6270">says where the code lives</text>
+<rect x="561" y="470" width="40" height="12" rx="3" fill="#F1F1EC"/>
+<text x="581" y="478.5" text-anchor="middle" class="s-node" fill="#6B7280">submit</text>
+<rect x="532" y="484" width="246" height="48" rx="5" fill="#FBFCFC" stroke="#C6D8F6"/>
+<circle cx="547" cy="498" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="501.5" text-anchor="middle" class="s-num" fill="#2A5FC4">9</text>
+<text x="561" y="501" class="s-blkb" fill="#16181D">Resolve and provision</text>
+<text x="561" y="513" class="s-tiny" fill="#5B6270">template match · Sovereign Runtime</text>
+<text x="561" y="522" class="s-tiny" fill="#5B6270">assembled as code</text>
+<rect x="561" y="524" width="138" height="12" rx="3" fill="#F1F1EC"/>
+<text x="630" y="532.5" text-anchor="middle" class="s-node" fill="#6B7280">lint · static-scan · build</text>
+<text x="770" y="532" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+<rect x="532" y="538" width="246" height="48" rx="5" fill="#FBFCFC" stroke="#C6D8F6"/>
+<circle cx="547" cy="552" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="555.5" text-anchor="middle" class="s-num" fill="#2A5FC4">10</text>
+<text x="561" y="555" class="s-blkb" fill="#16181D">Deploy and test in the sandbox</text>
+<text x="561" y="567" class="s-tiny" fill="#5B6270">synthetic data only — no production</text>
+<text x="561" y="576" class="s-tiny" fill="#5B6270">data at any point</text>
+<rect x="561" y="578" width="70" height="12" rx="3" fill="#F1F1EC"/>
+<text x="596" y="586.5" text-anchor="middle" class="s-node" fill="#6B7280">sandbox-eval</text>
+<text x="770" y="586" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+<rect x="532" y="592" width="246" height="48" rx="5" fill="#fff" stroke="#C6D8F6"/>
+<circle cx="547" cy="606" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="609.5" text-anchor="middle" class="s-num" fill="#2A5FC4">11</text>
+<text x="561" y="609" class="s-blkb" fill="#16181D">Run the quality evaluation</text>
+<text x="561" y="621" class="s-tiny" fill="#5B6270">scored against the tenant pass bar</text>
+<text x="561" y="630" class="s-tiny" fill="#5B6270">e.g. 86% against a bar of 80%</text>
+<rect x="561" y="632" width="70" height="12" rx="3" fill="#F1F1EC"/>
+<text x="596" y="640.5" text-anchor="middle" class="s-node" fill="#6B7280">quality-eval</text>
+<rect x="802" y="430" width="206" height="48" rx="5" fill="#fff" stroke="#C6D8F6"/>
+<circle cx="817" cy="444" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="817" y="447.5" text-anchor="middle" class="s-num" fill="#2A5FC4">12</text>
+<text x="831" y="447" class="s-blkb" fill="#16181D">Choose destination and submit</text>
+<text x="831" y="459" class="s-tiny" fill="#5B6270">internal workspace, or the public</text>
+<text x="831" y="468" class="s-tiny" fill="#5B6270">marketplace on HUMAIN ONE</text>
+<rect x="802" y="668" width="206" height="48" rx="5" fill="#FBFCFC" stroke="#EFD5BE"/>
+<circle cx="817" cy="682" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="685.5" text-anchor="middle" class="s-num" fill="#9A4A14">13</text>
+<text x="831" y="685" class="s-blkb" fill="#16181D">The record opens by itself</text>
+<text x="831" y="697" class="s-tiny" fill="#5B6270">crossing the bar puts it in the queue</text>
+<text x="831" y="706" class="s-tiny" fill="#5B6270">with no approval step in between</text>
+<rect x="831" y="708" width="70" height="12" rx="3" fill="#F1F1EC"/>
+<text x="866" y="716.5" text-anchor="middle" class="s-node" fill="#6B7280">cert_pending</text>
+<text x="1000" y="716" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+<rect x="802" y="722" width="206" height="48" rx="5" fill="#FBFCFC" stroke="#EFD5BE"/>
+<circle cx="817" cy="736" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="739.5" text-anchor="middle" class="s-num" fill="#9A4A14">14</text>
+<text x="831" y="739" class="s-blkb" fill="#16181D">Automated checks resolve</text>
+<text x="831" y="751" class="s-tiny" fill="#5B6270">Set A baseline + Set B tenant checks</text>
+<text x="831" y="760" class="s-tiny" fill="#5B6270">14 of them, the moment it opens</text>
+<text x="1000" y="770" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+<rect x="802" y="776" width="206" height="48" rx="5" fill="#fff" stroke="#EFD5BE"/>
+<circle cx="817" cy="790" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="793.5" text-anchor="middle" class="s-num" fill="#9A4A14">15</text>
+<text x="831" y="793" class="s-blkb" fill="#16181D">Safety suite and human review</text>
+<text x="831" y="805" class="s-tiny" fill="#5B6270">prompt injection · behaviour ·</text>
+<text x="831" y="814" class="s-tiny" fill="#5B6270">listing integrity</text>
+<rect x="831" y="816" width="65" height="12" rx="3" fill="#F1F1EC"/>
+<text x="863" y="824.5" text-anchor="middle" class="s-node" fill="#6B7280">safety-eval</text>
+<rect x="802" y="830" width="206" height="48" rx="5" fill="#fff" stroke="#EFD5BE"/>
+<circle cx="817" cy="844" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="847.5" text-anchor="middle" class="s-num" fill="#9A4A14">16</text>
+<text x="831" y="847" class="s-blkb" fill="#16181D">Decide — four outcomes</text>
+<text x="831" y="859" class="s-tiny" fill="#5B6270">approve · with conditions ·</text>
+<text x="831" y="868" class="s-tiny" fill="#5B6270">request changes · reject</text>
+<rect x="831" y="870" width="60" height="12" rx="3" fill="#F1F1EC"/>
+<text x="861" y="878.5" text-anchor="middle" class="s-node" fill="#6B7280">human-cert</text>
+<rect x="1032" y="668" width="156" height="48" rx="5" fill="#9A4A14" stroke="#9A4A14"/>
+<circle cx="1047" cy="682" r="8.5" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width=".9"/>
+<text x="1047" y="685.5" text-anchor="middle" class="s-num" fill="#fff">17</text>
+<text x="1061" y="685" class="s-blkb" fill="#fff">Publish internally</text>
+<text x="1061" y="697" class="s-tiny" fill="rgba(255,255,255,.85)">on approval it goes live</text>
+<text x="1061" y="706" class="s-tiny" fill="rgba(255,255,255,.85)">straight away</text>
+<rect x="1061" y="708" width="45" height="12" rx="3" fill="rgba(255,255,255,.2)"/>
+<text x="1084" y="716.5" text-anchor="middle" class="s-node" fill="#fff">publish</text>
+<rect x="1032" y="722" width="156" height="48" rx="5" fill="#9A4A14" stroke="#9A4A14"/>
+<circle cx="1047" cy="736" r="8.5" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width=".9"/>
+<text x="1047" y="739.5" text-anchor="middle" class="s-num" fill="#fff">18</text>
+<text x="1061" y="739" class="s-blkb" fill="#fff">Send to Guardian</text>
+<text x="1061" y="751" class="s-tiny" fill="rgba(255,255,255,.85)">mandatory for public</text>
+<text x="1061" y="760" class="s-tiny" fill="rgba(255,255,255,.85)">listings · HUMAIN sets this</text>
+<rect x="1032" y="906" width="156" height="48" rx="5" fill="#fff" stroke="#BFE0DA"/>
+<circle cx="1047" cy="920" r="8.5" fill="#E9F4F2" stroke="#0F6E63" stroke-width=".9"/>
+<text x="1047" y="923.5" text-anchor="middle" class="s-num" fill="#0F6E63">19</text>
+<text x="1061" y="923" class="s-blkb" fill="#16181D">Independent audit</text>
+<text x="1061" y="935" class="s-tiny" fill="#5B6270">embedded_audit.v1 · threads</text>
+<text x="1061" y="944" class="s-tiny" fill="#5B6270">re-audit keeps finding ids</text>
+<rect x="1032" y="960" width="156" height="48" rx="5" fill="#fff" stroke="#BFE0DA"/>
+<circle cx="1047" cy="974" r="8.5" fill="#E9F4F2" stroke="#0F6E63" stroke-width=".9"/>
+<text x="1047" y="977.5" text-anchor="middle" class="s-num" fill="#0F6E63">20</text>
+<text x="1061" y="977" class="s-blkb" fill="#16181D">Findings + verdict band</text>
+<text x="1061" y="989" class="s-tiny" fill="#5B6270">never a pass or fail —</text>
+<text x="1061" y="998" class="s-tiny" fill="#5B6270">evidence only, so we decide</text>
+<rect x="1212" y="430" width="168" height="48" rx="5" fill="#2A5FC4" stroke="#2A5FC4"/>
+<circle cx="1227" cy="444" r="8.5" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width=".9"/>
+<text x="1227" y="447.5" text-anchor="middle" class="s-num" fill="#fff">21</text>
+<text x="1241" y="447" class="s-blkb" fill="#fff">Release to marketplace</text>
+<text x="1241" y="459" class="s-tiny" fill="rgba(255,255,255,.85)">unlocked once certified —</text>
+<text x="1241" y="468" class="s-tiny" fill="rgba(255,255,255,.85)">both gates already cleared</text>
+<rect x="1241" y="470" width="45" height="12" rx="3" fill="rgba(255,255,255,.2)"/>
+<text x="1264" y="478.5" text-anchor="middle" class="s-node" fill="#fff">publish</text>
+<rect x="1212" y="668" width="168" height="48" rx="5" fill="#fff" stroke="#EFD5BE"/>
+<circle cx="1227" cy="682" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="1227" y="685.5" text-anchor="middle" class="s-num" fill="#9A4A14">22</text>
+<text x="1241" y="685" class="s-blkb" fill="#16181D">Monitor and re-verify</text>
+<text x="1241" y="697" class="s-tiny" fill="#5B6270">a new version = a new record</text>
+<text x="1241" y="706" class="s-tiny" fill="#5B6270">and is verified again</text>
+<rect x="1212" y="246" width="168" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="1227" cy="260" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="1227" y="263.5" text-anchor="middle" class="s-num" fill="#4A5568">23</text>
+<text x="1241" y="263" class="s-blkb" fill="#16181D">Quotas · pause · retire</text>
+<text x="1241" y="275" class="s-tiny" fill="#5B6270">erase · tenant operations</text>
+<text x="1241" y="284" class="s-tiny" fill="#5B6270">and the erasure record</text>
+<rect x="1212" y="62" width="168" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="1227" cy="76" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="1227" y="79.5" text-anchor="middle" class="s-num" fill="#6B3FA0">24</text>
+<text x="1241" y="79" class="s-blkb" fill="#16181D">Marketplace catalogue</text>
+<text x="1241" y="91" class="s-tiny" fill="#5B6270">discovery across every tenant</text>
+<path d="M235,218 V236" stroke="#6B3FA0" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="241" y="225" width="146" height="12" fill="#F3EEFB"/>
+<text x="243" y="234" class="s-tiny" fill="#6B3FA0" text-anchor="start">inherited · cannot be weakened</text>
+<path d="M1008,454 H1024 Q1038,454 1038,476 V670 Q1038,692 1054,692 H802" stroke="#2A5FC4" stroke-width="1.8" fill="none" marker-end="url(#ab)"/>
+<rect x="1040" y="564" width="174" height="12" fill="#EEF3FD"/>
+<text x="1042" y="573" class="s-tiny" fill="#2A5FC4" text-anchor="start">evidence bundle · 8 sealed artifacts</text>
+<path d="M1008,854 H1022 Q1034,854 1034,828 V706 Q1034,692 1046,692 H1032" stroke="#9A4A14" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="1036" y="811" width="91" height="12" fill="#FBF1E9"/>
+<text x="1038" y="820" class="s-tiny" fill="#9A4A14" text-anchor="start">approve · internal</text>
+<path d="M1008,854 H1022 Q1034,854 1034,874 V732 Q1034,746 1046,746 H1032" stroke="#0F6E63" stroke-width="1.8" fill="none" marker-end="url(#ag)"/>
+<rect x="1036" y="875" width="82" height="12" fill="#FBF1E9"/>
+<text x="1038" y="884" class="s-tiny" fill="#0F6E63" text-anchor="start">approve · public</text>
+<path d="M1110,770 V906" stroke="#0F6E63" stroke-width="1.8" fill="none" marker-end="url(#ag)"/>
+<rect x="1116" y="833" width="164" height="12" fill="#FBF1E9"/>
+<text x="1118" y="842" class="s-tiny" fill="#0F6E63" text-anchor="start">mandatory · not waivable by anyone</text>
+<path d="M1188,984 H1252 Q1266,984 1266,960 V492 Q1266,478 1252,478 H1330" stroke="#0F6E63" stroke-width="1.8" fill="none" marker-end="url(#ag)"/>
+<rect x="1270" y="722" width="160" height="12" fill="#EEF3FD"/>
+<text x="1272" y="731" class="s-tiny" fill="#0F6E63" text-anchor="start">certified → unlocks the developer</text>
+<path d="M1032,984 H1002 Q988,984 988,954 V888 Q988,878 974,878 H915" stroke="#8A2F2F" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#aw)"/>
+<rect x="990" y="935" width="160" height="12" fill="#FBF1E9"/>
+<text x="992" y="944" class="s-tiny" fill="#8A2F2F" text-anchor="start">guidance returns via the verifier</text>
+<path d="M865,878 V894 H655 V478" stroke="#8A2F2F" stroke-width="1.5" stroke-dasharray="5 4" fill="none" marker-end="url(#aw)"/>
+<rect x="626" y="882" width="229" height="12" fill="#FBF1E9"/>
+<text x="740" y="891" class="s-tiny" fill="#8A2F2F" text-anchor="middle">findings: failing check · evidence · re-run path</text>
+<path d="M532,508 H508 Q494,508 494,478 V402" stroke="#4A5568" stroke-width="1.3" stroke-dasharray="4 3" fill="none" marker-end="url(#a)"/>
+<rect x="390" y="457" width="197" height="12" fill="#EEF3FD"/>
+<text x="392" y="466" class="s-tiny" fill="#4A5568" text-anchor="start">no template match → request → agent parks</text>
+<rect x="8" y="1030" width="1384" height="56" rx="6" fill="#FBFCFC" stroke="#E4E4DE"/>
+<text x="20" y="1052" class="s-lane" fill="#5B6270">AGENT STATE</text>
+<text x="20" y="1066" class="s-lane2" fill="#8A8F98">every transition audited</text>
+<rect x="150" y="1046" width="164" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="232" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Draft</text>
+<rect x="530" y="1046" width="164" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="612" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Deployed</text>
+<rect x="704" y="1046" width="78" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="743" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Eval passed</text>
+<rect x="794" y="1046" width="216" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="902" y="1062" text-anchor="middle" class="s-node" fill="#16181D">cert_pending</text>
+<rect x="1022" y="1046" width="76" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="1060" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Approved</text>
+<rect x="1108" y="1046" width="82" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="1149" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Certified</text>
+<rect x="1202" y="1046" width="182" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="1293" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Published</text>
+<text x="1384" y="1082" text-anchor="end" class="s-tiny" fill="#8A2F2F">Nowhere does the developer approve their own submission.</text>
+</svg>
+</div></div>
+</body>
+</html>
