@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent lifecycle — interactive master flow</title>
+<style>
+ *{box-sizing:border-box}
+ html,body{margin:0;padding:0;background:#FAFAF8}
+ body{font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;color:#16181D;-webkit-font-smoothing:antialiased}
+ .top{padding:12px 22px;border-bottom:1px solid #E4E4DE;background:#fff;position:sticky;top:0;z-index:20}
+ .t1{display:flex;align-items:center;gap:14px}
+ .t1 b{font-size:14.5px;letter-spacing:-.01em}
+ .hint{font-size:12.5px;color:#5B6270}
+ .hint kbd{font:600 11px ui-monospace,Menlo,monospace;background:#F1F1EC;border:1px solid #E4E4DE;border-radius:4px;padding:1px 5px}
+ .spacer{flex:1}
+ .btn{border:1px solid #D8DBE0;background:#fff;border-radius:7px;padding:6px 12px;font:600 12.5px inherit;color:#16181D;cursor:pointer}
+ .btn:hover{background:#FAFAF8}
+ .btn[disabled]{opacity:.4;cursor:default}
+ .key{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:9px;font-size:11.5px;color:#5B6270;align-items:center}
+ .k{display:inline-flex;align-items:center;gap:6px}
+ .sw{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.12)}
+ .tag{display:inline-block;font:700 9px inherit;letter-spacing:.07em;text-transform:uppercase;border-radius:3px;padding:2px 6px;white-space:nowrap}
+ .tS{background:#E9F4F2;color:#0B6F54;border:1px solid #BFE0DA}
+ .tC{background:#EEF3FD;color:#2A5FC4;border:1px solid #C6D8F6}
+ .tT{background:#FBF1E9;color:#9A4A14;border:1px solid #EFD5BE}
+ .tM{background:#FBEDED;color:#8A2F2F;border:1px solid #EFD3D3}
+ .tO{background:#F3EEFB;color:#6B3FA0;border:1px solid #DDD0F0}
+
+ .frame{padding:20px;display:flex;gap:18px;align-items:flex-start}
+ .board{flex:1;min-width:0;background:#fff;border:1px solid #E4E4DE;border-radius:8px;padding:20px;overflow-x:auto}
+ svg{display:block;width:100%;min-width:1180px;height:auto}
+ .step{cursor:pointer}
+ .step:hover>rect:first-of-type,.step:focus>rect:first-of-type{stroke-width:2}
+ .step:focus{outline:none}
+ .step.sel>rect:first-of-type{stroke:#0F6E63;stroke-width:2.4}
+ .step.up>rect:first-of-type{stroke:#2A5FC4;stroke-width:1.9;stroke-dasharray:4 2}
+ .step.dn>rect:first-of-type{stroke:#0F6E63;stroke-width:1.9;stroke-dasharray:4 2}
+ .step.lp>rect:first-of-type{stroke:#8A2F2F;stroke-width:1.9;stroke-dasharray:3 3}
+ svg.picking .step:not(.sel):not(.up):not(.dn):not(.lp){opacity:.3;transition:opacity .15s}
+
+ .panel{width:404px;flex:0 0 404px;background:#fff;border:1px solid #E4E4DE;border-radius:8px;
+        position:sticky;top:104px;max-height:calc(100vh - 126px);overflow-y:auto;display:none}
+ .panel.on{display:block}
+ .ph{padding:15px 18px 12px;border-bottom:1px solid #EFEFEA;position:sticky;top:0;background:#fff;z-index:2}
+ .row1{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+ .num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 11.5px inherit;color:#fff;flex:0 0 24px}
+ .lane{font:700 9.5px inherit;letter-spacing:.1em;text-transform:uppercase}
+ .ph h2{font-size:17px;line-height:1.25;letter-spacing:-.018em;margin:0}
+ .node{display:inline-block;font:600 10px ui-monospace,Menlo,monospace;background:#F1F1EC;color:#6B7280;border-radius:4px;padding:2px 7px;margin-top:7px}
+ .close{margin-left:auto;border:0;background:none;font-size:19px;color:#8A8F98;cursor:pointer;line-height:1;padding:0 2px}
+ .pb{padding:14px 18px 18px}
+ .what{font-size:14px;line-height:1.6;color:#31353E;margin:0 0 15px}
+ .sec{margin-bottom:14px}
+ .sec>.lbl{font:700 9.5px inherit;letter-spacing:.11em;text-transform:uppercase;color:#8A8F98;margin-bottom:6px}
+ .sec ul{margin:0;padding-left:16px}
+ .sec li{font-size:13px;line-height:1.55;color:#31353E;margin:3px 0}
+ .who{border-top:1px solid #EFEFEA;padding:8px 0 0;margin-top:6px}
+ .who:first-of-type{border-top:0;padding-top:0;margin-top:0}
+ .who b{display:block;font-size:12.5px;font-weight:650}
+ .who span{font-size:12.5px;color:#5B6270;line-height:1.5}
+ .chips{display:flex;flex-wrap:wrap;gap:6px}
+ .chip{border:1px solid #D8DBE0;background:#fff;border-radius:20px;padding:3px 10px;font:600 11.5px inherit;cursor:pointer;color:#31353E}
+ .chip:hover{background:#F1F1EC}
+ .chip .n{color:#8A8F98;font-weight:700;margin-right:4px}
+ .prov{border-top:1px solid #EFEFEA;padding-top:12px;margin-top:4px}
+ .pr{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;margin:7px 0}
+ .pr .txt{font-size:12.5px;line-height:1.5;color:#31353E}
+ .pr .txt em{display:block;color:#8A8F98;font-style:normal;font-size:11.5px;margin-top:1px}
+ .fail{background:#FBEDED;border:1px solid #EFD3D3;border-radius:6px;padding:11px 13px;font-size:12.5px;line-height:1.55;color:#3A3F49}
+ .open{background:#E9F4F2;border:1px solid #BFE0DA;border-radius:6px;padding:11px 13px;font-size:12.5px;line-height:1.55;color:#3A3F49;margin-top:12px}
+ .blk{font:700 9.5px inherit;letter-spacing:.11em;text-transform:uppercase;margin-bottom:5px}
+ .nav{display:flex;gap:8px;padding:12px 18px 18px;border-top:1px solid #EFEFEA}
+ .nav .btn{flex:1;text-align:center}
+
+ .s-col{font:700 9.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;letter-spacing:.1em}
+ .s-lane{font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;letter-spacing:.06em}
+ .s-lane2{font:500 9.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+ .s-blkb{font:700 10.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+ .s-tiny{font:500 8.6px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+ .s-num{font:700 9px -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+ .s-node{font:600 8.4px ui-monospace,SFMono-Regular,Menlo,monospace}
+
+ @media (max-width:1180px){.frame{flex-direction:column}.panel{width:100%;flex:none;position:static;max-height:none}}
+ @media print{.top,.panel,.nav{display:none}body{background:#fff}.frame{padding:0;display:block}
+  .board{border:0;padding:0;overflow:visible}svg{min-width:0}@page{size:A3 landscape;margin:10mm}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="t1">
+    <b>Agent lifecycle — master flow</b>
+    <span class="hint">Click any step for how information flows, what it depends on, and which personas it affects. <kbd>&larr;</kbd> <kbd>&rarr;</kbd> move &middot; <kbd>Esc</kbd> close</span>
+    <span class="spacer"></span>
+    <button class="btn" id="closeAll">Close detail</button>
+  </div>
+  <div class="key">
+    <span class="k"><span class="sw" style="background:#F3EEFB"></span>HUMAIN</span>
+    <span class="k"><span class="sw" style="background:#F1F2F4"></span>Tenant admin</span>
+    <span class="k"><span class="sw" style="background:#EEF3FD"></span>Developer</span>
+    <span class="k"><span class="sw" style="background:#FBF1E9"></span>Verifier</span>
+    <span class="k"><span class="sw" style="background:#E9F4F2"></span>Guardian</span>
+    <span style="color:#D8DBE0">|</span>
+    <span class="k"><span class="tag tS">In a HUMAIN doc</span></span>
+    <span class="k"><span class="tag tC">Confirmed in a call</span></span>
+    <span class="k"><span class="tag tT">Turing proposal</span></span>
+    <span class="k"><span class="tag tM">Mock placeholder</span></span>
+    <span class="k"><span class="tag tO">Unresolved</span></span>
+    <span style="color:#D8DBE0">|</span>
+    <span class="k" style="color:#2A5FC4">— — prerequisite</span>
+    <span class="k" style="color:#0F6E63">— — unblocks</span>
+    <span class="k" style="color:#8A2F2F">· · return path</span>
+  </div>
+</div>
+
+<div class="frame">
+  <div class="board"><svg viewBox="0 0 1400 1096" role="img" aria-labelledby="t2"><title id="t2">Detailed swimlane of the agent lifecycle across HUMAIN, tenant admin, developer, verifier and Guardian</title>
+<defs>
+ <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6270"/></marker>
+ <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0F6E63"/></marker>
+ <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8A2F2F"/></marker>
+ <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2A5FC4"/></marker>
+</defs>
+<text x="235" y="26" text-anchor="middle" class="s-col" fill="#5B6270">0 · ONBOARD</text>
+<text x="425" y="26" text-anchor="middle" class="s-col" fill="#5B6270">1 · CONFIGURE</text>
+<line x1="330" y1="36" x2="330" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="655" y="26" text-anchor="middle" class="s-col" fill="#5B6270">2 · BUILD &amp; EVALUATE</text>
+<line x1="520" y1="36" x2="520" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="905" y="26" text-anchor="middle" class="s-col" fill="#5B6270">3 · VERIFY</text>
+<line x1="790" y1="36" x2="790" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="1110" y="26" text-anchor="middle" class="s-col" fill="#5B6270">4 · CERTIFY</text>
+<line x1="1020" y1="36" x2="1020" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<text x="1296" y="26" text-anchor="middle" class="s-col" fill="#5B6270">5 · PUBLISH &amp; OPERATE</text>
+<line x1="1200" y1="36" x2="1200" y2="1024" stroke="#E4E4DE" stroke-dasharray="3 4"/>
+<line x1="140" y1="36" x2="140" y2="1024" stroke="#E4E4DE"/>
+<rect x="8" y="52" width="1384" height="176" rx="6" fill="#F3EEFB"/>
+<text x="20" y="78" class="s-lane" fill="#6B3FA0">HUMAIN</text>
+<text x="20" y="92" class="s-lane2" fill="#5B6270">platform · all tenants</text>
+<rect x="8" y="236" width="1384" height="176" rx="6" fill="#F1F2F4"/>
+<text x="20" y="262" class="s-lane" fill="#4A5568">TENANT ADMIN</text>
+<text x="20" y="276" class="s-lane2" fill="#5B6270">one tenant</text>
+<rect x="8" y="420" width="1384" height="230" rx="6" fill="#EEF3FD"/>
+<text x="20" y="446" class="s-lane" fill="#2A5FC4">DEVELOPER</text>
+<text x="20" y="460" class="s-lane2" fill="#5B6270">own agents</text>
+<rect x="8" y="658" width="1384" height="230" rx="6" fill="#FBF1E9"/>
+<text x="20" y="684" class="s-lane" fill="#9A4A14">VERIFIER</text>
+<text x="20" y="698" class="s-lane2" fill="#5B6270">one tenant</text>
+<rect x="8" y="896" width="1384" height="122" rx="6" fill="#E9F4F2"/>
+<text x="20" y="922" class="s-lane" fill="#0F6E63">GUARDIAN</text>
+<text x="20" y="936" class="s-lane2" fill="#5B6270">HUMAIN · independent audit</text>
+<g class="step" data-step="1" tabindex="0" role="button" aria-label="Step 1"><rect x="152" y="62" width="166" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="167" cy="76" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="167" y="79.5" text-anchor="middle" class="s-num" fill="#6B3FA0">1</text>
+<text x="181" y="79" class="s-blkb" fill="#16181D">Create the tenant</text>
+<text x="181" y="91" class="s-tiny" fill="#5B6270">Keycloak realm · in-Kingdom</text>
+<text x="181" y="100" class="s-tiny" fill="#5B6270">one cost ledger · one quota</text>
+</g><g class="step" data-step="2" tabindex="0" role="button" aria-label="Step 2"><rect x="152" y="116" width="166" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="167" cy="130" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="167" y="133.5" text-anchor="middle" class="s-num" fill="#6B3FA0">2</text>
+<text x="181" y="133" class="s-blkb" fill="#16181D">Set platform ceilings</text>
+<text x="181" y="145" class="s-tiny" fill="#5B6270">sandboxes · compute · storage</text>
+<text x="181" y="154" class="s-tiny" fill="#5B6270">evaluation runs per day</text>
+</g><g class="step" data-step="3" tabindex="0" role="button" aria-label="Step 3"><rect x="152" y="170" width="166" height="48" rx="5" fill="#F1F1EC" stroke="#E4E4DE"/>
+<circle cx="167" cy="184" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="167" y="187.5" text-anchor="middle" class="s-num" fill="#6B3FA0">3</text>
+<text x="181" y="187" class="s-blkb" fill="#16181D">Attach policy baseline</text>
+<text x="181" y="199" class="s-tiny" fill="#5B6270">8 checks · 50% floor</text>
+<text x="181" y="208" class="s-tiny" fill="#5B6270">Guardian rule for this tenant</text>
+<text x="310" y="218" text-anchor="end" class="s-tiny" fill="#8A2F2F">locked · inherited</text>
+</g><g class="step" data-step="4" tabindex="0" role="button" aria-label="Step 4"><rect x="342" y="62" width="166" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="357" cy="76" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="357" y="79.5" text-anchor="middle" class="s-num" fill="#6B3FA0">4</text>
+<text x="371" y="79" class="s-blkb" fill="#16181D">Issue first admin login</text>
+<text x="371" y="91" class="s-tiny" fill="#5B6270">the only role grant the tenant</text>
+<text x="371" y="100" class="s-tiny" fill="#5B6270">does not make for itself</text>
+</g><g class="step" data-step="5" tabindex="0" role="button" aria-label="Step 5"><rect x="342" y="246" width="166" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="357" cy="260" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="357" y="263.5" text-anchor="middle" class="s-num" fill="#4A5568">5</text>
+<text x="371" y="263" class="s-blkb" fill="#16181D">Create logins &amp; roles</text>
+<text x="371" y="275" class="s-tiny" fill="#5B6270">developer · verifier · co-admin</text>
+<text x="371" y="284" class="s-tiny" fill="#5B6270">separable; admin is a superset</text>
+</g><g class="step" data-step="6" tabindex="0" role="button" aria-label="Step 6"><rect x="342" y="300" width="166" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="357" cy="314" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="357" y="317.5" text-anchor="middle" class="s-num" fill="#4A5568">6</text>
+<text x="371" y="317" class="s-blkb" fill="#16181D">Set the pass bar and SLA</text>
+<text x="371" y="329" class="s-tiny" fill="#5B6270">at or above the 50% floor</text>
+<text x="371" y="338" class="s-tiny" fill="#5B6270">turnaround target for decisions</text>
+</g><g class="step" data-step="7" tabindex="0" role="button" aria-label="Step 7"><rect x="342" y="354" width="166" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="357" cy="368" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="357" y="371.5" text-anchor="middle" class="s-num" fill="#4A5568">7</text>
+<text x="371" y="371" class="s-blkb" fill="#16181D">Add checks · templates</text>
+<text x="371" y="383" class="s-tiny" fill="#5B6270">tenant checks above baseline</text>
+<text x="371" y="392" class="s-tiny" fill="#5B6270">sandbox templates to match</text>
+</g><g class="step" data-step="8" tabindex="0" role="button" aria-label="Step 8"><rect x="532" y="430" width="246" height="48" rx="5" fill="#fff" stroke="#C6D8F6"/>
+<circle cx="547" cy="444" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="447.5" text-anchor="middle" class="s-num" fill="#2A5FC4">8</text>
+<text x="561" y="447" class="s-blkb" fill="#16181D">Author agent.yaml</text>
+<text x="561" y="459" class="s-tiny" fill="#5B6270">the manifest is the agent; a source field</text>
+<text x="561" y="468" class="s-tiny" fill="#5B6270">says where the code lives</text>
+<rect x="561" y="470" width="40" height="12" rx="3" fill="#F1F1EC"/>
+<text x="581" y="478.5" text-anchor="middle" class="s-node" fill="#6B7280">submit</text>
+</g><g class="step" data-step="9" tabindex="0" role="button" aria-label="Step 9"><rect x="532" y="484" width="246" height="48" rx="5" fill="#FBFCFC" stroke="#C6D8F6"/>
+<circle cx="547" cy="498" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="501.5" text-anchor="middle" class="s-num" fill="#2A5FC4">9</text>
+<text x="561" y="501" class="s-blkb" fill="#16181D">Resolve and provision</text>
+<text x="561" y="513" class="s-tiny" fill="#5B6270">template match · Sovereign Runtime</text>
+<text x="561" y="522" class="s-tiny" fill="#5B6270">assembled as code</text>
+<rect x="561" y="524" width="138" height="12" rx="3" fill="#F1F1EC"/>
+<text x="630" y="532.5" text-anchor="middle" class="s-node" fill="#6B7280">lint · static-scan · build</text>
+<text x="770" y="532" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+</g><g class="step" data-step="10" tabindex="0" role="button" aria-label="Step 10"><rect x="532" y="538" width="246" height="48" rx="5" fill="#FBFCFC" stroke="#C6D8F6"/>
+<circle cx="547" cy="552" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="555.5" text-anchor="middle" class="s-num" fill="#2A5FC4">10</text>
+<text x="561" y="555" class="s-blkb" fill="#16181D">Deploy and test in the sandbox</text>
+<text x="561" y="567" class="s-tiny" fill="#5B6270">synthetic data only — no production</text>
+<text x="561" y="576" class="s-tiny" fill="#5B6270">data at any point</text>
+<rect x="561" y="578" width="70" height="12" rx="3" fill="#F1F1EC"/>
+<text x="596" y="586.5" text-anchor="middle" class="s-node" fill="#6B7280">sandbox-eval</text>
+<text x="770" y="586" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+</g><g class="step" data-step="11" tabindex="0" role="button" aria-label="Step 11"><rect x="532" y="592" width="246" height="48" rx="5" fill="#fff" stroke="#C6D8F6"/>
+<circle cx="547" cy="606" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="547" y="609.5" text-anchor="middle" class="s-num" fill="#2A5FC4">11</text>
+<text x="561" y="609" class="s-blkb" fill="#16181D">Run the quality evaluation</text>
+<text x="561" y="621" class="s-tiny" fill="#5B6270">scored against the tenant pass bar</text>
+<text x="561" y="630" class="s-tiny" fill="#5B6270">e.g. 86% against a bar of 80%</text>
+<rect x="561" y="632" width="70" height="12" rx="3" fill="#F1F1EC"/>
+<text x="596" y="640.5" text-anchor="middle" class="s-node" fill="#6B7280">quality-eval</text>
+</g><g class="step" data-step="12" tabindex="0" role="button" aria-label="Step 12"><rect x="802" y="430" width="206" height="48" rx="5" fill="#fff" stroke="#C6D8F6"/>
+<circle cx="817" cy="444" r="8.5" fill="#EEF3FD" stroke="#2A5FC4" stroke-width=".9"/>
+<text x="817" y="447.5" text-anchor="middle" class="s-num" fill="#2A5FC4">12</text>
+<text x="831" y="447" class="s-blkb" fill="#16181D">Choose destination and submit</text>
+<text x="831" y="459" class="s-tiny" fill="#5B6270">internal workspace, or the public</text>
+<text x="831" y="468" class="s-tiny" fill="#5B6270">marketplace on HUMAIN ONE</text>
+</g><g class="step" data-step="13" tabindex="0" role="button" aria-label="Step 13"><rect x="802" y="668" width="206" height="48" rx="5" fill="#FBFCFC" stroke="#EFD5BE"/>
+<circle cx="817" cy="682" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="685.5" text-anchor="middle" class="s-num" fill="#9A4A14">13</text>
+<text x="831" y="685" class="s-blkb" fill="#16181D">The record opens by itself</text>
+<text x="831" y="697" class="s-tiny" fill="#5B6270">crossing the bar puts it in the queue</text>
+<text x="831" y="706" class="s-tiny" fill="#5B6270">with no approval step in between</text>
+<rect x="831" y="708" width="70" height="12" rx="3" fill="#F1F1EC"/>
+<text x="866" y="716.5" text-anchor="middle" class="s-node" fill="#6B7280">cert_pending</text>
+<text x="1000" y="716" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+</g><g class="step" data-step="14" tabindex="0" role="button" aria-label="Step 14"><rect x="802" y="722" width="206" height="48" rx="5" fill="#FBFCFC" stroke="#EFD5BE"/>
+<circle cx="817" cy="736" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="739.5" text-anchor="middle" class="s-num" fill="#9A4A14">14</text>
+<text x="831" y="739" class="s-blkb" fill="#16181D">Automated checks resolve</text>
+<text x="831" y="751" class="s-tiny" fill="#5B6270">Set A baseline + Set B tenant checks</text>
+<text x="831" y="760" class="s-tiny" fill="#5B6270">14 of them, the moment it opens</text>
+<text x="1000" y="770" text-anchor="end" class="s-tiny" fill="#8A8F98">automatic</text>
+</g><g class="step" data-step="15" tabindex="0" role="button" aria-label="Step 15"><rect x="802" y="776" width="206" height="48" rx="5" fill="#fff" stroke="#EFD5BE"/>
+<circle cx="817" cy="790" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="793.5" text-anchor="middle" class="s-num" fill="#9A4A14">15</text>
+<text x="831" y="793" class="s-blkb" fill="#16181D">Safety suite and human review</text>
+<text x="831" y="805" class="s-tiny" fill="#5B6270">prompt injection · behaviour ·</text>
+<text x="831" y="814" class="s-tiny" fill="#5B6270">listing integrity</text>
+<rect x="831" y="816" width="65" height="12" rx="3" fill="#F1F1EC"/>
+<text x="863" y="824.5" text-anchor="middle" class="s-node" fill="#6B7280">safety-eval</text>
+</g><g class="step" data-step="16" tabindex="0" role="button" aria-label="Step 16"><rect x="802" y="830" width="206" height="48" rx="5" fill="#fff" stroke="#EFD5BE"/>
+<circle cx="817" cy="844" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="817" y="847.5" text-anchor="middle" class="s-num" fill="#9A4A14">16</text>
+<text x="831" y="847" class="s-blkb" fill="#16181D">Decide — four outcomes</text>
+<text x="831" y="859" class="s-tiny" fill="#5B6270">approve · with conditions ·</text>
+<text x="831" y="868" class="s-tiny" fill="#5B6270">request changes · reject</text>
+<rect x="831" y="870" width="60" height="12" rx="3" fill="#F1F1EC"/>
+<text x="861" y="878.5" text-anchor="middle" class="s-node" fill="#6B7280">human-cert</text>
+</g><g class="step" data-step="17" tabindex="0" role="button" aria-label="Step 17"><rect x="1032" y="668" width="156" height="48" rx="5" fill="#9A4A14" stroke="#9A4A14"/>
+<circle cx="1047" cy="682" r="8.5" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width=".9"/>
+<text x="1047" y="685.5" text-anchor="middle" class="s-num" fill="#fff">17</text>
+<text x="1061" y="685" class="s-blkb" fill="#fff">Publish internally</text>
+<text x="1061" y="697" class="s-tiny" fill="rgba(255,255,255,.85)">on approval it goes live</text>
+<text x="1061" y="706" class="s-tiny" fill="rgba(255,255,255,.85)">straight away</text>
+<rect x="1061" y="708" width="45" height="12" rx="3" fill="rgba(255,255,255,.2)"/>
+<text x="1084" y="716.5" text-anchor="middle" class="s-node" fill="#fff">publish</text>
+</g><g class="step" data-step="18" tabindex="0" role="button" aria-label="Step 18"><rect x="1032" y="722" width="156" height="48" rx="5" fill="#9A4A14" stroke="#9A4A14"/>
+<circle cx="1047" cy="736" r="8.5" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width=".9"/>
+<text x="1047" y="739.5" text-anchor="middle" class="s-num" fill="#fff">18</text>
+<text x="1061" y="739" class="s-blkb" fill="#fff">Send to Guardian</text>
+<text x="1061" y="751" class="s-tiny" fill="rgba(255,255,255,.85)">mandatory for public</text>
+<text x="1061" y="760" class="s-tiny" fill="rgba(255,255,255,.85)">listings · HUMAIN sets this</text>
+</g><g class="step" data-step="19" tabindex="0" role="button" aria-label="Step 19"><rect x="1032" y="906" width="156" height="48" rx="5" fill="#fff" stroke="#BFE0DA"/>
+<circle cx="1047" cy="920" r="8.5" fill="#E9F4F2" stroke="#0F6E63" stroke-width=".9"/>
+<text x="1047" y="923.5" text-anchor="middle" class="s-num" fill="#0F6E63">19</text>
+<text x="1061" y="923" class="s-blkb" fill="#16181D">Independent audit</text>
+<text x="1061" y="935" class="s-tiny" fill="#5B6270">embedded_audit.v1 · threads</text>
+<text x="1061" y="944" class="s-tiny" fill="#5B6270">re-audit keeps finding ids</text>
+</g><g class="step" data-step="20" tabindex="0" role="button" aria-label="Step 20"><rect x="1032" y="960" width="156" height="48" rx="5" fill="#fff" stroke="#BFE0DA"/>
+<circle cx="1047" cy="974" r="8.5" fill="#E9F4F2" stroke="#0F6E63" stroke-width=".9"/>
+<text x="1047" y="977.5" text-anchor="middle" class="s-num" fill="#0F6E63">20</text>
+<text x="1061" y="977" class="s-blkb" fill="#16181D">Findings + verdict band</text>
+<text x="1061" y="989" class="s-tiny" fill="#5B6270">never a pass or fail —</text>
+<text x="1061" y="998" class="s-tiny" fill="#5B6270">evidence only, so we decide</text>
+</g><g class="step" data-step="21" tabindex="0" role="button" aria-label="Step 21"><rect x="1212" y="430" width="168" height="48" rx="5" fill="#2A5FC4" stroke="#2A5FC4"/>
+<circle cx="1227" cy="444" r="8.5" fill="rgba(255,255,255,.22)" stroke="#fff" stroke-width=".9"/>
+<text x="1227" y="447.5" text-anchor="middle" class="s-num" fill="#fff">21</text>
+<text x="1241" y="447" class="s-blkb" fill="#fff">Release to marketplace</text>
+<text x="1241" y="459" class="s-tiny" fill="rgba(255,255,255,.85)">unlocked once certified —</text>
+<text x="1241" y="468" class="s-tiny" fill="rgba(255,255,255,.85)">both gates already cleared</text>
+<rect x="1241" y="470" width="45" height="12" rx="3" fill="rgba(255,255,255,.2)"/>
+<text x="1264" y="478.5" text-anchor="middle" class="s-node" fill="#fff">publish</text>
+</g><g class="step" data-step="22" tabindex="0" role="button" aria-label="Step 22"><rect x="1212" y="668" width="168" height="48" rx="5" fill="#fff" stroke="#EFD5BE"/>
+<circle cx="1227" cy="682" r="8.5" fill="#FBF1E9" stroke="#9A4A14" stroke-width=".9"/>
+<text x="1227" y="685.5" text-anchor="middle" class="s-num" fill="#9A4A14">22</text>
+<text x="1241" y="685" class="s-blkb" fill="#16181D">Monitor and re-verify</text>
+<text x="1241" y="697" class="s-tiny" fill="#5B6270">a new version = a new record</text>
+<text x="1241" y="706" class="s-tiny" fill="#5B6270">and is verified again</text>
+</g><g class="step" data-step="23" tabindex="0" role="button" aria-label="Step 23"><rect x="1212" y="246" width="168" height="48" rx="5" fill="#fff" stroke="#D8DBE0"/>
+<circle cx="1227" cy="260" r="8.5" fill="#F1F2F4" stroke="#4A5568" stroke-width=".9"/>
+<text x="1227" y="263.5" text-anchor="middle" class="s-num" fill="#4A5568">23</text>
+<text x="1241" y="263" class="s-blkb" fill="#16181D">Quotas · pause · retire</text>
+<text x="1241" y="275" class="s-tiny" fill="#5B6270">erase · tenant operations</text>
+<text x="1241" y="284" class="s-tiny" fill="#5B6270">and the erasure record</text>
+</g><g class="step" data-step="24" tabindex="0" role="button" aria-label="Step 24"><rect x="1212" y="62" width="168" height="48" rx="5" fill="#fff" stroke="#DDD0F0"/>
+<circle cx="1227" cy="76" r="8.5" fill="#F3EEFB" stroke="#6B3FA0" stroke-width=".9"/>
+<text x="1227" y="79.5" text-anchor="middle" class="s-num" fill="#6B3FA0">24</text>
+<text x="1241" y="79" class="s-blkb" fill="#16181D">Marketplace catalogue</text>
+<text x="1241" y="91" class="s-tiny" fill="#5B6270">discovery across every tenant</text>
+</g><path d="M235,218 V236" stroke="#6B3FA0" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<rect x="241" y="225" width="146" height="12" fill="#F3EEFB"/>
+<text x="243" y="234" class="s-tiny" fill="#6B3FA0" text-anchor="start">inherited · cannot be weakened</text>
+<path d="M1008,454 H1024 Q1038,454 1038,476 V670 Q1038,692 1054,692 H802" stroke="#2A5FC4" stroke-width="1.8" fill="none" marker-end="url(#ab)"/>
+<rect x="1040" y="564" width="174" height="12" fill="#EEF3FD"/>
+<text x="1042" y="573" class="s-tiny" fill="#2A5FC4" text-anchor="start">evidence bundle · 8 sealed artifacts</text>
+<path d="M1008,854 H1022 Q1034,854 1034,828 V706 Q1034,692 1046,692 H1032" stroke="#9A4A14" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+<rect x="1036" y="811" width="91" height="12" fill="#FBF1E9"/>
+<text x="1038" y="820" class="s-tiny" fill="#9A4A14" text-anchor="start">approve · internal</text>
+<path d="M1008,854 H1022 Q1034,854 1034,874 V732 Q1034,746 1046,746 H1032" stroke="#0F6E63" stroke-width="1.8" fill="none" marker-end="url(#ag)"/>
+<rect x="1036" y="875" width="82" height="12" fill="#FBF1E9"/>
+<text x="1038" y="884" class="s-tiny" fill="#0F6E63" text-anchor="start">approve · public</text>
+<path d="M1110,770 V906" stroke="#0F6E63" stroke-width="1.8" fill="none" marker-end="url(#ag)"/>
+<rect x="1116" y="833" width="164" height="12" fill="#FBF1E9"/>
+<text x="1118" y="842" class="s-tiny" fill="#0F6E63" text-anchor="start">mandatory · not waivable by anyone</text>
+<path d="M1188,984 H1252 Q1266,984 1266,960 V492 Q1266,478 1252,478 H1330" stroke="#0F6E63" stroke-width="1.8" fill="none" marker-end="url(#ag)"/>
+<rect x="1270" y="722" width="160" height="12" fill="#EEF3FD"/>
+<text x="1272" y="731" class="s-tiny" fill="#0F6E63" text-anchor="start">certified → unlocks the developer</text>
+<path d="M1032,984 H1002 Q988,984 988,954 V888 Q988,878 974,878 H915" stroke="#8A2F2F" stroke-width="1.4" stroke-dasharray="5 4" fill="none" marker-end="url(#aw)"/>
+<rect x="990" y="935" width="160" height="12" fill="#FBF1E9"/>
+<text x="992" y="944" class="s-tiny" fill="#8A2F2F" text-anchor="start">guidance returns via the verifier</text>
+<path d="M865,878 V894 H655 V478" stroke="#8A2F2F" stroke-width="1.5" stroke-dasharray="5 4" fill="none" marker-end="url(#aw)"/>
+<rect x="626" y="882" width="229" height="12" fill="#FBF1E9"/>
+<text x="740" y="891" class="s-tiny" fill="#8A2F2F" text-anchor="middle">findings: failing check · evidence · re-run path</text>
+<path d="M532,508 H508 Q494,508 494,478 V402" stroke="#4A5568" stroke-width="1.3" stroke-dasharray="4 3" fill="none" marker-end="url(#a)"/>
+<rect x="390" y="457" width="197" height="12" fill="#EEF3FD"/>
+<text x="392" y="466" class="s-tiny" fill="#4A5568" text-anchor="start">no template match → request → agent parks</text>
+<rect x="8" y="1030" width="1384" height="56" rx="6" fill="#FBFCFC" stroke="#E4E4DE"/>
+<text x="20" y="1052" class="s-lane" fill="#5B6270">AGENT STATE</text>
+<text x="20" y="1066" class="s-lane2" fill="#8A8F98">every transition audited</text>
+<rect x="150" y="1046" width="164" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="232" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Draft</text>
+<rect x="530" y="1046" width="164" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="612" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Deployed</text>
+<rect x="704" y="1046" width="78" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="743" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Eval passed</text>
+<rect x="794" y="1046" width="216" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="902" y="1062" text-anchor="middle" class="s-node" fill="#16181D">cert_pending</text>
+<rect x="1022" y="1046" width="76" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="1060" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Approved</text>
+<rect x="1108" y="1046" width="82" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="1149" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Certified</text>
+<rect x="1202" y="1046" width="182" height="24" rx="12" fill="#fff" stroke="#D8DBE0"/>
+<text x="1293" y="1062" text-anchor="middle" class="s-blkb" fill="#16181D">Published</text>
+<text x="1384" y="1082" text-anchor="end" class="s-tiny" fill="#8A2F2F">Nowhere does the developer approve their own submission.</text>
+</svg></g></div>
+  <aside class="panel" id="panel"></aside>
+</div>
+
+<script>
+const DETAIL = {"1": {"t": "Create the tenant", "lane": "HUMAIN", "node": "", "w": "HUMAIN provisions a new enterprise tenant. One Keycloak realm, one cost ledger, one quota envelope, placement fixed in-Kingdom. Nothing else in this diagram can begin until this exists.", "i": ["Executed commercial agreement", "Tenant name and region"], "o": ["Tenant id", "Keycloak realm scoped to the tenant", "Cost ledger", "Empty quota envelope"], "s": ["Keycloak realm creation (identity layer spec v1.0)", "Substrate tenant registry"], "p": [["Tenant admin", "Does not exist yet — their login is issued at step 4"], ["Developer", "No workspace to build in until the tenant admin configures one"]], "f": "No tenant, nothing downstream starts. Not a runtime failure mode — a prerequisite.", "x": ""}, "2": {"t": "Set platform ceilings", "lane": "HUMAIN", "node": "", "w": "HUMAIN sets the maximum the tenant may ever allocate: sandboxes, compute, storage and evaluation runs per day. The tenant admin allocates inside these and can never exceed them.", "i": ["Commercial tier"], "o": ["Ceiling values on the tenant record"], "s": ["Substrate quota service, enforced at provisioning time"], "p": [["Tenant admin", "Allocates within the ceiling; raising it is a request back to HUMAIN"], ["Developer", "Hits the ceiling at provision time, not at submit time"]], "f": "A ceiling set too low parks agents at provisioning. The tenant admin raises a ceiling request; the agent resumes when granted.", "x": ""}, "3": {"t": "Attach the policy baseline", "lane": "HUMAIN", "node": "", "w": "Eight mandatory checks, the 50% pass-bar floor, and whether this tenant requires Guardian review for internal publishing. Attached at creation and inherited by the tenant as read-only.", "i": ["HUMAIN platform policy version"], "o": ["Set A baseline attached to the tenant", "50% floor", "Per-tenant Guardian rule"], "s": ["Policy service, versioned"], "p": [["Verifier", "Runs these as Set A on every submission; a Set A failure can never be waived as a condition"], ["Tenant admin", "Sees them read-only, attributed to HUMAIN; may add but never remove"], ["Developer", "These are the checks that must pass regardless of what their tenant adds"]], "f": "If the platform policy version advances, already-published agents may need re-certification. That trigger is not designed yet.", "x": "Open: does a policy version bump force re-certification of live agents?"}, "4": {"t": "Issue the first admin login", "lane": "HUMAIN", "node": "", "w": "The only role grant the tenant does not make for itself. Everything the tenant admin later configures depends on this one account existing.", "i": ["Named person at the tenant"], "o": ["Keycloak user carrying the tenant-admin role"], "s": ["Keycloak; roles arrive in realm_access.roles on the access token"], "p": [["Tenant admin", "Becomes able to act"], ["Verifier / developer", "Cannot be created until this account exists"]], "f": "Without it the tenant is provisioned but unusable.", "x": ""}, "5": {"t": "Create logins and role grants", "lane": "TENANT ADMIN", "node": "", "w": "The tenant admin creates developer, verifier and co-admin logins. The grants are separable; the admin holds every verifier action as well, and the audit records which role a person acted under.", "i": ["Names and work emails", "Role choice per person"], "o": ["Keycloak users with role grants scoped to this tenant"], "s": ["Keycloak; coarse authorization from realm roles, fine-grained in the control plane"], "p": [["Verifier", "Comes into existence here. If nobody is named, the queue has no owner"], ["Developer", "Gains the ability to build and submit, and nothing else"]], "f": "An unnamed verifier is the most likely real-world failure: submissions accumulate at cert_pending with nobody to resolve them, and in practice the role quietly reverts to the developer — which is exactly the separation this design exists to prevent.", "x": "Needed before Phase-1 launch: who is the named verifier for our own tenant?"}, "6": {"t": "Set the pass bar and SLA", "lane": "TENANT ADMIN", "node": "", "w": "The tenant quality threshold — at or above the 50% platform floor — and the turnaround target for verification decisions.", "i": ["Tenant risk appetite"], "o": ["Pass bar percentage", "SLA in business days"], "s": ["Tenant policy record; applies to new submissions only"], "p": [["Developer", "Sees the bar on the Evaluate step; crossing it is what makes a version eligible"], ["Verifier", "Queue rows age against the SLA and flag amber once past it"]], "f": "Changing the bar does not re-open closed records or un-publish live versions. Raising it mid-flight only affects the next submission.", "x": ""}, "7": {"t": "Add checks and approve templates", "lane": "TENANT ADMIN", "node": "", "w": "Tenant-specific checks layered on top of the locked baseline, plus the sandbox templates that agents are matched against during Resolve. Developers never build infrastructure — they request a template and the tenant admin publishes it.", "i": ["Sector and compliance requirements", "Template requests raised by developers"], "o": ["Set B checks, marked required or advisory", "Published templates, matchable in Resolve"], "s": ["Tenant policy record", "Template catalogue"], "p": [["Developer", "An agent that matches no template parks at Resolve until this queue is worked"], ["Verifier", "Runs Set B alongside Set A on every submission, internal or public"]], "f": "An unworked template request leaves an agent parked indefinitely. The console shows what is parked on each request for exactly this reason.", "x": "Phase 2: tenant policy and compliance documents with a RAG pre-check the verifier interprets."}, "8": {"t": "Author agent.yaml", "lane": "DEVELOPER", "node": "submit", "w": "The developer submits one thing: the manifest. The manifest is the agent — runtime, services, data, policy, and a source field saying where the code lives. There is no separate package upload.", "i": ["Agent design", "Repository and branch, or a code archive"], "o": ["agent.yaml validated against manifest schema v1", "draft_submissions row persisted before the substrate call"], "s": ["POST /v1/graphs/devflow/runs with an Idempotency-Key", "Code archive passed by reference as a short-lived signed URL, never by value"], "p": [["Verifier", "Everything they later check derives from what is declared here — egress allowlist, tools, access scope"], ["Tenant admin", "The declared runtime determines whether an approved template matches"]], "f": "Schema validation fails before anything runs. The durability boundary means a substrate timeout leaves a recoverable draft rather than a lost submission.", "x": ""}, "9": {"t": "Resolve and provision", "lane": "DEVELOPER", "node": "lint · static-scan · build", "w": "The platform matches an approved template, assembles the Sovereign Runtime as code, then lints, scans and builds the image. No infrastructure choices are asked of the developer.", "i": ["Validated manifest"], "o": ["Matched template", "Provisioned runtime blocks", "Built image with a pinned digest"], "s": ["Three DevFlow nodes running inside the substrate", "Runtime assembled from Terraform-style modules"], "p": [["Tenant admin", "Their template catalogue decides whether a match exists at all"], ["Verifier", "The scan output becomes evidence they read later"]], "f": "Two real failures: no template match, which parks the agent and raises a request to the tenant admin; and image build or pull failure, which returns the developer to the manifest.", "x": ""}, "10": {"t": "Deploy and test in the sandbox", "lane": "DEVELOPER", "node": "sandbox-eval", "w": "The agent is deployed into an isolated sandbox and exercised against synthetic data. No production data at any point. This is the developer checking behaviour, not a consumer using the service.", "i": ["Built image", "Synthetic dataset"], "o": ["Sandbox job results", "Runtime traces, redaction records, observed egress"], "s": ["Turing's Sandbox Adapter translates the manifest into a jobspec, then POST /v1/sandbox/jobs", "HMAC-signed callback on completion — the sole documented inbound exception to the one-way boundary"], "p": [["Verifier", "The traces produced here are the evidence they read: which endpoints were actually called, what was redacted"], ["Tenant admin", "Consumes sandbox quota from the tenant allocation"]], "f": "Sandbox provisioning failure, or a job that never calls back. Idempotency is keyed on the manifest hash so retries do not provision a second microVM.", "x": "Phase 2: verifier-run security probing inside the live sandbox."}, "11": {"t": "Run the quality evaluation", "lane": "DEVELOPER", "node": "quality-eval", "w": "The developer's own evaluation set is scored and compared against the tenant pass bar. This is the developer's territory — they iterate here freely, with no approvals.", "i": ["Evaluation dataset and suite version"], "o": ["Score, per-metric results, report reference", "Version-against-version comparison"], "s": ["Eval handoff to the evaluator, returning decision plus score and a report URI"], "p": [["Tenant admin", "Owns the bar this is measured against"], ["Verifier", "Reads the result but does not run it; a low score simply never reaches them"]], "f": "Below the bar the developer keeps iterating and nothing enters the queue. That is the intended behaviour, not an error.", "x": "The eval-node handoff field names are still marked PROPOSED in the v0.3.1 addendum — HUMAIN is waiting on us to confirm them."}, "12": {"t": "Choose destination and submit", "lane": "DEVELOPER", "node": "", "w": "The developer chooses the internal workspace or the public marketplace, and submits. This is a declaration of intent — the verifier still decides — but the choice determines whether Guardian is in the path at all.", "i": ["A version at or above the bar", "Listing draft: title, description, category, support contact"], "o": ["Submission carrying the target", "Evidence bundle sealed — eight artifacts, immutable from here"], "s": ["BFF write; the bundle cannot change during review"], "p": [["Verifier", "Receives exactly what the developer previewed — the sealing is what makes 'no surprises' structural"], ["Guardian", "Enters the path only if the target is public"]], "f": "A submission with an incomplete bundle is blocked at the pre-submit gates rather than reaching the queue.", "x": ""}, "13": {"t": "The record opens by itself", "lane": "VERIFIER", "node": "cert_pending", "w": "The DevFlow graph reaches human-cert and pauses. A verification record opens in the verifier's queue automatically — there is no approval step between the evaluation passing and the queue.", "i": ["Submission and sealed bundle"], "o": ["Verification record id", "Run status stays running, with current_node set to cert_pending"], "s": ["Substrate emits events; the BFF projects them into a local review queue", "The projection is rebuildable — the substrate Agent Registry stays canonical"], "p": [["Tenant admin", "Queue depth and SLA ageing become visible as workload"], ["Developer", "Sees the state change and who holds it, but has no controls"]], "f": "If the projection falls behind, the queue is stale but recoverable by replaying substrate events. The decision itself is never taken against the projection alone.", "x": ""}, "14": {"t": "Automated checks resolve", "lane": "VERIFIER", "node": "", "w": "Fourteen automated checks across Set A and Set B resolve the moment the record opens. The verifier arrives to a record that has already done its own arithmetic.", "i": ["Evidence bundle, scan reports, runtime traces"], "o": ["Per-sub-check result, the bar it was measured against, and an evidence reference"], "s": ["Scanners and suites; stubbed in the current mockups, with the UI complete"], "p": [["Developer", "Anything failing here becomes a finding they receive with a re-run path"], ["HUMAIN", "Set A results are the platform's assurance, not the tenant's"]], "f": "A failing Set A check cannot be waived as a condition — it blocks. A failing Set B check can be waived only if the tenant admin has enabled conditional approval.", "x": "Matches the SteerCo principle: automation first, humans for novel or ambiguous cases only."}, "15": {"t": "Safety suite and human review", "lane": "VERIFIER", "node": "safety-eval", "w": "The verifier-owned safety regression suite runs, and the verifier performs the three reviews that cannot be automated: human handoff on irreversible actions, capability against listing claims, and refusal behaviour.", "i": ["Safety suite version", "Evaluation transcripts", "Listing diff against the last verified version"], "o": ["Recorded review notes", "Suite version stamped onto the record"], "s": ["safety-eval node"], "p": [["Developer", "Read-only — they see that it ran and what it found, never the suite's contents"], ["HUMAIN", "Guardian audits independently later; this does not substitute for that"]], "f": "Stamping the suite version is what makes re-certification answerable later: if the suite advances, we know which agents were verified against an older one.", "x": "Open: does Guardian eventually own this suite? If so this becomes an integration rather than a build."}, "16": {"t": "Decide — four outcomes", "lane": "VERIFIER", "node": "human-cert", "w": "The verifier decides: approve, approve with conditions, request changes, or reject. Approval requires every check resolved; rejection is available at any point, because an obviously unsafe submission should not need a full pass first.", "i": ["Everything above, plus the verifier's own review notes"], "o": ["Decision written to the record", "Findings, each with the failing check, evidence and a re-run path", "Audit entry naming actor, role, time and outcome"], "s": ["A saga of two idempotent writes: the decision resumes the paused human-cert node, then the audit record is written", "A broadcast keeps concurrent reviewers consistent; duplicate decisions are idempotent"], "p": [["Developer", "Receives findings that are specific and re-testable, and resubmits as a new version"], ["Guardian", "Only reached if the decision is approve and the target is public"], ["Tenant admin", "Holds this same authority; the audit records which role acted"]], "f": "A crash between the two writes leaves a recoverable state — the missing write is retried with the same key. Two reviewers deciding at once is a designed-for race, not an edge case.", "x": ""}, "17": {"t": "Publish internally", "lane": "VERIFIER", "node": "publish", "w": "On approval the internal listing goes live in the tenant workspace immediately. For a public-marketplace submission this still happens — the internal listing serves while Guardian works.", "i": ["Approval decision"], "o": ["Published internal version", "Previous version retained for rollback"], "s": ["DevFlow publish node"], "p": [["Developer", "Sees a state change, not a button — they never publish internally"], ["Consumers in the tenant", "Can now use the agent"]], "f": "Rollback is a version pin, not a rebuild. The previous version keeps serving until the new one is live.", "x": ""}, "18": {"t": "Send to Guardian", "lane": "VERIFIER", "node": "", "w": "For a public-marketplace target the evidence package goes to Guardian. This is mandatory, set by HUMAIN, and cannot be switched off by the tenant admin or the verifier.", "i": ["Approved record and its evidence"], "o": ["Guardian thread id and cycle id, persisted against the agent"], "s": ["POST /audits with an Idempotency-Key; poll every 30–60 seconds", "Persist the thread id per agent so re-audits continue the same thread"], "p": [["Developer", "Nothing required of them yet; the internal listing is already serving"], ["HUMAIN", "Guardian is a separate team, reached through the API, on its own timeline"]], "f": "Rate limits are real: three concurrent audits per key, twenty launches an hour. A queue of public submissions has to respect them.", "x": "Launching at approval rather than at decision-time means the verdict is usually ready when the verifier next looks."}, "19": {"t": "Independent audit", "lane": "GUARDIAN", "node": "", "w": "Guardian audits the source independently of anything we ran. It is a real audit thread with a cycle inside it, so re-audits after a fix compound rather than starting over.", "i": ["Code archive or connected repository", "Optionally a running app endpoint for live probing"], "o": ["Findings with severity, confidence band, evidence references and reproduction steps"], "s": ["embedded_audit.v1 — a frozen contract", "Typically around thirty minutes; progress is honest stage labels, never percentages"], "p": [["Verifier", "Holds the thread; the poll and the forwarding are theirs"], ["Developer", "Receives the findings only through the verifier, never directly"]], "f": "Failures are classed recoverable or terminal. Trust labels distinguish what Guardian verified itself from what we claimed — worth surfacing to the verifier rather than flattening.", "x": ""}, "20": {"t": "Findings and a verdict band", "lane": "GUARDIAN", "node": "", "w": "Guardian returns findings, a band of ready, needs work or hold, one recommended action and a plain-language ship opinion. It deliberately never returns a pass or a fail.", "i": ["Completed audit cycle"], "o": ["Structured findings", "Four deliverable artifacts plus an agent-handoff package for coding agents"], "s": ["GET findings and deliverables; download URLs live fifteen minutes and are fetched on demand"], "p": [["Verifier", "Must map evidence to a decision — this is precisely why the role has to exist"], ["Developer", "Guidance reaches them through the verifier, with a re-run path attached"]], "f": "Guardian will not add a pass field, a score or a threshold; requests for one are declined by design. Our platform owns the mapping, under our accountability.", "x": "Simplified to pass or fail in the current mockups and tagged as such."}, "21": {"t": "Release to the marketplace", "lane": "DEVELOPER", "node": "publish", "w": "Once certified, the developer performs the release. This is the one publish action the developer legitimately holds: both gates it depends on — the verifier's approval and Guardian's certification — have already been cleared, so the release is execution rather than a decision.", "i": ["Guardian certification"], "o": ["Public listing carrying the verification record and the certification"], "s": ["DevFlow publish node"], "p": [["Verifier", "Does not publish publicly; their record closes at certification"], ["Buyers", "See verified-by-the-tenant-verifier alongside Guardian's verdict"], ["HUMAIN", "Operates the catalogue the listing appears in"]], "f": "Publishing is blocked unless the state is genuinely certified. A new version starts a new record and is verified again.", "x": "Confirmed 18 August. This is the one place our model follows Google Cloud Marketplace rather than Apple: approval and release are separate acts."}, "22": {"t": "Monitor and re-verify", "lane": "VERIFIER", "node": "", "w": "The verifier watches live behaviour. A new version always opens a new record and is verified again — certification does not transfer between versions.", "i": ["Runtime signals: trust drift, error rate, latency, policy violations"], "o": ["Re-verification, or a pause"], "s": ["Observability stack"], "p": [["Tenant admin", "Can pause a live agent in one action, recorded with who did it"], ["Developer", "Notified with the reason and a resubmit path"]], "f": "Without this, an agent that degrades after publication has no route back into verification.", "x": "Phase 2: production watch, flagging drift to both the verifier and the tenant admin."}, "23": {"t": "Quotas, pause, retire, erase", "lane": "TENANT ADMIN", "node": "", "w": "Tenant-side operations. Pause stops a runtime in one click; retirement tears down and produces an erasure record that outlives the agent.", "i": ["Retirement request from a developer, or an operational decision"], "o": ["Pause record", "Immutable erasure record: what was preserved, what was erased and in what order"], "s": ["Control plane; every action carries actor, time and outcome"], "p": [["Developer", "Requests retirement; does not execute it"], ["Verifier", "Holds pause authority too under the tenant-admin grant"]], "f": "The erasure record is the data-protection guarantee. It has to survive the resources it describes, which is why it is written before teardown begins.", "x": ""}, "24": {"t": "Marketplace catalogue", "lane": "HUMAIN", "node": "", "w": "HUMAIN operates cross-tenant discovery. Listings carry both the tenant verifier's record and Guardian's certification.", "i": ["Certified, released listings"], "o": ["Catalogue entries discoverable by every tenant"], "s": ["HUMAIN marketplace"], "p": [["Developer", "Their listing appears here after release"], ["Buyers in other tenants", "Acquire and run the agent"]], "f": "", "x": "Open, and the one I would resolve before sign-off: the SteerCo operating model lists a Cert approval queue under HUMAIN Operations at two FTE. If that is a further human review after Guardian, this diagram needs a sixth lane."}}
+;
+const META = {"prov": {"1": [["S", "Tenant = one Keycloak realm, one cost ledger, one quota envelope", "H2O-O Platform Brief v0.3a"], ["S", "OIDC realm and claim contract", "H2O Agentic Identity Layer spec v1.0"]], "2": [["S", "Per-tenant quota envelope, enforced at provisioning", "Platform Brief · Sprint 0-3 features"], ["T", "The specific ceiling dimensions we expose", "proposed"]], "3": [["C", "Pass-bar floor of 50%", "confirmed 18 Aug"], ["C", "HUMAIN decides per tenant whether Guardian review applies", "confirmed 18 Aug"], ["T", "The eight baseline checks as a set", "our proposal — accepted for Mock 1, not ratified"]], "4": [["T", "HUMAIN issues the first tenant-admin login", "proposed; follows from realm ownership"]], "5": [["C", "Verifier and tenant admin are separable grants in one console", "confirmed 17 Aug"], ["S", "Tenant-aware RBAC, no cross-tenant queries", "Governance Framework, SteerCo 11 Jun"]], "6": [["C", "Tenant sets the pass bar above the platform floor", "confirmed 17 and 18 Aug"], ["T", "A verification SLA as a tenant setting", "our proposal"]], "7": [["S", "Tenant admins define pre-approved sandbox templates", "Governance Framework, Sprint 0-3"], ["C", "Tenant checks are additive and apply to every destination", "confirmed 18 Aug"]], "8": [["S", "The manifest is the submission; code passes by reference", "SEQ-02 · manifest schema v1"], ["S", "Draft persisted before the substrate call; Idempotency-Key on writes", "SEQ-02"]], "9": [["S", "lint, static-scan and build are DevFlow nodes", "Platform Brief — DevFlow node list"]], "10": [["S", "sandbox-eval node; Sandbox Adapter is the sole inbound exception", "SEQ-04"], ["S", "HMAC-signed callback, idempotent on manifest hash", "SEQ-04"]], "11": [["S", "quality-eval is a DevFlow node", "Platform Brief"], ["S", "Eval-node handoff contract is marked PROPOSED by HUMAIN", "OpenAPI v0.3.1 addendum, section 4"], ["C", "Quality eval belongs to the developer", "confirmed 17 Aug"]], "12": [["C", "The developer chooses internal or public", "confirmed 18 Aug"], ["T", "Sealing the evidence bundle at submission", "our proposal"]], "13": [["S", "DevFlow pauses at human-cert; status stays running with current_node = cert_pending", "OpenAPI v0.3.1 addendum"], ["S", "Review queue is a BFF-local projection; the Agent Registry stays canonical", "SEQ-03"], ["C", "No approval step between the bar and the queue", "confirmed 18 Aug"]], "14": [["S", "Automation first, humans for novel or ambiguous cases", "Governance Framework — Agentic Certification Protocols"], ["M", "Fourteen checks, and the Set A / Set B split as drawn", "invented for the mockup — the shape is the proposal, the count is not real"]], "15": [["S", "safety-eval is a DevFlow node", "Platform Brief"], ["C", "Safety belongs to the verifier, read-only to the developer", "confirmed 17 Aug"], ["T", "The three manual reviews as specified", "our proposal"]], "16": [["S", "The decision resumes the paused human-cert node; saga of two idempotent writes", "SEQ-03"], ["S", "Concurrent reviewers reconciled by broadcast; duplicate decisions idempotent", "SEQ-03"], ["C", "Four outcomes; rejection available at any point", "confirmed 18 Aug"]], "17": [["S", "publish is a DevFlow node", "Platform Brief"], ["C", "The verifier publishes internally on approval", "confirmed 17 Aug"]], "18": [["C", "Guardian is mandatory for public listings and not waivable", "confirmed 18 Aug"], ["S", "Guardian is a separate HUMAIN team reached by API", "Governance Framework · Guardian API guide"], ["T", "Launching at approval rather than at decision time", "our proposal"]], "19": [["S", "Audit threads and cycles; ~30 min; poll 30-60s; rate limits", "Embedded Guardian API guide"], ["S", "Trust labels separate server truth from caller claims", "Guardian API guide, section 6"]], "20": [["S", "Findings, band, one recommended action; never a pass/fail", "Guardian API guide, sections 1 and 9"], ["M", "Simplified to pass/fail in the current mockups", "tagged as simplified in the UI"]], "21": [["C", "Certification unlocks publishing for the developer", "confirmed 18 Aug"]], "22": [["T", "Verifier monitoring and re-verification", "our proposal — Phase 2"]], "23": [["S", "Pause, retirement and a proven erasure record", "Tenant Console V2 · PDPL guarantee"]], "24": [["S", "HUMAIN operates the marketplace catalogue", "Platform Brief"], ["O", "A Cert approval queue sits under HUMAIN Operations at 2 FTE — is that a further human review after Guardian?", "Governance Framework, operating model — unresolved"]]}, "dep": {"1": [[], [2, 3, 4]], "2": [[1], [9]], "3": [[1], [6, 14]], "4": [[1], [5, 6, 7]], "5": [[4], [8, 13, 23]], "6": [[3, 4], [11, 13]], "7": [[4], [9, 14]], "8": [[5], [9]], "9": [[2, 7, 8], [10]], "10": [[9], [11, 14]], "11": [[6, 10], [12]], "12": [[11], [13]], "13": [[5, 6, 12], [14, 15]], "14": [[3, 7, 10, 13], [16]], "15": [[13], [16]], "16": [[14, 15], [17, 18]], "17": [[16], [22]], "18": [[16], [19]], "19": [[18], [20]], "20": [[19], [21]], "21": [[20], [22, 24]], "22": [[17, 21], []], "23": [[5], []], "24": [[21], []]}, "loops": {"16": [20, 22]}, "returns": {"20": [16], "22": [16], "16": [8]}}
+const LANEC={"HUMAIN":"#6B3FA0","TENANT ADMIN":"#4A5568","DEVELOPER":"#2A5FC4","VERIFIER":"#9A4A14","GUARDIAN":"#0F6E63"};
+const PROVN={S:"In a HUMAIN doc",C:"Confirmed in a call",T:"Turing proposal",M:"Mock placeholder",O:"Unresolved"};
+const svg=document.querySelector('svg'), panel=document.getElementById('panel');
+let cur=null;
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const list=a=>a&&a.length?'<ul>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'';
+function chips(ids){
+  if(!ids||!ids.length) return '<div style="font-size:12.5px;color:#8A8F98">None</div>';
+  return '<div class="chips">'+ids.map(n=>'<button class="chip" data-go="'+n+'"><span class="n">'+n+'</span>'+esc((DETAIL[n]||{}).t||'')+'</button>').join('')+'</div>';
+}
+function render(n){
+  const d=DETAIL[n]; if(!d) return;
+  const c=LANEC[d.lane]||'#5B6270';
+  const pv=(META.prov[n]||[]), dep=(META.dep[n]||[[],[]]);
+  panel.innerHTML=
+   '<div class="ph"><div class="row1"><span class="num" style="background:'+c+'">'+n+'</span>'+
+   '<span class="lane" style="color:'+c+'">'+esc(d.lane)+'</span>'+
+   '<button class="close" id="x" aria-label="Close">&times;</button></div>'+
+   '<h2>'+esc(d.t)+'</h2>'+(d.node?'<span class="node">'+esc(d.node)+'</span>':'')+'</div>'+
+   '<div class="pb"><p class="what">'+esc(d.w)+'</p>'+
+   (d.i&&d.i.length?'<div class="sec"><div class="lbl">Inputs — what arrives</div>'+list(d.i)+'</div>':'')+
+   (d.o&&d.o.length?'<div class="sec"><div class="lbl">Outputs — what it produces</div>'+list(d.o)+'</div>':'')+
+   (d.s&&d.s.length?'<div class="sec"><div class="lbl">How it runs</div>'+list(d.s)+'</div>':'')+
+   '<div class="sec"><div class="lbl">Cannot start until</div>'+chips(dep[0])+'</div>'+
+   '<div class="sec"><div class="lbl">Unblocks</div>'+chips(dep[1])+'</div>'+
+   ((META.loops[n]||[]).length?'<div class="sec"><div class="lbl">Can be re-entered from</div>'+chips(META.loops[n])+'</div>':'')+
+   ((META.returns[n]||[]).length?'<div class="sec"><div class="lbl">Sends work back to</div>'+chips(META.returns[n])+'</div>':'')+
+   (d.p&&d.p.length?'<div class="sec"><div class="lbl">Who else this touches</div>'+
+     d.p.map(p=>'<div class="who"><b>'+esc(p[0])+'</b><span>'+esc(p[1])+'</span></div>').join('')+'</div>':'')+
+   (d.f?'<div class="fail"><div class="blk" style="color:#8A2F2F">Where it breaks</div>'+esc(d.f)+'</div>':'')+
+   (d.x?'<div class="open"><div class="blk" style="color:#0F6E63">Note</div>'+esc(d.x)+'</div>':'')+
+   (pv.length?'<div class="prov"><div class="lbl" style="font:700 9.5px inherit;letter-spacing:.11em;text-transform:uppercase;color:#8A8F98;margin-bottom:8px">What this rests on</div>'+
+     pv.map(r=>'<div class="pr"><span class="tag t'+r[0]+'">'+esc(PROVN[r[0]])+'</span>'+
+       '<span class="txt">'+esc(r[1])+'<em>'+esc(r[2])+'</em></span></div>').join('')+'</div>':'')+
+   '</div>'+
+   '<div class="nav"><button class="btn" id="prev"'+(n<=1?' disabled':'')+'>&larr; '+(n-1)+'</button>'+
+   '<button class="btn" id="next"'+(n>=24?' disabled':'')+'>'+(n+1)+' &rarr;</button></div>';
+  panel.classList.add('on');
+  document.getElementById('x').onclick=clear;
+  const p=document.getElementById('prev'),q=document.getElementById('next');
+  if(p&&!p.disabled)p.onclick=()=>select(n-1);
+  if(q&&!q.disabled)q.onclick=()=>select(n+1);
+  panel.querySelectorAll('.chip').forEach(b=>b.onclick=()=>select(+b.dataset.go));
+  panel.scrollTop=0;
+}
+function select(n){
+  cur=n; svg.classList.add('picking');
+  const dep=META.dep[n]||[[],[]];
+  svg.querySelectorAll('.step').forEach(g=>{const k=+g.dataset.step;
+    g.classList.toggle('sel',k===n);
+    g.classList.toggle('up',dep[0].includes(k));
+    g.classList.toggle('dn',dep[1].includes(k));
+    const lp=(META.loops[n]||[]).concat(META.returns[n]||[]);
+    g.classList.toggle('lp',lp.includes(k));});
+  render(n); history.replaceState(null,'','#step-'+n);
+}
+function clear(){
+  cur=null; svg.classList.remove('picking');
+  svg.querySelectorAll('.step').forEach(g=>g.classList.remove('sel','up','dn','lp'));
+  panel.classList.remove('on'); panel.innerHTML='';
+  history.replaceState(null,'',location.pathname);
+}
+svg.querySelectorAll('.step').forEach(g=>{const n=+g.dataset.step;
+  g.addEventListener('click',()=>select(n));
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(n);}});});
+document.getElementById('closeAll').onclick=clear;
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')return clear();
+  if(!cur)return;
+  if(e.key==='ArrowRight'&&cur<24)select(cur+1);
+  if(e.key==='ArrowLeft'&&cur>1)select(cur-1);});
+const h=location.hash.match(/^#step-(\d+)$/);
+if(h)select(Math.min(24,Math.max(1,+h[1])));
+</script>
+</body>
+</html>
