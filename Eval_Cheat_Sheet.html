@@ -35,6 +35,17 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 <h1>The eval product, screen by screen</h1>
 <p class="deck">One block per screen. What it is, why it exists, the sentence to say, and the answer if they push back.</p>
 
+<div class="scr" style="border-color:var(--gov-bd);background:var(--gov-bg)">
+  <h2>If you only say five things</h2>
+  <div class="path">The whole argument in one card</div>
+  <div class="row"><b>1</b><span>Every metric in your palette is on one screen, over a real 380-case Arabic and English dataset, and every number opens the cases behind it.</span></div>
+  <div class="row"><b>2</b><span>Safety is not a toggle. Two cases pass every column and still leak data or follow an injected instruction. Only always-on answer checks catch them.</span></div>
+  <div class="row"><b>3</b><span>The judge earns trust instead of demanding it: every saved check shows how often it agreed with the developer before it scores anything.</span></div>
+  <div class="row"><b>4</b><span>Regressions cannot hide. A new safety flag shows up as broken even when every metric stays green, and five runs of history show the arc.</span></div>
+  <div class="row"><b>5</b><span>The verifier pack states what was not checked. Silence never reads as a pass.</span></div>
+  <div class="row say"><b>Demo path</b><span>Set up a run: browse the dataset, click Arabic, tick Bias and watch 380 become 760 with the price. Run it. Results: the red safety band, then click the Safety cell. What broke since last time: the new flag with green columns. Evidence: the coverage table, download the pack. Ninety seconds.</span></div>
+</div>
+
 <div class="scr">
   <h2>Set up a run</h2>
   <div class="path">Screen 1 &middot; the three-layer metric board</div>
@@ -48,7 +59,7 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
   <h2>Results</h2>
   <div class="path">Screen 2 &middot; where the two-case argument lives</div>
   <div class="row"><b>What</b><span>A nine-metric board covering the whole palette: accuracy, trustworthiness, safety, helpfulness, robustness, bias and fairness, latency, multilingual, reliability. Every cell opens per-case evidence. An across-runs card tracks six of them as sparklines over the full run history. Below it, the safety band and the per-case table.</span></div>
-  <div class="row"><b>Why</b><span>Two cases in the demo pass every automatic column and still raise a safety flag: a cross-record phone number leak and a prompt injection from an uploaded document. Without always-on answer checks both are invisible. <span class="cite">Looping and early exit alone are ~a quarter of failures in published agent-failure taxonomies (MAST); the rest needs judgement.</span></span></div>
+  <div class="row"><b>Why</b><span>Two cases in the demo pass every automatic column and still raise a safety flag: a cross-record phone number leak and a prompt injection from an uploaded document. Without always-on answer checks both are invisible. <span class="cite">Step repetition (15.7%) plus mishandled termination (12.4%) is about a quarter of observed failures in MAST, Cemri et al. 2025, arXiv 2503.13657. The rest needs judgement.</span></span></div>
   <div class="row say"><b>Say this</b><span>Every metric in your palette is on this one screen, and every number opens the cases behind it. Then watch case 8 and case 11: green across every column, and both are the kind of failure that ends up in a newspaper. That is why safety is not a toggle.</span></div>
   <div class="row push"><b>Push back</b><span>"How do you know the judge is right?" We do not yet, and the card says so on screen: judge scores are labelled signal, not measurement, until judge-vs-human agreement ships. The design follows the published calibration loop, sample, hand-grade, compute agreement, recalibrate on change, and well-calibrated judges now agree with humans about as often as two humans agree with each other. Stating the limit beats having it extracted from us.</span></div>
 </div>
