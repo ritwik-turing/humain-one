@@ -109,6 +109,9 @@ tr.click:focus-visible{outline-offset:-2px}
   margin:18px -22px -50px;padding:14px 22px;background:rgba(245,247,248,.93);
   backdrop-filter:blur(6px);border-top:1px solid var(--line)}
 .runbar #runEst{font-size:12px}
+.cat{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--lock-bg);color:var(--lock);border:1px solid var(--lock-bd);
+  border-radius:5px;padding:2px 7px;margin-left:9px;vertical-align:2px;white-space:nowrap}
 .why{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;
   border:1px solid var(--line-2);background:var(--panel);color:var(--muted);
   font:700 10px/1 ui-monospace,Menlo,monospace;cursor:pointer;vertical-align:2px;margin-left:6px;padding:0}
@@ -504,7 +507,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   <span class="spacer"></span>
   <button class="topbtn" id="resetBtn">Reset demo</button>
   <button class="topbtn" id="aboutBtn">About this mockup</button>
-  <span class="who">Ritwik Chakradhar &middot; alnoor-tenant</span>
+  <span class="who">Ritwik Chakradhar &middot; Developer &middot; Al Noor Municipality sandbox</span>
 </div>
 
 <div class="rail">
@@ -559,12 +562,19 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <div class="prev" id="prevRun"></div>
 
     <div class="card">
-      <div class="hd"><h3>Cases</h3><span class="sp"></span><span class="badge b-lock" id="caseCount"></span></div>
+      <div class="hd"><h3>Cases</h3><span class="cat">Dataset</span><span class="sp"></span><span class="badge b-lock" id="caseCount"></span></div>
       <div class="bd">
         <div class="kv">
-          <span class="k">Source</span><span>gov-services-eval &middot; reviewed answer set &middot; uploaded 24 Aug</span>
+          <span class="k">Source</span><span><b>Snowflake</b> &middot; GOV_SERVICES.EVAL_V3 &middot; synced 2 hours ago <span class="badge b-gov" style="margin-left:6px">Connected</span></span>
           <span class="k">Columns mapped</span><span>question &rarr; input &nbsp;&middot;&nbsp; expected_reply &rarr; expected answer</span>
           <span class="k">Coverage</span><span id="coverage"></span>
+        </div>
+        <div style="margin-top:13px"><span class="muted" style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700">Add cases from</span></div>
+        <div style="margin-top:7px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost sm" data-why="Upload a CSV of questions with the answers you expect. Column mapping happens once and is remembered." aria-expanded="false">CSV upload</button>
+          <button class="btn ghost sm" data-why="Reads a table or view on a schedule. Snowflake, BigQuery and Databricks connectors; this dataset syncs from Snowflake nightly." aria-expanded="false">Data warehouse</button>
+          <button class="btn ghost sm" data-why="Points at a bucket of JSON or parquet conversation logs. S3 and GCS, same column mapping as CSV." aria-expanded="false">S3 or GCS bucket</button>
+          <button class="btn ghost sm" data-why="Samples one in fifty live conversations after PII masking. New production failures land in the attention set automatically, which closes the loop between monitoring and evaluation." aria-expanded="false">Production traffic</button>
         </div>
         <div style="margin-top:14px"><button class="btn ghost sm" id="dsBrowse">Browse all cases</button> <button class="btn ghost sm" id="editCases">Edit attention cases</button> <button class="btn ghost sm" id="addCase">Add a case that failed in production</button></div>
         <div id="dsPanel" style="display:none"></div>
@@ -573,7 +583,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     </div>
 
     <div class="card">
-      <div class="hd"><h3>Always on</h3><span class="badge b-gov">Not configurable</span><span class="sp"></span><span class="muted" style="font-size:12px">No setup, works on the first upload</span></div>
+      <div class="hd"><h3>Always on</h3><span class="cat">Built-in checks</span><span class="badge b-gov">Not configurable</span><span class="sp"></span><span class="muted" style="font-size:12px">No setup, works on the first upload</span></div>
       <div class="bd">
         <div class="lyr">Read from the run</div>
         <p class="lyrd">Filled in automatically for every case. This is the results table you see next.</p>
@@ -610,7 +620,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     </div>
 
     <div class="card">
-      <div class="hd"><h3>On for Government services</h3><span class="badge b-gov" id="catBadge"></span><span class="sp"></span><span class="muted" style="font-size:12px">Turn off any that do not fit your agent</span></div>
+      <div class="hd"><h3>On for Government services</h3><span class="cat">Judge metrics</span><span class="badge b-gov" id="catBadge"></span><span class="sp"></span><span class="muted" style="font-size:12px">Turn off any that do not fit your agent</span></div>
       <div class="bd">
         <p class="muted" style="margin:0 0 12px;font-size:12.5px">Scored against <b>gov-services-eval</b>: 380 reviewed cases across 38 citizen journeys, Arabic and English.<button class="why" aria-expanded="false" aria-label="Why does this depend on the category" data-why="Accuracy needs a written correct answer to compare against. A category without a reviewed answer set does not get this card, and the developer sees why instead of a greyed-out toggle.">i</button></p>
         <div class="mtogs" id="catRows"></div>
@@ -618,7 +628,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     </div>
 
     <div class="card">
-      <div class="hd"><h3>Costs extra</h3><span class="badge b-pre" id="extraBadge"></span><span class="sp"></span><span class="muted" style="font-size:12px">These change the size of the run</span></div>
+      <div class="hd"><h3>Costs extra</h3><span class="cat">Run strategies</span><span class="badge b-pre" id="extraBadge"></span><span class="sp"></span><span class="muted" style="font-size:12px">These change the size of the run</span></div>
       <div class="bd">
         <p class="muted" style="margin:0 0 12px;font-size:12.5px">Each of these runs your cases again in altered form. The count below moves as you pick.<button class="why" aria-expanded="false" aria-label="Why do these cost extra" data-why="These are run strategies, not scores on the run you already did. Bias runs every case twice with one detail changed. Reliability runs everything three times. The cost is shown before you commit, not after the bill.">i</button></p>
         <div class="mtogs" id="extraRows"></div>
@@ -653,9 +663,10 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <div class="card">
       <div class="hd"><h3>Needs your attention</h3><span class="badge b-pre" id="attnBadge"></span><span class="sp"></span>
         <span class="rowbar">
-          <button class="fbtn on" data-filter="all">All 12</button>
-          <button class="fbtn" data-filter="fail">Needs a look</button>
-          <button class="fbtn" data-filter="unread">Not yet reviewed</button>
+          <button class="fbtn on" data-filter="attn" id="fAttn">Needs attention</button>
+          <button class="fbtn" data-filter="all" id="fAll">All cases</button>
+          <button class="fbtn" data-filter="fail" id="fFail">Failing</button>
+          <button class="fbtn" data-filter="unread" id="fUnread">Not yet reviewed</button>
         </span>
       </div>
       <div class="bd" style="padding-bottom:0">
@@ -1045,7 +1056,7 @@ function safetyDelta(){
   return {added:added,kept:kept,cleared:cleared};
 }
 var TAGS={multi:"Multiple open applications",prior:"Ignores earlier contact",doc:"Confuses licence and permit",nopath:"No process exists, keeps searching"};
-var TOTAL=12, cur=2, filter="all";
+var TOTAL=12, cur=2, filter="attn", resPage=0;
 
 function fails(c){return !(c.fin&&c.loop&&c.out===1)}
 function reviewed(){return CASES.filter(function(c){return c.note||c.skipped}).length}
@@ -1056,51 +1067,98 @@ function pill(v,okTxt,badTxt,midTxt){
 }
 function renderRows(){
   var tb=document.getElementById('caserows'); if(!tb)return;
-  var html='';
+  // The run covers every case, so this table does too. Attention is the default
+  // view of the complete table, never a separate smaller one.
+  var rows=[];
   CASES.forEach(function(c,i){
-    if(filter==='fail'&&!fails(c))return;
     if(filter==='unread'&&(c.note||c.skipped))return;
-    html+='<tr class="click" data-case="'+i+'" tabindex="0" role="button" aria-label="Open case '+(i+1)+', '+esc(c.q).replace(/"/g,'')+'"><td class="muted">'+(i+1)+'</td><td><span class="c-min '+(fails(c)?'sc s-lo':'sc s-hi')+'">'+(fails(c)?'needs a look':'ok')+'</span>"'+c.q+'"'
-      +(c.flag?' <span class="sfpin" title="'+SAFETY[c.flag].n+'">safety</span>':'')+'</td>'
-      +'<td class="c-opt">'+pill(c.fin,'yes','no')+'</td>'
-      +'<td class="c-opt">'+pill(c.loop,'yes','no')+'</td>'
-      +'<td class="c-opt">'+(c.fin? pill(c.out,'yes','&mdash;'):'<span class="sc s-na">&mdash;</span>')+'</td>'
-      +'<td class="c-opt muted">'+c.t+'</td>'
-      +'<td>'+(c.note?'<span class="sc s-hi">written</span>':(c.skipped?'<span class="sc s-na">fine</span>':'<span class="muted" style="font-size:11.5px">&mdash;</span>'))+'</td></tr>';
+    if(filter==='fail'&&!(fails(c)||c.flag))return;
+    rows.push({att:true,i:i,c:c});
   });
-  var shown=(html.match(/<tr/g)||[]).length;
-  if(!shown){
+  if(filter==='all'||filter==='fail'){
+    DS.forEach(function(d,ix){
+      var ok=d.fin===1&&d.loop===1&&d.out===1;
+      if(filter==='fail'&&ok)return;
+      rows.push({att:false,d:d,ix:ix});
+    });
+  }
+  var per=25, pages=Math.max(1,Math.ceil(rows.length/per));
+  if(resPage>pages-1)resPage=pages-1;
+  var start=resPage*per, slice=rows.slice(start,start+per);
+  var html=slice.map(function(r){
+    if(r.att){
+      var c=r.c,i=r.i;
+      return '<tr class="click" data-case="'+i+'" tabindex="0" role="button" aria-label="Open case '+(i+1)+', '+esc(c.q).replace(/"/g,'')+'"><td class="muted">'+(i+1)+'</td><td><span class="c-min '+(fails(c)?'sc s-lo':'sc s-hi')+'">'+(fails(c)?'needs a look':'ok')+'</span>"'+c.q+'"'
+        +(c.flag?' <span class="sfpin" title="'+SAFETY[c.flag].n+'">safety</span>':'')+'</td>'
+        +'<td class="c-opt">'+pill(c.fin,'yes','no')+'</td>'
+        +'<td class="c-opt">'+pill(c.loop,'yes','no')+'</td>'
+        +'<td class="c-opt">'+(c.fin? pill(c.out,'yes','&mdash;'):'<span class="sc s-na">&mdash;</span>')+'</td>'
+        +'<td class="c-opt muted">'+c.t+'</td>'
+        +'<td>'+(c.note?'<span class="sc s-hi">written</span>':(c.skipped?'<span class="sc s-na">fine</span>':'<span class="muted" style="font-size:11.5px">&mdash;</span>'))+'</td></tr>';
+    }
+    var d=r.d, ar=d.lang==='AR';
+    return '<tr title="Full traces live on attention cases"><td class="muted">'+(13+r.ix)+'</td>'
+      +'<td><span'+(ar?' dir="rtl"':'')+'>"'+esc(d.q)+'"</span> <span style="font-size:11px;color:var(--muted)">'+esc(d.j)+'</span></td>'
+      +'<td class="c-opt">'+pill(d.fin,'yes','no')+'</td>'
+      +'<td class="c-opt">'+pill(d.loop,'yes','no')+'</td>'
+      +'<td class="c-opt">'+(d.fin? pill(d.out,'yes','&mdash;'):'<span class="sc s-na">&mdash;</span>')+'</td>'
+      +'<td class="c-opt muted">'+d.t.toFixed(1)+'s</td>'
+      +'<td><span class="muted" style="font-size:11.5px">&mdash;</span></td></tr>';
+  }).join('');
+  var shown=slice.length;
+  if(!rows.length){
     var msg, sub, act='';
-    if(!CASES.length){
-      msg='No cases yet'; sub='Add a case that failed in production, or upload a file of questions with the answers you expect.';
-      act='<button class="btn sm" id="addCase2">Add one from production</button>';
+    if(!CASES.length&&filter!=='all'&&filter!=='fail'){
+      msg='No attention cases'; sub='The run still covers the full dataset. Add a case that failed in production, or switch to All cases.';
+      act='<button class="fbtn" data-filter="all">Show all 380</button>';
     } else if(filter==='unread'){
       var g=Object.keys(groupCounts()).length;
       msg='Everything has been reviewed';
-      sub='You worked through all '+CASES.length+' cases'+(g?' and found '+g+' failure group'+(g>1?'s':'')+'.':'.');
+      sub='You worked through all '+CASES.length+' attention cases'+(g?' and found '+g+' failure group'+(g>1?'s':'')+'.':'.');
       act='<button class="btn sm" data-go="s4">See what went wrong</button>';
-    } else if(filter==='fail'){
-      msg='Nothing needs a look'; sub='Every case finished, stayed on track and came back with something usable.';
-      act='<button class="fbtn" data-filter="all">Show all cases</button>';
+    } else {
+      msg='Nothing here'; sub='Every case finished, stayed on track and came back with something usable.';
+      act='<button class="fbtn" data-filter="all">Show all 380</button>';
     }
     html='<tr><td colspan="7"><div class="empty"><div class="ic">&#10003;</div>'
       +'<div class="t">'+msg+'</div><div class="d">'+sub+'</div>'+act+'</div></td></tr>';
   }
   tb.innerHTML=html;
-  document.getElementById('rowcount').textContent = CASES.length
-    ? 'Showing '+shown+' of '+CASES.length+' representative cases, clustered from the '+totalCases()+' in the run.'
-    : 'No attention cases. The dataset browser on set up holds all '+DS.length+'.';
+  var failN=CASES.filter(function(c){return fails(c)||c.flag}).length
+    +DS.filter(function(d){return !(d.fin===1&&d.loop===1&&d.out===1)}).length;
+  var unreadN=CASES.filter(function(c){return !c.note&&!c.skipped}).length;
+  var mid=' \u00b7 ';
+  var setChip=function(id,txt){var e=document.getElementById(id); if(e)e.textContent=txt};
+  setChip('fAttn','Needs attention'+mid+CASES.length);
+  setChip('fAll','All cases'+mid+totalCases());
+  setChip('fFail','Failing'+mid+failN);
+  setChip('fUnread','Not yet reviewed'+mid+unreadN);
+  var pager = pages>1
+    ? ' &nbsp;<button class="btn ghost sm" id="resPrev"'+(resPage===0?' disabled':'')+'>&lsaquo;</button>'
+      +' page '+(resPage+1)+' of '+pages+' '
+      +'<button class="btn ghost sm" id="resNext"'+(resPage>=pages-1?' disabled':'')+'>&rsaquo;</button>'
+    : '';
+  var rc=document.getElementById('rowcount');
+  if(filter==='attn'){
+    rc.innerHTML='The '+CASES.length+' attention cases, clustered from the '+totalCases()+' in the run. Switch to All cases for every row.';
+  } else if(filter==='all'){
+    rc.innerHTML='Showing '+(rows.length?start+1:0)+' to '+(start+shown)+' of all '+rows.length+' cases.'+pager;
+  } else if(filter==='fail'){
+    rc.innerHTML='Showing '+(rows.length?start+1:0)+' to '+(start+shown)+' of '+rows.length+' failing cases across the whole run.'+pager;
+  } else {
+    rc.innerHTML=rows.length+' attention case'+(rows.length===1?'':'s')+' still to review.';
+  }
   var ab=document.getElementById('attnBadge');
   if(ab)ab.textContent=CASES.length+' of '+totalCases();
   var r=reviewed();
-  document.getElementById('progtxt').textContent=r+' of '+CASES.length+' reviewed';
-  document.getElementById('progbar').style.width=(r/CASES.length*100)+'%';
+  document.getElementById('progtxt').textContent=r+' of '+CASES.length+' attention cases reviewed';
+  document.getElementById('progbar').style.width=(CASES.length? r/CASES.length*100:0)+'%';
   var strip=document.getElementById('dots'); if(strip)strip.setAttribute('aria-hidden','true');
-  var d='';
-  CASES.forEach(function(c,i){   // decorative summary of the table above, not a second control set
-    d+='<i data-case="'+i+'" class="'+(fails(c)?'fail':'pass')+(c.note?' noted':'')+(i===cur?' cur':'')+'" title="'+c.q+'"></i>';
+  var d2='';
+  CASES.forEach(function(c,i){
+    d2+='<i data-case="'+i+'" class="'+(fails(c)?'fail':'pass')+(c.note?' noted':'')+(i===cur?' cur':'')+'" title="'+c.q+'"></i>';
   });
-  document.getElementById('dots').innerHTML=d;
+  document.getElementById('dots').innerHTML=d2;
 }
 function secs(t){var m=String(t).match(/([\d.]+)/);return m?parseFloat(m[1]):0;}
 function stepSecs(st){var m=String(st[2]).match(/([\d.]+)s/);return m?parseFloat(m[1]):0;}
@@ -2111,7 +2169,7 @@ function renderResultsCopy(){
   renderMetrics();
   var t=document.getElementById('resTitle'), sb=document.getElementById('resSub');
   if(t)t.innerHTML='Run '+RUNS_DONE+' <span class="muted" style="font-weight:400">&middot; results</span>';
-  if(sb)sb.textContent=CASES.length+' cases attempted. This is a starting point, not a verdict. '
+  if(sb)sb.textContent=totalCases()+' cases attempted. This is a starting point, not a verdict. '
     +'Nothing here stops you submitting.';
   var g=document.getElementById('grpSub');
   if(g){
@@ -2148,7 +2206,7 @@ document.addEventListener('click',function(e){
   var cf=e.target.closest('[data-cmp]');
   if(cf){cmpFilter=cf.dataset.cmp;document.querySelectorAll('[data-cmp]').forEach(function(b){b.classList.toggle('on',b===cf)});renderCompare();return;}
   var f=e.target.closest('[data-filter]');
-  if(f){filter=f.dataset.filter;
+  if(f){filter=f.dataset.filter;resPage=0;
     document.querySelectorAll('.fbtn').forEach(function(b){b.classList.toggle('on',b===f)});
     renderRows();return;}
   var tg=e.target.closest('[data-tag]');
@@ -2179,13 +2237,15 @@ document.addEventListener('click',function(e){
     e.target.textContent=open?'Edit cases':'Done editing';
     if(!open)renderEditList();
     return;}
-  var wy=e.target.closest('.why');
+  var wy=e.target.closest('[data-why]');
   if(wy){toggleWhy(wy);return;}
   if(e.target.id==='dsBrowse'){dsOpen=!dsOpen;renderDS();return;}
   var df=e.target.closest('[data-dsf]');
   if(df){dsF=df.dataset.dsf;dsPage=0;dsSel=null;renderDS();return;}
   var dx=e.target.closest('[data-dsx]');
   if(dx){var dv=+dx.dataset.dsx;dsSel=(dsSel===dv?null:dv);renderDS();return;}
+  if(e.target.id==='resPrev'){resPage=Math.max(0,resPage-1);renderRows();return;}
+  if(e.target.id==='resNext'){resPage=resPage+1;renderRows();return;}
   if(e.target.id==='dsPrev'){dsPage=Math.max(0,dsPage-1);dsSel=null;renderDS();return;}
   if(e.target.id==='dsNext'){dsPage=dsPage+1;dsSel=null;renderDS();return;}
   var bd=e.target.closest('[data-board]');
