@@ -564,7 +564,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <div class="card">
       <div class="hd"><h3>Cases</h3><span class="cat">Dataset</span><span class="sp"></span><span class="badge b-lock" id="caseCount"></span></div>
       <div class="bd">
-        <p class="muted" style="margin:0 0 12px;font-size:12.5px">A case is one real citizen question paired with the answer you expect. Every run sends all of them to the agent, and everything below is measured on what comes back.</p>
+        <p class="muted" style="margin:0 0 12px;font-size:12.5px">A case is one real citizen question. Most come with the answer you expect, which is what accuracy is scored against. Cases sampled from live traffic arrive without one until somebody writes it. Every run sends all of them to the agent, and everything below is measured on what comes back.</p>
         <div class="kv">
           <span class="k">Source</span><span><b>Snowflake</b> &middot; GOV_SERVICES.EVAL_V3 &middot; synced 2 hours ago <span class="badge b-gov" style="margin-left:6px">Connected</span></span>
           <span class="k">Columns mapped</span><span>question &rarr; input &nbsp;&middot;&nbsp; expected_reply &rarr; expected answer</span>
@@ -1686,8 +1686,9 @@ function renderSetup(){
   var p=document.getElementById('prevRun');
   if(RUNS_DONE){
     p.innerHTML='<div><div class="t">Run '+RUNS_DONE+' finished '+ago()+'</div>'
-      +'<div class="d">'+fail+' of '+CASES.length+' attention cases still need a look. '
-      +reviewed()+' reviewed so far.</div></div>'
+      +'<div class="d">'+fail+' of '+CASES.length+' attention cases had problems. '
+      +reviewed()+' reviewed, '+CASES.filter(function(c){return fails(c)&&!c.note&&!c.skipped}).length
+      +' still need a look.</div></div>'
       +'<div><button class="btn ghost sm" data-go="s2">Open run '+RUNS_DONE+'</button></div>';
     p.style.display='grid';
   } else { p.style.display='none'; }
