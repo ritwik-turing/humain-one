@@ -1601,7 +1601,7 @@ function renderSetup(){
   var p=document.getElementById('prevRun');
   if(RUNS_DONE){
     p.innerHTML='<div><div class="t">Run '+RUNS_DONE+' finished '+ago()+'</div>'
-      +'<div class="d">'+fail+' of '+CASES.length+' cases still need a look. '
+      +'<div class="d">'+fail+' of '+CASES.length+' attention cases still need a look. '
       +reviewed()+' reviewed so far.</div></div>'
       +'<div><button class="btn ghost sm" data-go="s2">Open run '+RUNS_DONE+'</button></div>';
     p.style.display='grid';
