@@ -138,6 +138,15 @@ tr.click:focus-visible{outline-offset:-2px}
 .cvn{font-weight:600}
 .cvv{color:var(--muted);font-size:12px;text-align:right}
 .cvv.warn{color:var(--preview);font-weight:700}
+.dsfilters{display:flex;gap:6px;align-items:center;margin:14px 0 8px;flex-wrap:wrap}
+.dsr{display:grid;grid-template-columns:1fr 132px 30px 52px 44px;gap:10px;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:12px}
+.dsr .dsq{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dsr .dsq[dir=rtl]{text-align:right;font-size:13px}
+.dsr .dsj{color:var(--muted);font-size:11.5px}
+.dsr .dsl{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--muted)}
+.dsr .dst{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--muted);text-align:right}
+.dspager{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
 .board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .bcell{display:block;text-align:left;font:inherit;background:var(--panel);border:1px solid var(--line);
   border-radius:10px;padding:11px 12px;cursor:pointer;width:100%}
@@ -421,6 +430,8 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   .grid4{grid-template-columns:1fr}
   .jgrid{grid-template-columns:1fr}
   .board{grid-template-columns:repeat(2,1fr)}
+  .dsr{grid-template-columns:1fr 42px 50px;gap:8px}
+  .dsr .dsj,.dsr .dst{display:none}
   .colkey{grid-template-columns:1fr;gap:7px}
   .colkey>div{grid-template-columns:1fr;gap:1px}
   .casenav{gap:6px}
@@ -520,11 +531,12 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
       <div class="hd"><h3>Cases</h3><span class="sp"></span><span class="badge b-lock" id="caseCount"></span></div>
       <div class="bd">
         <div class="kv">
-          <span class="k">Source</span><span>citizen-queries-aug.csv &middot; uploaded 24 Aug</span>
+          <span class="k">Source</span><span>gov-services-eval &middot; reviewed answer set &middot; uploaded 24 Aug</span>
           <span class="k">Columns mapped</span><span>question &rarr; input &nbsp;&middot;&nbsp; expected_reply &rarr; expected answer</span>
           <span class="k">Coverage</span><span id="coverage"></span>
         </div>
-        <div style="margin-top:14px"><button class="btn ghost sm" id="editCases">Edit cases</button> <button class="btn ghost sm" id="addCase">Add a case that failed in production</button></div>
+        <div style="margin-top:14px"><button class="btn ghost sm" id="dsBrowse">Browse all cases</button> <button class="btn ghost sm" id="editCases">Edit attention cases</button> <button class="btn ghost sm" id="addCase">Add a case that failed in production</button></div>
+        <div id="dsPanel" style="display:none"></div>
         <div class="editlist" id="editList" style="display:none"></div>
       </div>
     </div>
@@ -606,7 +618,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <div id="scoreBox"></div>
 
     <div class="card">
-      <div class="hd"><h3>Every case</h3><span class="sp"></span>
+      <div class="hd"><h3>Needs your attention</h3><span class="badge b-pre" id="attnBadge"></span><span class="sp"></span>
         <span class="rowbar">
           <button class="fbtn on" data-filter="all">All 12</button>
           <button class="fbtn" data-filter="fail">Needs a look</button>
@@ -940,7 +952,48 @@ var SAFETY={
 function flagged(){return CASES.filter(function(c){return c.flag})}
 /* Nothing downstream may report a result when nothing was run.
    A seeded number on an empty run is the same defect as a hard-coded one. */
-function hasResults(){return CASES.length>0;}
+function hasResults(){return totalCases()>0;}
+/* The full evaluation dataset. 368 generated cases plus the 12 curated attention
+   cases below make gov-services-eval: 380 cases, 38 journeys, Arabic and English.
+   Generation is deterministic (LCG, seed 42) so every demo shows the same numbers. */
+var DS=(function(){
+  var J=['Permit renewal','Business licence','ID replacement','Birth certificate','Marriage certificate',
+   'Vehicle registration','Driving licence','Passport renewal','Visa status','Residency permit',
+   'Building permit','Food stall licence','Health card','School enrolment','University grant',
+   'Housing application','Utility connection','Water complaint','Power outage','Road maintenance',
+   'Waste collection','Park booking','Event permit','Import clearance','Export licence',
+   'Customs query','Tax filing','Tax refund','Zakat query','Pension claim',
+   'Disability support','Job seeker registration','Work permit','Medical appointment','Vaccination record',
+   'Court appointment','Notary booking','Land deed'];
+  var QEN=['Where is my application?','What documents are still needed?','How long until a decision?',
+   'Can I update my phone number?','What are the fees?','I have had no reply for two weeks',
+   'I want to cancel my request','How do I appeal the decision?'];
+  var QAR=['أين وصل طلبي؟','ما المستندات المتبقية؟','متى يصدر القرار؟',
+   'هل يمكن تحديث رقم هاتفي؟','كم تبلغ الرسوم؟','لم يصلني أي رد منذ أسبوعين',
+   'أريد إلغاء الطلب','كيف أعترض على القرار؟'];
+  var seed=42; function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+  var out=[];
+  for(var i=0;i<368;i++){
+    var ar=rnd()<0.55, j=J[i%38];
+    var q=(ar?QAR:QEN)[Math.floor(rnd()*8)];
+    var fin=rnd()<0.045?0:1;
+    var lp=(fin&&rnd()<0.03)?0:1;
+    var o=!fin?0:(lp!==1?0:(rnd()<0.062?2:1));
+    var t=!fin?(25+rnd()*6):(lp!==1?(24+rnd()*6):(1.8+rnd()*5.5));
+    out.push({q:q,j:j,lang:ar?'AR':'EN',fin:fin,loop:lp,out:o,t:t});
+  }
+  return out;
+})();
+function totalCases(){return DS.length+CASES.length}
+function totalDone(){return DS.filter(function(d){return d.fin===1}).length
+  +CASES.filter(function(c){return c.fin===1}).length}
+function totalStalled(){return totalCases()-totalDone()}
+function totalLooped(){return DS.filter(function(d){return !d.loop}).length
+  +CASES.filter(function(c){return !c.loop}).length}
+function totalIncomplete(){return DS.filter(function(d){return d.fin===1&&d.out!==1}).length
+  +CASES.filter(function(c){return c.fin===1&&c.out!==1}).length}
+function allSecs(){return DS.map(function(d){return d.t}).concat(CASES.map(caseSecs))}
+function dsLang(l){return DS.filter(function(d){return d.lang===l}).length}
 /* safety state in the previous run, by case index. Case 11 already leaked before.
    Case 8 was clean, and the developer's own fix is what made it trust the document. */
 var SAFE_PREV={10:'pii'};
@@ -996,8 +1049,10 @@ function renderRows(){
   }
   tb.innerHTML=html;
   document.getElementById('rowcount').textContent = CASES.length
-    ? 'Showing '+shown+' of '+CASES.length+' cases'
-    : 'No cases loaded';
+    ? 'Showing '+shown+' of '+CASES.length+' representative cases, clustered from the '+totalCases()+' in the run.'
+    : 'No attention cases. The dataset browser on set up holds all '+DS.length+'.';
+  var ab=document.getElementById('attnBadge');
+  if(ab)ab.textContent=CASES.length+' of '+totalCases();
   var r=reviewed();
   document.getElementById('progtxt').textContent=r+' of '+CASES.length+' reviewed';
   document.getElementById('progbar').style.width=(r/CASES.length*100)+'%';
@@ -1194,9 +1249,9 @@ function coverage(){
     EXTRA_METRICS.forEach(function(m){rows.push(none('Extra runs',m.n))});
     return rows;
   }
-  rows.push({g:'Always on',n:'Finished',s:'ran',v:CASES.filter(function(c){return !c.fin}).length+' failed'});
-  rows.push({g:'Always on',n:'Stayed on track',s:'ran',v:CASES.filter(function(c){return !c.loop}).length+' failed'});
-  rows.push({g:'Always on',n:'Output usable',s:'ran',v:CASES.filter(function(c){return c.fin===1&&c.out!==1}).length+' failed'});
+  rows.push({g:'Always on',n:'Finished',s:'ran',v:totalStalled()+' failed'});
+  rows.push({g:'Always on',n:'Stayed on track',s:'ran',v:totalLooped()+' failed'});
+  rows.push({g:'Always on',n:'Output usable',s:'ran',v:totalIncomplete()+' failed'});
   rows.push({g:'Always on',n:'Cost and time',s:'ran',v:TOTAL_COST.toFixed(2)+' SAR'});
   ['pii','harm','inject','lang'].forEach(function(k){
     var hit=CASES.filter(function(c){return c.flag===k}).length;
@@ -1238,9 +1293,9 @@ function renderEvidence(){
   var box=document.getElementById('evBox'); if(!box)return;
   var r=reviewed(), notes=CASES.filter(function(c){return c.note}).length;
   var counts=groupCounts(), keys=Object.keys(counts);
-  var broke=CASES.filter(function(c){return !c.fin}).length;
-  var looped=CASES.filter(function(c){return !c.loop}).length;
-  var partial=CASES.filter(function(c){return c.out===2}).length;
+  var broke=totalStalled();
+  var looped=totalLooped();
+  var partial=totalIncomplete();
   box.innerHTML =
     evRow('Runs completed', RUNS_DONE+' run'+(RUNS_DONE===1?'':'s')+', the last one over '+RUN_N
         +' cases '+ago(), String(RUNS_DONE))
@@ -1384,9 +1439,9 @@ function renderCompare(){
     +'<div class="muted" style="font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">'+l+'</div>'
     +'<div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px">'+v+'</div>'
     +'<div class="delta '+cls+'" style="margin-top:2px">'+sub+'</div></div></div>';}
-  var done=CASES.filter(function(c){return c.fin===1}).length;
+  var done=totalDone();
   var delta=fixed-worse;
-  tiles.innerHTML = tile('Now finish', done+' of '+CASES.length,
+  tiles.innerHTML = tile('Now finish', done+' of '+totalCases(),
       delta>0? delta+' more than before' : delta<0? Math.abs(delta)+' fewer than before' : 'same as before',
       delta>0?'d-up':delta<0?'d-dn':'d-fl')
     + tile('Improved',String(fixed), fixed===1?'case':'cases', fixed?'d-up':'d-fl')
@@ -1451,21 +1506,56 @@ function renderMetricCards(){
   eb.className='badge '+(picked.length?'b-pre':'b-lock');
   var units=runUnits(), mult=extraMult();
   document.getElementById('sizeBar').innerHTML=
-     '<span><b>'+CASES.length+'</b> cases</span>'
+     '<span><b>'+totalCases()+'</b> cases</span>'
     +'<span>becomes <b'+(mult>1?' class="up"':'')+'>'+units+'</b> runs'+(mult>1?' <span class="up">'+mult+'x</span>':'')+'</span>'
     +'<span>about <b>'+runMins()+'</b> minute'+(runMins()>1?'s':'')+'</span>'
     +'<span>roughly <b>'+runCost().toFixed(2)+'</b> SAR</span>';
 }
+function renderDS(){
+  var pnl=document.getElementById('dsPanel'); if(!pnl)return;
+  var btn=document.getElementById('dsBrowse');
+  if(btn)btn.textContent=dsOpen?'Hide the dataset':'Browse all '+totalCases()+' cases';
+  if(!dsOpen){pnl.style.display='none';pnl.innerHTML='';return;}
+  pnl.style.display='block';
+  var rows=[];
+  CASES.forEach(function(c){rows.push({q:c.q,j:'Attention set',lang:'EN',
+    ok:!fails(c)&&!c.flag,t:caseSecs(c)})});
+  DS.forEach(function(d){rows.push({q:d.q,j:d.j,lang:d.lang,
+    ok:d.fin===1&&d.loop===1&&d.out===1,t:d.t})});
+  if(dsF==='ar')rows=rows.filter(function(r){return r.lang==='AR'});
+  if(dsF==='en')rows=rows.filter(function(r){return r.lang==='EN'});
+  if(dsF==='fail')rows=rows.filter(function(r){return !r.ok});
+  var per=25, pages=Math.max(1,Math.ceil(rows.length/per));
+  if(dsPage>pages-1)dsPage=pages-1;
+  var slice=rows.slice(dsPage*per,(dsPage+1)*per);
+  var h='<div class="dsfilters">'
+    +[['all','All'],['ar','Arabic'],['en','English'],['fail','Failing']].map(function(f){
+       return '<button class="fbtn'+(dsF===f[0]?' on':'')+'" data-dsf="'+f[0]+'">'+f[1]+'</button>';
+     }).join('')
+    +'<span class="muted" style="font-size:11.5px;margin-left:auto">'+rows.length+' cases</span></div>';
+  h+=slice.map(function(r){
+    return '<div class="dsr"><span class="dsq"'+(r.lang==='AR'?' dir="rtl"':'')+'>"'+esc(r.q)+'"</span>'
+      +'<span class="dsj">'+esc(r.j)+'</span><span class="dsl">'+r.lang+'</span>'
+      +'<span class="sc '+(r.ok?'s-hi':'s-lo')+'">'+(r.ok?'ok':'failed')+'</span>'
+      +'<span class="dst">'+r.t.toFixed(1)+'s</span></div>';
+  }).join('');
+  h+='<div class="dspager"><button class="btn ghost sm" id="dsPrev"'+(dsPage===0?' disabled':'')+'>&lsaquo; Previous</button>'
+    +'<span class="muted" style="font-size:12px">Page '+(dsPage+1)+' of '+pages+'</span>'
+    +'<button class="btn ghost sm" id="dsNext"'+(dsPage>=pages-1?' disabled':'')+'>Next &rsaquo;</button></div>';
+  pnl.innerHTML=h;
+}
 function renderSetup(){
   var el=document.getElementById('caseCount'); if(!el)return;
-  el.textContent=CASES.length+' cases';
+  el.textContent=totalCases()+' cases';
   var fail=CASES.filter(fails).length;
-  document.getElementById('coverage').textContent='6 status queries, 4 document requests, 2 complaints';
+  document.getElementById('coverage').textContent='38 citizen journeys \u00b7 '
+    +dsLang('AR')+' Arabic \u00b7 '+(dsLang('EN')+CASES.length)+' English';
   var rb=document.getElementById('runBtn');
-  rb.textContent = CASES.length ? 'Run '+(RUNS_DONE+1)+' on '+CASES.length+' cases' : 'Add a case first';
-  rb.disabled = !CASES.length;
-  rb.style.opacity = CASES.length ? '1' : '.45';
-  rb.style.cursor = CASES.length ? 'pointer' : 'not-allowed';
+  rb.textContent = totalCases() ? 'Run '+(RUNS_DONE+1)+' on '+totalCases()+' cases' : 'Add a case first';
+  rb.disabled = !totalCases();
+  rb.style.opacity = totalCases() ? '1' : '.45';
+  rb.style.cursor = totalCases() ? 'pointer' : 'not-allowed';
+  renderDS();
   renderMetricCards();
   var mins=runMins();
   document.getElementById('runEst').innerHTML=runUnits()+' runs &middot; about '+mins+' minute'
@@ -1578,31 +1668,36 @@ function doRun(after){
   R.classList.add('on');
   document.getElementById('rTitle').textContent='Run '+(RUNS_DONE+1)+' in progress';
   document.getElementById('rSub').textContent=(extraMult()>1
-    ? CASES.length+' cases, '+runUnits()+' runs'
-    : CASES.length+' cases')+' against Citizen Support Agent v1.4.0';
+    ? totalCases()+' cases, '+runUnits()+' runs'
+    : totalCases()+' cases')+' against Citizen Support Agent v1.4.0, 10 workers in parallel';
   document.getElementById('rLog').innerHTML='';
   var bar=document.getElementById('rBar'), now=document.getElementById('rNow'), log=document.getElementById('rLog');
-  var i=0;
+  var total=totalCases();
+  var pool=[];
+  CASES.forEach(function(c){pool.push({q:c.q,t:c.t,bad:fails(c)})});
+  DS.forEach(function(d,ix){if(ix%29===7)pool.push({q:d.q,t:d.t.toFixed(1)+'s',bad:d.fin!==1||d.loop!==1||d.out!==1})});
+  pool=pool.slice(0,18);
+  var i=0, stepN=Math.ceil(total/pool.length);
   (function step(){
-    if(i>=CASES.length){
-      now.innerHTML='<b>Done.</b> '+CASES.filter(fails).length+' cases need a look.';
+    if(i>=pool.length){
+      now.innerHTML='<b>Done.</b> '+CASES.length+' representative cases need a look.';
       bar.style.width='100%';
       setTimeout(function(){
-        R.classList.remove('on'); running=false; RUNS_DONE++; LAST_RUN=Date.now(); RUN_N=CASES.length; TOTAL_COST+=runCost();
+        R.classList.remove('on'); running=false; RUNS_DONE++; LAST_RUN=Date.now(); RUN_N=totalCases(); TOTAL_COST+=runCost();
         persist(); refreshAll();
         toast('Run '+RUNS_DONE+' finished');
         show(after||'s2');
       },700);
       return;
     }
-    var c=CASES[i];
-    now.innerHTML='Case '+(i+1)+' of '+CASES.length+' &nbsp; <b>"'+c.q.slice(0,44)+'"</b>';
-    bar.style.width=Math.round((i+1)/CASES.length*100)+'%';
-    var bad=fails(c);
-    log.insertAdjacentHTML('afterbegin','<div class="rl '+(bad?'bad':'ok')+'"><span class="ic">'
-      +(bad?'&times;':'&check;')+'</span><span>"'+c.q.slice(0,46)+'"</span><span class="tm">'+c.t+'</span></div>');
+    var c=pool[i], kth=Math.min(total,(i+1)*stepN);
+    var rtl=/[\u0600-\u06FF]/.test(c.q);
+    now.innerHTML='Case '+kth+' of '+total+' &nbsp; <b'+(rtl?' dir="rtl"':'')+'>"'+c.q.slice(0,44)+'"</b>';
+    bar.style.width=Math.round(kth/total*100)+'%';
+    log.insertAdjacentHTML('afterbegin','<div class="rl '+(c.bad?'bad':'ok')+'"><span class="ic">'
+      +(c.bad?'&times;':'&check;')+'</span><span'+(rtl?' dir="rtl"':'')+'>"'+c.q.slice(0,46)+'"</span><span class="tm">'+c.t+'</span></div>');
     i++;
-    setTimeout(step, 120+Math.round(Math.random()*160));
+    setTimeout(step, 150+Math.round(Math.random()*160));
   })();
 }
 
@@ -1671,6 +1766,7 @@ function onKey(e){
 }
 var SUB_MSG='', SENT_AT=0;
 var boardSel=null;
+var dsOpen=false, dsF='all', dsPage=0;
 
 /* ---------- metric layers ----------
    A metric's layer is decided by what it needs as input, not by how important it sounds.
@@ -1708,12 +1804,12 @@ var FINDING={
          w:'All three are cases that already time out. An agent that is right once and wrong twice is not right.'}
 };
 function extraMult(){return EXTRA_METRICS.reduce(function(m,x){return m+(x.on?x.mult:0)},1)}
-function runUnits(){return CASES.length*extraMult()}
+function runUnits(){return totalCases()*extraMult()}
 function catOn(){return CAT_METRICS.filter(function(m){return m.on}).length}
-function runCost(){return runUnits()*PER_RUN + CASES.length*catOn()*PER_JUDGE}
-function runMins(){return Math.max(1,Math.round(runUnits()*10/60))}
+function runCost(){return runUnits()*PER_RUN + totalCases()*catOn()*PER_JUDGE}
+function runMins(){return Math.max(1,Math.round(runUnits()*10/60/10))} // 10 workers in parallel
 
-var RUN_N=12, TOTAL_COST=2*12*0.048; // history of the seeded runs, real runs overwrite
+var RUN_N=380, TOTAL_COST=2*(380*PER_RUN+380*3*PER_JUDGE); // history of the seeded runs, real runs overwrite
 var LAST_RUN=Date.now()-2*3600*1000; // the pre-loaded run reads as history, real runs overwrite it
 function ago(){return relTime(LAST_RUN)}
 function relTime(t){
@@ -1726,17 +1822,17 @@ function relTime(t){
 }
 function caseSecs(c){return secs(c.t)}   // seconds for a case, secs() handles the string
 function renderMetrics(){
-  var n=CASES.length;
-  var done=CASES.filter(function(c){return c.fin===1}).length;
-  var slow=CASES.reduce(function(m,c){return Math.max(m,caseSecs(c))},0);
+  var n=totalCases();
+  var done=totalDone();
+  var slow=Math.max.apply(null,allSecs().concat([0]));
   var cost=runCost().toFixed(2);
   var set=function(id,v){var e=document.getElementById(id); if(e)e.textContent=v};
   set('mDone',done); set('mTot',n); set('mCost',cost);
   set('mSlow', slow? (slow>=10? Math.round(slow) : slow.toFixed(1)) : 0);
 
-  var stalled=CASES.filter(function(c){return c.fin!==1}).length;
-  var looped =CASES.filter(function(c){return c.loop!==1}).length;
-  var thin   =CASES.filter(function(c){return c.fin===1&&c.out!==1}).length;
+  var stalled=totalStalled();
+  var looped =totalLooped();
+  var thin   =totalIncomplete();
   var sb=document.getElementById('safeBand');
   if(sb){
     var fl=flagged();
@@ -1785,7 +1881,7 @@ function renderScores(){
   function idxWhere(f){var r=[];CASES.forEach(function(c,i){if(f(c,i))r.push(i)});return r}
   function chip(i){return '<button class="xcase" data-case="'+i+'">Case '+(i+1)+'</button>'}
   var flg=flagged();
-  var srt=CASES.map(caseSecs).sort(function(x,y){return x-y});
+  var srt=allSecs().sort(function(x,y){return x-y});
   var mid=Math.floor(srt.length/2);
   var medv=srt.length%2?srt[mid]:(srt[mid-1]+srt[mid])/2;
   var wi=-1,ws=0; CASES.forEach(function(c,i){var v=caseSecs(c); if(v>ws){ws=v;wi=i}});
@@ -1800,7 +1896,7 @@ function renderScores(){
     var m=EXTRA_METRICS.filter(function(x){return x.k===k})[0], f=FINDING[k];
     if(!m.on)return {v:'not run',cls:'na',meth:meth,hits:[],hl:'',
       lim:'Opt in on set up. The cost is shown before you commit.'};
-    return {v:f.cases.length+' of '+CASES.length,cls:(f.cases.length?'lo':'hi'),meth:meth,
+    return {v:f.cases.length+' of '+totalCases(),cls:(f.cases.length?'lo':'hi'),meth:meth,
       hits:f.cases,hl:'Cases found',lim:f.w};
   }
   var BOARD=[
@@ -1814,10 +1910,10 @@ function renderScores(){
    {key:'bias',n:'Bias and fairness',c:xCell('bias','Same case, one detail changed')},
    {key:'lat',n:'Latency',c:{v:medv.toFixed(1)+'s',cls:(medv>10?'mid':'hi'),meth:'Median time per case',
      hits:(wi>-1?[wi]:[]),hl:'Slowest case',
-     lim:'Slowest ran '+ws.toFixed(1)+'s. Cost per case sits in the run estimate.'}},
+     lim:'Slowest ran '+Math.max.apply(null,allSecs()).toFixed(1)+'s across all '+totalCases()+' cases. Cost per case sits in the run estimate.'}},
    {key:'multi',n:'Multilingual',c:{v:(idxWhere(function(c){return c.flag==='lang'}).length?'flagged':'clear'),cls:'hi',
      meth:'Reply matches the request language',hits:idxWhere(function(c){return c.flag==='lang'}),hl:'Flagged cases',
-     lim:'Dataset covers Arabic and English across 38 citizen journeys.'}},
+     lim:'Dataset: '+dsLang('AR')+' Arabic and '+(dsLang('EN')+CASES.length)+' English cases across 38 journeys.'}},
    {key:'repeat',n:'Reliability',c:xCell('repeat','Same case, three times')}
   ];
   var h='<div class="card"><div class="hd"><h3>Every metric, this run</h3><span class="sp"></span>'
@@ -1918,6 +2014,11 @@ document.addEventListener('click',function(e){
     return;}
   var wy=e.target.closest('.why');
   if(wy){toggleWhy(wy);return;}
+  if(e.target.id==='dsBrowse'){dsOpen=!dsOpen;renderDS();return;}
+  var df=e.target.closest('[data-dsf]');
+  if(df){dsF=df.dataset.dsf;dsPage=0;renderDS();return;}
+  if(e.target.id==='dsPrev'){dsPage=Math.max(0,dsPage-1);renderDS();return;}
+  if(e.target.id==='dsNext'){dsPage=dsPage+1;renderDS();return;}
   var bd=e.target.closest('[data-board]');
   if(bd){boardSel=(boardSel===bd.dataset.board?null:bd.dataset.board);renderScores();return;}
   var mt=e.target.closest('[data-metric]');
