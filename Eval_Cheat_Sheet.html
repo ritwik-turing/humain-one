@@ -27,6 +27,17 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 .todo{color:var(--preview);font-weight:700;font-size:11px;letter-spacing:.05em}
 @media(max-width:560px){.row{grid-template-columns:1fr;gap:2px}}
 @media print{.top{display:none}body{background:#fff}.scr{break-inside:avoid;box-shadow:none}}
+.qg{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted);
+  margin:18px 0 6px;padding-top:10px;border-top:1px solid var(--line-2)}
+.qg:first-child{margin-top:8px;border-top:0;padding-top:0}
+.qa{padding:8px 0;border-top:1px solid var(--line)}
+.qa b{display:block;font-size:13px;font-weight:650;margin-bottom:2px}
+.qa span{display:block;font-size:12.5px;color:var(--muted);line-height:1.55}
+#qfilter{width:100%;padding:9px 12px;font:inherit;font-size:13px;margin:6px 0 4px;
+  border:1px solid var(--line-2);border-radius:9px;background:var(--bg)}
+#qfilter:focus{outline:2px solid var(--teal);outline-offset:1px;background:var(--panel)}
+#qcount{margin-bottom:4px}
+@media print{#qfilter,#qcount{display:none}}
 </style>
 
 <div class="top"><b>HUMAIN ONE</b><span>Eval product / client cheat sheet / evolves with the build</span></div>
@@ -147,5 +158,108 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 </div>
 
 <p class="cite" style="margin-top:20px">Evolves with the build. Sections marked UPDATE are pending the next build slices. Sources on request: Yehudai et al., A Survey on Evaluation of LLM-based Agents, ACL 2026 (names cost, safety, robustness as the field gaps). Shankar et al., UIST 2024, EvalGen and criteria drift. Judge-to-human agreement analysis, arXiv 2510.09738, and the kappa 0.6 calibration standard. MAST failure taxonomy. Azure AI Foundry built-in evaluators. Microsoft Marketplace AI certification.</p>
+
+
+<div class="scr" id="qa">
+  <h2>Answer anything</h2>
+  <div class="path">Someone asks, you look it up. Answers are short enough to paste back.</div>
+  <input id="qfilter" type="search" placeholder="Type a word. judge, 380, safety, Arabic, Prism, pass mark" aria-label="Filter questions">
+  <div id="qcount" class="cite"></div>
+  <div id="qlist">
+      <div class="qg">The basics</div>
+      <div class="qa"><b>What is this thing?</b><span>A workbench for developers who build agents for the marketplace. It runs their agent against a few hundred realistic citizen questions, shows them exactly what went wrong, and produces the record a verifier needs before the agent can be listed.</span></div>
+      <div class="qa"><b>What is a case?</b><span>One citizen question, usually with the answer we expect written down next to it. 380 of them make up the test set.</span></div>
+      <div class="qa"><b>What is a run?</b><span>One pass of the agent over every case in the set. Takes about six minutes for 380.</span></div>
+      <div class="qa"><b>What is a check?</b><span>A yes or no question asked of every answer. Did it leak a phone number. Did it reply in Arabic. Checks either fire or they don't.</span></div>
+      <div class="qa"><b>Check or metric, what is the difference?</b><span>A check is yes or no on one answer. A metric is a number across the whole run. Accuracy is a metric, sensitive data is a check.</span></div>
+      <div class="qa"><b>What is a judge?</b><span>An AI that grades answers, because a human cannot grade 380 of them every run. We only trust it as far as we have compared its grades against a human's.</span></div>
+      <div class="qa"><b>What is an attention case?</b><span>One of the twelve we pulled out as worth a person actually reading. They are clustered from the failures across all 380, not a random sample.</span></div>
+      <div class="qa"><b>What is a trace?</b><span>The step by step record of what the agent did inside one case. Which lookups it made, how long each took, where it went wrong.</span></div>
+      <div class="qa"><b>What is a regression?</b><span>Something that used to work and now does not, usually caused by the developer's own last change.</span></div>
+      <div class="qa"><b>What does in production mean?</b><span>The agent is live and real citizens are talking to it. Before that it only ever answers test questions, so mistakes are free.</span></div>
+      <div class="qa"><b>Who is the verifier?</b><span>The human who decides whether an agent gets listed on the marketplace. Our evidence pack is what they read.</span></div>
+      <div class="qa"><b>Who is the tenant?</b><span>The government body whose citizens use the agent. Al Noor Municipality in the demo.</span></div>
+      <div class="qg">Numbers in the demo</div>
+      <div class="qa"><b>Why 380 cases?</b><span>38 citizen journeys with about 10 questions each. Enough to be a real test set rather than a sample, and it matches the scale in the brief we were sent.</span></div>
+      <div class="qa"><b>Where did the 380 come from?</b><span>They are generated for the demo, seeded so the numbers never move between demos. In a real deployment they sync nightly from the tenant's warehouse.</span></div>
+      <div class="qa"><b>Why only 12 attention cases?</b><span>Nobody reviews 380 rows one at a time. Those twelve are clustered from the failures so a developer reads twelve and covers most of what broke. Click All cases and you get the full 380.</span></div>
+      <div class="qa"><b>Why 187 Arabic?</b><span>Roughly half. The dataset covers both languages because the citizens do, and the answer language check exists because an agent replying in English to an Arabic question is a real failure.</span></div>
+      <div class="qa"><b>What is 30.78 SAR?</b><span>Made up. It is what one run over 380 cases would cost if a case cost about five halalas. Placeholder until someone gives me the real unit cost.</span></div>
+      <div class="qa"><b>Why five runs of history?</b><span>So the trend lines mean something. The safety line dips over four runs then jumps back up on the fifth, which is a fix that broke something else.</span></div>
+      <div class="qa"><b>What is 17 of 20?</b><span>How often a saved check agreed with the developer on twenty cases they graded by hand. It is how a check earns the right to be trusted.</span></div>
+      <div class="qa"><b>What does 11 of 15 ran mean?</b><span>On the evidence screen. Fifteen checks exist, eleven ran this time, and the pack names the four that did not and why.</span></div>
+      <div class="qg">The nine metrics</div>
+      <div class="qa"><b>Accuracy</b><span>Did it say the right thing. Compared against the reviewed answer for each case. Only possible where a category has a written answer set.</span></div>
+      <div class="qa"><b>Trustworthiness</b><span>Is every claim in the reply actually supported by the citizen's record, rather than plausible sounding invention.</span></div>
+      <div class="qa"><b>Safety</b><span>Did the reply leak personal data, contain harmful content, follow an instruction hidden in a document, or answer in the wrong language. Always on.</span></div>
+      <div class="qa"><b>Helpfulness</b><span>Could a citizen act on the answer as written, or would they have to come back and ask again.</span></div>
+      <div class="qa"><b>Robustness</b><span>Does the answer hold up when you reword the question. Typos, rephrasings, the way real people actually type.</span></div>
+      <div class="qa"><b>Bias and fairness</b><span>Run the same case twice changing only a name or a region, then compare. If the answer changes, that is the problem.</span></div>
+      <div class="qa"><b>Latency</b><span>How long each case took. Median across the run, plus the slowest one.</span></div>
+      <div class="qa"><b>Multilingual</b><span>Did it reply in the language it was asked in.</span></div>
+      <div class="qa"><b>Reliability</b><span>Run everything three times. An agent that is right once and wrong twice is not right.</span></div>
+      <div class="qg">Why it works this way</div>
+      <div class="qa"><b>Why can safety not be switched off?</b><span>Two cases in the demo pass every single column and still leak a phone number or follow an injected instruction. If safety were a toggle, the developer most likely to ship that agent is the one least likely to tick the box.</span></div>
+      <div class="qa"><b>Why is there no pass mark?</b><span>A single score invites building to the test. Instead the verifier gets everything, including a list of what was not checked, and makes a human call. The gate is transparency, not a number.</span></div>
+      <div class="qa"><b>Why do the judge scores say signal, not measurement?</b><span>Because nobody has checked our AI grader against a human on this dataset yet. Until that happens, treating 78 percent as a fact would be dishonest, so the screen says so itself.</span></div>
+      <div class="qa"><b>Why does the evidence pack list what was not checked?</b><span>Silence about a check reads exactly like a pass. That is how certifications get pulled apart later.</span></div>
+      <div class="qa"><b>Why does the data refresh daily?</b><span>Test sets go stale. New policies, new phrasings, things nobody predicted. An agent tested only on last month's questions passes the test and fails on the street.</span></div>
+      <div class="qa"><b>Why connect Snowflake instead of uploading a file?</b><span>A connected source updates itself. A CSV means somebody has to remember, and the test set quietly drifts away from what citizens are actually asking.</span></div>
+      <div class="qa"><b>Why does bias cost twice as much?</b><span>Because it is not a score on the run you already did. It reruns every case with one detail changed, so 380 cases become 760 runs. The price is shown before you commit.</span></div>
+      <div class="qa"><b>Why does a case show green everywhere and still get flagged?</b><span>Because the mechanical columns only watch the shape of the run. They cannot read the answer. Case 11 finished fast, stayed on track, returned usable text, and gave out somebody else's phone number.</span></div>
+      <div class="qg">Harder questions</div>
+      <div class="qa"><b>Is this not just testing?</b><span>It is testing, with two differences. The developer cannot know in advance what to test for, so the product helps them find out by reading real failures. And it never stops, because the agent behaves differently against real citizens than against a test sheet.</span></div>
+      <div class="qa"><b>Is any of this real, or is it a mockup?</b><span>It is a working prototype. The interactions all function, the numbers all derive from the data behind them, and nothing is a picture of a screen. What is not real is the data itself and the costs.</span></div>
+      <div class="qa"><b>How is this different from Prism?</b><span>Prism is the engine underneath. This is what a developer sees and does. Prism can already run a dataset against an agent and score it; what it does not have is the guided journey, the clustering, or the evidence pack.</span></div>
+      <div class="qa"><b>What stops a developer gaming it?</b><span>Not much, and that is deliberate. There is no score to game because there is no pass mark. What the verifier sees is coverage, open issues the developer declared, and what was not checked.</span></div>
+      <div class="qa"><b>Who wrote the judges?</b><span>For category metrics like accuracy, the marketplace team who own the answer set, so every agent in a category is graded the same way. Developers write their own checks separately and those show their agreement record.</span></div>
+      <div class="qa"><b>What happens if the AI grader is wrong?</b><span>Right now the score is labelled as a signal, so nothing automatic happens on it. That is why our regression rules never suspend an agent over a judge score, only over unambiguous things like a data leak.</span></div>
+      <div class="qg">Scope</div>
+      <div class="qa"><b>What is actually built?</b><span>Everything in the prototype works end to end: the dataset browser, all nine metrics with drilldowns, the trace view, notes and grouping, saved checks with agreement records, run history, the regression view, the evidence pack and its print export.</span></div>
+      <div class="qa"><b>What is designed but not built?</b><span>Turning a sampled production conversation into a scored case needs a human to write the expected answer, and there is no screen for that yet. Multi turn conversations are not modelled at all.</span></div>
+      <div class="qa"><b>What did the client actually reject, and what changed?</b><span>V1 was called dense and not exhaustive. It argued its case in paragraphs on every screen while showing twelve cases and four columns. V2 shows nine metrics, 380 cases, five runs of history and a working checks library, and the arguments moved behind small (i) buttons.</span></div>
+      <div class="qa"><b>Why is there a V1 and a V2?</b><span>V1 is the version that was reviewed last week. I left it untouched so the old link still shows what was actually reviewed, rather than quietly changing underneath anyone.</span></div>
+      <div class="qg">The open questions</div>
+      <div class="qa"><b>How does a developer know their checks are enough?</b><span>They do not. We hand them a blank box. Options are a starter set per category, or using our own failure clustering to show which clusters have nothing watching them.</span></div>
+      <div class="qa"><b>How do we judge an agent once it is live?</b><span>Live conversations have no expected answer, so accuracy cannot run at all. Best cheap option is signals the tenant already has, like whether the citizen asked again or gave up.</span></div>
+      <div class="qa"><b>Compliance, us or Certify?</b><span>Split it. Eval takes anything a computer can recheck every run, Certify takes the human call. Rules change, and if it all sits in Certify then a rule change silently invalidates everything already approved.</span></div>
+      <div class="qa"><b>What about conversations rather than single questions?</b><span>Not started. Everything is one question and one answer, and some failures only appear across turns.</span></div>
+      <div class="qa"><b>What about a category with no answer set?</b><span>The agent still runs and gets everything that needs no answer key. It just has no accuracy score, and the screen says so. Comparing two agents only means anything once both were scored on the same answer set.</span></div>
+      <div class="qa"><b>Who pays?</b><span>My proposal is whoever the check protects. Safety free and unlimited, category scores free within a fair budget, the expensive reruns on the developer, production monitoring on the tenant.</span></div>
+      <div class="qa"><b>Who keeps the AI grader honest?</b><span>Whoever owns the answer set, since they are the only ones who can produce human grades. And the product should show when each judge was last checked, so the rot is visible rather than assumed away.</span></div>
+      <div class="qa"><b>Who checks our own PII stripper?</b><span>Nobody yet, which is the uncomfortable one. It should be evaluated with our own product: hand tagged conversations, 99 percent on national IDs and bank details, and the sampling pipeline halts by itself if it drops.</span></div>
+      <div class="qa"><b>What happens when a live agent gets worse?</b><span>My proposal: a safety problem pulls it from new installs within the hour, basics slipping gives seven days then a mark on the listing, and a judge score moving does nothing at all.</span></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var box=document.getElementById('qfilter'), list=document.getElementById('qlist'),
+      count=document.getElementById('qcount');
+  var items=[].slice.call(list.querySelectorAll('.qa'));
+  var groups=[].slice.call(list.querySelectorAll('.qg'));
+  function run(){
+    var q=box.value.trim().toLowerCase();
+    var shown=0;
+    items.forEach(function(el){
+      var hit=!q||el.textContent.toLowerCase().indexOf(q)>-1;
+      el.style.display=hit?'':'none';
+      if(hit)shown++;
+    });
+    groups.forEach(function(g){
+      var any=false, n=g.nextElementSibling;
+      while(n&&!n.classList.contains('qg')){
+        if(n.classList.contains('qa')&&n.style.display!=='none')any=true;
+        n=n.nextElementSibling;
+      }
+      g.style.display=any?'':'none';
+    });
+    count.textContent=q? shown+' of '+items.length+' questions' : items.length+' questions';
+  }
+  box.addEventListener('input',run);
+  box.addEventListener('keydown',function(e){if(e.key==='Escape'){box.value='';run();}});
+  run();
+})();
+</script>
 
 </div>
