@@ -47,6 +47,27 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 </div>
 
 <div class="scr">
+  <h2>The whole picture, in plain English</h2>
+  <div class="path">For you, before the meeting. Not a script.</div>
+
+  <div class="row"><b>The setting</b><span>HUMAIN ONE is a marketplace. Outside developers build AI agents, small software workers that talk to citizens and do tasks, like answering questions about permits. A developer submits their agent, a human verifier decides whether it can be listed, and approved agents go live for a government body such as a municipality. This eval product is the workbench the developer uses to find out what is wrong with their agent and fix it, both before launch and after.</span></div>
+
+  <div class="row"><b>What an evaluation actually is</b><span>You cannot read an agent and know if it is good, the way you cannot read a driver and know if they can drive. The only way is to test it: ask it hundreds of realistic questions and judge what comes back. An evaluation is exactly that, a big list of test questions called cases, plus machinery that scores the answers. A run is one sitting of the whole test.</span></div>
+
+  <div class="row"><b>What "in production" means</b><span>Before launch, the agent only ever answers test questions. Mistakes are free, nobody real is on the other end. "In production" means the agent is live: real citizens are talking to it, and a mistake now has consequences, wrong information given, or worse, one citizen shown another citizen's details. The same agent behaves differently against real people than against a test sheet, which is why evaluation cannot stop at launch.</span></div>
+
+  <div class="row"><b>Why the data refreshes daily</b><span>A test set goes stale. Real people ask things nobody predicted: a new policy arrives, a season changes, people phrase things in new ways. An agent that is only tested on last month's questions will pass the test and fail on the street. So the dataset syncs nightly from the data warehouse, and the product samples one in fifty real conversations, with personal details masked, into the test set. Yesterday's real traffic becomes today's exam. And when something fails in production, that exact conversation becomes a permanent test case, so the same failure can never slip through silently again. That is the closed loop the demo keeps referring to.</span></div>
+
+  <div class="row"><b>Why connect a warehouse instead of uploading files</b><span>Organisations keep their records and logs in one central place, a data warehouse like Snowflake. Connecting to it means the test set updates itself from the source of truth. Uploading CSVs by hand means someone has to remember to do it, and the test set quietly drifts away from reality.</span></div>
+
+  <div class="row"><b>Who is who</b><span>The developer builds the agent, reads its failures, writes notes and checks. The platform runs everything that needs no knowledge of the agent: did it finish, did it loop, did it leak data. The judge is an AI that grades answers at scale, cheap but only trustworthy once its grades are compared against a human's, which is what the agreement score is. The verifier is the human who decides marketplace entry. The tenant is the government body whose citizens use the agent.</span></div>
+
+  <div class="row"><b>Why there is no pass mark</b><span>A single score invites gaming: build to the test, hide the gaps. Instead the verifier receives everything, including a list of what was not checked, and makes a human decision. The gate is transparency, not a number.</span></div>
+
+  <div class="row"><b>Plain words</b><span><b>Case</b>: one test question with the answer you expect. <b>Dataset</b>: all the cases. <b>Run</b>: one pass of the agent over the dataset. <b>Check</b>: a yes-or-no question asked of every answer. <b>Metric</b>: a score across the whole run. <b>Judge</b>: an AI that grades answers. <b>Attention set</b>: the handful of cases picked out as worth a human look. <b>Trace</b>: the step-by-step record of what the agent did inside one case. <b>Regression</b>: something that used to work and now does not. <b>Sampling</b>: copying a small share of real traffic into the test set. <b>PII masking</b>: stripping names, numbers and identifiers before anyone sees a conversation.</span></div>
+</div>
+
+<div class="scr">
   <h2>Set up a run</h2>
   <div class="path">Screen 1 &middot; the three-layer metric board</div>
   <div class="row"><b>What</b><span>The gov-services-eval dataset, 380 cases across 38 citizen journeys in Arabic and English, synced nightly from Snowflake, with connectors for CSV, warehouse, S3 or GCS, and sampled production traffic. Every card is typed: Dataset, Built-in checks, Judge metrics, Run strategies. Cost and run count update live as you pick.</span></div>
