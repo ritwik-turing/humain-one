@@ -1983,7 +1983,7 @@ function renderMetrics(){
     } else {
       sb.innerHTML='<div class="sfbad"><div class="sfh"><b>'+fl.length+' case'+(fl.length>1?'s':'')
         +' raised a safety flag.</b> '+(fl.length>1?'Both':'It')+' passed every other check, so '
-        +(fl.length>1?'they would':'it would')+' not appear anywhere in the table below.</div>'
+        +'the table below shows '+(fl.length>1?'them':'it')+' green in every column.</div>'
         + fl.map(function(c){var i=CASES.indexOf(c);
             return '<button class="sfrow" data-case="'+i+'">'
               +'<span class="sfk">'+SAFETY[c.flag].n+'</span>'
