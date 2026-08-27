@@ -138,6 +138,20 @@ tr.click:focus-visible{outline-offset:-2px}
 .cvn{font-weight:600}
 .cvv{color:var(--muted);font-size:12px;text-align:right}
 .cvv.warn{color:var(--preview);font-weight:700}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.bcell{display:block;text-align:left;font:inherit;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:11px 12px;cursor:pointer;width:100%}
+.bcell:hover{border-color:var(--line-2)}
+.bcell.on{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+.bn{display:block;font-size:11.5px;font-weight:700}
+.bv{display:block;font-size:20px;font-weight:750;margin-top:2px}
+.bv.hi{color:var(--gov)} .bv.mid{color:var(--preview)} .bv.lo{color:var(--alert)}
+.bv.na{color:var(--muted);font-weight:600;font-size:14px;padding-top:4px}
+.bm{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.bdrill{margin-top:10px;padding:12px 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+.bdrill .t{font-size:12.5px;font-weight:700}
+.bdrill .d{font-size:12px;margin-top:3px}
+.bdrill .lim{font-size:11.5px;color:var(--muted);margin-top:8px}
 .jgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .jc{border:1px solid var(--line);border-radius:10px;padding:13px}
 .jn{font-size:12px;font-weight:700}
@@ -406,6 +420,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   .grid3,.grid5,.nextup,.tsum{grid-template-columns:1fr 1fr}
   .grid4{grid-template-columns:1fr}
   .jgrid{grid-template-columns:1fr}
+  .board{grid-template-columns:repeat(2,1fr)}
   .colkey{grid-template-columns:1fr;gap:7px}
   .colkey>div{grid-template-columns:1fr;gap:1px}
   .casenav{gap:6px}
@@ -1655,6 +1670,7 @@ function onKey(e){
   else if(k==='s'){e.preventDefault();CASES[cur].skipped=true;CASES[cur].note='';persist();nextUnreviewed();}
 }
 var SUB_MSG='', SENT_AT=0;
+var boardSel=null;
 
 /* ---------- metric layers ----------
    A metric's layer is decided by what it needs as input, not by how important it sounds.
@@ -1663,7 +1679,7 @@ var SUB_MSG='', SENT_AT=0;
    L3 needs the cases run again in altered form, so it changes the size of the run. */
 var CAT_METRICS=[
  {k:'acc',  on:true, n:'Accuracy',    d:'Compared against the reviewed answer for each case. Only possible because this category has one.'},
- {k:'rel',  on:true, n:'Relevance',   d:'Did the answer address what was actually asked, rather than something adjacent.'},
+ {k:'trust',on:true, n:'Trustworthiness', d:'Every claim in the reply is supported by the record on file.'},
  {k:'help', on:true, n:'Helpfulness', d:'Could a citizen act on the answer as written, without asking again.'}
 ];
 var EXTRA_METRICS=[
@@ -1680,7 +1696,7 @@ var PER_RUN=0.048, PER_JUDGE=0.011;
    so they ship with their own limit stated rather than as a bare percentage. */
 var JUDGE={
  acc: {v:78, d:'Compared against the reviewed answer for each of the 380 cases in gov-services-eval.'},
- rel: {v:91, d:'Did the reply address the question that was asked.'},
+ trust:{v:92, d:'Claims in the reply are supported by the record on file.'},
  help:{v:84, d:'Could a citizen act on the reply without asking again.'}
 };
 var FINDING={
@@ -1762,49 +1778,73 @@ function renderScores(){
   var box=document.getElementById('scoreBox'); if(!box)return;
   if(!hasResults()){
     box.innerHTML='<div class="card"><div class="bd"><p class="muted" style="margin:0;font-size:12.5px">'
-      +'<b>Nothing to score.</b> No cases ran, so there is no accuracy, relevance or helpfulness to report. '
+      +'<b>Nothing to score.</b> No cases ran, so there is no metric to report. '
       +'Add a case on the setup screen and run it.</p></div></div>';
     return;
   }
-  var cats=CAT_METRICS.filter(function(m){return m.on});
-  var xs=EXTRA_METRICS.filter(function(m){return m.on});
-  if(!cats.length&&!xs.length){
-    box.innerHTML='<div class="card"><div class="bd"><p class="muted" style="margin:0;font-size:12.5px">'
-      +'<b>Nothing else was scored.</b> You turned off every category metric and picked no extra runs, '
-      +'so this run only has the always-on checks above.</p></div></div>';
-    return;
+  function idxWhere(f){var r=[];CASES.forEach(function(c,i){if(f(c,i))r.push(i)});return r}
+  function chip(i){return '<button class="xcase" data-case="'+i+'">Case '+(i+1)+'</button>'}
+  var flg=flagged();
+  var srt=CASES.map(caseSecs).sort(function(x,y){return x-y});
+  var mid=Math.floor(srt.length/2);
+  var medv=srt.length%2?srt[mid]:(srt[mid-1]+srt[mid])/2;
+  var wi=-1,ws=0; CASES.forEach(function(c,i){var v=caseSecs(c); if(v>ws){ws=v;wi=i}});
+  function catCell(k,hits,label){
+    var m=CAT_METRICS.filter(function(x){return x.k===k})[0];
+    if(!m.on)return {v:'off',cls:'na',meth:'Turned off by the developer',hits:[],hl:'',
+      lim:'Turn it on in set up to score the next run.'};
+    return {v:JUDGE[k].v+'%',cls:(JUDGE[k].v>=85?'hi':'mid'),meth:JUDGE[k].d,hits:hits,hl:label,
+      lim:'A model judged this. Treat it as a signal, not a measurement, until judge agreement against a human ships.'};
   }
-  var h='';
-  if(cats.length){
-    h+='<div class="card"><div class="hd"><h3>Scored by a judge</h3><span class="sp"></span>'
-      +'<span class="badge b-pre">Signal, not a measurement</span></div><div class="bd">'
-      +'<div class="jgrid">'
-      + cats.map(function(m){var j=JUDGE[m.k];
-          return '<div class="jc"><div class="jn">'+m.n+'</div>'
-            +'<div class="jv">'+j.v+'<span>%</span></div>'
-            +'<div class="jb"><i style="width:'+j.v+'%"></i></div>'
-            +'<div class="jd">'+j.d+'</div></div>';}).join('')
-      +'</div>'
-      +'<p class="muted" style="font-size:12px;margin:14px 0 0">These come from a model judging another '
-      +'model. Nobody has checked the judge against a human on this dataset yet, so a percentage here is '
-      +'a signal worth investigating, not a measurement you can quote. Judge agreement is '
-      +'<a href="#" data-go="s5" style="color:inherit">not in this release</a>.</p>'
-      +'</div></div>';
+  function xCell(k,meth){
+    var m=EXTRA_METRICS.filter(function(x){return x.k===k})[0], f=FINDING[k];
+    if(!m.on)return {v:'not run',cls:'na',meth:meth,hits:[],hl:'',
+      lim:'Opt in on set up. The cost is shown before you commit.'};
+    return {v:f.cases.length+' of '+CASES.length,cls:(f.cases.length?'lo':'hi'),meth:meth,
+      hits:f.cases,hl:'Cases found',lim:f.w};
   }
-  if(xs.length){
-    h+='<div class="card"><div class="hd"><h3>From the extra runs</h3><span class="sp"></span>'
-      +'<span class="muted" style="font-size:12px">'+runUnits()+' runs across '+CASES.length+' cases</span>'
-      +'</div><div class="bd"><div class="mrows">'
-      + xs.map(function(m){var f=FINDING[m.k], n=f.cases.length;
-          return '<div class="xf"><div class="xh"><b>'+m.n+'</b>'
-            +'<span class="xn">'+n+' of '+CASES.length+'</span></div>'
-            +'<div class="xd">'+n+' case'+(n>1?'s':'')+' '+f.d+'.</div>'
-            +'<div class="xw">'+f.w+'</div>'
-            +'<div class="xl">'+f.cases.map(function(i){
-                return '<button class="xcase" data-case="'+i+'">Case '+(i+1)+'</button>';}).join('')
-            +'</div></div>';}).join('')
-      +'</div></div></div>';
+  var BOARD=[
+   {key:'acc',n:'Accuracy',c:catCell('acc',idxWhere(function(c){return c.out!==1}),'Lowest scoring cases')},
+   {key:'trust',n:'Trustworthiness',c:catCell('trust',[7],'Unsupported claims')},
+   {key:'safety',n:'Safety',c:{v:(flg.length?flg.length+' flagged':'clear'),cls:(flg.length?'lo':'hi'),
+     meth:'Reads every reply. Cannot be switched off.',hits:idxWhere(function(c){return !!c.flag}),hl:'Flagged cases',
+     lim:'Sensitive data, harmful content, prompt injection and answer language. A disabled check is not a guarantee.'}},
+   {key:'help',n:'Helpfulness',c:catCell('help',idxWhere(function(c){return c.out===2}),'Lowest scoring cases')},
+   {key:'robust',n:'Robustness',c:xCell('robust','Same case, reworded')},
+   {key:'bias',n:'Bias and fairness',c:xCell('bias','Same case, one detail changed')},
+   {key:'lat',n:'Latency',c:{v:medv.toFixed(1)+'s',cls:(medv>10?'mid':'hi'),meth:'Median time per case',
+     hits:(wi>-1?[wi]:[]),hl:'Slowest case',
+     lim:'Slowest ran '+ws.toFixed(1)+'s. Cost per case sits in the run estimate.'}},
+   {key:'multi',n:'Multilingual',c:{v:(idxWhere(function(c){return c.flag==='lang'}).length?'flagged':'clear'),cls:'hi',
+     meth:'Reply matches the request language',hits:idxWhere(function(c){return c.flag==='lang'}),hl:'Flagged cases',
+     lim:'Dataset covers Arabic and English across 38 citizen journeys.'}},
+   {key:'repeat',n:'Reliability',c:xCell('repeat','Same case, three times')}
+  ];
+  var h='<div class="card"><div class="hd"><h3>Every metric, this run</h3><span class="sp"></span>'
+    +'<span class="muted" style="font-size:12px">Judge scores are a signal, not a measurement</span>'
+    +'<button class="why" aria-expanded="false" aria-label="About judge scores" data-why="Accuracy, trustworthiness and helpfulness come from a model judging another model. Nobody has checked that judge against a human on this dataset yet, so treat them as direction rather than truth. Judge agreement is named in the evidence pack as not yet run.">i</button>'
+    +'</div><div class="bd"><div class="board">'
+    + BOARD.map(function(b){
+        return '<button class="bcell'+(boardSel===b.key?' on':'')+'" data-board="'+b.key
+          +'" aria-expanded="'+(boardSel===b.key)+'">'
+          +'<span class="bn">'+b.n+'</span><span class="bv '+b.c.cls+'">'+b.c.v+'</span>'
+          +'<span class="bm">'+b.c.meth+'</span></button>';
+      }).join('')
+    +'</div>';
+  if(boardSel){
+    var sel=BOARD.filter(function(b){return b.key===boardSel})[0];
+    if(sel){
+      h+='<div class="bdrill"><div class="t">'+sel.n+'</div><div class="d">'+sel.c.meth+'</div>'
+        +(sel.c.cls==='na'
+          ? ''
+          : sel.c.hits.length
+          ? '<div class="d" style="margin-top:8px"><span class="muted" style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">'+sel.c.hl+'</span>'
+            +'<div class="xl" style="margin-top:6px">'+sel.c.hits.map(chip).join('')+'</div></div>'
+          : '<div class="d" style="margin-top:8px;color:var(--gov)">Nothing flagged in this run.</div>')
+        +'<div class="lim">'+sel.c.lim+'</div></div>';
+    }
   }
+  h+='</div></div>';
   box.innerHTML=h;
 }
 function renderResultsCopy(){
@@ -1878,6 +1918,8 @@ document.addEventListener('click',function(e){
     return;}
   var wy=e.target.closest('.why');
   if(wy){toggleWhy(wy);return;}
+  var bd=e.target.closest('[data-board]');
+  if(bd){boardSel=(boardSel===bd.dataset.board?null:bd.dataset.board);renderScores();return;}
   var mt=e.target.closest('[data-metric]');
   if(mt){
     var parts=mt.dataset.metric.split(':');
