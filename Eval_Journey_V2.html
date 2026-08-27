@@ -480,6 +480,14 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
 }
 .wm{position:fixed;right:12px;bottom:12px;background:var(--ink);color:#fff;font-size:10.5px;
  padding:5px 10px;border-radius:7px;opacity:.75;font-family:ui-monospace,Menlo,monospace}
+@media print{
+  .top,.rail,.side,.runbar,.btn,.topbtn,.fbtn,.why,.whypanel,.lnk,.keyhint,.wm,.toast,#runner{display:none!important}
+  .shell{display:block}
+  .main{padding:0}
+  body{background:#fff}
+  .card{box-shadow:none;break-inside:avoid;border-color:#ccc}
+  .screen{padding:0}
+}
 </style>
 </head>
 <body>
@@ -826,7 +834,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   <!-- 7 EVIDENCE -->
   <section class="screen" id="s7">
     <h2 class="h1">Evidence</h2>
-    <p class="sub">Everything the verifier will see. None of it was assembled by hand. Each line came out of the work you already did.</p>
+    <p class="sub">Everything the verifier will see, assembled from the work you already did.</p>
 
     <div class="card">
       <div class="hd"><h3>What we collected while you worked</h3><span class="sp"></span><span class="badge b-gov">Nothing to fill in</span></div>
@@ -836,24 +844,21 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <div class="card">
       <div class="hd"><h3>What was checked, and what was not</h3><span class="sp"></span><span class="badge b-gov" id="covBadge"></span></div>
       <div class="bd">
-        <p class="muted" style="margin:0 0 12px;font-size:12.5px">A pack that leaves a check out cannot be read. Silence about a metric looks the same as a pass. Every check is listed below with what actually happened to it.</p>
+        <p class="muted" style="margin:0 0 12px;font-size:12.5px">Every check is listed with what actually happened to it, including the ones that did not run.<button class="why" aria-expanded="false" aria-label="Why list checks that did not run" data-why="Silence about a metric looks the same as a pass, which is how certifications get torn apart. A pack that leaves a check out cannot be read, so this one states its own coverage.">i</button></p>
         <div id="covBox"></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="hd"><h3>Still open</h3><span class="sp"></span><span id="evOpenBadge"></span></div>
+      <div class="hd"><h3>Still open</h3><button class="why" aria-expanded="false" aria-label="Why show unresolved issues to the verifier" data-why="A developer who states what is still wrong is easier to trust than one who submits a clean-looking record. The verifier sees the same picture you do.">i</button><span class="sp"></span><span id="evOpenBadge"></span></div>
       <div class="bd">
         <p class="muted" style="margin:0 0 8px;font-size:12.5px">Failure groups you found but have not resolved. These go to the verifier as they are.</p>
         <div class="openlist" id="evOpen"></div>
-        <div class="declare">
-          <div class="t">Why we show these rather than hide them</div>
-          <p>A developer who states what is still wrong is easier to trust than one who submits a clean-looking record. The verifier sees the same picture you do.</p>
-        </div>
       </div>
     </div>
 
     <button class="btn" data-go="s8">Continue to verification</button>
+    <button class="btn ghost" id="printPack">Download the pack as PDF</button>
     <button class="btn ghost" data-go="s4">Keep working on these first</button>
   </section>
 
@@ -2130,6 +2135,7 @@ document.addEventListener('click',function(e){
   if(e.target.id==='saveNote'){CASES[cur].note=document.getElementById('caseNote').value.trim();persist();nextUnreviewed();return;}
   var rm=e.target.closest('[data-rm]');
   if(rm){removeCase(+rm.dataset.rm);return;}
+  if(e.target.id==='printPack'){window.print();return;}
   if(e.target.id==='deferSave'){saveCheck();return;}
   if(e.target.id==='deferTry'){tryCheck();return;}
   var rc=e.target.closest('[data-rmchk]');
