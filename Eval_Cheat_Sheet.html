@@ -50,7 +50,7 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
   <div class="row"><b>What</b><span>A nine-metric board covering the whole palette: accuracy, trustworthiness, safety, helpfulness, robustness, bias and fairness, latency, multilingual, reliability. Every cell opens per-case evidence. An across-runs card tracks six of them as sparklines over the full run history. Below it, the safety band and the per-case table.</span></div>
   <div class="row"><b>Why</b><span>Two cases in the demo pass every automatic column and still raise a safety flag: a cross-record phone number leak and a prompt injection from an uploaded document. Without always-on answer checks both are invisible. <span class="cite">Looping and early exit alone are ~a quarter of failures in published agent-failure taxonomies (MAST); the rest needs judgement.</span></span></div>
   <div class="row say"><b>Say this</b><span>Every metric in your palette is on this one screen, and every number opens the cases behind it. Then watch case 8 and case 11: green across every column, and both are the kind of failure that ends up in a newspaper. That is why safety is not a toggle.</span></div>
-  <div class="row push"><b>Push back</b><span>"How do you know the judge is right?" We do not, and the card says so on screen: judge scores are labelled signal, not measurement, until judge-vs-human agreement ships. Stating the limit beats having it extracted from us.</span></div>
+  <div class="row push"><b>Push back</b><span>"How do you know the judge is right?" We do not yet, and the card says so on screen: judge scores are labelled signal, not measurement, until judge-vs-human agreement ships. The design follows the published calibration loop, sample, hand-grade, compute agreement, recalibrate on change, and well-calibrated judges now agree with humans about as often as two humans agree with each other. Stating the limit beats having it extracted from us.</span></div>
 </div>
 
 <div class="scr">
@@ -66,7 +66,7 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
   <h2>Turn notes into checks</h2>
   <div class="path">Screen 5 &middot; notes become permanent tests, and the judge earns trust</div>
   <div class="row"><b>What</b><span>A note the developer wrote becomes a saved check that runs on every case of every future run. Before anyone relies on a check, the product shows how often it agreed with the developer on cases they graded by hand: 17 of 20 here, with the three disagreements listed row by row.</span></div>
-  <div class="row"><b>Why</b><span>Evaluation criteria drift as developers read outputs, so automated judges must be validated against human grades rather than assumed correct. Showing the agreement record before a check gates anything is the published state of the art. <span class="cite">EvalGen, Shankar et al., UIST 2024: "Who Validates the Validators?"</span></span></div>
+  <div class="row"><b>Why</b><span>Evaluation criteria drift as developers read outputs, so automated judges must be validated against human grades rather than assumed correct. Showing the agreement record before a check gates anything is the published state of the art. <span class="cite">EvalGen, Shankar et al., UIST 2024: "Who Validates the Validators?" The 2026 industry standard formalises the same loop: hand-grade a sample, compute judge-to-human agreement, accept at kappa 0.6 and above, recalibrate monthly.</span></span></div>
   <div class="row say"><b>Say this</b><span>Most tools let you write a judge and trust it blindly. Here the judge earns trust: it shows you exactly where it disagrees with you before it ever scores a run, and every saved check carries that record into the evidence pack.</span></div>
   <div class="row push"><b>Push back</b><span>"Is 20 hand-graded cases enough?" It is the starting signal, and the screen says exactly how many grades back the number. Every case the developer reviews afterwards sharpens it. The alternative shipped by everyone else is zero validation.</span></div>
 </div>
@@ -92,12 +92,13 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 <div class="scr">
   <h2>Objection bank</h2>
   <div class="path">Cross-cutting</div>
+  <div class="row push"><b>Is this state of the art?</b><span>The ACL 2026 survey of agent evaluation names cost-efficiency, safety and robustness as the critical gaps in the field. Those are exactly the three this product treats as first class: cost on every estimate before you run, safety always on, robustness one toggle away with its price shown.</span></div>
   <div class="row push"><b>Cost figures</b><span>Illustrative at 0.048 SAR per case, consistent everywhere. Real unit economics slot in without changing the design.</span></div>
   <div class="row push"><b>Arabic</b><span>187 of the 380 cases are Arabic, rendered right to left in the dataset browser, and the answer-language check is always on. Open the browser and click the Arabic filter to show it live.</span></div>
   <div class="row push"><b>Why 12 rows for 380 cases?</b><span>Nobody reviews 380 rows. The run covers all 380 and the aggregates say so; the table shows 12 representative cases clustered from the failures, the same triage pattern issue trackers use. Every number on the metric board still opens the evidence behind it.</span></div>
   <div class="row push"><b>Any agent?</b><span>Layer 1 needs nothing from the developer, so it works for any agent on first upload. Only category scores need a curated answer set, and the product says so instead of hiding it.</span></div>
 </div>
 
-<p class="cite" style="margin-top:20px">Evolves with the build. Sections marked UPDATE are pending the next build slices. Sources on request: MAST failure taxonomy, Shankar et al. UIST 2024 (criteria drift), Azure AI Foundry built-in evaluators, Microsoft Marketplace AI certification, EvalGen judge-alignment workflow.</p>
+<p class="cite" style="margin-top:20px">Evolves with the build. Sections marked UPDATE are pending the next build slices. Sources on request: Yehudai et al., A Survey on Evaluation of LLM-based Agents, ACL 2026 (names cost, safety, robustness as the field gaps). Shankar et al., UIST 2024, EvalGen and criteria drift. Judge-to-human agreement analysis, arXiv 2510.09738, and the kappa 0.6 calibration standard. MAST failure taxonomy. Azure AI Foundry built-in evaluators. Microsoft Marketplace AI certification.</p>
 
 </div>
