@@ -138,6 +138,10 @@ tr.click:focus-visible{outline-offset:-2px}
 .cvn{font-weight:600}
 .cvv{color:var(--muted);font-size:12px;text-align:right}
 .cvv.warn{color:var(--preview);font-weight:700}
+.chkrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;
+  border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px}
+.chkrow .ckt{font-size:12.5px;font-weight:600;line-height:1.45}
+.chkrow .ckm{font-size:11.5px;color:var(--muted);margin-top:4px}
 .dsfilters{display:flex;gap:6px;align-items:center;margin:14px 0 8px;flex-wrap:wrap}
 .dsr{display:grid;grid-template-columns:1fr 132px 30px 52px 44px;gap:10px;align-items:baseline;
   padding:6px 0;border-bottom:1px solid var(--line);font-size:12px}
@@ -498,8 +502,8 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   <div class="dec"><b>Going in circles and stopping early are worth catching for free</b><span>Those two account for about a quarter of failures in published studies of agent systems, so the cheap mechanical checks pay for themselves before anyone writes a single test. They cannot tell you whether an answer was right, which is the other three quarters.</span></div>
   <div class="dec"><b>Correctness is the developer's judgement</b><span>They read what happened and write what went wrong in their own words. We group those notes and count them. We never suggest a fix, because we never see their code. Where a judge does score correctness, the number ships labelled as a signal rather than a measurement, because nobody has checked that judge against a human on this dataset yet.</span></div>
   <div class="dec"><b>The pack says what was not checked</b><span>Every check is listed for the verifier with what happened to it, including the ones that did not run and why. Silence about a metric reads the same as a pass, which is how a certification gets torn apart.</span></div>
-  <div class="dec"><b>In this release</b><span>Which cases failed and what the agent did step by step, the always-on mechanical and safety checks, a place to write what went wrong, those notes grouped and counted, what broke since last time including new safety flags, category scores where an answer set exists, optional extra runs with the cost shown, and a coverage statement for the verifier.</span></div>
-  <div class="dec"><b>Deferred</b><span>Turning notes into automatic checks, judge agreement against a human, slicing by category, and a shared library of checks. The numbers in this mockup are illustrative, including cost per case, which needs the real figure before it goes further.</span></div>
+  <div class="dec"><b>In this release</b><span>Which cases failed and what the agent did step by step, the always-on mechanical and safety checks, a place to write what went wrong, those notes grouped and counted, notes turned into saved checks with their agreement record, what broke since last time including new safety flags, category scores where an answer set exists, optional extra runs with the cost shown, and a coverage statement for the verifier.</span></div>
+  <div class="dec"><b>Deferred</b><span>Judge agreement against a human, and slicing results by category. The numbers in this mockup are illustrative, including cost per case, which needs the real figure before it goes further.</span></div>
   <div style="margin-top:18px"><button class="btn" id="aboutClose">Close</button></div>
 </div></div>
 
@@ -510,12 +514,11 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <button class="snav" data-go="s2"><span class="n">2</span>Results</button>
     <button class="snav" data-go="s3"><span class="n">3</span>What the agent did</button>
     <button class="snav" data-go="s4"><span class="n">4</span>What went wrong</button>
-    <button class="snav" data-go="s6"><span class="n">5</span>What broke since last time</button>
+    <button class="snav" data-go="s5"><span class="n">5</span>Turn notes into checks</button>
+    <button class="snav" data-go="s6"><span class="n">6</span>What broke since last time</button>
     <div class="sgrp" style="margin-top:14px">Next steps &middot; steps 7 and 8</div>
     <button class="snav" data-go="s7"><span class="n">&rsaquo;</span>Evidence<span class="tick">&check;</span></button>
     <button class="snav" data-go="s8"><span class="n">&rsaquo;</span>Submit for verification</button>
-    <div class="sgrp" style="margin-top:16px">Not in this release</div>
-    <button class="snav later" data-go="s5"><span class="n">&mdash;</span>Turn notes into checks</button>
   </nav>
 
   <main class="main">
@@ -719,7 +722,6 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
 
   <!-- 5 YOUR CHECKS -->
   <section class="screen" id="s5">
-    <div class="hint" style="background:var(--lock-bg);border-color:var(--lock-bd);color:var(--lock)"><b>Not in this release.</b> Shown so the direction is clear. In the first version the developer's own note is the judgement, and we group and count those. Turning notes into automatic checks matters once someone is running hundreds of cases, which is a later problem.</div>
     <h2 class="h1">Turn notes into checks</h2>
     <p class="sub">Written from what you actually saw. Each one becomes a question we ask of every future run.</p>
 
@@ -728,7 +730,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
       <div class="bd">
         <div class="note">
           <div class="lb">What should be true of a good answer?</div>
-          <div class="in">When the citizen has more than one open application, the reply must name both and ask which one they mean.</div>
+          <textarea class="note-in" id="chkDraft">When the citizen has more than one open application, the reply must name both and ask which one they mean.</textarea>
         </div>
         <div class="grid2" style="margin-top:14px">
           <div>
@@ -742,6 +744,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
           </div>
         </div>
         <div style="margin-top:14px"><button class="btn" id="deferSave">Save check</button> <button class="btn ghost" id="deferTry">Try on 5 more cases</button></div>
+        <div id="tryOut"></div>
       </div>
     </div>
 
@@ -762,6 +765,14 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
           </tbody>
         </table></div>
         <p class="muted" style="font-size:12px;margin:12px 0 0">All three disagreements are the same shape: the citizen implied a second application rather than saying so. Your check probably needs to cover that wording.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd"><h3>Your check library</h3><span class="sp"></span><span class="badge b-gov" id="chkBadge"></span></div>
+      <div class="bd">
+        <p class="muted" style="margin:0 0 10px;font-size:12.5px">Saved checks run on every case of every future run, and each carries its own agreement record.</p>
+        <div id="chkLib"></div>
       </div>
     </div>
   </section>
@@ -1268,6 +1279,10 @@ function coverage(){
       ? {g:'Extra runs',n:m.n,s:'ran',v:f.cases.length+' of '+CASES.length+' flagged',warn:!!f.cases.length}
       : {g:'Extra runs',n:m.n,s:'off',v:'Not selected for this run'});
   });
+  CHECKS.forEach(function(k){
+    rows.push({g:'Your checks',n:k.t.length>48?k.t.slice(0,48)+'...':k.t,
+      s:'armed',v:'agreement '+k.agree});
+  });
   return rows;
 }
 function renderCoverage(){
@@ -1278,8 +1293,8 @@ function renderCoverage(){
     return '<div class="covg">'+g+'</div>'
       + rows.filter(function(r){return r.g===g}).map(function(r){
           return '<div class="cov'+(r.s==='off'?' off':'')+'">'
-            +'<span class="cvs '+(r.s==='off'?'x':(r.warn?'w':'y'))+'">'
-            +(r.s==='off'?'not run':'ran')+'</span>'
+            +'<span class="cvs '+(r.s==='off'?'x':(r.s==='armed'||r.warn?'w':'y'))+'">'
+            +(r.s==='off'?'not run':(r.s==='armed'?'armed':'ran'))+'</span>'
             +'<span class="cvn">'+r.n+'</span>'
             +'<span class="cvv'+(r.warn?' warn':'')+'">'+r.v+'</span></div>';
         }).join('');
@@ -1592,7 +1607,7 @@ function toast(msg){
   clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('on')},2200);
 }
 function refreshAll(){
-  renderRows(); renderSetup(); renderCase(); renderResultsCopy();
+  renderRows(); renderSetup(); renderCase(); renderResultsCopy(); renderChecks();
   if(document.getElementById('groupBox'))renderGroups();
 }
 function addProdCase(){
@@ -1639,7 +1654,8 @@ function persist(){
   try{localStorage.setItem(KEY,JSON.stringify({
     notes:CASES.map(function(c){return {note:c.note||'',tag:c.tag||null,skipped:!!c.skipped}}),
     runs:RUNS_DONE, tags:TAGS, at:LAST_RUN, msg:SUB_MSG, sent:SENT_AT, rn:RUN_N, cost:TOTAL_COST,
-    cat:CAT_METRICS.map(function(m){return m.on}), ext:EXTRA_METRICS.map(function(m){return m.on})
+    cat:CAT_METRICS.map(function(m){return m.on}), ext:EXTRA_METRICS.map(function(m){return m.on}),
+    chk:CHECKS
   }));}catch(e){}
 }
 function restore(){
@@ -1656,6 +1672,7 @@ function restore(){
     if(typeof d.cost==='number')TOTAL_COST=d.cost;
     if(d.cat)d.cat.forEach(function(v,i){if(CAT_METRICS[i])CAT_METRICS[i].on=v});
     if(d.ext)d.ext.forEach(function(v,i){if(EXTRA_METRICS[i])EXTRA_METRICS[i].on=v});
+    if(d.chk)CHECKS=d.chk;
   }catch(e){}
 }
 function resetAll(){try{localStorage.removeItem(KEY);}catch(e){} location.reload();}
@@ -1767,6 +1784,31 @@ function onKey(e){
 var SUB_MSG='', SENT_AT=0;
 var boardSel=null;
 var dsOpen=false, dsF='all', dsPage=0;
+/* Developer-written checks. Saved ones run on every future case; each carries the
+   record of how often it agreed with the developer, which is what makes it trustable. */
+var CHECKS=[{t:'The reply must never state an approval or rejection decision. Decisions come from the department, not the agent.',run:3,agree:'19 of 20'}];
+function saveCheck(){
+  var ta=document.getElementById('chkDraft');
+  var text=(ta&&ta.value.trim())||'';
+  if(!text){toast('Write the check first');return;}
+  CHECKS.push({t:text,run:RUNS_DONE+1,agree:'17 of 20'});
+  persist(); renderChecks();
+  toast('Saved. It runs on every case from run '+(RUNS_DONE+1)+'.');
+}
+function tryCheck(){
+  var el=document.getElementById('tryOut'); if(!el)return;
+  el.innerHTML='<div class="whypanel" role="status">Tried on 5 unreviewed cases: flagged 2, and both flags matched the note you wrote on that case. 3 passed.</div>';
+}
+function renderChecks(){
+  var lib=document.getElementById('chkLib'); if(!lib)return;
+  var b=document.getElementById('chkBadge');
+  if(b)b.textContent=CHECKS.length+' saved';
+  lib.innerHTML=CHECKS.length? CHECKS.map(function(k,i){
+    return '<div class="chkrow"><div><div class="ckt">'+esc(k.t)+'</div>'
+      +'<div class="ckm">Agreement with you: '+k.agree+' &middot; armed from run '+k.run+'</div></div>'
+      +'<button class="lnk" data-rmchk="'+i+'">Remove</button></div>';
+  }).join('') : '<p class="muted" style="font-size:12.5px;margin:0">Nothing saved yet. The draft above becomes your first.</p>';
+}
 
 /* ---------- metric layers ----------
    A metric's layer is decided by what it needs as input, not by how important it sounds.
@@ -1998,7 +2040,10 @@ document.addEventListener('click',function(e){
   if(e.target.id==='saveNote'){CASES[cur].note=document.getElementById('caseNote').value.trim();persist();nextUnreviewed();return;}
   var rm=e.target.closest('[data-rm]');
   if(rm){removeCase(+rm.dataset.rm);return;}
-  if(e.target.id==='deferSave'||e.target.id==='deferTry'){toast('Not in this release. In the first version your note is the judgement.');return;}
+  if(e.target.id==='deferSave'){saveCheck();return;}
+  if(e.target.id==='deferTry'){tryCheck();return;}
+  var rc=e.target.closest('[data-rmchk]');
+  if(rc){CHECKS.splice(+rc.dataset.rmchk,1);persist();renderChecks();toast('Check removed');return;}
   if(e.target.id==='runBtn'){doRun('s2');return;}
   if(e.target.id==='rerunBtn'){doRun('s6');return;}
   if(e.target.id==='resetBtn'){resetAll();return;}
@@ -2045,7 +2090,7 @@ document.addEventListener('click',function(e){
   }
   if(e.target.id==='skipCase'){CASES[cur].skipped=true;CASES[cur].note='';persist();nextUnreviewed();return;}
 });
-restore(); renderCase(); renderRows(); renderSetup(); renderResultsCopy();
+restore(); renderCase(); renderRows(); renderSetup(); renderResultsCopy(); renderChecks();
 document.addEventListener('keydown', onKey);
 document.addEventListener('input', function(e){
   if(e.target.id==='caseNote'){
