@@ -43,13 +43,13 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
   <div class="row"><b>3</b><span>The judge earns trust instead of demanding it: every saved check shows how often it agreed with the developer before it scores anything.</span></div>
   <div class="row"><b>4</b><span>Regressions cannot hide. A new safety flag shows up as broken even when every metric stays green, and five runs of history show the arc.</span></div>
   <div class="row"><b>5</b><span>The verifier pack states what was not checked. Silence never reads as a pass.</span></div>
-  <div class="row say"><b>Demo path</b><span>Set up a run: browse the dataset, click Arabic, tick Bias and watch 380 become 760 with the price. Run it. Results: the red safety band, then click the Safety cell. What broke since last time: the new flag with green columns. Evidence: the coverage table, download the pack. Ninety seconds.</span></div>
+  <div class="row say"><b>Demo path</b><span>Set up a run: the Snowflake source, click Production traffic to show the closed loop, tick Bias and watch 380 become 760 with the price. Run it. Results: the red safety band, click the Safety cell, then switch the table to All cases and page through the full 380. What broke since last time: the new flag with green columns. Evidence: the coverage table, download the pack. Two minutes.</span></div>
 </div>
 
 <div class="scr">
   <h2>Set up a run</h2>
   <div class="path">Screen 1 &middot; the three-layer metric board</div>
-  <div class="row"><b>What</b><span>The gov-services-eval dataset, 380 cases across 38 citizen journeys in Arabic and English with a browsable, filterable case list, plus three layers of metrics: always-on, category scores, and paid extra runs. Cost and run count update live as you pick.</span></div>
+  <div class="row"><b>What</b><span>The gov-services-eval dataset, 380 cases across 38 citizen journeys in Arabic and English, synced nightly from Snowflake, with connectors for CSV, warehouse, S3 or GCS, and sampled production traffic. Every card is typed: Dataset, Built-in checks, Judge metrics, Run strategies. Cost and run count update live as you pick.</span></div>
   <div class="row"><b>Why</b><span>A metric's place is decided by what it needs as input, not how important it sounds. Checks that read only the run or the reply generalise to any agent, so they are defaults. Checks that need ground truth or repeat runs are choices with visible cost. <span class="cite">Same split Azure AI Foundry ships: risk-and-safety evaluators recommended for every application type.</span></span></div>
   <div class="row say"><b>Say this</b><span>Nothing here needs configuring to get value on day one. The developer can run the moment they upload, and every extra depth is priced before they commit.</span></div>
   <div class="row push"><b>Push back</b><span>"Why can safety not be turned off?" A check the developer can disable is not a guarantee the marketplace can make. The developer most likely to leak citizen data is the one least likely to tick the box.</span></div>
@@ -58,7 +58,7 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 <div class="scr">
   <h2>Results</h2>
   <div class="path">Screen 2 &middot; where the two-case argument lives</div>
-  <div class="row"><b>What</b><span>A nine-metric board covering the whole palette: accuracy, trustworthiness, safety, helpfulness, robustness, bias and fairness, latency, multilingual, reliability. Every cell opens per-case evidence. An across-runs card tracks six of them as sparklines over the full run history. Below it, the safety band and the per-case table.</span></div>
+  <div class="row"><b>What</b><span>A nine-metric board covering the whole palette, each cell opening per-case evidence, sparklines across the full run history, the safety band, and one complete case table: all 380 rows, paginated, with Needs attention as its default filter. Attention is a view of the table, never a smaller table.</span></div>
   <div class="row"><b>Why</b><span>Two cases in the demo pass every automatic column and still raise a safety flag: a cross-record phone number leak and a prompt injection from an uploaded document. Without always-on answer checks both are invisible. <span class="cite">Step repetition (15.7%) plus mishandled termination (12.4%) is about a quarter of observed failures in MAST, Cemri et al. 2025, arXiv 2503.13657. The rest needs judgement.</span></span></div>
   <div class="row say"><b>Say this</b><span>Every metric in your palette is on this one screen, and every number opens the cases behind it. Then watch case 8 and case 11: green across every column, and both are the kind of failure that ends up in a newspaper. That is why safety is not a toggle.</span></div>
   <div class="row push"><b>Push back</b><span>"How do you know the judge is right?" We do not yet, and the card says so on screen: judge scores are labelled signal, not measurement, until judge-vs-human agreement ships. The design follows the published calibration loop, sample, hand-grade, compute agreement, recalibrate on change, and well-calibrated judges now agree with humans about as often as two humans agree with each other. Stating the limit beats having it extracted from us.</span></div>
@@ -101,12 +101,23 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 </div>
 
 <div class="scr">
+  <h2>The end state, end to end</h2>
+  <div class="path">Where this product goes, one loop</div>
+  <div class="row"><b>Ingest</b><span>Datasets arrive from a warehouse table (Snowflake, BigQuery, Databricks), a bucket of logs (S3, GCS), a CSV, or sampled production traffic after PII masking. Mapping happens once per source.</span></div>
+  <div class="row"><b>Evaluate</b><span>Always-on mechanical and safety checks on every case, judge metrics where the category has a reviewed answer set, run strategies (bias, robustness, reliability) priced before you commit.</span></div>
+  <div class="row"><b>Improve</b><span>Failures cluster into an attention set. The developer reads traces, writes notes, notes become groups, groups become saved checks, and every check carries its agreement record before it scores anything.</span></div>
+  <div class="row"><b>Certify</b><span>Run history shows the arc, the regression view catches what a fix broke including invisible safety regressions, and the evidence pack states what was and was not checked for the verifier. No pass bar; the gate is transparency.</span></div>
+  <div class="row"><b>Monitor</b><span>Published agents feed sampled production conversations back into the dataset. A production failure becomes tomorrow morning attention case, which closes the loop: the same screens serve pre-release evaluation and live monitoring.</span></div>
+  <div class="row say"><b>Say this</b><span>Evaluation is not a stage the agent passes through once. It is the loop the marketplace runs forever, and every part of that loop is on these screens today.</span></div>
+</div>
+
+<div class="scr">
   <h2>Objection bank</h2>
   <div class="path">Cross-cutting</div>
   <div class="row push"><b>Is this state of the art?</b><span>The ACL 2026 survey of agent evaluation names cost-efficiency, safety and robustness as the critical gaps in the field. Those are exactly the three this product treats as first class: cost on every estimate before you run, safety always on, robustness one toggle away with its price shown.</span></div>
   <div class="row push"><b>Cost figures</b><span>Illustrative at 0.048 SAR per case, consistent everywhere. Real unit economics slot in without changing the design.</span></div>
   <div class="row push"><b>Arabic</b><span>187 of the 380 cases are Arabic, rendered right to left in the dataset browser, and the answer-language check is always on. Open the browser and click the Arabic filter to show it live.</span></div>
-  <div class="row push"><b>Why 12 rows for 380 cases?</b><span>Nobody reviews 380 rows. The run covers all 380 and the aggregates say so; the table shows 12 representative cases clustered from the failures, the same triage pattern issue trackers use. Every number on the metric board still opens the evidence behind it.</span></div>
+  <div class="row push"><b>Why focus on 12 of 380?</b><span>Nobody reviews 380 rows one by one, so the table defaults to the 12 representative cases clustered from the failures, the same triage pattern issue trackers use. Click All cases and the same table pages through every one of the 380. Nothing is hidden; attention is a filter, not a subset product.</span></div>
   <div class="row push"><b>Any agent?</b><span>Layer 1 needs nothing from the developer, so it works for any agent on first upload. Only category scores need a curated answer set, and the product says so instead of hiding it.</span></div>
 </div>
 
