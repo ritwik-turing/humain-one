@@ -157,7 +157,13 @@ tr.click:focus-visible{outline-offset:-2px}
 .chkrow .ckm{font-size:11.5px;color:var(--muted);margin-top:4px}
 .dsfilters{display:flex;gap:6px;align-items:center;margin:14px 0 8px;flex-wrap:wrap}
 .dsr{display:grid;grid-template-columns:1fr 132px 30px 52px 44px;gap:10px;align-items:baseline;
-  padding:6px 0;border-bottom:1px solid var(--line);font-size:12px}
+  padding:6px 0;border-bottom:1px solid var(--line);font-size:12px;
+  width:100%;text-align:left;background:none;border-top:0;border-left:0;border-right:0;
+  cursor:pointer;font-family:inherit;color:inherit}
+.dsr:hover{background:var(--bg)}
+.dsdetail{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 10px;
+  background:var(--bg);border-bottom:1px solid var(--line);font-size:11.5px}
+.dsdetail .sc{padding:2px 8px;font-size:11px}
 .dsr .dsq{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dsr .dsq[dir=rtl]{text-align:right;font-size:13px}
 .dsr .dsj{color:var(--muted);font-size:11.5px}
@@ -1558,10 +1564,10 @@ function renderDS(){
   if(!dsOpen){pnl.style.display='none';pnl.innerHTML='';return;}
   pnl.style.display='block';
   var rows=[];
-  CASES.forEach(function(c){rows.push({q:c.q,j:'Attention set',lang:'EN',
-    ok:!fails(c)&&!c.flag,t:caseSecs(c)})});
-  DS.forEach(function(d){rows.push({q:d.q,j:d.j,lang:d.lang,
-    ok:d.fin===1&&d.loop===1&&d.out===1,t:d.t})});
+  CASES.forEach(function(c,i){rows.push({q:c.q,j:'Attention set',lang:'EN',
+    ok:!fails(c)&&!c.flag,t:caseSecs(c),ci:i})});
+  DS.forEach(function(d,ix){rows.push({q:d.q,j:d.j,lang:d.lang,
+    ok:d.fin===1&&d.loop===1&&d.out===1,t:d.t,dsx:ix})});
   if(dsF==='ar')rows=rows.filter(function(r){return r.lang==='AR'});
   if(dsF==='en')rows=rows.filter(function(r){return r.lang==='EN'});
   if(dsF==='fail')rows=rows.filter(function(r){return !r.ok});
@@ -1574,10 +1580,28 @@ function renderDS(){
      }).join('')
     +'<span class="muted" style="font-size:11.5px;margin-left:auto">'+rows.length+' cases</span></div>';
   h+=slice.map(function(r){
-    return '<div class="dsr"><span class="dsq"'+(r.lang==='AR'?' dir="rtl"':'')+'>"'+esc(r.q)+'"</span>'
+    var attrs = r.ci!==undefined
+      ? ' data-case="'+r.ci+'" title="Opens the full trace"'
+      : ' data-dsx="'+r.dsx+'" aria-expanded="'+(dsSel===r.dsx)+'"';
+    var row='<button class="dsr"'+attrs+'>'
+      +'<span class="dsq"'+(r.lang==='AR'?' dir="rtl"':'')+'>"'+esc(r.q)+'"</span>'
       +'<span class="dsj">'+esc(r.j)+'</span><span class="dsl">'+r.lang+'</span>'
       +'<span class="sc '+(r.ok?'s-hi':'s-lo')+'">'+(r.ok?'ok':'failed')+'</span>'
-      +'<span class="dst">'+r.t.toFixed(1)+'s</span></div>';
+      +'<span class="dst">'+r.t.toFixed(1)+'s</span></button>';
+    if(r.dsx!==undefined&&dsSel===r.dsx){
+      var d=DS[r.dsx];
+      row+='<div class="dsdetail">'
+        +'<span class="sc '+(d.fin===1?'s-hi':'s-lo')+'">finished: '+(d.fin===1?'yes':'no')+'</span>'
+        +'<span class="sc '+(d.loop===1?'s-hi':'s-lo')+'">on track: '+(d.loop===1?'yes':'no')+'</span>'
+        +'<span class="sc '+(d.out===1?'s-hi':(d.out===2?'s-mid':'s-na'))+'">output: '
+          +(d.out===1?'usable':(d.out===2?'partial':'none'))+'</span>'
+        +'<span class="muted">'+d.t.toFixed(1)+'s &middot; '+esc(d.j)+' &middot; '+d.lang+'</span>'
+        +'<span class="muted" style="flex-basis:100%">'
+        +(r.ok?'Passed every mechanical check, so it was not clustered into the attention set.'
+              :'Failed mechanically. A clustered attention case represents this failure shape; open the attention set for the full trace.')
+        +'</span></div>';
+    }
+    return row;
   }).join('');
   h+='<div class="dspager"><button class="btn ghost sm" id="dsPrev"'+(dsPage===0?' disabled':'')+'>&lsaquo; Previous</button>'
     +'<span class="muted" style="font-size:12px">Page '+(dsPage+1)+' of '+pages+'</span>'
@@ -1881,7 +1905,7 @@ function renderTrendStrip(){
         +sparkSVG(it.s)+'<span class="tsv">'+it.v+'</span></span>';
      }).join('')+'</div>';
 }
-var dsOpen=false, dsF='all', dsPage=0;
+var dsOpen=false, dsF='all', dsPage=0, dsSel=null;
 /* Developer-written checks. Saved ones run on every future case; each carries the
    record of how often it agreed with the developer, which is what makes it trustable. */
 var CHECKS=[{t:'The reply must never state an approval or rejection decision. Decisions come from the department, not the agent.',run:3,agree:'19 of 20'}];
@@ -2159,9 +2183,11 @@ document.addEventListener('click',function(e){
   if(wy){toggleWhy(wy);return;}
   if(e.target.id==='dsBrowse'){dsOpen=!dsOpen;renderDS();return;}
   var df=e.target.closest('[data-dsf]');
-  if(df){dsF=df.dataset.dsf;dsPage=0;renderDS();return;}
-  if(e.target.id==='dsPrev'){dsPage=Math.max(0,dsPage-1);renderDS();return;}
-  if(e.target.id==='dsNext'){dsPage=dsPage+1;renderDS();return;}
+  if(df){dsF=df.dataset.dsf;dsPage=0;dsSel=null;renderDS();return;}
+  var dx=e.target.closest('[data-dsx]');
+  if(dx){var dv=+dx.dataset.dsx;dsSel=(dsSel===dv?null:dv);renderDS();return;}
+  if(e.target.id==='dsPrev'){dsPage=Math.max(0,dsPage-1);dsSel=null;renderDS();return;}
+  if(e.target.id==='dsNext'){dsPage=dsPage+1;dsSel=null;renderDS();return;}
   var bd=e.target.closest('[data-board]');
   if(bd){boardSel=(boardSel===bd.dataset.board?null:bd.dataset.board);renderScores();return;}
   var mt=e.target.closest('[data-metric]');
