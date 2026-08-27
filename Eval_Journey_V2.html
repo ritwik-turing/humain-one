@@ -575,7 +575,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
           <button class="btn ghost sm" data-why="Upload a CSV of questions with the answers you expect. Column mapping happens once and is remembered." aria-expanded="false">CSV upload</button>
           <button class="btn ghost sm" data-why="Reads a table or view on a schedule. Snowflake, BigQuery and Databricks connectors; this dataset syncs from Snowflake nightly." aria-expanded="false">Data warehouse</button>
           <button class="btn ghost sm" data-why="Points at a bucket of JSON or parquet conversation logs. S3 and GCS, same column mapping as CSV." aria-expanded="false">S3 or GCS bucket</button>
-          <button class="btn ghost sm" data-why="Samples one in fifty live conversations after PII masking. New production failures land in the attention set automatically, which closes the loop between monitoring and evaluation." aria-expanded="false">Production traffic</button>
+          <button class="btn ghost sm" data-why="Samples one in fifty live conversations after PII masking. A live conversation has no expected answer, so accuracy cannot score it. What runs on production traffic is the always-on checks, your own saved checks, and grounding against the record. Write an expected answer for a sampled case and it joins the dataset as a full case. Production failures land in the attention set either way." aria-expanded="false">Production traffic</button>
         </div>
         <div style="margin-top:14px"><button class="btn ghost sm" id="dsBrowse">Browse all cases</button> <button class="btn ghost sm" id="editCases">Edit attention cases</button> <button class="btn ghost sm" id="addCase">Add a case that failed in production</button></div>
         <div id="dsPanel" style="display:none"></div>
@@ -623,7 +623,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
     <div class="card">
       <div class="hd"><h3>On for Government services</h3><span class="cat">Judge metrics</span><span class="badge b-gov" id="catBadge"></span><span class="sp"></span><span class="muted" style="font-size:12px">Turn off any that do not fit your agent</span></div>
       <div class="bd">
-        <p class="muted" style="margin:0 0 12px;font-size:12.5px">Scored against <b>gov-services-eval</b>: 380 reviewed cases across 38 citizen journeys, Arabic and English.<button class="why" aria-expanded="false" aria-label="Why does this depend on the category" data-why="Accuracy needs a written correct answer to compare against. A category without a reviewed answer set does not get this card, and the developer sees why instead of a greyed-out toggle.">i</button></p>
+        <p class="muted" style="margin:0 0 12px;font-size:12.5px">Scored against <b>gov-services-eval</b>: 380 reviewed cases across 38 citizen journeys, Arabic and English.<button class="why" aria-expanded="false" aria-label="Why does this depend on the category" data-why="Accuracy needs a written correct answer to compare against. The marketplace team who own the answer set write and calibrate these judges, not you, so every agent in the category is scored the same way. A category without a reviewed answer set does not get this card, and you see why instead of a greyed-out toggle. Your own checks on screen 5 are the ones you write.">i</button></p>
         <div class="mtogs" id="catRows"></div>
       </div>
     </div>
