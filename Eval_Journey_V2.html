@@ -138,6 +138,19 @@ tr.click:focus-visible{outline-offset:-2px}
 .cvn{font-weight:600}
 .cvv{color:var(--muted);font-size:12px;text-align:right}
 .cvv.warn{color:var(--preview);font-weight:700}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tc .tl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tc .tv{font-size:19px;font-weight:750;margin:2px 0}
+.spk{display:block;width:100%;height:30px;color:var(--teal)}
+.tc.bad .spk,.tsi.bad .spk{color:var(--alert)}
+.tc.bad .tv{color:var(--alert)}
+.td2{font-size:11px;color:var(--muted);margin-top:3px}
+.tstripe{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.tsi{display:inline-flex;gap:8px;align-items:center}
+.tsi .spk{width:84px;height:20px}
+.tsl{font-size:11px;color:var(--muted);font-weight:600}
+.tsv{font-size:13px;font-weight:750}
 .chkrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;
   border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:8px}
 .chkrow .ckt{font-size:12.5px;font-weight:600;line-height:1.45}
@@ -434,6 +447,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   .grid4{grid-template-columns:1fr}
   .jgrid{grid-template-columns:1fr}
   .board{grid-template-columns:repeat(2,1fr)}
+  .tgrid{grid-template-columns:repeat(2,1fr)}
   .dsr{grid-template-columns:1fr 42px 50px;gap:8px}
   .dsr .dsj,.dsr .dst{display:none}
   .colkey{grid-template-columns:1fr;gap:7px}
@@ -618,6 +632,8 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
       <div class="card" style="margin:0"><div class="bd"><div class="muted" style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">Slowest case</div><div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px"><span id="mSlow">31</span> <span class="muted" style="font-size:14px;font-weight:400">seconds</span></div></div></div>
     </div>
 
+    <div id="trendBox"></div>
+
     <div id="scoreBox"></div>
 
     <div class="card">
@@ -784,6 +800,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
 
     <div class="hint" id="cmpHint"></div>
     <div id="cmpSafe"></div>
+    <div id="trendStrip"></div>
 
     <div class="grid3" style="margin-bottom:16px" id="cmpTiles"></div>
 
@@ -1487,6 +1504,7 @@ function renderCompare(){
         +(bits.length? bits.join(' ') : 'Nothing carried over either.')+'</div>';
     }
   }
+  renderTrendStrip();
   var h=document.getElementById('cmpHint');
   if(h){
     if(!worse&&!fixed) h.innerHTML='<b>Nothing changed.</b> Every case landed the same way it did last time.';
@@ -1500,7 +1518,7 @@ function renderCompare(){
                  :'The '+worse+' that got worse were passing before, which is usually the thing to look at first.');
   }
 }
-var RUNS_DONE=2;
+var RUNS_DONE=5;
 function metricRow(m,kind){
   return '<button class="mtog'+(m.on?' on':'')+'" data-metric="'+kind+':'+m.k+'">'
     +'<div><div class="mn">'+m.n+'</div><div class="md">'+m.d+'</div></div>'
@@ -1655,7 +1673,7 @@ function persist(){
     notes:CASES.map(function(c){return {note:c.note||'',tag:c.tag||null,skipped:!!c.skipped}}),
     runs:RUNS_DONE, tags:TAGS, at:LAST_RUN, msg:SUB_MSG, sent:SENT_AT, rn:RUN_N, cost:TOTAL_COST,
     cat:CAT_METRICS.map(function(m){return m.on}), ext:EXTRA_METRICS.map(function(m){return m.on}),
-    chk:CHECKS
+    chk:CHECKS, hist:HIST_PAST
   }));}catch(e){}
 }
 function restore(){
@@ -1673,6 +1691,7 @@ function restore(){
     if(d.cat)d.cat.forEach(function(v,i){if(CAT_METRICS[i])CAT_METRICS[i].on=v});
     if(d.ext)d.ext.forEach(function(v,i){if(EXTRA_METRICS[i])EXTRA_METRICS[i].on=v});
     if(d.chk)CHECKS=d.chk;
+    if(d.hist)HIST_PAST=d.hist;
   }catch(e){}
 }
 function resetAll(){try{localStorage.removeItem(KEY);}catch(e){} location.reload();}
@@ -1700,7 +1719,7 @@ function doRun(after){
       now.innerHTML='<b>Done.</b> '+CASES.length+' representative cases need a look.';
       bar.style.width='100%';
       setTimeout(function(){
-        R.classList.remove('on'); running=false; RUNS_DONE++; LAST_RUN=Date.now(); RUN_N=totalCases(); TOTAL_COST+=runCost();
+        R.classList.remove('on'); running=false; HIST_PAST.push(currentSnapshot()); RUNS_DONE++; LAST_RUN=Date.now(); RUN_N=totalCases(); TOTAL_COST+=runCost();
         persist(); refreshAll();
         toast('Run '+RUNS_DONE+' finished');
         show(after||'s2');
@@ -1783,6 +1802,78 @@ function onKey(e){
 }
 var SUB_MSG='', SENT_AT=0;
 var boardSel=null;
+function medLat(){
+  var srt=allSecs().sort(function(x,y){return x-y});
+  if(!srt.length)return 0;
+  var mid=Math.floor(srt.length/2);
+  return srt.length%2?srt[mid]:(srt[mid-1]+srt[mid])/2;
+}
+/* Earlier runs, one snapshot per run. The last point of every chart is computed
+   from the live page state, so history always ends at the numbers shown elsewhere.
+   Safety tells the arc: flags fell to 1, then the injection fix pushed them back up. */
+var HIST_PAST=[
+ {pass:281,safety:5,acc:64,trust:80,help:71,med:6.4},
+ {pass:312,safety:4,acc:69,trust:84,help:75,med:5.9},
+ {pass:338,safety:2,acc:73,trust:88,help:79,med:5.3},
+ {pass:353,safety:1,acc:76,trust:90,help:81,med:5.0}
+];
+function currentSnapshot(){
+  return {pass:totalDone(),safety:flagged().length,acc:JUDGE.acc.v,
+          trust:JUDGE.trust.v,help:JUDGE.help.v,med:medLat()};
+}
+function hist(){return HIST_PAST.concat([currentSnapshot()])}
+function sparkSVG(vals){
+  var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+  var span=(mx-mn)||1;
+  var pts=vals.map(function(v,i){
+    var x=vals.length>1? 2+96*i/(vals.length-1) : 50;
+    var y=26-20*((v-mn)/span);
+    return x.toFixed(1)+','+y.toFixed(1);
+  }).join(' ');
+  return '<svg class="spk" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">'
+    +'<polyline points="'+pts+'" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>';
+}
+function renderTrends(){
+  var box=document.getElementById('trendBox'); if(!box)return;
+  if(!hasResults()){box.innerHTML='';return;}
+  var H=hist(), n=H.length, f=H[0], l=H[n-1], r1=RUNS_DONE-n+1;
+  var items=[
+   {l:'Pass rate',v:Math.round(l.pass/totalCases()*100)+'%',
+    d:(l.pass-f.pass>=0?'+':'')+(l.pass-f.pass)+' cases since run '+r1,s:H.map(function(h){return h.pass})},
+   {l:'Safety flags',v:l.safety,bad:l.safety>H[n-2].safety,
+    d:'was '+f.safety+' at run '+r1+(l.safety>H[n-2].safety?', one new this run':''),
+    s:H.map(function(h){return h.safety})},
+   {l:'Accuracy',v:l.acc+'%',d:'+'+(l.acc-f.acc)+' pts since run '+r1,s:H.map(function(h){return h.acc})},
+   {l:'Trustworthiness',v:l.trust+'%',d:'+'+(l.trust-f.trust)+' pts',s:H.map(function(h){return h.trust})},
+   {l:'Helpfulness',v:l.help+'%',d:'+'+(l.help-f.help)+' pts',s:H.map(function(h){return h.help})},
+   {l:'Median latency',v:l.med.toFixed(1)+'s',d:(f.med-l.med).toFixed(1)+'s faster than run '+r1,
+    s:H.map(function(h){return h.med})}
+  ];
+  box.innerHTML='<div class="card"><div class="hd"><h3>Across runs</h3>'
+    +'<span class="badge b-lock">Run '+r1+' to '+RUNS_DONE+'</span><span class="sp"></span>'
+    +'<span class="muted" style="font-size:12px">Same '+totalCases()+' cases every run</span></div>'
+    +'<div class="bd"><div class="tgrid">'
+    +items.map(function(it){
+      return '<div class="tc'+(it.bad?' bad':'')+'"><div class="tl">'+it.l+'</div>'
+        +'<div class="tv">'+it.v+'</div>'+sparkSVG(it.s)+'<div class="td2">'+it.d+'</div></div>';
+     }).join('')
+    +'</div></div></div>';
+}
+function renderTrendStrip(){
+  var el=document.getElementById('trendStrip'); if(!el)return;
+  if(!hasResults()){el.innerHTML='';return;}
+  var H=hist(), n=H.length, l=H[n-1];
+  var mini=[
+   {l:'Pass rate',v:Math.round(l.pass/totalCases()*100)+'%',s:H.map(function(h){return h.pass})},
+   {l:'Safety flags',v:l.safety,bad:l.safety>H[n-2].safety,s:H.map(function(h){return h.safety})},
+   {l:'Accuracy',v:l.acc+'%',s:H.map(function(h){return h.acc})}
+  ];
+  el.innerHTML='<div class="tstripe"><span class="tsl" style="font-weight:700">Across all '+n+' runs</span>'
+    +mini.map(function(it){
+      return '<span class="tsi'+(it.bad?' bad':'')+'"><span class="tsl">'+it.l+'</span>'
+        +sparkSVG(it.s)+'<span class="tsv">'+it.v+'</span></span>';
+     }).join('')+'</div>';
+}
 var dsOpen=false, dsF='all', dsPage=0;
 /* Developer-written checks. Saved ones run on every future case; each carries the
    record of how often it agreed with the developer, which is what makes it trustable. */
@@ -1851,7 +1942,7 @@ function catOn(){return CAT_METRICS.filter(function(m){return m.on}).length}
 function runCost(){return runUnits()*PER_RUN + totalCases()*catOn()*PER_JUDGE}
 function runMins(){return Math.max(1,Math.round(runUnits()*10/60/10))} // 10 workers in parallel
 
-var RUN_N=380, TOTAL_COST=2*(380*PER_RUN+380*3*PER_JUDGE); // history of the seeded runs, real runs overwrite
+var RUN_N=380, TOTAL_COST=5*(380*PER_RUN+380*3*PER_JUDGE); // history of the seeded runs, real runs overwrite
 var LAST_RUN=Date.now()-2*3600*1000; // the pre-loaded run reads as history, real runs overwrite it
 function ago(){return relTime(LAST_RUN)}
 function relTime(t){
@@ -1923,9 +2014,7 @@ function renderScores(){
   function idxWhere(f){var r=[];CASES.forEach(function(c,i){if(f(c,i))r.push(i)});return r}
   function chip(i){return '<button class="xcase" data-case="'+i+'">Case '+(i+1)+'</button>'}
   var flg=flagged();
-  var srt=allSecs().sort(function(x,y){return x-y});
-  var mid=Math.floor(srt.length/2);
-  var medv=srt.length%2?srt[mid]:(srt[mid-1]+srt[mid])/2;
+  var medv=medLat();
   var wi=-1,ws=0; CASES.forEach(function(c,i){var v=caseSecs(c); if(v>ws){ws=v;wi=i}});
   function catCell(k,hits,label){
     var m=CAT_METRICS.filter(function(x){return x.k===k})[0];
@@ -1987,6 +2076,7 @@ function renderScores(){
 }
 function renderResultsCopy(){
   renderScores();
+  renderTrends();
   renderMetrics();
   var t=document.getElementById('resTitle'), sb=document.getElementById('resSub');
   if(t)t.innerHTML='Run '+RUNS_DONE+' <span class="muted" style="font-weight:400">&middot; results</span>';
