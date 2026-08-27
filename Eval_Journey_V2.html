@@ -1147,6 +1147,8 @@ function renderCase(){
   document.getElementById('caseTitle').textContent='"'+c.q+'"';
   document.getElementById('caseSub').textContent = fails(c)
     ? 'Something went wrong here. Ran for '+c.t+'.'
+    : c.flag
+    ? 'Every column passed in '+c.t+'. The flag below is why it still needs you.'
     : 'This one looks fine. Ran in '+c.t+'.';
   document.getElementById('caseBadge').innerHTML = !c.fin
     ? '<span class="badge b-alert">Never finished</span>'
