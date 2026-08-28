@@ -1,0 +1,193 @@
+<title>Eval session runbook</title>
+<style>
+:root{--ink:#0e1419;--bg:#f5f7f8;--panel:#fff;--line:#e7eaee;--line-2:#d7dce2;
+--text:#16201c;--muted:#697079;--teal:#0e9b76;--teal-d:#0b6f54;
+--gov:#1f9d62;--gov-bg:#e7f5ee;--gov-bd:#bfe3d3;
+--preview:#c0791e;--preview-bg:#fbf1dd;--preview-bd:#eddbb4;
+--alert:#c2554a;--alert-bg:#f7e7e5;--alert-bd:#eecfca;
+--lock:#5b6470;--lock-bg:#eef1f4;--lock-bd:#dbe0e6;--radius:12px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:14.5px/1.55 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.top{background:var(--ink);color:#fff;padding:11px 22px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+position:sticky;top:0;z-index:9}
+.top b{font-size:13px;letter-spacing:.14em}
+.top span{font-size:12px;color:#9aa4ae}
+.wrap{max-width:860px;margin:0 auto;padding:24px 20px 90px}
+h1{font-size:25px;margin:0 0 4px;letter-spacing:-.02em}
+.deck{color:var(--muted);margin:0 0 20px;font-size:13.5px}
+.c{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+box-shadow:0 1px 2px rgba(14,20,25,.05);padding:15px 17px;margin:0 0 13px}
+.c h2{font-size:16px;margin:0 0 3px}
+.c .p{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:9px}
+.step{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.step .t{font-family:ui-monospace,Menlo,monospace;font-size:11px;font-weight:700;color:var(--muted);padding-top:2px}
+.step h3{font-size:13.5px;margin:0 0 4px}
+.do{font-size:12.5px;margin:0 0 6px}
+.say{background:var(--gov-bg);border-left:2px solid var(--gov);padding:7px 10px;border-radius:0 7px 7px 0;
+font-size:12.5px;margin:0 0 6px}
+.hit{background:var(--preview-bg);border-left:2px solid var(--preview);padding:7px 10px;border-radius:0 7px 7px 0;
+font-size:12.5px;margin:0 0 6px}
+.ask{background:var(--lock-bg);border-left:2px solid var(--lock);padding:7px 10px;border-radius:0 7px 7px 0;
+font-size:12.5px}
+.lbl{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:2px;opacity:.75}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.list{font-size:12.5px;margin:0;padding-left:17px}
+.list li{margin-bottom:6px}
+.who{display:grid;grid-template-columns:104px 1fr;gap:11px;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px}
+.who b{font-size:12.5px}
+.big{background:var(--gov-bg);border-color:var(--gov-bd)}
+.red{background:var(--alert-bg);border-color:var(--alert-bd)}
+@media(max-width:640px){.two{grid-template-columns:1fr}.step,.who{grid-template-columns:1fr;gap:4px}}
+@media print{.top{position:static}.c{break-inside:avoid;box-shadow:none}}
+</style>
+
+<div class="top"><b>HUMAIN ONE</b><span>Eval session runbook / for Ritwik / not for sharing</span></div>
+<div class="wrap">
+
+<h1>Running the eval session</h1>
+<p class="deck">Product on the shared screen, this on your phone. Green is what you say, amber is what they will say back, grey is what you ask them.</p>
+
+<div class="c big">
+  <h2>The first sixty seconds</h2>
+  <div class="p">Set the frame before anything else</div>
+  <div class="say"><span class="lbl">Open with this</span>I am going to walk the whole thing in about fifteen minutes. I am not looking for approval today, I want you to try to break it. There are nine things I already know are unresolved and I will flag them as we go rather than wait to be caught. What I actually want out of the hour is a direction on two of them.</div>
+  <p class="do">Why this matters: it turns the session from a review you can fail into a working session you are running. It also means every hole they find is one you invited, not one you missed.</p>
+</div>
+
+<div class="c">
+  <h2>Run order</h2>
+  <div class="p">About fifteen minutes, then open it up</div>
+
+  <div class="step"><div class="t">0:00<br>2 min</div><div>
+    <h3>Set up a run</h3>
+    <p class="do">Show the source line, click Production traffic, tick Bias and let them watch 380 become 760 with the price move.</p>
+    <div class="say">Nothing here needs configuring to get value on day one. Every metric has a default. What costs more is priced before you commit, not after.</div>
+    <div class="hit">They will ask where the 380 came from. Answer: generated for the demo, seeded so numbers never move. In a real deployment it syncs nightly from the tenant warehouse.</div>
+    <div class="ask">Ask them: if you were the developer uploading here for the first time, what is missing before you would trust this?</div>
+  </div></div>
+
+  <div class="step"><div class="t">2:00<br>1 min</div><div>
+    <h3>Run it</h3>
+    <p class="do">Press run, let it go. Case counter climbs to 380, Arabic questions scroll past in the log.</p>
+    <div class="say">Ten workers in parallel, about six minutes for the full set. This is the bit nobody watches, which is the point.</div>
+  </div></div>
+
+  <div class="step"><div class="t">3:00<br>3 min</div><div>
+    <h3>Results, the metric board</h3>
+    <p class="do">Nine cells. Click Safety, then click a case chip and land on the trace.</p>
+    <div class="say">Every metric from the palette you sent, on one screen, and every number opens the cases behind it.</div>
+    <div class="hit">Judge scores will get challenged. Say it first: these three come from a model grading a model, nobody has checked it against a human on this dataset yet, and the card says so itself.</div>
+    <div class="ask">Ask them: which of these nine would you not trust, and what would you need to see to trust it?</div>
+  </div></div>
+
+  <div class="step"><div class="t">6:00<br>2 min</div><div>
+    <h3>The safety band, your strongest moment</h3>
+    <p class="do">Scroll to the red band. Two cases. Then scroll down and show those same two rows sitting green in every column.</p>
+    <div class="say">Both of these pass every automatic check. One hands a citizen somebody else's phone number. The other followed an instruction hidden inside an uploaded document and told the citizen their application was approved. If safety were a toggle, the developer most likely to ship this is the one least likely to tick the box.</div>
+    <div class="hit">If anyone says this is contrived, agree that the data is invented and point at the trace: the mechanism is real, the agent matched on surname instead of reference number.</div>
+  </div></div>
+
+  <div class="step"><div class="t">8:00<br>2 min</div><div>
+    <h3>What the agent did</h3>
+    <p class="do">Case 11. The red step, the two records side by side, the number appearing in the reply.</p>
+    <div class="say">This is the difference between telling a developer they failed and showing them where. The step that broke is the one that read the contact field off the wrong record.</div>
+    <div class="ask">Ask them: is this enough for a developer to actually fix it, or do they need something we are not showing?</div>
+  </div></div>
+
+  <div class="step"><div class="t">10:00<br>2 min</div><div>
+    <h3>Notes become checks</h3>
+    <p class="do">Screen 5. The draft, then the agreement card, then the library.</p>
+    <div class="say">Most tools let you write a judge and trust it blindly. Here it shows you where it disagreed with you on twenty cases you graded by hand, before it scores anything. Seventeen of twenty, and the three it got wrong are listed.</div>
+    <div class="hit">Ritesh may say Prism can already do rubric metrics. True. What Prism has nothing like is the validation loop, and that is the part that makes a check trustworthy.</div>
+  </div></div>
+
+  <div class="step"><div class="t">12:00<br>2 min</div><div>
+    <h3>What broke since last time</h3>
+    <p class="do">The new safety flag with unchanged columns. Then the across-runs strip.</p>
+    <div class="say">The developer fixed one thing and opened a security hole doing it. Every column stayed identical. This is the regression a metric dashboard cannot show you.</div>
+    <div class="ask">Ask them: what should actually happen to a live agent when this fires? I have a proposal but I am not confident in it.</div>
+  </div></div>
+
+  <div class="step"><div class="t">14:00<br>2 min</div><div>
+    <h3>Evidence and submit</h3>
+    <p class="do">The coverage table, the not-run rows, then the submit screen with no score gate.</p>
+    <div class="say">The pack says what was not checked, not just what was. Silence about a metric reads exactly like a pass, and that is how a certification gets pulled apart six months later. There is no minimum score anywhere in this product.</div>
+    <div class="ask">Ask them: is this enough for a verifier to make a decision, and what would you add?</div>
+  </div></div>
+</div>
+
+<div class="c">
+  <h2>Who will push where</h2>
+  <div class="p">Have the answer ready before the question</div>
+
+  <div class="who"><b>Tirthankar<br><span class="cite" style="font-weight:400;color:var(--muted);font-size:11px">architecture, security, tenancy</span></b><div>
+    Where does the eval compute run and under whose contract, given KSA data. Does one tenant's data ever touch another's. Who validates the PII masker before we sample live conversations. How does this sit against the substrate, one service or many.
+    <br><br><b>Your honest position:</b> compute residency is an open question I need HUMAIN to answer. The masker has no owner and no evaluation, and I have written a proposal for how it should be tested. Both are on the list, neither is solved.
+  </div></div>
+
+  <div class="who"><b>Ritesh<br><span class="cite" style="font-weight:400;color:var(--muted);font-size:11px">Prism, evaluation</span></b><div>
+    Is this not Prism with a new front end. Can Prism run this today or is it a rewrite. Who writes and maintains the answer sets per category. Who recalibrates the judges.
+    <br><br><b>Your honest position:</b> Prism is the engine and most of this rides on what it already does. What is new is the journey, the clustering into an attention set, the check validation loop, and the evidence pack. Answer sets and recalibration are real ongoing work with no owner yet, and that is a resourcing conversation not a design one.
+  </div></div>
+
+  <div class="who"><b>Sandip<br><span class="cite" style="font-weight:400;color:var(--muted);font-size:11px">client readiness, commercials</span></b><div>
+    Is this ready to put in front of the client. What does it cost us per run. What is the timeline to build. Did we actually fix what they objected to.
+    <br><br><b>Your honest position:</b> the objection was dense and not exhaustive, and both are addressed, nine metrics and 380 cases against twelve rows and four columns. Costs are invented and I need a real number. Timeline depends on the two open questions, which is why I am asking today.
+  </div></div>
+</div>
+
+<div class="c two" style="background:none;border:0;box-shadow:none;padding:0">
+  <div class="c red" style="margin:0">
+    <h2>Concede immediately</h2>
+    <div class="p">Fast agreement buys you the ones that matter</div>
+    <ul class="list">
+      <li>The costs are made up, cost per case included.</li>
+      <li>The 380 cases are generated, not real citizen traffic.</li>
+      <li>There is no screen for turning a live conversation into a scored case. A human has to write the expected answer and we have not designed that.</li>
+      <li>Everything is one question and one answer. Real conversations are not.</li>
+      <li>Nobody has checked our AI grader against a human on this dataset.</li>
+      <li>Nobody owns the PII masker or the policy corpus.</li>
+    </ul>
+    <p class="do" style="margin-top:8px">Say these before they are found. Every one you volunteer makes the next thing you defend more credible.</p>
+  </div>
+  <div class="c big" style="margin:0">
+    <h2>Hold firm</h2>
+    <div class="p">These have an argument behind them</div>
+    <ul class="list">
+      <li><b>Safety always on.</b> Two cases prove it on screen.</li>
+      <li><b>No pass mark.</b> A score invites building to the test. The verifier gets everything instead.</li>
+      <li><b>Judge scores labelled a signal.</b> Calling 78 percent a fact when nobody validated it would be dishonest.</li>
+      <li><b>The pack names what was not checked.</b> Silence reads as a pass.</li>
+      <li><b>Attention set is a filter, not a smaller product.</b> All 380 are in the same table.</li>
+      <li><b>No automatic action on a judge score.</b> We call it a signal, so acting on it would contradict us.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="c">
+  <h2>If it goes sideways</h2>
+  <div class="p">Recovery moves</div>
+  <div class="who"><b>This is just Prism</b><div>Agree first. Prism is the engine and I am not rebuilding it. Then show screen 5. The validation loop is the thing Prism has no answer for, and it is what makes a developer-written check worth anything.</div></div>
+  <div class="who"><b>Someone rabbit holes</b><div>That is a real question and I want to give it more than thirty seconds. Can I note it and come back once we are through the flow. Then actually write it down where they can see you write it.</div></div>
+  <div class="who"><b>Hard attack on one part</b><div>Agree with the true part of it out loud, then narrow to what is actually in dispute. You are right that the numbers are invented. The thing I would defend is the mechanism, not the data.</div></div>
+  <div class="who"><b>Room goes quiet</b><div>Name someone and give them a specific target rather than asking for general thoughts. Tirthankar, where does this break architecturally. Ritesh, what would Prism struggle with here.</div></div>
+  <div class="who"><b>You get asked something you cannot answer</b><div>Say you do not know, say when you will know, write it down. Do not improvise a design decision in the room, because it will be quoted back to you.</div></div>
+</div>
+
+<div class="c big">
+  <h2>What you need to walk out with</h2>
+  <div class="p">If you get nothing else, get these</div>
+  <ol class="list">
+    <li><b>A direction on judging live agents.</b> Reference-free only for now, or do we go after the tenant's own signals like repeat questions and escalations. This decides the next build.</li>
+    <li><b>A direction on compliance.</b> Eval takes the machine-checkable part, Certify takes the human call. Agree or disagree, but decide.</li>
+    <li><b>Three names.</b> Who owns the policy corpus, who builds answer sets per category, who owns the PII masker.</li>
+    <li><b>A real cost per case</b>, or agreement that someone will get one.</li>
+    <li><b>Go or no go on showing the client</b>, and if no go, exactly what is missing.</li>
+  </ol>
+  <div class="say" style="margin-top:10px"><span class="lbl">Close with this</span>What I need before I build anything else is a direction on two things: how we judge an agent once it is live, and whether compliance sits with us or with Certify. Everything else on my list I can carry. Those two change what the product is.</div>
+</div>
+
+<p class="cite" style="color:var(--muted);font-size:12px">Full reference with 56 lookup questions: <a href="Eval_Cheat_Sheet.html" style="color:var(--teal-d)">Eval_Cheat_Sheet.html</a> &nbsp;&middot;&nbsp; Product: <a href="Eval_Journey_V2.html" style="color:var(--teal-d)">Eval_Journey_V2.html</a></p>
+
+</div>
