@@ -31,6 +31,10 @@ font-size:12.5px;margin:0 0 6px}
 .ask{background:var(--lock-bg);border-left:2px solid var(--lock);padding:7px 10px;border-radius:0 7px 7px 0;
 font-size:12.5px}
 .lbl{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:2px;opacity:.75}
+.clk{margin:0 0 8px;padding-left:18px;font-size:12.5px}
+.clk li{margin-bottom:4px}
+.sub{margin:3px 0 0;padding-left:16px}
+.sub li{margin-bottom:5px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .list{font-size:12.5px;margin:0;padding-left:17px}
 .list li{margin-bottom:6px}
@@ -57,64 +61,78 @@ font-size:12.5px}
 
 <div class="c">
   <h2>Run order</h2>
-  <div class="p">About fifteen minutes, then open it up</div>
+  <div class="p">About eighteen minutes, then open it up</div>
 
-  <div class="step"><div class="t">0:00<br>2 min</div><div>
+  <div class="step"><div class="t">0:00<br>3 min</div><div>
     <h3>Set up a run</h3>
-    <p class="do">Show the source line, click Production traffic, tick Bias and let them watch 380 become 760 with the price move.</p>
-    <div class="say">Nothing here needs configuring to get value on day one. Every metric has a default. What costs more is priced before you commit, not after.</div>
-    <div class="hit">They will ask where the 380 came from. Answer: generated for the demo, seeded so numbers never move. In a real deployment it syncs nightly from the tenant warehouse.</div>
-    <div class="ask">Ask them: if you were the developer uploading here for the first time, what is missing before you would trust this?</div>
+    <ol class="clk"><li>Top line first. <b>Run 5 finished 2 hours ago, 6 of 12 had problems, 2 still need a look.</b> The product remembers where you were.</li><li>Cases card. The <b>380 badge</b>, then read the definition line out: a case is one citizen question, most with the answer you expect written next to it.</li><li>Source row. <b>Snowflake, GOV_SERVICES.EVAL_V3, synced 2 hours ago, Connected.</b> Not a CSV somebody uploaded once in March.</li><li>Coverage row. <b>38 journeys, 187 Arabic, 193 English.</b></li><li>Click <b>Browse all 380 cases</b>, hit the Arabic filter, let them see the right to left rendering, close it again.</li><li>Click <b>Production traffic</b> under Add cases from and read the panel aloud. This is the closed loop in one sentence.</li><li>Now point at the four card chips in order: <b>Dataset, Built-in checks, Judge metrics, Run strategies.</b></li><li>Always on card. Three example rows, then the line naming the four that read the reply itself.</li><li>Costs extra card. <b>Tick Bias</b> and let them watch 380 become 760, the time double, and the price move before anything runs.</li></ol>
+    <div class="say"><span class="lbl">Say</span>Four cards, four different kinds of thing, and the chip on each one says which. Dataset, built-in checks, judge metrics, run strategies. That split is the whole architecture, and it is decided by what each check needs as input rather than by how important it sounds.</div>
+    <div class="say">Nothing here needs configuring to get value on day one. Every metric has a default. What costs more is priced before you commit, not after it has run.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>Where did the 380 come from?</b> Generated for the demo and seeded, so the numbers never move between demos. In a real deployment it syncs nightly from the tenant warehouse.</li><li><b>Why Snowflake?</b> It is the example. The connectors underneath cover a warehouse, a bucket, a CSV, and sampled live traffic. Whatever the tenant already has.</li><li><b>What if a tenant has no warehouse?</b> CSV still works and that is the floor. The point of connecting a source is that it updates itself instead of drifting.</li><li><b>Who maps the columns?</b> Once per source, then remembered. That row is showing a mapping that already happened.</li><li><b>Why is accuracy only available in this category?</b> It needs a written correct answer to compare against. Government services has a reviewed answer set, a brand new category would not, and the screen says so rather than greying out a toggle.</li><li><b>What if I have 10,000 cases, not 380?</b> Same screen. Cost and time scale linearly, which is exactly why the estimate sits next to the button.</li><li><b>Is 30.78 SAR real?</b> No. Invented placeholder at about five halalas a case. I need the real number from someone.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>If you were the developer uploading here for the first time, what is missing before you would trust this?</li><li>Does the four card split read clearly on its own, or did it only make sense because I just explained it?</li><li>Should a developer see cost at all, or is that our problem to absorb and hide?</li></ul></div>
   </div></div>
 
-  <div class="step"><div class="t">2:00<br>1 min</div><div>
+  <div class="step"><div class="t">3:00<br>1 min</div><div>
     <h3>Run it</h3>
-    <p class="do">Press run, let it go. Case counter climbs to 380, Arabic questions scroll past in the log.</p>
-    <div class="say">Ten workers in parallel, about six minutes for the full set. This is the bit nobody watches, which is the point.</div>
+    <ol class="clk"><li>Press <b>Run 6 on 380 cases</b>.</li><li>Point at the counter climbing through the hundreds, and at the Arabic questions scrolling past in the log.</li><li>Let it finish and land on results by itself.</li></ol>
+    <div class="say"><span class="lbl">Say</span>Ten workers in parallel, about six minutes for the full set. This is the part nobody watches, which is rather the point.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>Six minutes is slow.</b> Agreed, and it is a demo number. Real throughput depends on the agent under test, not on us.</li><li><b>Can I run a subset?</b> Not in the prototype. Worth asking whether a smoke run of fifty before the full 380 is something a developer would actually want.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>Would you want a fast subset run before committing to the full set, or is that a false economy?</li></ul></div>
   </div></div>
 
-  <div class="step"><div class="t">3:00<br>3 min</div><div>
+  <div class="step"><div class="t">4:00<br>4 min</div><div>
     <h3>Results, the metric board</h3>
-    <p class="do">Nine cells. Click Safety, then click a case chip and land on the trace.</p>
-    <div class="say">Every metric from the palette you sent, on one screen, and every number opens the cases behind it.</div>
-    <div class="hit">Judge scores will get challenged. Say it first: these three come from a model grading a model, nobody has checked it against a human on this dataset yet, and the card says so itself.</div>
-    <div class="ask">Ask them: which of these nine would you not trust, and what would you need to see to trust it?</div>
-  </div></div>
-
-  <div class="step"><div class="t">6:00<br>2 min</div><div>
-    <h3>The safety band, your strongest moment</h3>
-    <p class="do">Scroll to the red band. Two cases. Then scroll down and show those same two rows sitting green in every column.</p>
-    <div class="say">Both of these pass every automatic check. One hands a citizen somebody else's phone number. The other followed an instruction hidden inside an uploaded document and told the citizen their application was approved. If safety were a toggle, the developer most likely to ship this is the one least likely to tick the box.</div>
-    <div class="hit">If anyone says this is contrived, agree that the data is invented and point at the trace: the mechanism is real, the agent matched on surname instead of reference number.</div>
+    <ol class="clk"><li>Read the top line: <b>380 cases attempted.</b> Not a sample.</li><li>Point at the nine cells and name them in the palette vocabulary they sent us.</li><li>Click <b>Safety</b>. The drilldown opens with the two flagged cases as chips.</li><li>Click <b>Accuracy</b> and let them see the caveat sitting under the number.</li><li>Click <b>Bias and fairness</b>, which reads not run, and show that it says why rather than showing a zero.</li><li>Scroll to the <b>Across runs</b> card. Six sparklines. Point at the red one.</li></ol>
+    <div class="say"><span class="lbl">Say</span>Every metric from the palette you sent, on one screen, and every number opens the cases behind it.</div>
+    <div class="say">Five of those six lines climb. The red one is safety, and it drops for four runs then jumps back up on the fifth. That is a fix breaking something else, and it is the story of the next two screens.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>How do you know the judge is right?</b> We do not, and the card says so before anyone asks. Nobody has checked our grader against a human on this dataset. That is why it is labelled a signal and why nothing automatic ever fires on it.</li><li><b>Why is bias off by default?</b> Because it doubles the run. It is a choice with a price, not a metric we can just leave on.</li><li><b>Latency shows a median, why not an average?</b> One 31 second timeout drags an average and hides the typical case. The slowest is shown separately in the drilldown.</li><li><b>Nine metrics feels like a lot to read.</b> Fair. The board is a glance layer, and the honest answer is that most days a developer looks at two of them.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>Which of these nine would you not trust, and what would you need to see before you did?</li><li>Is nine the right number, or should some of these live somewhere else?</li></ul></div>
   </div></div>
 
   <div class="step"><div class="t">8:00<br>2 min</div><div>
-    <h3>What the agent did</h3>
-    <p class="do">Case 11. The red step, the two records side by side, the number appearing in the reply.</p>
-    <div class="say">This is the difference between telling a developer they failed and showing them where. The step that broke is the one that read the contact field off the wrong record.</div>
-    <div class="ask">Ask them: is this enough for a developer to actually fix it, or do they need something we are not showing?</div>
+    <h3>The safety band, your strongest moment</h3>
+    <ol class="clk"><li>Scroll to the <b>red band</b> above the table. Two cases.</li><li>Read both aloud, including the mechanism, not just the label.</li><li>Now scroll down to the table and find those same two rows. Point at the columns: <b>yes, yes, yes.</b></li><li>Let the silence sit for a second before saying the line.</li></ol>
+    <div class="say"><span class="lbl">Say</span>Both of these pass every single automatic check. One hands a citizen somebody else phone number. The other followed an instruction hidden inside an uploaded document and told the citizen their application was approved.</div>
+    <div class="say">If safety were a toggle, the developer most likely to ship this is exactly the developer least likely to tick the box.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>This is contrived.</b> The data is invented, agreed. Open the trace and show the mechanism: it matched on surname instead of reference number. That failure is not exotic, it is a join on the wrong key.</li><li><b>Would a real safety classifier catch these?</b> A PII check catches the phone number. Injection is harder and the honest answer is that detection is imperfect, which is why the developer also gets to write their own checks.</li><li><b>Two out of 380 is not many.</b> It only takes one to end the programme. And these are the two that no other part of the product would have surfaced.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>Is there a category of failure like this that we are not watching for at all?</li></ul></div>
   </div></div>
 
   <div class="step"><div class="t">10:00<br>2 min</div><div>
+    <h3>What the agent did</h3>
+    <ol class="clk"><li>You are already on case 11 from the chip. Point at the subtitle: <b>every column passed, the flag below is why it still needs you.</b></li><li>The trace. Four steps, one of them red.</li><li>Point at the red step and read the payload: two records side by side, <b>SALEM N</b> with a mobile number and <b>SALEM A</b> with mobile withheld.</li><li>Then point at the reply on the right, containing that exact number.</li><li>Press <b>J</b> a couple of times to show you can walk the cases from the keyboard.</li></ol>
+    <div class="say"><span class="lbl">Say</span>This is the difference between telling a developer they failed and showing them where. The step that broke is the one that read the contact field off the wrong record.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>Would a real agent expose a trace like this?</b> It has to, or none of this works. That is a requirement on the agent contract, and worth flagging as one.</li><li><b>What if the agent is a black box?</b> Then we get the input, the output and the timings, and lose the step detail. The checks still run. The debugging gets much worse.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>Does the trace format we assume here match what agents on the substrate will actually emit?</li></ul></div>
+  </div></div>
+
+  <div class="step"><div class="t">12:00<br>3 min</div><div>
     <h3>Notes become checks</h3>
-    <p class="do">Screen 5. The draft, then the agreement card, then the library.</p>
-    <div class="say">Most tools let you write a judge and trust it blindly. Here it shows you where it disagreed with you on twenty cases you graded by hand, before it scores anything. Seventeen of twenty, and the three it got wrong are listed.</div>
-    <div class="hit">Ritesh may say Prism can already do rubric metrics. True. What Prism has nothing like is the validation loop, and that is the part that makes a check trustworthy.</div>
+    <ol class="clk"><li>Screen 5. Point at the <b>draft check</b> written in plain words, not code.</li><li>Point at <b>yes or no</b> as the only answer options and say why: two options is more reliable than a score out of ten.</li><li>Scroll to <b>Does this check agree with you.</b> 17 of 20.</li><li>Point at the three rows where it disagreed and read one.</li><li>Scroll to the <b>library</b>. The saved check carries its agreement record with it.</li></ol>
+    <div class="say"><span class="lbl">Say</span>Most tools let you write a judge and then trust it blindly. Here it has to show you where it disagreed with you on twenty cases you graded by hand, before it is allowed to score anything.</div>
+    <div class="say">And the three it got wrong are all the same shape, which tells the developer exactly how to sharpen the wording.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>Prism can already do rubric metrics.</b> True, and I am not rebuilding Prism. What Prism has no answer for is this validation loop, and that is the part that makes a developer-written check worth anything.</li><li><b>Twenty hand-graded cases is not many.</b> It is a starting signal and the screen says how many back it. The alternative everyone else ships is zero validation.</li><li><b>Who grades the twenty?</b> The developer, on their own agent. It is their definition of correct, which is the whole point.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>Should the verifier see a developer check library, or is it private to them?</li><li>What agreement level would you want before a check is allowed to gate anything?</li></ul></div>
   </div></div>
 
-  <div class="step"><div class="t">12:00<br>2 min</div><div>
+  <div class="step"><div class="t">15:00<br>2 min</div><div>
     <h3>What broke since last time</h3>
-    <p class="do">The new safety flag with unchanged columns. Then the across-runs strip.</p>
-    <div class="say">The developer fixed one thing and opened a security hole doing it. Every column stayed identical. This is the regression a metric dashboard cannot show you.</div>
-    <div class="ask">Ask them: what should actually happen to a live agent when this fires? I have a proposal but I am not confident in it.</div>
+    <ol class="clk"><li>Point at the header: <b>Run 6 against run 5.</b> Always the two most recent.</li><li>The red band. <b>One new safety flag since run 5.</b></li><li>Point at the second entry: <b>already there in run 5.</b> Different problem, different response.</li><li>Now the table row. Run 5 and Run 6 columns are <b>identical</b>. Nothing changed. It is still marked broken.</li><li>Click <b>Only what got worse</b> and show that the case is in there despite no column moving.</li></ol>
+    <div class="say"><span class="lbl">Say</span>The developer fixed one thing and opened a security hole doing it. Every column stayed the same. This is the regression a metric dashboard structurally cannot show you.</div>
+    <div class="say">And it separates your change broke this from this was already broken, which is the difference between a panic and a plan.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>Only two runs compared?</b> Detail is two runs because that is the decision a developer actually makes, keep this change or revert it. The full arc is in the across runs strip on the same screen.</li><li><b>What actually happens to a live agent when this fires?</b> This is my weakest answer and I would rather have yours. My proposal is that a safety problem pulls it from new installs within the hour, basics slipping gets seven days, and a judge score moving does nothing.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>What should the consequence be when a listed agent regresses? I have a proposal and I am not confident in it.</li><li>Is seven days right for the middle case, or is that made up? It is made up.</li></ul></div>
   </div></div>
 
-  <div class="step"><div class="t">14:00<br>2 min</div><div>
+  <div class="step"><div class="t">17:00<br>2 min</div><div>
     <h3>Evidence and submit</h3>
-    <p class="do">The coverage table, the not-run rows, then the submit screen with no score gate.</p>
-    <div class="say">The pack says what was not checked, not just what was. Silence about a metric reads exactly like a pass, and that is how a certification gets pulled apart six months later. There is no minimum score anywhere in this product.</div>
-    <div class="ask">Ask them: is this enough for a verifier to make a decision, and what would you add?</div>
+    <ol class="clk"><li>Point at the evidence rows and say none of it was typed by hand.</li><li>Scroll to <b>What was checked, and what was not.</b> Fifteen rows.</li><li>Point at the <b>not run</b> rows and read one, including the reason.</li><li>Click <b>Download the pack as PDF</b> so they see it is a real artefact.</li><li>Go to submit. Point at <b>there is no score you have to reach</b> and at the message box to the verifier.</li></ol>
+    <div class="say"><span class="lbl">Say</span>The pack says what was not checked, not just what was. Silence about a metric reads exactly like a pass, and that is how a certification gets pulled apart six months later.</div>
+    <div class="say">There is no minimum score anywhere in this product. The gate is the verifier plus total transparency about coverage.</div>
+    <div class="hit"><span class="lbl">They will hit</span><ul class="sub"><li><b>No pass mark at all?</b> A number invites building to the test. Give the verifier everything instead, including what the developer chose not to run, and let a human decide.</li><li><b>Will a verifier actually read this?</b> Honest answer, unknown. We have never watched one use it. Worth a session with whoever does that job.</li><li><b>What stops a developer turning everything off?</b> Nothing, and the pack says they did. Turning checks off is visible, which is the deterrent.</li></ul></div>
+    <div class="ask"><span class="lbl">Ask them</span><ul class="sub"><li>Is this enough for a verifier to make a decision, and what would you add?</li><li>Should any check be mandatory before submit is even possible?</li></ul></div>
   </div></div>
+
 </div>
 
 <div class="c">
