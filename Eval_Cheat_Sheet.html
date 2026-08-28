@@ -1,4 +1,4 @@
-<title>Eval product cheat sheet</title>
+<title>Eval playbook</title>
 <style>
 :root{--ink:#0e1419;--bg:#f5f7f8;--panel:#fff;--line:#e7eaee;--line-2:#d7dce2;
 --text:#16201c;--muted:#697079;--teal:#0e9b76;--teal-d:#0b6f54;
@@ -8,185 +8,303 @@
 --lock:#5b6470;--lock-bg:#eef1f4;--lock-bd:#dbe0e6;--radius:12px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);
-font:14.5px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-.top{background:var(--ink);color:#fff;padding:12px 24px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
-.top b{font-size:13.5px;letter-spacing:.14em}
+font:14.5px/1.58 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.top{background:var(--ink);color:#fff;padding:11px 22px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.top b{font-size:13px;letter-spacing:.14em}
 .top span{font-size:12px;color:#9aa4ae}
-.wrap{max-width:820px;margin:0 auto;padding:28px 20px 80px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(245,247,248,.96);backdrop-filter:blur(8px);
+border-bottom:1px solid var(--line);padding:8px 22px;display:flex;gap:6px;flex-wrap:wrap}
+.nav a{font-size:11.5px;font-weight:650;text-decoration:none;color:var(--muted);
+padding:4px 10px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.nav a:hover{color:var(--teal-d);border-color:var(--line-2);background:var(--panel)}
+.wrap{max-width:860px;margin:0 auto;padding:26px 20px 100px}
 h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
-.deck{color:var(--muted);margin:0 0 22px;font-size:14px}
+.deck{color:var(--muted);margin:0 0 8px;font-size:13.5px}
+.part{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--teal-d);
+margin:30px 0 10px;padding-top:16px;border-top:2px solid var(--line-2)}
+.part:first-of-type{margin-top:18px}
 .scr{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
+box-shadow:0 1px 2px rgba(14,20,25,.05);padding:15px 17px;margin:0 0 13px;scroll-margin-top:60px}
 .scr h2{font-size:16px;margin:0 0 2px}
-.scr .path{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
-.row{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
-.row b{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.scr .path{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:9px}
+.row{display:grid;grid-template-columns:104px 1fr;gap:11px;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.row b{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:2px}
 .row.say span{background:var(--gov-bg);border-left:2px solid var(--gov);padding:7px 10px;border-radius:0 7px 7px 0}
 .row.push span{background:var(--preview-bg);border-left:2px solid var(--preview);padding:7px 10px;border-radius:0 7px 7px 0}
+.row.ask span{background:var(--lock-bg);border-left:2px solid var(--lock);padding:7px 10px;border-radius:0 7px 7px 0}
 .cite{font-size:11.5px;color:var(--muted)}
-.todo{color:var(--preview);font-weight:700;font-size:11px;letter-spacing:.05em}
-@media(max-width:560px){.row{grid-template-columns:1fr;gap:2px}}
-@media print{.top{display:none}body{background:#fff}.scr{break-inside:avoid;box-shadow:none}}
+.clk{margin:0;padding-left:18px;font-size:12.5px}
+.clk li{margin-bottom:4px}
+.sub{margin:0;padding-left:16px}
+.sub li{margin-bottom:5px}
+.big{background:var(--gov-bg);border-color:var(--gov-bd)}
+.red{background:var(--alert-bg);border-color:var(--alert-bd)}
+.tt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.tt td{padding:5px 8px;border-bottom:1px solid var(--line)}
+.tt td:first-child{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--muted);width:74px}
+.tt tr:last-child td{border-bottom:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .qg{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted);
-  margin:18px 0 6px;padding-top:10px;border-top:1px solid var(--line-2)}
+margin:18px 0 6px;padding-top:10px;border-top:1px solid var(--line-2)}
 .qg:first-child{margin-top:8px;border-top:0;padding-top:0}
 .qa{padding:8px 0;border-top:1px solid var(--line)}
 .qa b{display:block;font-size:13px;font-weight:650;margin-bottom:2px}
 .qa span{display:block;font-size:12.5px;color:var(--muted);line-height:1.55}
 #qfilter{width:100%;padding:9px 12px;font:inherit;font-size:13px;margin:6px 0 4px;
-  border:1px solid var(--line-2);border-radius:9px;background:var(--bg)}
+border:1px solid var(--line-2);border-radius:9px;background:var(--bg)}
 #qfilter:focus{outline:2px solid var(--teal);outline-offset:1px;background:var(--panel)}
-#qcount{margin-bottom:4px}
-@media print{#qfilter,#qcount{display:none}}
+@media(max-width:640px){.two{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:3px}}
+@media print{.top,.nav,#qfilter,#qcount{display:none}body{background:#fff}.scr{break-inside:avoid;box-shadow:none}}
 </style>
 
-<div class="top"><b>HUMAIN ONE</b><span>Eval product / client cheat sheet / evolves with the build</span></div>
+<div class="top"><b>HUMAIN ONE</b><span>Eval playbook / prepare, present, defend, look up</span></div>
+<div class="nav"><a href="#prep">Before you walk in</a><a href="#ground">Ground</a><a href="#walk">Walkthrough</a><a href="#loop">The whole loop</a><a href="#room">Handling the room</a><a href="#qa">Look anything up</a></div>
 <div class="wrap">
+<h1>Eval playbook</h1>
+<p class="deck">Everything needed to run the session and answer whatever comes back. Green is what you say, amber is what they will say, grey is what you ask them.</p>
+<p class="cite">Product: <a href="Eval_Journey_V2.html" style="color:var(--teal-d)">Eval_Journey_V2.html</a></p>
+<div class="part" id="prep">Part one &middot; before you walk in</div>
+<div class="scr big">
+  <h2>The first sixty seconds</h2>
+  <div class="path">Set the frame before anything else</div>
+  <div class="row say"><b>Open with</b><span>I am going to walk the whole thing in about twenty minutes. I am not looking for approval today, I want you to try to break it. There are nine things I already know are unresolved and I will flag them as we go rather than wait to be caught. What I want out of the hour is a direction on two of them.</span></div>
+  <div class="row "><b>Why</b><span>It turns the session from a review you can fail into a working session you are running. Every hole they find becomes one you invited rather than one you missed.</span></div>
+</div>
 
-<h1>The eval product, screen by screen</h1>
-<p class="deck">One block per screen. What it is, why it exists, the sentence to say, and the answer if they push back.</p>
 
-<div class="scr" style="border-color:var(--gov-bd);background:var(--gov-bg)">
+<div class="scr ">
   <h2>If you only say five things</h2>
   <div class="path">The whole argument in one card</div>
-  <div class="row"><b>1</b><span>Every metric in your palette is on one screen, over a real 380-case Arabic and English dataset, and every number opens the cases behind it.</span></div>
-  <div class="row"><b>2</b><span>Safety is not a toggle. Two cases pass every column and still leak data or follow an injected instruction. Only always-on answer checks catch them.</span></div>
-  <div class="row"><b>3</b><span>The judge earns trust instead of demanding it: every saved check shows how often it agreed with the developer before it scores anything.</span></div>
-  <div class="row"><b>4</b><span>Regressions cannot hide. A new safety flag shows up as broken even when every metric stays green, and five runs of history show the arc.</span></div>
-  <div class="row"><b>5</b><span>The verifier pack states what was not checked. Silence never reads as a pass.</span></div>
-  <div class="row say"><b>Demo path</b><span>Set up a run: the Snowflake source, click Production traffic to show the closed loop, tick Bias and watch 380 become 760 with the price. Run it. Results: the red safety band, click the Safety cell, then switch the table to All cases and page through the full 380. What broke since last time: the new flag with green columns. Evidence: the coverage table, download the pack. Two minutes.</span></div>
+  <div class="row "><b>1</b><span>Every metric from the palette is on one screen, over a real 380 case Arabic and English dataset, and every number opens the cases behind it.</span></div>
+  <div class="row "><b>2</b><span>Safety is not a toggle. Two cases pass every column and still leak data or follow an injected instruction. Only the always on answer checks catch them.</span></div>
+  <div class="row "><b>3</b><span>The judge earns trust rather than demanding it. Every saved check shows how often it agreed with the developer before it scores anything.</span></div>
+  <div class="row "><b>4</b><span>Regressions cannot hide. A new safety flag shows as broken even when every column stays green, and five runs of history show the arc.</span></div>
+  <div class="row "><b>5</b><span>The verifier pack states what was not checked. Silence never reads as a pass.</span></div>
 </div>
 
-<div class="scr">
+
+<div class="scr ">
+  <h2>Timing</h2>
+  <div class="path">Twenty minutes of walking, then open it up</div>
+  <div class="row "><b>Plan</b><span><table class="tt"><tr><td>0:00</td><td>Set up a run</td></tr><tr><td>3:00</td><td>Run it</td></tr><tr><td>4:00</td><td>Results, the metric board</td></tr><tr><td>8:00</td><td>The safety band</td></tr><tr><td>10:00</td><td>What the agent did, the trace</td></tr><tr><td>12:00</td><td>What went wrong, the grouping</td></tr><tr><td>14:00</td><td>Notes become checks</td></tr><tr><td>17:00</td><td>What broke since last time</td></tr><tr><td>19:00</td><td>Evidence and submit</td></tr></table></span></div>
+</div>
+
+
+<div class="part" id="ground">Part two &middot; ground you need before you speak</div>
+<div class="scr ">
   <h2>The whole picture, in plain English</h2>
-  <div class="path">For you, before the meeting. Not a script.</div>
-
-  <div class="row"><b>The setting</b><span>HUMAIN ONE is a marketplace. Outside developers build AI agents, small software workers that talk to citizens and do tasks, like answering questions about permits. A developer submits their agent, a human verifier decides whether it can be listed, and approved agents go live for a government body such as a municipality. This eval product is the workbench the developer uses to find out what is wrong with their agent and fix it, both before launch and after.</span></div>
-
-  <div class="row"><b>What an evaluation actually is</b><span>You cannot read an agent and know if it is good, the way you cannot read a driver and know if they can drive. The only way is to test it: ask it hundreds of realistic questions and judge what comes back. An evaluation is exactly that, a big list of test questions called cases, plus machinery that scores the answers. A run is one sitting of the whole test.</span></div>
-
-  <div class="row"><b>What "in production" means</b><span>Before launch, the agent only ever answers test questions. Mistakes are free, nobody real is on the other end. "In production" means the agent is live: real citizens are talking to it, and a mistake now has consequences, wrong information given, or worse, one citizen shown another citizen's details. The same agent behaves differently against real people than against a test sheet, which is why evaluation cannot stop at launch.</span></div>
-
-  <div class="row"><b>Why the data refreshes daily</b><span>A test set goes stale. Real people ask things nobody predicted: a new policy arrives, a season changes, people phrase things in new ways. An agent that is only tested on last month's questions will pass the test and fail on the street. So the dataset syncs nightly from the data warehouse, and the product samples one in fifty real conversations, with personal details masked, into the test set. Yesterday's real traffic becomes today's exam. And when something fails in production, that exact conversation becomes a permanent test case, so the same failure can never slip through silently again. That is the closed loop the demo keeps referring to.</span></div>
-
-  <div class="row"><b>Why connect a warehouse instead of uploading files</b><span>Organisations keep their records and logs in one central place, a data warehouse like Snowflake. Connecting to it means the test set updates itself from the source of truth. Uploading CSVs by hand means someone has to remember to do it, and the test set quietly drifts away from reality.</span></div>
-
-  <div class="row"><b>Who is who</b><span>The developer builds the agent, reads its failures, writes notes and checks. The platform runs everything that needs no knowledge of the agent: did it finish, did it loop, did it leak data. The judge is an AI that grades answers at scale, cheap but only trustworthy once its grades are compared against a human's, which is what the agreement score is. The verifier is the human who decides marketplace entry. The tenant is the government body whose citizens use the agent.</span></div>
-
-  <div class="row"><b>Who sets up the judge</b><span>Three different owners. The mechanical and safety checks are ours, shipped, not configurable by anyone. The category judges, accuracy and trustworthiness and helpfulness, are written and calibrated by the marketplace team who own the reviewed answer set, so every agent in a category is scored the same way; the developer can only switch them on or off. The developer writes their own checks on screen 5, in their own words, and the product shows how often each one agreed with them before it is trusted.</span></div>
-
-  <div class="row"><b>What can be judged in production</b><span>Less than before launch, and this matters. A live conversation has no expected answer, nobody wrote down what the right reply should have been, so accuracy cannot score live traffic at all. What still works is anything that reads the reply on its own: safety, language, the developer's saved checks, and grounding a claim against the citizen's record. To give a sampled production case a real accuracy score, a human has to write the expected answer first. That labelling step is the price of the closed loop, and it is worth naming rather than glossing.</span></div>
-
-  <div class="row"><b>Why there is no pass mark</b><span>A single score invites gaming: build to the test, hide the gaps. Instead the verifier receives everything, including a list of what was not checked, and makes a human decision. The gate is transparency, not a number.</span></div>
-
-  <div class="row"><b>Plain words</b><span><b>Case</b>: one test question with the answer you expect. <b>Dataset</b>: all the cases. <b>Run</b>: one pass of the agent over the dataset. <b>Check</b>: a yes-or-no question asked of every answer. <b>Metric</b>: a score across the whole run. <b>Judge</b>: an AI that grades answers. <b>Attention set</b>: the handful of cases picked out as worth a human look. <b>Trace</b>: the step-by-step record of what the agent did inside one case. <b>Regression</b>: something that used to work and now does not. <b>Sampling</b>: copying a small share of real traffic into the test set. <b>PII masking</b>: stripping names, numbers and identifiers before anyone sees a conversation.</span></div>
+  <div class="path">Read this once the night before</div>
+  <div class="row "><b>The setting</b><span>HUMAIN ONE is a marketplace. Outside developers build AI agents, small software workers that talk to citizens and do tasks like answering questions about permits. A developer submits an agent, a human verifier decides whether it can be listed, and approved agents go live for a government body such as a municipality. This product is the workbench the developer uses to find out what is wrong with their agent and fix it, before launch and after.</span></div>
+  <div class="row "><b>What an evaluation is</b><span>You cannot read an agent and know if it is good, the way you cannot read a driver and know if they can drive. You have to test it: ask it hundreds of realistic questions and judge what comes back. That is all an evaluation is. A big list of test questions called cases, plus machinery that scores the answers. A run is one sitting of the whole test.</span></div>
+  <div class="row "><b>What in production means</b><span>Before launch the agent only answers test questions and mistakes are free. In production real citizens are talking to it, and a mistake means wrong information given, or one citizen shown another citizen details. The same agent behaves differently against real people than against a test sheet.</span></div>
+  <div class="row "><b>Who is who</b><span>The developer builds the agent and reads its failures. The platform runs everything that needs no knowledge of the agent. The judge is an AI that grades answers at scale. The verifier is the human who decides marketplace entry. The tenant is the government body whose citizens use the agent.</span></div>
+  <div class="row "><b>Who sets up the judge</b><span>Three owners. Mechanical and safety checks are ours, shipped, not configurable by anyone. Category judges, accuracy and trustworthiness and helpfulness, are written and calibrated by the marketplace team who own the reviewed answer set, so every agent in a category is scored the same way. The developer writes their own checks on screen 5, and the product shows how often each agreed with them before it is trusted.</span></div>
+  <div class="row "><b>What can be judged in production</b><span>Less than before launch. A live conversation has no expected answer, so accuracy cannot score it at all. What still works is anything that reads the reply alone: safety, language, the developer own checks, and grounding a claim against the citizen record. Turning a sampled live case into a scored one needs a human to write the expected answer.</span></div>
+  <div class="row "><b>Why no pass mark</b><span>A single score invites building to the test. The verifier gets everything instead, including what was not checked, and makes a human call. The gate is transparency, not a number.</span></div>
+  <div class="row "><b>Plain words</b><span><b>Case</b> one test question with the answer you expect. <b>Dataset</b> all the cases. <b>Run</b> one pass over the dataset. <b>Check</b> a yes or no question asked of every answer. <b>Metric</b> a number across the whole run. <b>Judge</b> an AI that grades answers. <b>Attention set</b> the cases picked out as worth a human look. <b>Trace</b> the step by step record inside one case. <b>Regression</b> something that worked and now does not. <b>Sampling</b> copying a share of real traffic into the test set. <b>PII masking</b> stripping identifiers before anyone sees a conversation.</span></div>
 </div>
 
-<div class="scr">
+
+<div class="scr ">
   <h2>Why evaluation cannot stop at launch</h2>
-  <div class="path">The argument for watching production, and where the industry landed</div>
-
-  <div class="row"><b>Short version</b><span>An agent can get worse without anybody touching it. Testing before launch only proves it worked against the questions we thought to ask, on the day we asked them.</span></div>
-
-  <div class="row"><b>1. The agent stays still, the world moves</b><span>The model provider updates the model underneath you. The documents it reads get edited. A regulation changes. Nobody deployed anything and the answers are different. This is the one that matters most, because there is no code change to trigger a retest. Without production monitoring there is no moment at which anyone would think to look.</span></div>
-
-  <div class="row"><b>2. The numbers do not work</b><span>We test on 380 cases. A live agent might handle fifty thousand conversations a month. A failure that hits half a percent of citizens is statistically invisible in a test set, you would expect to see it once or twice and could easily see it zero times. In production that same rate is 250 people a month getting a wrong answer.</span></div>
-
-  <div class="row"><b>3. You cannot test for what you have not imagined</b><span>Nobody writes a test case for an instruction hidden inside an uploaded document until it happens to somebody once. Every genuinely new failure mode arrives in production first. The question is only whether you find it or a journalist does.</span></div>
-
-  <div class="row"><b>4. The test set is a guess about what people will ask</b><span>Real traffic is the answer to that guess, and the two drift apart quietly. New season, new policy, new phrasing. An agent tested only on last month's questions passes the test and fails on the street.</span></div>
-
-  <div class="row"><b>5. Government makes this sharper</b><span>Rules change often and matter a lot. An agent that was compliant in March is non compliant in April with no code change at all. If compliance is only ever checked once at certification, that agent stays listed and stays wrong until somebody complains.</span></div>
-
-  <div class="row push"><b>The honest cost</b><span>Continuous evaluation costs money and produces noise. If nobody acts on what it surfaces, it is theatre with a dashboard. That is exactly why what happens when a live agent gets worse is on my open list, and why I would rather agree the response before we build more of the watching.</span></div>
-
-  <div class="row"><b>Where the industry landed</b><span>This is not a theory we invented. Both leading platforms have built the same shape in the last year. LangSmith runs online evaluators automatically on production traces with no deployment, and uses those traces to build the datasets you then evaluate against. Arize AX added continuous production evaluation plus Signal, a managed agent that continuously reviews production traces, groups related failures, and surfaces ranked issues. That is our attention set, arrived at independently. Both also tie their judges back to human judgment rather than trusting them outright. <span class="cite">Sources: LangSmith platform and production monitoring docs; Arize AX 2026 product notes.</span></span></div>
-
-  <div class="row say"><b>Say this</b><span>An agent can get worse without anyone touching it. The model underneath changes, the documents change, a rule changes. There is no deployment to trigger a retest, so if we are not watching production, nobody ever thinks to look. Both LangSmith and Arize built continuous production evaluation into their platforms in the last year, and Arize independently built failure clustering that looks a lot like our attention set. We are not proposing something exotic, we are proposing where the category has already gone.</span></div>
-
-  <div class="row push"><b>If they say it is premature</b><span>Reasonable for day one, and the always-on checks work from the first upload with no production data at all. The part I would not defer is the plumbing that samples live conversations, because a failure you did not capture is a failure you cannot turn into a test case, and that is the loop that stops the same problem happening twice.</span></div>
+  <div class="path">The argument, and where the industry landed</div>
+  <div class="row "><b>Short version</b><span>An agent can get worse without anybody touching it. Testing before launch only proves it worked against the questions we thought to ask, on the day we asked them.</span></div>
+  <div class="row "><b>1</b><span><b>The agent stays still, the world moves.</b> The model provider updates the model underneath you. The documents it reads get edited. A regulation changes. Nobody deployed anything and the answers are different. This is the one that matters most, because there is no code change to trigger a retest. Without production monitoring there is no moment at which anyone would think to look.</span></div>
+  <div class="row "><b>2</b><span><b>The numbers do not work.</b> We test on 380 cases. A live agent might handle fifty thousand conversations a month. A failure hitting half a percent of citizens is statistically invisible in a test set, and is 250 people a month in production.</span></div>
+  <div class="row "><b>3</b><span><b>You cannot test for what you have not imagined.</b> Nobody writes a test case for an instruction hidden inside an uploaded document until it happens once. Every genuinely new failure mode arrives in production first. The only question is whether you find it or a journalist does.</span></div>
+  <div class="row "><b>4</b><span><b>The test set is a guess.</b> Real traffic is the answer to that guess, and the two drift apart quietly. New season, new policy, new phrasing.</span></div>
+  <div class="row "><b>5</b><span><b>Government makes it sharper.</b> An agent compliant in March is non compliant in April with no code change. If compliance is only checked once at certification, that agent stays listed and stays wrong until somebody complains.</span></div>
+  <div class="row push"><b>The honest cost</b><span>Continuous evaluation costs money and produces noise. If nobody acts on what it surfaces it is theatre with a dashboard. That is exactly why what happens when a live agent gets worse is on my open list.</span></div>
+  <div class="row "><b>Industry</b><span>Not a theory we invented. LangSmith runs online evaluators automatically on production traces with no deployment, and uses those traces to build the datasets you evaluate against. Arize AX added continuous production evaluation plus Signal, a managed agent that continuously reviews production traces, groups related failures and surfaces ranked issues. That is our attention set, arrived at independently. Both tie their judges back to human judgment rather than trusting them outright.</span></div>
+  <div class="row say"><b>Say this</b><span>An agent can get worse without anyone touching it. There is no deployment to trigger a retest, so if we are not watching production nobody ever thinks to look. Both LangSmith and Arize built continuous production evaluation in the last year, and Arize independently built failure clustering that looks a lot like our attention set. We are not proposing something exotic, we are proposing where the category has already gone.</span></div>
+  <div class="row push"><b>If premature</b><span>Reasonable for day one, and the always on checks work from the first upload with no production data. The part I would not defer is the plumbing that samples live conversations, because a failure you did not capture is one you cannot turn into a test case.</span></div>
 </div>
 
-<div class="scr">
-  <h2>Set up a run</h2>
-  <div class="path">Screen 1 &middot; the three-layer metric board</div>
-  <div class="row"><b>What</b><span>The gov-services-eval dataset, 380 cases across 38 citizen journeys in Arabic and English, synced nightly from Snowflake, with connectors for CSV, warehouse, S3 or GCS, and sampled production traffic. Every card is typed: Dataset, Built-in checks, Judge metrics, Run strategies. Cost and run count update live as you pick.</span></div>
-  <div class="row"><b>Why</b><span>A metric's place is decided by what it needs as input, not how important it sounds. Checks that read only the run or the reply generalise to any agent, so they are defaults. Checks that need ground truth or repeat runs are choices with visible cost. <span class="cite">Same split Azure AI Foundry ships: risk-and-safety evaluators recommended for every application type.</span></span></div>
-  <div class="row say"><b>Say this</b><span>Nothing here needs configuring to get value on day one. The developer can run the moment they upload, and every extra depth is priced before they commit.</span></div>
-  <div class="row push"><b>Push back</b><span>"Why can safety not be turned off?" A check the developer can disable is not a guarantee the marketplace can make. The developer most likely to leak citizen data is the one least likely to tick the box.</span></div>
+
+<div class="part" id="walk">Part three &middot; the walkthrough, screen by screen</div>
+<div class="scr" id="w1">
+  <h2>1. Set up a run</h2>
+  <div class="path">0:00 &middot; 3 minutes</div>
+  <div class="row"><b>What it is</b><span>Cases plus three layers of metrics. The dataset with its connected source, the always on checks nobody can switch off, category judges for this category, and paid extra run strategies. Cost and run count move live as you pick.</span></div>
+  <div class="row"><b>Why it exists</b><span>A metric belongs where it does because of what it needs as input, not how important it sounds. Checks reading only the run or the reply generalise to any agent, so they are defaults. Checks needing ground truth or repeat runs are choices with a visible price. <span class="cite">Same split Azure AI Foundry ships, where risk and safety evaluators are recommended for every application type.</span></span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Top line first. <b>Run 5 finished 2 hours ago, 6 of 12 had problems, 2 still need a look.</b> The product remembers where you were.</li><li>Cases card. The <b>380 badge</b>, then read the definition line: a case is one citizen question, most with the answer you expect written next to it.</li><li>Source row. <b>Snowflake, GOV_SERVICES.EVAL_V3, synced 2 hours ago, Connected.</b> Not a CSV somebody uploaded once in March.</li><li>Coverage row. <b>38 journeys, 187 Arabic, 193 English.</b></li><li>Click <b>Browse all 380 cases</b>, hit the Arabic filter, let them see right to left rendering, close it.</li><li>Click <b>Production traffic</b> under Add cases from and read the panel aloud. The closed loop in one sentence.</li><li>Point at the four card chips in order: <b>Dataset, Built-in checks, Judge metrics, Run strategies.</b></li><li>Always on card. Three example rows, then the line naming the four that read the reply itself.</li><li>Costs extra card. <b>Tick Bias</b> and let them watch 380 become 760, the time double, and the price move before anything runs.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>Four cards, four different kinds of thing, and the chip on each says which. Dataset, built-in checks, judge metrics, run strategies. That split is the whole architecture, decided by what each check needs as input rather than by how important it sounds.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>Nothing here needs configuring to get value on day one. Every metric has a default. What costs more is priced before you commit, not after it has run.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>Where did the 380 come from?</b> Generated for the demo and seeded so numbers never move between demos. In a real deployment it syncs nightly from the tenant warehouse.</li><li><b>Why Snowflake?</b> It is the example. The connectors cover a warehouse, a bucket, a CSV and sampled live traffic. Whatever the tenant already has.</li><li><b>What if a tenant has no warehouse?</b> CSV still works and that is the floor. The point of a connected source is that it updates itself instead of drifting.</li><li><b>Who maps the columns?</b> Once per source, then remembered. That row shows a mapping that already happened.</li><li><b>Why is accuracy only available here?</b> It needs a written correct answer to compare against. Government services has a reviewed answer set, a brand new category would not, and the screen says so rather than greying out a toggle.</li><li><b>What if I have 10,000 cases?</b> Same screen. Cost and time scale linearly, which is why the estimate sits next to the button.</li><li><b>Is 30.78 SAR real?</b> No. Invented placeholder at about five halalas a case. I need the real number from someone.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>If you were the developer uploading here for the first time, what is missing before you would trust this?</li><li>Does the four card split read clearly on its own, or did it only make sense because I explained it?</li><li>Should a developer see cost at all, or is that ours to absorb and hide?</li></ul></span></div>
 </div>
 
-<div class="scr">
-  <h2>Results</h2>
-  <div class="path">Screen 2 &middot; where the two-case argument lives</div>
-  <div class="row"><b>What</b><span>A nine-metric board covering the whole palette, each cell opening per-case evidence, sparklines across the full run history, the safety band, and one complete case table: all 380 rows, paginated, with Needs attention as its default filter. Attention is a view of the table, never a smaller table.</span></div>
-  <div class="row"><b>Why</b><span>Two cases in the demo pass every automatic column and still raise a safety flag: a cross-record phone number leak and a prompt injection from an uploaded document. Without always-on answer checks both are invisible. <span class="cite">Step repetition (15.7%) plus mishandled termination (12.4%) is about a quarter of observed failures in MAST, Cemri et al. 2025, arXiv 2503.13657. The rest needs judgement.</span></span></div>
-  <div class="row say"><b>Say this</b><span>Every metric in your palette is on this one screen, and every number opens the cases behind it. Then watch case 8 and case 11: green across every column, and both are the kind of failure that ends up in a newspaper. That is why safety is not a toggle.</span></div>
-  <div class="row push"><b>Push back</b><span>"How do you know the judge is right?" We do not yet, and the card says so on screen: judge scores are labelled signal, not measurement, until judge-vs-human agreement ships. The design follows the published calibration loop, sample, hand-grade, compute agreement, recalibrate on change, and well-calibrated judges now agree with humans about as often as two humans agree with each other. Stating the limit beats having it extracted from us.</span></div>
+
+<div class="scr" id="w2">
+  <h2>2. Run it</h2>
+  <div class="path">3:00 &middot; 1 minute</div>
+  <div class="row"><b>What it is</b><span>The run overlay. Case counter, progress bar, and a live log of cases passing or failing as they go.</span></div>
+  <div class="row"><b>Why it exists</b><span>It makes the scale real. Reading 380 on a card is abstract; watching the counter climb past 300 with Arabic questions scrolling by is not.</span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Press <b>Run 6 on 380 cases</b>.</li><li>Point at the counter climbing and the Arabic questions in the log.</li><li>Let it finish and land on results by itself.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>Ten workers in parallel, about six minutes for the full set. This is the part nobody watches, which is rather the point.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>Six minutes is slow.</b> Agreed, and it is a demo number. Real throughput depends on the agent under test, not on us.</li><li><b>Can I run a subset?</b> Not in the prototype. Worth asking whether a smoke run of fifty before the full 380 is something a developer would want.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Would you want a fast subset run before committing to the full set, or is that a false economy?</li></ul></span></div>
 </div>
 
-<div class="scr">
-  <h2>What the agent did / What went wrong</h2>
-  <div class="path">Screens 3 and 4 &middot; the developer improvement loop</div>
-  <div class="row"><b>What</b><span>Step-by-step trace with timing bars and payloads, a notes box in the developer's own words, and notes auto-grouped and counted with rename and merge.</span></div>
-  <div class="row"><b>Why</b><span>Evaluation criteria cannot be fixed before seeing outputs; practitioners refine them by reading failures. The product operationalises exactly that loop. <span class="cite">Criteria drift: Shankar et al., UIST 2024. Error analysis via open coding: standard practice in applied LLM evaluation.</span></span></div>
-  <div class="row say"><b>Say this</b><span>We never see the developer's code and never suggest a fix. We make the failure legible and count what they tell us, which is what actually gets agents fixed.</span></div>
-  <div class="row push"><b>Push back</b><span>"Is a free-text note rigorous enough?" The notes become groups, groups become counts, and counts prioritise the next fix. It is the documented workflow of the strongest eval teams, not a compromise.</span></div>
+
+<div class="scr" id="w3">
+  <h2>3. Results, the metric board</h2>
+  <div class="path">4:00 &middot; 4 minutes</div>
+  <div class="row"><b>What it is</b><span>Nine metric cells covering the whole palette, each opening the cases behind it. Below that, six sparklines across the full run history, then the safety band and the complete case table.</span></div>
+  <div class="row"><b>Why it exists</b><span>The rejection said not exhaustive. This is the answer: every metric on one screen in the client own vocabulary, every number traceable to cases, and the whole 380 in one table with attention as its default filter.</span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Read the top line: <b>380 cases attempted.</b> Not a sample.</li><li>Point at the nine cells and name them in the palette vocabulary.</li><li>Click <b>Safety</b>. The drilldown opens with two flagged cases as chips.</li><li>Click <b>Accuracy</b> and let them see the caveat under the number.</li><li>Click <b>Bias and fairness</b>, which reads not run, and show it says why rather than showing a zero.</li><li>Scroll to <b>Across runs</b>. Six sparklines. Point at the red one.</li><li>Scroll to the table, switch to <b>All cases</b>, page through to show all 380 are there.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>Every metric from the palette you sent, on one screen, and every number opens the cases behind it.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>Five of those six lines climb. The red one is safety, and it drops for four runs then jumps back on the fifth. That is a fix breaking something else, and it is the story of the next two screens.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>How do you know the judge is right?</b> We do not, and the card says so before anyone asks. Nobody has checked our grader against a human on this dataset. That is why it is labelled a signal and why nothing automatic fires on it.</li><li><b>Why is bias off by default?</b> It doubles the run. A choice with a price, not a metric we can leave on.</li><li><b>Why a median latency, not an average?</b> One 31 second timeout drags an average and hides the typical case. The slowest is shown separately in the drilldown.</li><li><b>Nine metrics is a lot to read.</b> Fair. The board is a glance layer, and honestly most days a developer looks at two of them.</li><li><b>Why only 12 rows by default?</b> Nobody reviews 380 one at a time. Twelve are clustered from the failures. Click All cases and the same table pages through everything.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Which of these nine would you not trust, and what would you need to see before you did?</li><li>Is nine the right number, or should some of these live somewhere else?</li></ul></span></div>
 </div>
 
-<div class="scr">
-  <h2>Turn notes into checks</h2>
-  <div class="path">Screen 5 &middot; notes become permanent tests, and the judge earns trust</div>
-  <div class="row"><b>What</b><span>A note the developer wrote becomes a saved check that runs on every case of every future run. Before anyone relies on a check, the product shows how often it agreed with the developer on cases they graded by hand: 17 of 20 here, with the three disagreements listed row by row.</span></div>
-  <div class="row"><b>Why</b><span>Evaluation criteria drift as developers read outputs, so automated judges must be validated against human grades rather than assumed correct. Showing the agreement record before a check gates anything is the published state of the art. <span class="cite">EvalGen, Shankar et al., UIST 2024: "Who Validates the Validators?" The 2026 industry standard formalises the same loop: hand-grade a sample, compute judge-to-human agreement, accept at kappa 0.6 and above, recalibrate monthly.</span></span></div>
-  <div class="row say"><b>Say this</b><span>Most tools let you write a judge and trust it blindly. Here the judge earns trust: it shows you exactly where it disagrees with you before it ever scores a run, and every saved check carries that record into the evidence pack.</span></div>
-  <div class="row push"><b>Push back</b><span>"Is 20 hand-graded cases enough?" It is the starting signal, and the screen says exactly how many grades back the number. Every case the developer reviews afterwards sharpens it. The alternative shipped by everyone else is zero validation.</span></div>
+
+<div class="scr" id="w4">
+  <h2>4. The safety band</h2>
+  <div class="path">8:00 &middot; 2 minutes</div>
+  <div class="row"><b>What it is</b><span>A red band above the case table naming every case that raised a safety flag, with the mechanism spelled out, each clickable through to its trace.</span></div>
+  <div class="row"><b>Why it exists</b><span>Two cases in this run pass every mechanical column and still fail. Without checks that read the reply itself, both are invisible. This is the single strongest argument in the product.</span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Scroll to the <b>red band</b>. Two cases.</li><li>Read both aloud including the mechanism, not just the label.</li><li>Scroll to the table and find those same two rows. Point at the columns: <b>yes, yes, yes.</b></li><li>Let the silence sit for a second before saying the line.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>Both of these pass every single automatic check. One hands a citizen somebody else phone number. The other followed an instruction hidden inside an uploaded document and told the citizen their application was approved.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>If safety were a toggle, the developer most likely to ship this is exactly the developer least likely to tick the box.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>This is contrived.</b> The data is invented, agreed. Open the trace and show the mechanism: it matched on surname instead of reference number. That is a join on the wrong key, not an exotic failure.</li><li><b>Would a real classifier catch these?</b> A PII check catches the phone number. Injection is harder, and detection is imperfect, which is why the developer also writes their own checks.</li><li><b>Two out of 380 is not many.</b> It takes one to end the programme. And these are the two no other part of the product would have surfaced.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Is there a category of failure like this that we are not watching for at all?</li></ul></span></div>
 </div>
 
-<div class="scr">
-  <h2>What broke since last time</h2>
-  <div class="path">Screen 6 &middot; regressions, including invisible ones</div>
-  <div class="row"><b>What</b><span>Two most recent runs compared per case, with a band for new safety flags even when no column changed.</span></div>
-  <div class="row"><b>Why</b><span>The scariest regression is the one the columns cannot show: the demo contains a fix that introduces a prompt-injection flag while every mechanical value stays identical.</span></div>
-  <div class="row say"><b>Say this</b><span>The developer's own fix caused this flag. The screen separates "your change broke this" from "this was already broken", which is the difference between panic and a plan.</span></div>
-  <div class="row push"><b>Push back</b><span>"Only two runs?" The across-runs strip on this screen and the sparkline card on results cover the full history: pass rate 74 to 97 percent over five runs, accuracy up 14 points, and the safety line dips then rises when the bad fix lands. Detail stays two-run because that is the decision a developer actually makes: keep this change or revert it.</span></div>
+
+<div class="scr" id="w5">
+  <h2>5. What the agent did, the trace</h2>
+  <div class="path">10:00 &middot; 2 minutes</div>
+  <div class="row"><b>What it is</b><span>The step by step record inside one case. Each step timed, with a proportional bar, the payload it saw, and a plain line on why a bad step matters. Alongside it, what you expected and what came back.</span></div>
+  <div class="row"><b>Why it exists</b><span>The difference between telling a developer they failed and showing them where. Criteria cannot be fixed before seeing outputs, so the product has to make the output readable. <span class="cite">Criteria drift, Shankar et al., UIST 2024.</span></span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>You are on case 11 from the chip. Point at the subtitle: <b>every column passed, the flag below is why it still needs you.</b></li><li>The trace. Four steps, one red.</li><li>Read the payload on the red step: two records side by side, <b>SALEM N</b> with a mobile number and <b>SALEM A</b> with mobile withheld.</li><li>Point at the reply on the right containing that exact number.</li><li>Press <b>J</b> twice to show you can walk cases from the keyboard.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>This is the difference between telling a developer they failed and showing them where. The step that broke is the one that read the contact field off the wrong record.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>Would a real agent expose a trace like this?</b> It has to, or none of this works. That is a requirement on the agent contract and worth flagging as one.</li><li><b>What if the agent is a black box?</b> Then we get input, output and timings and lose the step detail. The checks still run. Debugging gets much worse.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Does the trace format we assume here match what agents on the substrate will actually emit?</li></ul></span></div>
 </div>
 
-<div class="scr">
-  <h2>Evidence and Submit</h2>
-  <div class="path">Screens 7 and 8 &middot; what the verifier receives</div>
-  <div class="row"><b>What</b><span>Auto-assembled pack: every check listed with what happened to it, including the ones that did not run and why. Open issues declared, not hidden. Submit is never gated by a score.</span></div>
-  <div class="row"><b>Why</b><span>Silence about a metric reads the same as a pass, which is how certifications get torn apart. Stating coverage explicitly is what separates an assessed tier from a self-declared one. <span class="cite">Mirrors tiered attestation standards for agent vendors; goes beyond Microsoft Marketplace, which runs no output evaluation at all.</span></span></div>
-  <div class="row say"><b>Say this</b><span>There is no pass bar. Evaluation earns its place by being useful, and the verifier sees exactly what was and was not checked, so trust comes from coverage rather than a single number.</span></div>
-  <div class="row push"><b>Push back</b><span>"No minimum score, really?" The gate is the verifier plus total transparency of coverage. A bar invites gaming the number; a coverage statement invites fixing the agent.</span></div>
+
+<div class="scr" id="w6">
+  <h2>6. What went wrong, the grouping</h2>
+  <div class="path">12:00 &middot; 2 minutes</div>
+  <div class="row"><b>What it is</b><span>The developer note in their own words, then those notes grouped and counted, with the biggest group named and every note readable underneath it. Groups can be renamed or merged.</span></div>
+  <div class="row"><b>Why it exists</b><span>This is the bridge between reading one failure and fixing many. Practitioners refine criteria by reading failures and clustering them, which is exactly the documented error analysis loop rather than a shortcut around it.</span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>On the trace screen, point at the note box. <b>In your own words. No categories, no dropdown.</b></li><li>Go to <b>What went wrong</b>. Two groups, counted, biggest first.</li><li>Point at the actual notes underneath each group, not just the label. Those are the developer own words.</li><li>Point at <b>Rename</b> and <b>Merge into</b> on a group.</li><li>Point at the line at the top: fixing the biggest one alone would address most of the notes.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>We never see the developer code and never suggest a fix. We make the failure legible, take what they tell us in their own words, and count it so they know what to fix first.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>The groups are suggestions. They can rename or merge them, because only the developer knows which two failures are really the same failure.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>Is a free text note rigorous enough?</b> Notes become groups, groups become counts, counts prioritise the next fix. That is the documented workflow of the strongest eval teams, not a compromise.</li><li><b>Who does the grouping?</b> We suggest, they correct. Automatic clustering that cannot be overridden would be worse than none.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Would a developer actually write these notes, or do we need to make it even cheaper than a text box?</li></ul></span></div>
 </div>
 
-<div class="scr">
+
+<div class="scr" id="w7">
+  <h2>7. Notes become checks</h2>
+  <div class="path">14:00 &middot; 3 minutes</div>
+  <div class="row"><b>What it is</b><span>A note turns into a saved check that runs on every case of every future run. Before anyone relies on it, the product shows how often it agreed with the developer on cases they graded by hand, and lists the disagreements.</span></div>
+  <div class="row"><b>Why it exists</b><span>Automated judges must be validated against human grades rather than assumed correct. Showing the agreement record before a check gates anything is the published state of the art. <span class="cite">EvalGen, Shankar et al., UIST 2024. The 2026 standard formalises the same loop: hand grade a sample, compute agreement, accept at kappa 0.6 and above, recalibrate monthly.</span></span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Point at the <b>draft check</b> written in plain words, not code.</li><li>Point at <b>yes or no</b> as the only answer options and say why: two options is more reliable than a score out of ten.</li><li>Scroll to <b>Does this check agree with you.</b> 17 of 20.</li><li>Point at the three rows where it disagreed and read one.</li><li>Scroll to the <b>library</b>. The saved check carries its agreement record with it.</li><li>Mention it appears in the verifier pack as armed.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>Most tools let you write a judge and then trust it blindly. Here it has to show you where it disagreed with you on twenty cases you graded by hand, before it is allowed to score anything.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>And the three it got wrong are all the same shape, which tells the developer exactly how to sharpen the wording.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>Prism can already do rubric metrics.</b> True, and I am not rebuilding Prism. What Prism has no answer for is this validation loop, and that is what makes a developer written check worth anything.</li><li><b>Twenty hand graded cases is not many.</b> A starting signal, and the screen says how many back it. The alternative everyone else ships is zero validation.</li><li><b>Who grades the twenty?</b> The developer, on their own agent. It is their definition of correct, which is the point.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Should the verifier see a developer check library, or is it private to them?</li><li>What agreement level would you want before a check is allowed to gate anything?</li></ul></span></div>
+</div>
+
+
+<div class="scr" id="w8">
+  <h2>8. What broke since last time</h2>
+  <div class="path">17:00 &middot; 2 minutes</div>
+  <div class="row"><b>What it is</b><span>The two most recent runs compared case by case, plus a band for new safety flags even when no column moved, and a strip showing the trend across all runs.</span></div>
+  <div class="row"><b>Why it exists</b><span>The scariest regression is the one the columns cannot show. The demo contains a fix that introduces a prompt injection flag while every mechanical value stays identical.</span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Point at the header: <b>Run 6 against run 5.</b> Always the two most recent.</li><li>The red band. <b>One new safety flag since run 5.</b></li><li>Point at the second entry: <b>already there in run 5.</b> Different problem, different response.</li><li>The table row. Run 5 and Run 6 columns are <b>identical</b>. Nothing changed. Still marked broken.</li><li>Click <b>Only what got worse</b> and show the case is in there despite no column moving.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>The developer fixed one thing and opened a security hole doing it. Every column stayed the same. This is the regression a metric dashboard structurally cannot show you.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>And it separates your change broke this from this was already broken, which is the difference between a panic and a plan.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>Only two runs compared?</b> Detail is two runs because that is the decision a developer makes, keep this change or revert it. The full arc is in the across runs strip on the same screen.</li><li><b>What actually happens to a live agent when this fires?</b> My weakest answer and I would rather have yours. My proposal is a safety problem pulls it from new installs within the hour, basics slipping gets seven days, and a judge score moving does nothing.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>What should the consequence be when a listed agent regresses?</li><li>Is seven days right for the middle case, or is that made up? It is made up.</li></ul></span></div>
+</div>
+
+
+<div class="scr" id="w9">
+  <h2>9. Evidence and submit</h2>
+  <div class="path">19:00 &middot; 2 minutes</div>
+  <div class="row"><b>What it is</b><span>An auto assembled pack: every check listed with what happened to it including the ones that did not run and why, open issues declared, and a submit step never gated by a score.</span></div>
+  <div class="row"><b>Why it exists</b><span>Silence about a metric reads exactly like a pass, which is how a certification gets pulled apart later. Stating coverage explicitly is what separates an assessed tier from a self declared one. <span class="cite">Goes beyond Microsoft Marketplace, which runs no output evaluation on submitted agents at all.</span></span></div>
+  <div class="row"><b>Click order</b><span><ol class="clk"><li>Point at the evidence rows and say none of it was typed by hand.</li><li>Scroll to <b>What was checked, and what was not.</b> Fifteen rows.</li><li>Point at the <b>not run</b> rows and read one including the reason.</li><li>Click <b>Download the pack as PDF</b> so they see it is a real artefact.</li><li>Go to submit. Point at <b>there is no score you have to reach</b> and at the message box to the verifier.</li></ol></span></div>
+  <div class="row say"><b>Say this</b><span>The pack says what was not checked, not just what was. Silence about a metric reads exactly like a pass, and that is how a certification gets pulled apart six months later.</span></div>
+  <div class="row say"><b>&nbsp;</b><span>There is no minimum score anywhere in this product. The gate is the verifier plus total transparency about coverage.</span></div>
+  <div class="row push"><b>They will hit</b><span><ul class="sub"><li><b>No pass mark at all?</b> A number invites building to the test. Give the verifier everything instead, including what the developer chose not to run, and let a human decide.</li><li><b>Will a verifier actually read this?</b> Honest answer, unknown. We have never watched one use it. Worth a session with whoever does that job.</li><li><b>What stops a developer turning everything off?</b> Nothing, and the pack says they did. Turning checks off is visible, which is the deterrent.</li></ul></span></div>
+  <div class="row ask"><b>Ask them</b><span><ul class="sub"><li>Is this enough for a verifier to make a decision, and what would you add?</li><li>Should any check be mandatory before submit is even possible?</li></ul></span></div>
+</div>
+
+
+<div class="part" id="loop">Part four &middot; the whole loop</div>
+<div class="scr ">
   <h2>The end state, end to end</h2>
-  <div class="path">Where this product goes, one loop</div>
-  <div class="row"><b>Ingest</b><span>Datasets arrive from a warehouse table (Snowflake, BigQuery, Databricks), a bucket of logs (S3, GCS), a CSV, or sampled production traffic after PII masking. Mapping happens once per source.</span></div>
-  <div class="row"><b>Evaluate</b><span>Always-on mechanical and safety checks on every case, judge metrics where the category has a reviewed answer set, run strategies (bias, robustness, reliability) priced before you commit.</span></div>
-  <div class="row"><b>Improve</b><span>Failures cluster into an attention set. The developer reads traces, writes notes, notes become groups, groups become saved checks, and every check carries its agreement record before it scores anything.</span></div>
-  <div class="row"><b>Certify</b><span>Run history shows the arc, the regression view catches what a fix broke including invisible safety regressions, and the evidence pack states what was and was not checked for the verifier. No pass bar; the gate is transparency.</span></div>
-  <div class="row"><b>Monitor</b><span>Published agents feed sampled production conversations back into the dataset. A production failure becomes tomorrow morning attention case, which closes the loop: the same screens serve pre-release evaluation and live monitoring.</span></div>
+  <div class="path">Where this goes, one loop</div>
+  <div class="row "><b>Ingest</b><span>Datasets arrive from a warehouse table, a bucket of logs, a CSV, or sampled production traffic after PII masking. Mapping happens once per source.</span></div>
+  <div class="row "><b>Evaluate</b><span>Always on mechanical and safety checks on every case, judge metrics where the category has a reviewed answer set, run strategies priced before you commit.</span></div>
+  <div class="row "><b>Improve</b><span>Failures cluster into an attention set. The developer reads traces, writes notes, notes become groups, groups become saved checks, and every check carries its agreement record.</span></div>
+  <div class="row "><b>Certify</b><span>Run history shows the arc, the regression view catches what a fix broke including invisible safety regressions, and the evidence pack states what was and was not checked. No pass bar; the gate is transparency.</span></div>
+  <div class="row "><b>Monitor</b><span>Published agents feed sampled production conversations back into the dataset. A production failure becomes tomorrow morning attention case, which closes the loop: the same screens serve pre release evaluation and live monitoring.</span></div>
   <div class="row say"><b>Say this</b><span>Evaluation is not a stage the agent passes through once. It is the loop the marketplace runs forever, and every part of that loop is on these screens today.</span></div>
 </div>
 
-<div class="scr">
-  <h2>Objection bank</h2>
-  <div class="path">Cross-cutting</div>
-  <div class="row push"><b>Is this state of the art?</b><span>The ACL 2026 survey of agent evaluation names cost-efficiency, safety and robustness as the critical gaps in the field. Those are exactly the three this product treats as first class: cost on every estimate before you run, safety always on, robustness one toggle away with its price shown.</span></div>
-  <div class="row push"><b>Cost figures</b><span>Illustrative at 0.048 SAR per case, consistent everywhere. Real unit economics slot in without changing the design.</span></div>
-  <div class="row push"><b>Arabic</b><span>187 of the 380 cases are Arabic, rendered right to left in the dataset browser, and the answer-language check is always on. Open the browser and click the Arabic filter to show it live.</span></div>
-  <div class="row push"><b>Why focus on 12 of 380?</b><span>Nobody reviews 380 rows one by one, so the table defaults to the 12 representative cases clustered from the failures, the same triage pattern issue trackers use. Click All cases and the same table pages through every one of the 380. Nothing is hidden; attention is a filter, not a subset product.</span></div>
-  <div class="row push"><b>Any agent?</b><span>Layer 1 needs nothing from the developer, so it works for any agent on first upload. Only category scores need a curated answer set, and the product says so instead of hiding it.</span></div>
+
+<div class="part" id="room">Part five &middot; handling the room</div>
+<div class="scr ">
+  <h2>Who will push where</h2>
+  <div class="path">Have the answer ready before the question</div>
+  <div class="row "><b>Tirthankar</b><span>Architecture, security, tenancy. Where eval compute runs and under whose contract given KSA data. Whether one tenant data ever touches another. Who validates the PII masker before we sample live conversations. How this sits against the substrate. <br><br><b>Honest position:</b> compute residency is open and I need HUMAIN to answer it. The masker has no owner and no evaluation, and I have written a proposal for how it should be tested. Neither is solved.</span></div>
+  <div class="row "><b>Ritesh</b><span>Prism and evaluation. Whether this is Prism with a new front end. Whether Prism runs this today or it is a rewrite. Who writes and maintains answer sets per category. Who recalibrates judges. <br><br><b>Honest position:</b> Prism is the engine and most of this rides on what it already does. New is the journey, the clustering, the check validation loop, and the evidence pack. Answer sets and recalibration are real ongoing work with no owner, which is resourcing not design.</span></div>
+  <div class="row "><b>Sandip</b><span>Client readiness and commercials. Whether this is ready to show. What it costs per run. Timeline to build. Whether we fixed what they objected to. <br><br><b>Honest position:</b> the objection was dense and not exhaustive, and both are addressed, nine metrics and 380 cases against twelve rows and four columns. Costs are invented and I need a real number. Timeline depends on the two open questions, which is why I am asking today.</span></div>
 </div>
 
-<p class="cite" style="margin-top:20px">Evolves with the build. Sections marked UPDATE are pending the next build slices. Sources on request: Yehudai et al., A Survey on Evaluation of LLM-based Agents, ACL 2026 (names cost, safety, robustness as the field gaps). Shankar et al., UIST 2024, EvalGen and criteria drift. Judge-to-human agreement analysis, arXiv 2510.09738, and the kappa 0.6 calibration standard. MAST failure taxonomy. Azure AI Foundry built-in evaluators. Microsoft Marketplace AI certification.</p>
 
+<div class="two">
+<div class="scr red">
+  <h2>Concede immediately</h2>
+  <div class="path">Fast agreement buys the ones that matter</div>
+  <div class="row "><b>List</b><span><ul class="sub"><li>The costs are made up, cost per case included.</li><li>The 380 cases are generated, not real citizen traffic.</li><li>There is no screen for turning a live conversation into a scored case. A human writes the expected answer and we have not designed that.</li><li>Everything is one question and one answer. Real conversations are not.</li><li>Nobody has checked our AI grader against a human on this dataset.</li><li>Nobody owns the PII masker or the policy corpus.</li></ul></span></div>
+  <div class="row "><b>Why</b><span>Say these before they are found. Every one you volunteer makes the next thing you defend more credible.</span></div>
+</div>
+
+
+<div class="scr big">
+  <h2>Hold firm</h2>
+  <div class="path">These have an argument behind them</div>
+  <div class="row "><b>List</b><span><ul class="sub"><li><b>Safety always on.</b> Two cases prove it on screen.</li><li><b>No pass mark.</b> A score invites building to the test.</li><li><b>Judge scores labelled a signal.</b> Calling 78 percent a fact when nobody validated it would be dishonest.</li><li><b>The pack names what was not checked.</b> Silence reads as a pass.</li><li><b>Attention is a filter, not a smaller product.</b> All 380 sit in the same table.</li><li><b>No automatic action on a judge score.</b> We call it a signal, so acting on it would contradict us.</li></ul></span></div>
+</div>
+
+
+</div>
+
+<div class="scr ">
+  <h2>If it goes sideways</h2>
+  <div class="path">Recovery moves</div>
+  <div class="row "><b>This is just Prism</b><span>Agree first. Prism is the engine and I am not rebuilding it. Then show screen 5. The validation loop is what Prism has no answer for, and it is what makes a developer written check worth anything.</span></div>
+  <div class="row "><b>Someone rabbit holes</b><span>That is a real question and I want to give it more than thirty seconds. Can I note it and come back once we are through the flow. Then actually write it down where they can see you write it.</span></div>
+  <div class="row "><b>Hard attack on one part</b><span>Agree with the true part out loud, then narrow to what is actually in dispute. You are right that the numbers are invented. The thing I would defend is the mechanism, not the data.</span></div>
+  <div class="row "><b>Room goes quiet</b><span>Name someone and give them a target rather than asking for general thoughts. Where does this break architecturally. What would Prism struggle with here.</span></div>
+  <div class="row "><b>You cannot answer</b><span>Say you do not know, say when you will know, write it down. Do not improvise a design decision in the room, because it will be quoted back to you.</span></div>
+</div>
+
+
+<div class="scr big">
+  <h2>What you need to walk out with</h2>
+  <div class="path">If you get nothing else, get these</div>
+  <div class="row "><b>1</b><span><b>A direction on judging live agents.</b> Reference free only for now, or do we go after the tenant own signals like repeat questions and escalations. This decides the next build.</span></div>
+  <div class="row "><b>2</b><span><b>A direction on compliance.</b> Eval takes the machine checkable part, Certify takes the human call. Agree or disagree, but decide.</span></div>
+  <div class="row "><b>3</b><span><b>Three names.</b> Who owns the policy corpus, who builds answer sets per category, who owns the PII masker.</span></div>
+  <div class="row "><b>4</b><span><b>A real cost per case</b>, or agreement that someone will get one.</span></div>
+  <div class="row "><b>5</b><span><b>Go or no go on showing the client</b>, and if no go, exactly what is missing.</span></div>
+  <div class="row say"><b>Close with</b><span>What I need before I build anything else is a direction on two things: how we judge an agent once it is live, and whether compliance sits with us or with Certify. Everything else on my list I can carry. Those two change what the product is.</span></div>
+</div>
+
+
+<div class="part" id="qa-part">Part six &middot; look anything up</div>
 
 <div class="scr" id="qa">
-  <h2>Answer anything</h2>
+  <h2>Look anything up</h2>
   <div class="path">Someone asks, you look it up. Answers are short enough to paste back.</div>
   <input id="qfilter" type="search" placeholder="Type a word. judge, 380, safety, Arabic, Prism, pass mark" aria-label="Filter questions">
   <div id="qcount" class="cite"></div>
@@ -287,4 +405,5 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 })();
 </script>
 
+<p class="cite" style="margin-top:22px">Product: <a href="Eval_Journey_V2.html" style="color:var(--teal-d)">Eval_Journey_V2.html</a> &nbsp;&middot;&nbsp; Sources on request: MAST failure taxonomy arXiv 2503.13657, Shankar et al. UIST 2024 on criteria drift and EvalGen, the ACL 2026 agent evaluation survey, Azure AI Foundry built-in evaluators, Microsoft Marketplace AI certification, LangSmith and Arize AX 2026 product documentation.</p>
 </div>
