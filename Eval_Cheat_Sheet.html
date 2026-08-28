@@ -83,6 +83,31 @@ box-shadow:0 1px 2px rgba(14,20,25,.05);padding:16px 18px;margin:0 0 14px}
 </div>
 
 <div class="scr">
+  <h2>Why evaluation cannot stop at launch</h2>
+  <div class="path">The argument for watching production, and where the industry landed</div>
+
+  <div class="row"><b>Short version</b><span>An agent can get worse without anybody touching it. Testing before launch only proves it worked against the questions we thought to ask, on the day we asked them.</span></div>
+
+  <div class="row"><b>1. The agent stays still, the world moves</b><span>The model provider updates the model underneath you. The documents it reads get edited. A regulation changes. Nobody deployed anything and the answers are different. This is the one that matters most, because there is no code change to trigger a retest. Without production monitoring there is no moment at which anyone would think to look.</span></div>
+
+  <div class="row"><b>2. The numbers do not work</b><span>We test on 380 cases. A live agent might handle fifty thousand conversations a month. A failure that hits half a percent of citizens is statistically invisible in a test set, you would expect to see it once or twice and could easily see it zero times. In production that same rate is 250 people a month getting a wrong answer.</span></div>
+
+  <div class="row"><b>3. You cannot test for what you have not imagined</b><span>Nobody writes a test case for an instruction hidden inside an uploaded document until it happens to somebody once. Every genuinely new failure mode arrives in production first. The question is only whether you find it or a journalist does.</span></div>
+
+  <div class="row"><b>4. The test set is a guess about what people will ask</b><span>Real traffic is the answer to that guess, and the two drift apart quietly. New season, new policy, new phrasing. An agent tested only on last month's questions passes the test and fails on the street.</span></div>
+
+  <div class="row"><b>5. Government makes this sharper</b><span>Rules change often and matter a lot. An agent that was compliant in March is non compliant in April with no code change at all. If compliance is only ever checked once at certification, that agent stays listed and stays wrong until somebody complains.</span></div>
+
+  <div class="row push"><b>The honest cost</b><span>Continuous evaluation costs money and produces noise. If nobody acts on what it surfaces, it is theatre with a dashboard. That is exactly why what happens when a live agent gets worse is on my open list, and why I would rather agree the response before we build more of the watching.</span></div>
+
+  <div class="row"><b>Where the industry landed</b><span>This is not a theory we invented. Both leading platforms have built the same shape in the last year. LangSmith runs online evaluators automatically on production traces with no deployment, and uses those traces to build the datasets you then evaluate against. Arize AX added continuous production evaluation plus Signal, a managed agent that continuously reviews production traces, groups related failures, and surfaces ranked issues. That is our attention set, arrived at independently. Both also tie their judges back to human judgment rather than trusting them outright. <span class="cite">Sources: LangSmith platform and production monitoring docs; Arize AX 2026 product notes.</span></span></div>
+
+  <div class="row say"><b>Say this</b><span>An agent can get worse without anyone touching it. The model underneath changes, the documents change, a rule changes. There is no deployment to trigger a retest, so if we are not watching production, nobody ever thinks to look. Both LangSmith and Arize built continuous production evaluation into their platforms in the last year, and Arize independently built failure clustering that looks a lot like our attention set. We are not proposing something exotic, we are proposing where the category has already gone.</span></div>
+
+  <div class="row push"><b>If they say it is premature</b><span>Reasonable for day one, and the always-on checks work from the first upload with no production data at all. The part I would not defer is the plumbing that samples live conversations, because a failure you did not capture is a failure you cannot turn into a test case, and that is the loop that stops the same problem happening twice.</span></div>
+</div>
+
+<div class="scr">
   <h2>Set up a run</h2>
   <div class="path">Screen 1 &middot; the three-layer metric board</div>
   <div class="row"><b>What</b><span>The gov-services-eval dataset, 380 cases across 38 citizen journeys in Arabic and English, synced nightly from Snowflake, with connectors for CSV, warehouse, S3 or GCS, and sampled production traffic. Every card is typed: Dataset, Built-in checks, Judge metrics, Run strategies. Cost and run count update live as you pick.</span></div>
