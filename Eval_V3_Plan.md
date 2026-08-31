@@ -74,3 +74,23 @@ Everything in "Build now, unblocked" is in `Eval_Journey_V3.html`. V2 is untouch
 Verified: no console errors, both profiles walked across all eight screens, no leftover question-and-answer wording in document mode, results and regression screens agree with each other, no layout overflow.
 
 Still blocked: the batching screen needs the Prism walkthrough, and the Phase 1 agent-type list needs Humain.
+
+---
+
+## Rebuilt, 31 Aug: modality moved onto the case
+
+Ritwik's point in review: the input can be an image, a video, a database file, unstructured data, anything, and the output likewise. Treating that as a property of the agent is still a type system with two boxes in it. `Eval_Journey_V4.html`.
+
+**Agent type no longer exists in the product.** A case is an input, an output, an optional expected answer and a trace. Input and output are lists of parts, and every part carries its own type: text, image, video, audio, document, table, structured payload, raw file. The switch in the top bar is gone because there is nothing to switch between.
+
+**One dataset, 380 cases, all eight types together.** 14 worked cases spanning image to fields, video to fields, audio to text, document to fields, table to fields, table to text, structured to structured, file to text, and image to image. The rest generated so every count on screen is real.
+
+**The results table shows both sides.** What went in and what came out, each rendered as itself. A thumbnail and dimensions for an image, a play frame and duration for a clip, a waveform and sample rate for audio, page count for a document, rows and columns for a table.
+
+**Coverage became a count.** Every metric names the one part it cannot work without, and whether it runs is answered per case. In this run: accuracy 349 of 380, skipping 31 with no expected answer. Trustworthiness 347, skipping 33 that returned nothing. Helpfulness 161, skipping 219 where the output is not prose. Steps taken 271, skipping 109 with no reference steps. The evidence pack carries the same numbers, so a metric that quietly covered a third of the run can no longer read like one that covered all of it.
+
+**Trajectory scoring is in** as a fourth category metric, scored against the reference steps on the case rather than against the answer. Trace steps carry OpenInference span kinds.
+
+**Prism does the content scoring**, whatever the modality, marked on each metric. Per Ritwik, 30 Aug: assume Prism covers video and audio. That assumption lives in one field per metric, so the Prism meeting notes change data, not screens.
+
+Verified: no console errors, all eight screens, a full 380 case run end to end, every part type rendering, no page overflow, structure reparses clean.
