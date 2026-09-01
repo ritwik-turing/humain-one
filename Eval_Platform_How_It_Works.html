@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The eval platform, end to end</title>
+<style>
+:root{
+  --bg:#F2F5F9; --card:#FFF; --sunk:#E4EAF2;
+  --ink:#0C1219; --dim:#5F6E80; --line:#D5DEE8;
+  --acc:#1F52E0; --acc-soft:#DDE6FF;
+  --ok:#0B7F4E; --ok-soft:#D5F0E4;
+  --mid:#A66C05; --mid-soft:#FAEBD1;
+  --no:#C4372C; --no-soft:#FBE0DD;
+  --na:#C8D2DD;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#070B10; --card:#111A24; --sunk:#0C1520;
+  --ink:#ECF2F9; --dim:#8394A6; --line:#22303E;
+  --acc:#6E96FF; --acc-soft:#152845;
+  --ok:#40CB8D; --ok-soft:#0D2A1F;
+  --mid:#E5B55A; --mid-soft:#2B2413;
+  --no:#F27568; --no-soft:#2F1917;
+  --na:#2C3A48;
+}}
+:root[data-theme="dark"]{
+  --bg:#070B10; --card:#111A24; --sunk:#0C1520;
+  --ink:#ECF2F9; --dim:#8394A6; --line:#22303E;
+  --acc:#6E96FF; --acc-soft:#152845;
+  --ok:#40CB8D; --ok-soft:#0D2A1F;
+  --mid:#E5B55A; --mid-soft:#2B2413;
+  --no:#F27568; --no-soft:#2F1917;
+  --na:#2C3A48;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+ font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+p{margin:0 0 15px;max-width:66ch}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:830;letter-spacing:-.035em;line-height:1.08;margin:0 0 20px;text-wrap:balance}
+h2{font-size:clamp(1.25rem,2.9vw,1.75rem);font-weight:800;letter-spacing:-.025em;line-height:1.25;margin:0 0 12px;text-wrap:balance;max-width:26ch}
+h3{font-size:1.02rem;font-weight:750;margin:0 0 7px}
+.eyebrow{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.63rem;letter-spacing:.19em;
+ text-transform:uppercase;color:var(--dim);font-weight:750;margin:0 0 12px}
+.lede{font-size:clamp(1.03rem,2.1vw,1.2rem);color:var(--dim);line-height:1.55;max-width:62ch}
+b{font-weight:720;color:var(--ink)}
+.a{color:var(--acc)}.g{color:var(--ok)}.r{color:var(--no)}.m{color:var(--mid)}
+.answer{padding:70px 0 24px}
+.rec{background:var(--acc-soft);border-radius:16px;padding:22px 24px;margin:26px 0 0;max-width:70ch}
+.rec p{margin:0;font-size:clamp(1rem,2.1vw,1.14rem);line-height:1.5;color:var(--ink);max-width:none}
+.claims{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:26px 0 0}
+.cl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 17px}
+.cl .num{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.62rem;letter-spacing:.16em;color:var(--dim);font-weight:750;margin-bottom:9px}
+.cl p{font-size:.93rem;line-height:1.5;margin:0;color:var(--dim)}
+.cl b{display:block;margin-bottom:5px;font-size:.99rem;color:var(--ink)}
+section{padding:44px 0}
+.fig{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:24px 0}
+.fig svg{display:block;width:100%;height:auto}
+.cap{font-size:.88rem;color:var(--dim);margin:14px 0 0;line-height:1.5;max-width:74ch}
+.cap b{color:var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin:18px 0 0}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);font-weight:750}
+td:first-child{font-weight:700;white-space:nowrap}
+td:nth-child(2){font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.83rem;color:var(--acc);white-space:nowrap}
+.risk{background:var(--mid-soft);border-radius:14px;padding:18px 20px;margin:16px 0 0}
+.risk h3{margin-bottom:4px}
+.risk p{margin:0;font-size:.93rem;color:var(--ink);opacity:.85}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+@media(max-width:760px){.claims,.grid2{grid-template-columns:1fr}}
+text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.sl{font-size:9px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="answer">
+  <p class="eyebrow">Humain ONE &middot; Evaluate &middot; step 6 of 9</p>
+  <h1>We built a machine that tells you what it did not check.</h1>
+  <p class="lede">Any agent, any dataset, any input type. It runs, it scores, it groups what went wrong, and it turns your own words into checks that run forever. The part that makes it an evaluation platform rather than a score printer is the last one: it states its own coverage, every time.</p>
+  <div class="rec"><p>If you say one thing to the team, say this. <b>Every metric names the one thing it cannot work without, so whether it runs is answered per case, not per run.</b> That single rule produces the setup screen, the coverage counts, the evidence pack, and the reason this works for an image agent and a text agent without changing a screen.</p></div>
+  <div class="claims">
+    <div class="cl"><div class="num">01</div><b>A case is five things</b><p>Input, output, an optional expected answer, a trace, metadata. None of them is a question. There is no agent type anywhere in the product.</p></div>
+    <div class="cl"><div class="num">02</div><b>Coverage is a count</b><p>Accuracy ran on 349 of 380. Helpfulness on 161. The product says so on screen, because a metric that quietly covered a third of the run reads exactly like one that covered all of it.</p></div>
+    <div class="cl"><div class="num">03</div><b>You are the ground truth</b><p>The developer writes what went wrong in their own words. We group and count. Judge scores ship labelled as a signal, not a measurement.</p></div>
+  </div>
+</div>
+
+<section>
+<h2>The whole thing, in five bands</h2>
+<p>Read it top to bottom. Everything above the dotted line happens once per run. Everything below happens because a run produced something worth looking at.</p>
+
+<div class="fig">
+<svg viewBox="0 0 940 700" role="img" aria-label="End to end flow of the evaluation product in five bands">
+<defs>
+ <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+  <path d="M0,0 L10,5 L0,10 z" fill="var(--dim)"/></marker>
+ <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+  <path d="M0,0 L10,5 L0,10 z" fill="var(--acc)"/></marker>
+</defs>
+
+<!-- BAND 1 SET UP -->
+<text x="0" y="14" class="sl" fill="var(--dim)">1 &middot; Set up</text>
+<rect x="0" y="24" width="180" height="76" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="14" y="46" font-size="13" font-weight="700" fill="var(--ink)">Sources</text>
+<text x="14" y="64" font-size="11" fill="var(--dim)">CSV &middot; warehouse &middot; bucket</text>
+<text x="14" y="80" font-size="11" fill="var(--dim)">production traffic sample</text>
+
+<line x1="180" y1="62" x2="230" y2="62" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="232" y="24" width="196" height="76" rx="10" fill="var(--card)" stroke="var(--acc)"/>
+<text x="246" y="46" font-size="13" font-weight="700" fill="var(--ink)">Name the fields</text>
+<text x="246" y="64" font-size="11" fill="var(--dim)">which key is the input,</text>
+<text x="246" y="80" font-size="11" fill="var(--dim)">which is the expected answer</text>
+
+<line x1="428" y1="62" x2="478" y2="62" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="480" y="24" width="200" height="76" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="494" y="46" font-size="13" font-weight="700" fill="var(--ink)">Pick metrics</text>
+<text x="494" y="64" font-size="11" fill="var(--dim)">prompt &middot; deterministic</text>
+<text x="494" y="80" font-size="11" fill="var(--dim)">REST API &middot; agentic</text>
+
+<line x1="680" y1="62" x2="730" y2="62" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="732" y="24" width="208" height="76" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="746" y="46" font-size="13" font-weight="700" fill="var(--ink)">Run settings</text>
+<text x="746" y="64" font-size="11" fill="var(--dim)">number of runs 1 to 5</text>
+<text x="746" y="80" font-size="11" fill="var(--dim)">parallel datapoints</text>
+
+<line x1="470" y1="100" x2="470" y2="132" stroke="var(--acc)" marker-end="url(#ara)"/>
+
+<!-- BAND 2 RUN -->
+<text x="0" y="132" class="sl" fill="var(--dim)">2 &middot; Run</text>
+<rect x="0" y="142" width="940" height="94" rx="12" fill="var(--card)" stroke="var(--acc)"/>
+<text x="18" y="166" font-size="13" font-weight="700" fill="var(--ink)">One job, every datapoint</text>
+<rect x="18" y="178" width="150" height="42" rx="8" fill="var(--acc-soft)"/>
+<text x="30" y="196" font-size="11.5" font-weight="700" fill="var(--ink)">send the input</text>
+<text x="30" y="212" font-size="10.5" fill="var(--dim)">to the agent</text>
+<line x1="168" y1="199" x2="204" y2="199" stroke="var(--dim)" marker-end="url(#ar)"/>
+<rect x="206" y="178" width="164" height="42" rx="8" fill="var(--acc-soft)"/>
+<text x="218" y="196" font-size="11.5" font-weight="700" fill="var(--ink)">collect the response</text>
+<text x="218" y="212" font-size="10.5" fill="var(--dim)">output and trace</text>
+<line x1="370" y1="199" x2="406" y2="199" stroke="var(--dim)" marker-end="url(#ar)"/>
+<rect x="408" y="178" width="196" height="42" rx="8" fill="var(--acc-soft)"/>
+<text x="420" y="196" font-size="11.5" font-weight="700" fill="var(--ink)">run each metric it can</text>
+<text x="420" y="212" font-size="10.5" fill="var(--dim)">skip the ones it cannot, and say so</text>
+<line x1="604" y1="199" x2="640" y2="199" stroke="var(--dim)" marker-end="url(#ar)"/>
+<rect x="642" y="178" width="140" height="42" rx="8" fill="var(--acc-soft)"/>
+<text x="654" y="196" font-size="11.5" font-weight="700" fill="var(--ink)">aggregate</text>
+<text x="654" y="212" font-size="10.5" fill="var(--dim)">average per metric</text>
+<text x="800" y="192" font-size="10.5" fill="var(--dim)">tokens in and out,</text>
+<text x="800" y="207" font-size="10.5" fill="var(--dim)">P50 P95 P99 latency</text>
+
+<line x1="470" y1="236" x2="470" y2="268" stroke="var(--acc)" marker-end="url(#ara)"/>
+
+<!-- BAND 3 READ -->
+<text x="0" y="268" class="sl" fill="var(--dim)">3 &middot; Read</text>
+<rect x="0" y="278" width="300" height="86" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="14" y="300" font-size="13" font-weight="700" fill="var(--ink)">Scores, with their coverage</text>
+<text x="14" y="319" font-size="11" fill="var(--dim)">accuracy 78% on 349 of 380</text>
+<text x="14" y="335" font-size="11" fill="var(--dim)">helpfulness 84% on 161 of 380</text>
+<text x="14" y="352" font-size="11" fill="var(--no)">the skipped ones are named, not hidden</text>
+
+<rect x="316" y="278" width="292" height="86" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="330" y="300" font-size="13" font-weight="700" fill="var(--ink)">Datapoint by metric</text>
+<text x="330" y="318" font-size="11" fill="var(--dim)">one cell per case per metric</text>
+<g>
+<rect x="330" y="328" width="8" height="8" rx="2" fill="var(--ok)"/><rect x="341" y="328" width="8" height="8" rx="2" fill="var(--ok)"/>
+<rect x="352" y="328" width="8" height="8" rx="2" fill="var(--mid)"/><rect x="363" y="328" width="8" height="8" rx="2" fill="var(--na)"/>
+<rect x="374" y="328" width="8" height="8" rx="2" fill="var(--ok)"/><rect x="385" y="328" width="8" height="8" rx="2" fill="var(--no)"/>
+<rect x="396" y="328" width="8" height="8" rx="2" fill="var(--na)"/><rect x="407" y="328" width="8" height="8" rx="2" fill="var(--ok)"/>
+<rect x="418" y="328" width="8" height="8" rx="2" fill="var(--ok)"/><rect x="429" y="328" width="8" height="8" rx="2" fill="var(--na)"/>
+</g>
+<text x="330" y="354" font-size="11" fill="var(--dim)">grey means the metric could not read that case</text>
+
+<rect x="624" y="278" width="316" height="86" rx="10" fill="var(--card)" stroke="var(--acc)"/>
+<text x="638" y="300" font-size="13" font-weight="700" fill="var(--ink)">The attention set</text>
+<text x="638" y="319" font-size="11" fill="var(--dim)">the complete table, filtered to what failed</text>
+<text x="638" y="335" font-size="11" fill="var(--dim)">or raised a flag. Never a smaller table,</text>
+<text x="638" y="352" font-size="11" fill="var(--dim)">always the full one with a filter on.</text>
+
+<line x1="782" y1="364" x2="782" y2="396" stroke="var(--acc)" marker-end="url(#ara)"/>
+
+<!-- BAND 4 IMPROVE -->
+<text x="0" y="396" class="sl" fill="var(--dim)">4 &middot; Improve</text>
+<rect x="0" y="406" width="212" height="88" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="14" y="428" font-size="13" font-weight="700" fill="var(--ink)">Open one case</text>
+<text x="14" y="447" font-size="11" fill="var(--dim)">what went in, what came back,</text>
+<text x="14" y="463" font-size="11" fill="var(--dim)">what you expected, every step</text>
+<text x="14" y="482" font-size="11" fill="var(--dim)">the agent took and how long</text>
+
+<line x1="212" y1="450" x2="248" y2="450" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="250" y="406" width="208" height="88" rx="10" fill="var(--card)" stroke="var(--ok)"/>
+<text x="264" y="428" font-size="13" font-weight="700" fill="var(--ink)">Write what you saw</text>
+<text x="264" y="447" font-size="11" fill="var(--dim)">plain words, no dropdown,</text>
+<text x="264" y="463" font-size="11" fill="var(--dim)">no category to pick from</text>
+<text x="264" y="482" font-size="11" fill="var(--ok)">this is the ground truth</text>
+
+<line x1="458" y1="450" x2="494" y2="450" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="496" y="406" width="196" height="88" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="510" y="428" font-size="13" font-weight="700" fill="var(--ink)">Notes become groups</text>
+<text x="510" y="447" font-size="11" fill="var(--dim)">we suggest the grouping,</text>
+<text x="510" y="463" font-size="11" fill="var(--dim)">you rename and merge</text>
+<text x="510" y="482" font-size="11" fill="var(--dim)">biggest group first</text>
+
+<line x1="692" y1="450" x2="728" y2="450" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="730" y="406" width="210" height="88" rx="10" fill="var(--card)" stroke="var(--ok)"/>
+<text x="744" y="428" font-size="13" font-weight="700" fill="var(--ink)">A group becomes a check</text>
+<text x="744" y="447" font-size="11" fill="var(--dim)">saved, versioned, and run on</text>
+<text x="744" y="463" font-size="11" fill="var(--dim)">every future job with an</text>
+<text x="744" y="482" font-size="11" fill="var(--dim)">agreement record attached</text>
+
+<path d="M835 494 L835 520 L470 520 L470 546" fill="none" stroke="var(--ok)" stroke-dasharray="5 4" marker-end="url(#ara)"/>
+<text x="486" y="514" font-size="10.5" fill="var(--ok)">the check joins the next run</text>
+
+<!-- BAND 5 PROVE -->
+<text x="0" y="546" class="sl" fill="var(--dim)">5 &middot; Prove</text>
+<rect x="0" y="556" width="300" height="86" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="14" y="578" font-size="13" font-weight="700" fill="var(--ink)">This job against the last</text>
+<text x="14" y="597" font-size="11" fill="var(--dim)">what your change fixed,</text>
+<text x="14" y="613" font-size="11" fill="var(--dim)">what it broke</text>
+<text x="14" y="632" font-size="11" fill="var(--no)">a new safety flag counts as broken</text>
+
+<line x1="300" y1="599" x2="336" y2="599" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="338" y="556" width="290" height="86" rx="10" fill="var(--card)" stroke="var(--acc)"/>
+<text x="352" y="578" font-size="13" font-weight="700" fill="var(--ink)">The evidence pack</text>
+<text x="352" y="597" font-size="11" fill="var(--dim)">every check listed with what happened</text>
+<text x="352" y="613" font-size="11" fill="var(--dim)">to it, including the ones that did not</text>
+<text x="352" y="632" font-size="11" fill="var(--dim)">run, and why</text>
+
+<line x1="628" y1="599" x2="664" y2="599" stroke="var(--dim)" marker-end="url(#ar)"/>
+
+<rect x="666" y="556" width="274" height="86" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="680" y="578" font-size="13" font-weight="700" fill="var(--ink)">Submit for verification</text>
+<text x="680" y="597" font-size="11" fill="var(--dim)">available after one run,</text>
+<text x="680" y="613" font-size="11" fill="var(--dim)">whatever the result</text>
+<text x="680" y="632" font-size="11" fill="var(--ok)">there is no pass mark</text>
+
+<line x1="0" y1="252" x2="940" y2="252" stroke="var(--line)" stroke-dasharray="3 5"/>
+<text x="700" y="248" font-size="10" fill="var(--dim)">above: once per run</text>
+<text x="700" y="266" font-size="10" fill="var(--dim)">below: because a run found something</text>
+</svg>
+<p class="cap"><b>The load bearing arrow is the dashed green one.</b> A note you wrote on one bad case becomes a check that runs on every case forever. That is the difference between a report and a platform: the second run is better than the first because of what you did after the first.</p>
+</div>
+</section>
+
+<hr>
+
+<section>
+<h2>A case is five things, and none of them is a question</h2>
+<p>The first version of this product assumed a question came in and an answer went out. Ritesh was right that this made us narrower than the platform underneath us. The fix was to stop describing agents and start describing cases.</p>
+
+<div class="fig">
+<svg viewBox="0 0 940 300" role="img" aria-label="What a case is made of">
+<rect x="0" y="24" width="940" height="252" rx="14" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="20" y="16" class="sl" fill="var(--dim)">one case</text>
+
+<rect x="20" y="44" width="212" height="212" rx="10" fill="var(--card)" stroke="var(--acc)"/>
+<text x="34" y="68" font-size="13" font-weight="700" fill="var(--acc)">Input</text>
+<text x="34" y="87" font-size="11" fill="var(--dim)">a list of parts, each typed</text>
+<g font-size="10.5" fill="var(--ink)">
+<text x="34" y="112">text</text><text x="104" y="112">image</text><text x="174" y="112">video</text>
+<text x="34" y="134">audio</text><text x="104" y="134">document</text><text x="34" y="156">table</text>
+<text x="104" y="156">structured</text><text x="34" y="178">raw file</text>
+</g>
+<text x="34" y="212" font-size="11" fill="var(--dim)">Media is not stored here.</text>
+<text x="34" y="228" font-size="11" fill="var(--dim)">The row carries a link and</text>
+<text x="34" y="244" font-size="11" fill="var(--dim)">the agent fetches it.</text>
+
+<rect x="248" y="44" width="200" height="212" rx="10" fill="var(--card)" stroke="var(--acc)"/>
+<text x="262" y="68" font-size="13" font-weight="700" fill="var(--acc)">Output</text>
+<text x="262" y="87" font-size="11" fill="var(--dim)">the same eight types</text>
+<text x="262" y="112" font-size="11" fill="var(--ink)">A document agent returns</text>
+<text x="262" y="128" font-size="11" fill="var(--ink)">fields. A support agent</text>
+<text x="262" y="144" font-size="11" fill="var(--ink)">returns prose. A redaction</text>
+<text x="262" y="160" font-size="11" fill="var(--ink)">agent returns an image.</text>
+<text x="262" y="192" font-size="11" fill="var(--dim)">Nothing above this line</text>
+<text x="262" y="208" font-size="11" fill="var(--dim)">needs to know which.</text>
+
+<rect x="464" y="44" width="180" height="212" rx="10" fill="var(--card)" stroke="var(--mid)"/>
+<text x="478" y="68" font-size="13" font-weight="700" fill="var(--mid)">Expected answer</text>
+<text x="478" y="87" font-size="11" fill="var(--dim)">optional</text>
+<text x="478" y="116" font-size="11" fill="var(--ink)">Most cases have one.</text>
+<text x="478" y="132" font-size="11" fill="var(--ink)">Cases sampled from live</text>
+<text x="478" y="148" font-size="11" fill="var(--ink)">traffic do not, until</text>
+<text x="478" y="164" font-size="11" fill="var(--ink)">somebody writes one.</text>
+<text x="478" y="196" font-size="11" fill="var(--mid)">This single optional field</text>
+<text x="478" y="212" font-size="11" fill="var(--mid)">is why accuracy cannot</text>
+<text x="478" y="228" font-size="11" fill="var(--mid)">run on production traffic.</text>
+
+<rect x="660" y="44" width="140" height="212" rx="10" fill="var(--card)" stroke="var(--line)"/>
+<text x="674" y="68" font-size="13" font-weight="700" fill="var(--ink)">Trace</text>
+<text x="674" y="87" font-size="11" fill="var(--dim)">the steps it took</text>
+<text x="674" y="116" font-size="11" fill="var(--ink)">Only scoreable if</text>
+<text x="674" y="132" font-size="11" fill="var(--ink)">the agent returns it.</text>
+<text x="674" y="164" font-size="11" fill="var(--dim)">A metric can only</text>
+<text x="674" y="180" font-size="11" fill="var(--dim)">read what came</text>
+<text x="674" y="196" font-size="11" fill="var(--dim)">back.</text>
+
+<rect x="816" y="44" width="104" height="212" rx="10" fill="var(--card)" stroke="var(--line)"/>
+<text x="830" y="68" font-size="13" font-weight="700" fill="var(--ink)">Metadata</text>
+<text x="830" y="96" font-size="11" fill="var(--dim)">language,</text>
+<text x="830" y="112" font-size="11" fill="var(--dim)">source,</text>
+<text x="830" y="128" font-size="11" fill="var(--dim)">links to</text>
+<text x="830" y="144" font-size="11" fill="var(--dim)">media,</text>
+<text x="830" y="160" font-size="11" fill="var(--dim)">anything</text>
+<text x="830" y="176" font-size="11" fill="var(--dim)">else you</text>
+<text x="830" y="192" font-size="11" fill="var(--dim)">want to</text>
+<text x="830" y="208" font-size="11" fill="var(--dim)">filter on.</text>
+</svg>
+<p class="cap"><b>There is no agent type in this picture, and that is the point.</b> One dataset holds a pothole photo, a CCTV clip, an Arabic call recording, a scanned deed, a query result and a plain question, side by side. Adding a ninth input type is a data change. It is not a new screen.</p>
+</div>
+</section>
+
+<hr>
+
+<section>
+<h2>A metric declares what it needs, so coverage is a count</h2>
+<p>This is the rule that produces everything else. Sort metrics by what they cannot work without, and the setup screen, the pricing and the honesty all fall out of the ordering.</p>
+
+<div class="fig">
+<svg viewBox="0 0 940 396" role="img" aria-label="Metrics sorted by what input they require">
+<g font-size="11">
+<rect x="0" y="6" width="940" height="64" rx="10" fill="var(--ok-soft)"/>
+<text x="18" y="30" font-size="12.5" font-weight="700" fill="var(--ink)">Needs only the trace</text>
+<text x="18" y="50" fill="var(--dim)">Did it finish. Did it repeat a step until it timed out. How long did it take.</text>
+<text x="18" y="65" fill="var(--dim)">Runs on every case, costs nothing, and catches about a quarter of observed agent failures.</text>
+<text x="700" y="34" font-size="18" font-weight="750" fill="var(--ok)">380 of 380</text>
+<text x="700" y="52" fill="var(--dim)">always on, free</text>
+
+<rect x="0" y="78" width="940" height="58" rx="10" fill="var(--ok-soft)"/>
+<text x="18" y="102" font-size="12.5" font-weight="700" fill="var(--ink)">Needs the output</text>
+<text x="18" y="122" fill="var(--dim)">Sensitive data, harmful content, prompt injection, output language, groundedness.</text>
+<text x="700" y="106" font-size="18" font-weight="750" fill="var(--ok)">347 of 380</text>
+<text x="700" y="124" fill="var(--dim)">33 returned nothing to read</text>
+
+<rect x="0" y="144" width="940" height="58" rx="10" fill="var(--mid-soft)"/>
+<text x="18" y="168" font-size="12.5" font-weight="700" fill="var(--ink)">Needs the output to be prose</text>
+<text x="18" y="188" fill="var(--dim)">Helpfulness. Could someone act on the answer as written.</text>
+<text x="700" y="172" font-size="18" font-weight="750" fill="var(--mid)">161 of 380</text>
+<text x="700" y="190" fill="var(--dim)">219 returned fields, not prose</text>
+
+<rect x="0" y="210" width="940" height="58" rx="10" fill="var(--mid-soft)"/>
+<text x="18" y="234" font-size="12.5" font-weight="700" fill="var(--ink)">Needs an expected answer</text>
+<text x="18" y="254" fill="var(--dim)">Accuracy. The one everybody asks for first, and the one production traffic cannot give you.</text>
+<text x="700" y="238" font-size="18" font-weight="750" fill="var(--mid)">349 of 380</text>
+<text x="700" y="256" fill="var(--dim)">31 sampled live, no label yet</text>
+
+<rect x="0" y="276" width="940" height="58" rx="10" fill="var(--mid-soft)"/>
+<text x="18" y="300" font-size="12.5" font-weight="700" fill="var(--ink)">Needs reference steps</text>
+<text x="18" y="320" fill="var(--dim)">Did it take the right steps in the right order. Scored against the trace, not the answer.</text>
+<text x="700" y="304" font-size="18" font-weight="750" fill="var(--mid)">271 of 380</text>
+<text x="700" y="322" fill="var(--dim)">109 have no reference steps</text>
+
+<rect x="0" y="342" width="940" height="54" rx="10" fill="var(--no-soft)"/>
+<text x="18" y="366" font-size="12.5" font-weight="700" fill="var(--ink)">Needs the cases run again</text>
+<text x="18" y="386" fill="var(--dim)">Bias, robustness, reliability. Opt in, because they multiply the run.</text>
+<text x="700" y="370" font-size="18" font-weight="750" fill="var(--no)">priced on screen</text>
+</g>
+</svg>
+<p class="cap"><b>Read the right hand column out loud in the meeting.</b> Two metrics both reporting a healthy number can be standing on very different amounts of the run, and until this product nobody could see that. A metric that quietly covered 161 of 380 cases looked identical to one that covered all of them.</p>
+</div>
+</section>
+
+<hr>
+
+<section>
+<h2>Prism does the running. We do the deciding.</h2>
+<p>Worth being precise about the boundary, because the team keeps asking what we are actually building versus what we are wrapping.</p>
+
+<div class="fig">
+<svg viewBox="0 0 940 250" role="img" aria-label="What Prism owns and what we own">
+<rect x="0" y="20" width="452" height="220" rx="14" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="20" y="14" class="sl" fill="var(--dim)">Prism owns this</text>
+<g font-size="11.5" fill="var(--ink)">
+<text x="22" y="52">Storing datasets in whatever shape they arrive</text>
+<text x="22" y="76">Calling the agent for every datapoint</text>
+<text x="22" y="100">Running metrics, four kinds: prompt, deterministic,</text>
+<text x="22" y="116">REST API, agentic</text>
+<text x="22" y="140">Aggregating scores across datapoints</text>
+<text x="22" y="164">Reporting tokens, latency percentiles, datapoints</text>
+<text x="22" y="188">Versioning prompts, and grouping jobs under</text>
+<text x="22" y="204">a named evaluation</text>
+</g>
+<text x="22" y="230" font-size="11" fill="var(--dim)">None of this is ours to build. It exists today.</text>
+
+<rect x="488" y="20" width="452" height="220" rx="14" fill="var(--card)" stroke="var(--acc)"/>
+<text x="508" y="14" class="sl" fill="var(--acc)">We own this</text>
+<g font-size="11.5" fill="var(--ink)">
+<text x="510" y="52">Knowing what each metric requires, so we can say</text>
+<text x="510" y="68">where it ran and where it did not</text>
+<text x="510" y="92">Turning a developer note into a saved check</text>
+<text x="510" y="116">Grouping failures and counting them</text>
+<text x="510" y="140">Comparing this job to the last one, and calling a</text>
+<text x="510" y="156">new safety flag a regression</text>
+<text x="510" y="180">The coverage statement the verifier reads</text>
+<text x="510" y="204">Every screen a developer actually touches</text>
+</g>
+<text x="510" y="230" font-size="11" fill="var(--acc)">This is the product. The rest is plumbing we call.</text>
+</svg>
+<p class="cap"><b>Prism has no opinion about whether your agent is good.</b> Uday said it plainly: Prism does not have the domain knowledge to set a threshold. That gap is not a weakness in Prism, it is the space our product occupies.</p>
+</div>
+</section>
+
+<hr>
+
+<section>
+<h2>Why it holds together as an evaluation platform</h2>
+
+<div class="grid2">
+<div>
+<h3>Silence is treated as a defect</h3>
+<p>Every check appears in the evidence pack with what happened to it, including the ones that did not run and the reason. A pack that omits a metric cannot be read, and that is how certifications get pulled apart.</p>
+</div>
+<div>
+<h3>The free checks run first</h3>
+<p>Step repetition is 15.7 percent of observed agent failures and mishandled termination another 12.4 in the MAST taxonomy. Both are visible in the trace alone, at zero cost, before any model is involved.</p>
+</div>
+<div>
+<h3>Judge scores are labelled as signals</h3>
+<p>A model grading a model is direction, not truth, until somebody checks the judge against a human. Until that agreement number exists, the pack says so rather than printing a confident percentage.</p>
+</div>
+<div>
+<h3>Evaluation does not gate publishing</h3>
+<p>There is no pass bar and no platform minimum. Once a developer has run once, submit is available whatever the result. The loop has to earn its use by being useful, not by being compulsory.</p>
+</div>
+<div>
+<h3>The second run is where the value is</h3>
+<p>Comparing a job to the one before it is the only way to know whether your fix worked. A case that started passing is a win. A case that stopped passing is the thing to look at first, and a new safety flag counts even when every column stayed green.</p>
+</div>
+<div>
+<h3>A note outlives the person who wrote it</h3>
+<p>The developer who spots a failure writes one sentence. That sentence becomes a versioned check with an agreement record, running on every future job. Knowledge stops leaving when people move teams.</p>
+</div>
+</div>
+
+<div class="risk">
+<h3>What we have not solved</h3>
+<p>Batch size, how per batch results add back up, and what happens when a batch fails halfway are still open with Chandra. Judge agreement against a human has not been run, so every judge score carries that caveat. Automatic metric and threshold suggestions were considered with Uday and deliberately deferred past V1, because an unvalidated suggestion is a second thing to check rather than an answer.</p>
+</div>
+</section>
+
+<hr>
+
+<section>
+<h2>The same words, three ways</h2>
+<p>So you and Ritesh and Uday can talk from one page.</p>
+<table>
+<thead><tr><th>The plain word</th><th>What Prism calls it</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td>Case</td><td>datapoint</td><td>One thing the agent was asked to handle. One row of the dataset.</td></tr>
+<tr><td>Run</td><td>job</td><td>One execution across every datapoint. Jobs sit under a named evaluation, so run two is comparable to run one.</td></tr>
+<tr><td>Setup</td><td>evaluation</td><td>The saved pairing of an agent, a dataset and a set of metrics. Reusable, versioned.</td></tr>
+<tr><td>Expected answer</td><td>expected output</td><td>Optional. Where it is missing, accuracy skips the case and says so.</td></tr>
+<tr><td>Naming the fields</td><td>mapping</td><td>Telling Prism which key in your file is the input and which is the expected output. Done once, by hand, because there is no schema file.</td></tr>
+<tr><td>Check</td><td>metric</td><td>A prompt, a deterministic function, a REST endpoint, or an agentic call. Four kinds, and agents are typed the same four ways.</td></tr>
+<tr><td>Attention set</td><td>filter</td><td>The complete results table with a filter on. Never a smaller separate table.</td></tr>
+<tr><td>Coverage</td><td>no equivalent</td><td>How many of the datapoints a metric could actually read. This one is ours.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section style="padding-bottom:80px">
+<h2>The one sentence to close on</h2>
+<div class="rec"><p>Every other tool tells you a score. This one tells you the score <b>and how much of the run it is standing on</b>, then turns the thing you noticed into a check that runs forever. That is the whole product, and it works for an image agent and a text agent without changing a single screen.</p></div>
+</section>
+
+</div>
+</body>
+</html>
