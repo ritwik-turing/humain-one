@@ -988,7 +988,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   <div class="rlog" id="rLog"></div>
 </div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<div class="wm">Eval_Journey_V2 &middot; mockup</div>
+<div class="wm">Eval_Journey_V5 &middot; mockup</div>
 
 <script>
 /* ---------- case data ---------- */
@@ -1096,7 +1096,7 @@ var CFG={
   cat:'Al Noor Municipality',
   draft:'When the input runs longer than the agent sampled, read to the end or say which part was not read.',
   agreeNote:'All three disagreements are the same shape: the agent read part of the input and reported as though it had read all of it. Your check probably needs to say what counts as having read the whole thing.',
-  caseDef:'A case is one row of your dataset, in whatever shape your file already has. You name which key is the input and which is the expected answer, once, when you point the dataset at an agent. Every row in a run has to share that shape, because they all go to the same agent. Media is not stored here: the row carries a link and the agent fetches it. A case is one thing the agent was asked to handle. The input can be text, an image, video, audio, a document, a table, a structured payload or a raw file, and the output can be any of those too. Most cases carry an expected answer, which is the label accuracy is scored against. Cases sampled from live traffic arrive without one until somebody writes it.'
+  caseDef:'A case is one row of your dataset: one thing the agent was asked to handle. The input can be text, an image, video, audio, a document, a table, a structured payload or a raw file, and the output can be any of those too. Most cases carry an expected answer, which is what accuracy is scored against; cases sampled from live traffic arrive without one until somebody writes it. The file keeps whatever shape it already has. You name which key is the input and which is the expected answer once, when you point the dataset at an agent, and every row in a run shares that shape because every row goes to the same agent. Media is not stored here: the row carries a link and the agent fetches it.'
 };
 
 /* The cases a developer works through by hand. Eight input types, five output
