@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HUMAIN ONE · Evaluate · V5</title>
+<title>HUMAIN ONE · Evaluate · V5.1</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230e1419'/%3E%3Ctext x='32' y='45' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%2386c63f'%3EH%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -68,6 +68,18 @@ body{margin:0;background:var(--bg);color:var(--text);
 .bychip.code{background:#e7eef7;color:#40607f}
 .bychip.judge{background:#ece7f7;color:#5f4f96}
 .bychip.endpoint{background:#e6f0ea;color:#3d6553}
+.bychip.agentic{background:#f2ece0;color:#7a6535}
+.perf{display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin-bottom:16px;font-size:12.5px}
+.perf .pk{font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.perf .pi{color:var(--muted)}.perf .pi b{color:var(--ink);font-weight:650}
+.grow{margin-bottom:13px}
+.gl{font-size:12.5px;font-weight:650;margin-bottom:5px;display:flex;gap:9px;align-items:baseline}
+.gl span{font-weight:400;font-size:11.5px;color:var(--muted)}
+.gcells{display:flex;flex-wrap:wrap;gap:1.5px}
+.gcells i{width:7px;height:7px;border-radius:1.5px;display:block}
+.g-lo{background:#d3776f}.g-mid{background:#e0b356}.g-hi{background:#6f9e7d}.g-na{background:#dde3e9}
+.gkey{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.gkey i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-left:8px}
 .mcov{font-size:11.5px;color:var(--muted);margin-top:5px}
 .mcov b{color:var(--ink);font-weight:650}
 .tscroll table{min-width:940px}
@@ -583,7 +595,7 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
   <div class="dec"><b>Repeated steps and broken endings are worth catching for free</b><span>Step repetition is 15.7 percent of observed agent failures and mishandled termination another 12.4 in the MAST taxonomy, about a quarter combined. The mechanical checks catch both at zero cost. They cannot say whether an answer was right, which is the other three quarters.</span></div>
   <div class="dec"><b>Correctness is the developer's judgement</b><span>The developer writes what went wrong in their own words; we group and count. Judge scores ship labelled as a signal, not a measurement, until judge agreement against a human is run.</span></div>
   <div class="dec"><b>The pack says what was not checked</b><span>Every check is listed with what happened to it, including the ones that did not run and why. Silence about a metric reads the same as a pass.</span></div>
-  <div class="dec"><b>A metric is a function, a prompt, or an endpoint</b><span>Those are the three ways Prism lets you define one, and every metric on the setup screen says which it is. Nothing is scored by modality: a metric can only read what the agent returned, so a trace has to come back in the response before it can be scored. Confirmed with Uday Kumar Pabbathi, 1 Sep.</span></div>
+  <div class="dec"><b>A metric is a prompt, a deterministic function, a REST endpoint, or an agentic one</b><span>Those are the four kinds Prism lets you define, the same four it types agents by, and every metric on the setup screen says which it is. Nothing is scored by modality: a metric can only read what the agent returned, so a trace has to come back in the response before it can be scored. Confirmed with Uday Kumar Pabbathi, 1 Sep.</span></div>
   <div class="dec"><b>The dataset keeps its own shape, and you name the fields once</b><span>There is no schema file. You upload whatever shape you already have, then name which key is the input, which is the expected output, and which are metadata. Every row in a run shares that shape because every row goes to the same agent. Media is never stored in the dataset; the row carries a link and the agent fetches it.</span></div>
   <div class="dec"><b>No pass mark, and that is now a joint decision</b><span>Prism has no domain knowledge of your agent, so it cannot say what score is good enough. Automatic metric and threshold suggestions were considered and deliberately deferred past V1, because a suggestion nobody has validated is a second thing to check rather than an answer. The developer reads the numbers.</span></div>
   <div class="dec"><b>There is no such thing as an agent type here</b><span>A case is an input, an output, an optional expected answer and a trace. Input and output are lists of parts, and every part carries its own type: text, image, video, audio, a document, a table, a structured payload or a raw file. One dataset holds all eight at once. Nothing in the product asks what kind of agent produced them.</span></div>
@@ -704,9 +716,13 @@ textarea.note-in:focus{outline:2px solid var(--teal);outline-offset:-1px}
 
     <div class="grid3 mrow" style="margin-bottom:16px">
       <div class="card" style="margin:0"><div class="bd"><div class="muted" style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">Completed</div><div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px"><span id="mDone">9</span> <span class="muted" style="font-size:14px;font-weight:400">of <span id="mTot">12</span></span></div></div></div>
-      <div class="card" style="margin:0"><div class="bd"><div class="muted" style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">Cost</div><div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px"><span id="mCost">0.58</span> <span class="muted" style="font-size:14px;font-weight:400">SAR</span></div></div></div>
-      <div class="card" style="margin:0"><div class="bd"><div class="muted" style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">Slowest case</div><div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px"><span id="mSlow">31</span> <span class="muted" style="font-size:14px;font-weight:400">seconds</span></div></div></div>
+      <div class="card" style="margin:0"><div class="bd"><div class="muted" style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">Tokens</div><div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px"><span id="mTok">0</span> <span class="muted" style="font-size:14px;font-weight:400"><span id="mTokSub"></span></span></div></div></div>
+      <div class="card" style="margin:0"><div class="bd"><div class="muted" style="font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700">Latency P95</div><div class="mnum" style="font-size:26px;font-weight:750;margin-top:4px"><span id="mSlow">31</span> <span class="muted" style="font-size:14px;font-weight:400"><span id="mLatSub"></span></span></div></div></div>
     </div>
+
+    <div id="perfStrip"></div>
+
+    <div id="gridBox"></div>
 
     <div id="trendBox"></div>
 
@@ -1635,7 +1651,7 @@ function coverage(){
   rows.push({g:'Always on',n:'Finished',s:'ran',v:totalStalled()+' failed'});
   rows.push({g:'Always on',n:'Stayed on track',s:'ran',v:totalLooped()+' failed'});
   rows.push({g:'Always on',n:'Output usable',s:'ran',v:totalIncomplete()+' failed'});
-  rows.push({g:'Always on',n:'Cost and time',s:'ran',v:TOTAL_COST.toFixed(2)+' SAR'});
+  rows.push({g:'Always on',n:'Cost and time',s:'ran',v:fmtTok(runTokens().i+runTokens().o)+' tokens this job'});
   var withOut=allCases().filter(hasOut).length, noOut=allCases().length-withOut;
   ['pii','harm','inject','lang'].forEach(function(k){
     var hit=CASES.filter(function(c){return c.flag===k}).length;
@@ -1704,8 +1720,8 @@ function renderEvidence(){
       ? flagged().map(function(c){return SAFETY[c.flag].n}).join(', ')
       : 'Sensitive data, harmful content, prompt injection and output language all clear',
       String(flagged().length), flagged().length?'warn':'ok')
-  + evRow('Cost', RUNS_DONE===1?'This run':RUNS_DONE===2?'Both runs combined':'All '+RUNS_DONE+' runs combined',
-          TOTAL_COST.toFixed(2)+' SAR')
+  + evRow('Tokens', RUNS_DONE===1?'This job':'All '+RUNS_DONE+' jobs combined',
+          fmtTok((runTokens().i+runTokens().o)*RUNS_DONE))
   + (function(){
       var wi=-1,ws=0;
       CASES.forEach(function(c,i){var v=caseSecs(c); if(v>ws){ws=v;wi=i}});
@@ -1886,20 +1902,24 @@ var RUNS_DONE=5;
    scored by modality. A metric is a function, a prompt, or an endpoint, and
    what it can read is whatever the agent returned. */
 var MECH={
- code:    {n:'Function',  c:'code',
-   d:'A deterministic function Prism runs over the agent response. Same input, same score, every time.'},
- judge:   {n:'LLM judge', c:'judge',
-   d:'A prompt Prism runs against the agent response, with fields from the case passed in as variables.'},
- endpoint:{n:'Endpoint',  c:'endpoint',
-   d:'Prism posts the agent response to a REST or agentic endpoint and saves what comes back as the score.'}
+ code:    {n:'Deterministic', c:'code',
+   d:'A function Prism runs over the agent response. Same input, same score, every time. No model involved.'},
+ judge:   {n:'Prompt', c:'judge',
+   d:'A versioned prompt Prism runs against the agent response, with fields from the case bound to {variables} in the prompt.'},
+ endpoint:{n:'REST API', c:'endpoint',
+   d:'Prism posts the agent response to an endpoint you own and saves what comes back as the score.'},
+ agentic: {n:'Agentic', c:'agentic',
+   d:'Prism runs its own agent over the response. Same slot as REST API, but Prism supplies the caller.'}
 };
 function byChip(m){
   var x=MECH[m.by]||MECH.code;
   return '<span class="bychip '+x.c+'" title="'+esc(x.d)+'">'+x.n+'</span>';
 }
+var AGG='Average';
 function covLine(cv){
-  if(!cv.skipped)return '<div class="mcov">Runs on all '+cv.total+' cases, averaged across them.</div>';
-  return '<div class="mcov">Runs on <b>'+cv.ran+' of '+cv.total+'</b>, averaged across those. '
+  var a=AGG.toLowerCase();
+  if(!cv.skipped)return '<div class="mcov">Runs on all '+cv.total+' datapoints, '+a+' across them.</div>';
+  return '<div class="mcov">Runs on <b>'+cv.ran+' of '+cv.total+'</b> datapoints, '+a+' across those. '
     +'Skips '+cv.skipped+' where '+cv.why+'.</div>';
 }
 function metricRow(m,kind){
@@ -1939,7 +1959,7 @@ function renderMetricCards(){
      '<span><b>'+totalCases()+'</b> cases</span>'
     +'<span>becomes <b'+(mult>1?' class="up"':'')+'>'+units+'</b> runs'+(mult>1?' <span class="up">'+mult+'x</span>':'')+'</span>'
     +'<span>about <b>'+runMins()+'</b> minute'+(runMins()>1?'s':'')+'</span>'
-    +'<span>roughly <b>'+runCost().toFixed(2)+'</b> SAR</span>';
+    +'<span>about <b>'+fmtTok(runTokens().i+runTokens().o)+'</b> tokens</span>';
 }
 function renderDS(){
   var pnl=document.getElementById('dsPanel'); if(!pnl)return;
@@ -2035,8 +2055,8 @@ function renderSetup(){
   renderDS();
   renderMetricCards();
   var mins=runMins();
-  document.getElementById('runEst').innerHTML=runUnits()+' runs &middot; about '+mins+' minute'
-    +(mins>1?'s':'')+', roughly '+runCost().toFixed(2)+' SAR';
+  document.getElementById('runEst').innerHTML=runUnits()+' datapoint runs &middot; about '+mins+' minute'
+    +(mins>1?'s':'')+', about '+fmtTok(runTokens().i+runTokens().o)+' tokens';
   var p=document.getElementById('prevRun');
   if(RUNS_DONE){
     p.innerHTML='<div><div class="t">Run '+RUNS_DONE+' finished '+ago()+'</div>'
@@ -2151,7 +2171,7 @@ function doRun(after){
   document.getElementById('rTitle').textContent='Run '+(RUNS_DONE+1)+' in progress';
   document.getElementById('rSub').textContent=(extraMult()>1
     ? totalCases()+' cases, '+runUnits()+' runs'
-    : totalCases()+' cases')+' across '+dsGroups()+' request types, 10 workers in parallel';
+    : totalCases()+' cases')+' across '+dsGroups()+' request types, parallel datapoints on';
   document.getElementById('rLog').innerHTML='';
   var bar=document.getElementById('rBar'), now=document.getElementById('rNow'), log=document.getElementById('rLog');
   var total=totalCases();
@@ -2305,7 +2325,7 @@ function renderTrends(){
   });
   box.innerHTML='<div class="card"><div class="hd"><h3>Across runs</h3>'
     +'<span class="badge b-lock">Run '+r1+' to '+RUNS_DONE+'</span><span class="sp"></span>'
-    +'<span class="muted" style="font-size:12px">Same '+totalCases()+' cases every run</span></div>'
+    +'<span class="muted" style="font-size:12px">Jobs under one evaluation, same '+totalCases()+' datapoints each</span></div>'
     +'<div class="bd"><div class="tgrid">'
     +items.map(function(it){
       return '<div class="tc'+(it.bad?' bad':'')+'"><div class="tl">'+it.l+'</div>'
@@ -2426,7 +2446,12 @@ function trajScores(){
   return {exact:Math.round(e/n*100), inorder:Math.round(i/n*100), anyorder:Math.round(a/n*100), n:pool.length};
 }
 
-var PER_RUN=0.048, PER_JUDGE=0.011;
+/* Prism reports tokens in and out per job, so cost is derived rather than asserted.
+   Rates are the only assumption left and they sit here, in one place. */
+var TOK_IN=830, TOK_OUT=60, RATE_IN=0.30/1e6, RATE_OUT=2.50/1e6;
+function runTokens(){return {i:runUnits()*TOK_IN, o:runUnits()*TOK_OUT}}
+function fmtTok(n){return n>=1e6? (n/1e6).toFixed(2)+'M' : n>=1e3? Math.round(n/1e3)+'k' : String(n)}
+var PER_RUN=TOK_IN*RATE_IN+TOK_OUT*RATE_OUT, PER_JUDGE=0.011;
 
 /* What the chosen metrics actually produce. Judge scores are a model grading a model,
    so they ship with their own limit stated rather than as a bare percentage. */
@@ -2462,14 +2487,62 @@ function relTime(t){
   var d=Math.floor(h/24); return d+' day'+(d>1?'s':'')+' ago';
 }
 function caseSecs(c){return secs(c.t)}   // seconds for a case, secs() handles the string
+/* Datapoint by metric, the way Prism lays it out on a job. One cell per case
+   per metric. A cell is grey where the metric could not run on that case,
+   which is the whole coverage argument in one picture. */
+function renderGrid(){
+  var box=document.getElementById('gridBox'); if(!box)return;
+  if(!hasResults()){box.innerHTML='';return;}
+  var mets=CAT_METRICS.concat(EXTRA_METRICS).filter(function(m){
+    return m.on && metricAvailable(m).ok;});
+  var cases=allCases();
+  var seed=11; function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+  var rows=mets.map(function(m){
+    var need=NEEDS[m.need]||NEEDS.any, ran=0, cells='';
+    cases.forEach(function(c){
+      if(!need.ok(c)){cells+='<i class="g-na" title="not scoreable on this case"></i>'; return;}
+      ran++;
+      var ok=c.fin&&c.loop&&c.out===1;
+      var v=rnd(); var band = !ok ? (v<0.7?'lo':'mid') : (v<0.12?'lo':v<0.34?'mid':'hi');
+      cells+='<i class="g-'+band+'"></i>';
+    });
+    return '<div class="grow"><div class="gl">'+m.n+'<span>'+ran+' of '+cases.length+'</span></div>'
+      +'<div class="gcells">'+cells+'</div></div>';
+  }).join('');
+  box.innerHTML='<div class="card"><div class="hd"><h3>Datapoint by metric</h3><span class="sp"></span>'
+    +'<span class="gkey"><i class="g-lo"></i>under 40<i class="g-mid"></i>40 to 60<i class="g-hi"></i>60 plus'
+    +'<i class="g-na"></i>did not run</span></div>'
+    +'<div class="bd"><p class="muted" style="margin:0 0 12px;font-size:12.5px">One cell per datapoint per metric, '
+    +cases.length+' across. The grey cells are the ones a metric could not read, and they are the reason a headline '
+    +'score on its own is not enough to go on.'
+    +'<button class="why" aria-expanded="false" aria-label="Why grey cells matter" data-why="Prism lays the job out this way. Every metric runs on the datapoints it can read and skips the rest, so two metrics reporting the same percentage can be standing on very different amounts of the run. The grey tells you which.">i</button></p>'
+    +rows+'</div></div>';
+}
 function renderMetrics(){
   var n=totalCases();
   var done=totalDone();
-  var slow=Math.max.apply(null,allSecs().concat([0]));
-  var cost=runCost().toFixed(2);
+  var L=allSecs().slice().sort(function(a,b){return a-b});
+  var pct=function(p){return L.length? L[Math.min(L.length-1,Math.floor(L.length*p))] : 0};
+  var slow=pct(0.95);
+  var tk=runTokens();
   var set=function(id,v){var e=document.getElementById(id); if(e)e.textContent=v};
-  set('mDone',done); set('mTot',n); set('mCost',cost);
+  var seth=function(id,v){var e=document.getElementById(id); if(e)e.innerHTML=v};
+  set('mDone',done); set('mTot',n);
+  set('mTok', fmtTok(tk.i+tk.o));
+  seth('mTokSub', 'in and out');
   set('mSlow', slow? (slow>=10? Math.round(slow) : slow.toFixed(1)) : 0);
+  seth('mLatSub','seconds');
+  renderGrid();
+  var ps=document.getElementById('perfStrip');
+  if(ps)ps.innerHTML = !hasResults() ? '' :
+    '<div class="perf"><span class="pk">Performance</span>'
+    +'<span class="pi"><b>'+n+'</b> datapoints</span>'
+    +'<span class="pi">avg <b>'+(L.reduce(function(a,b){return a+b},0)/(L.length||1)).toFixed(1)+'s</b></span>'
+    +'<span class="pi">P50 <b>'+pct(0.5).toFixed(1)+'s</b></span>'
+    +'<span class="pi">P95 <b>'+pct(0.95).toFixed(1)+'s</b></span>'
+    +'<span class="pi">P99 <b>'+pct(0.99).toFixed(1)+'s</b></span>'
+    +'<span class="pi">tokens <b>'+fmtTok(tk.i)+'</b> in / <b>'+fmtTok(tk.o)+'</b> out</span>'
+    +'<button class="why" aria-expanded="false" aria-label="Where these come from" data-why="Prism reports these per job: datapoints attempted, latency spread, and tokens in and out. Cost follows from the token counts and your model rates, which is why there is no invented per-case price anywhere on this screen.">i</button></div>';
 
   var stalled=totalStalled();
   var looped =totalLooped();
