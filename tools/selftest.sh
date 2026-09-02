@@ -44,13 +44,22 @@ harness = r"""
   T('dropping {expected_output} moves coverage to 347',function(){return /347 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   click('mbSave');
   T('saved metric is in the library, marked yours, v1.0.0',function(){var y=USER_METRICS.length===1&&rowEl(USER_METRICS[0].n); return !!y && !!y.querySelector('.yours') && y.querySelector('.verchip').textContent==='v1.0.0'});
+  if(typeof SNAP!=='undefined'){
+    T('setup freezes a reproducibility snapshot before run',function(){return /Run snapshot/.test(document.getElementById('evalSum').innerText) && document.getElementById('evalSum').innerText.indexOf(SNAP.id)>-1});
+  }
   nav('s2');
   T('jobs list includes a failed job at 0 of total',function(){return Array.from(document.querySelectorAll('#jobsBox tbody tr')).some(function(r){return /failed/.test(r.innerText) && /0\//.test(r.innerText)})});
   T('newest job is LATEST',function(){return !!document.querySelector('#jobsBox tbody tr:first-child .latest')});
+  if(typeof SNAP!=='undefined'){
+    T('latest job exposes its immutable receipt',function(){return /Latest job receipt/.test(document.getElementById('jobsBox').innerText) && document.getElementById('jobsBox').innerText.indexOf(SNAP.dataset)>-1});
+    document.querySelector('#scoreBox .bcell').click();
+    T('metric drilldown exposes definition and execution provenance',function(){var x=document.querySelector('#scoreBox .bdrill').innerText;return /Definition/.test(x)&&/Frozen execution/.test(x)&&x.indexOf(SNAP.id)>-1});
+  }
   var ag=document.getElementById('aggSel'); ag.value='Sum'; ag.dispatchEvent(new Event('change',{bubbles:true}));
   T('Sum shows the expected-output metric as 272 of 349 on the board',function(){return document.querySelector('#scoreBox .bv').textContent==='272 of 349'});
   nav('s7');
   T('evidence pack shows the same Sum',function(){return Array.from(document.querySelectorAll('#covBox .cov')).some(function(r){return r.innerText.indexOf(PRIMARY)>-1&&/272 of 349/.test(r.innerText)})});
+  if(typeof SNAP!=='undefined')T('evidence pack carries the run snapshot',function(){return document.getElementById('evBox').innerText.indexOf(SNAP.id)>-1});
   nav('s2'); ag=document.getElementById('aggSel'); ag.value='Average'; ag.dispatchEvent(new Event('change',{bubbles:true}));
   document.querySelector('[data-scale="0-10"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));
   T('0 to 10 scale shows 7.8',function(){return document.querySelector('#scoreBox .bv').textContent==='7.8'});
@@ -76,6 +85,7 @@ harness = r"""
   if(document.getElementById('cmpScope')){
     var cp=document.getElementById('cmpScope'); cp.value='evals'; cp.dispatchEvent(new Event('change',{bubbles:true}));
     T('comparison matches evaluations on shared case IDs',function(){return /342 shared cases matched by case ID/.test(document.getElementById('cmpMatch').innerText) && /Safety baseline v2/i.test(document.getElementById('cmpPrevH').innerText)});
+    if(typeof SNAP!=='undefined')T('comparison excludes metric version drift from deltas',function(){return /identical metric versions/.test(document.getElementById('cmpBasis').innerText) && /Version drift/.test(document.getElementById('cmpUnmatched').innerText)});
     if(document.getElementById('cmpBasis')){
       T('unmatched cases and metric differences stay visible',function(){return /38 cases/.test(document.getElementById('cmpUnmatched').innerText) && /Metric-set difference/.test(document.getElementById('cmpUnmatched').innerText)});
       var from=document.getElementById('cmpFrom'); from.value='quality'; from.dispatchEvent(new Event('change',{bubbles:true}));

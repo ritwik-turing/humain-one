@@ -1,6 +1,8 @@
 # Prism demo, item by item, against the prototype
 
-Source: Uday Kumar Pabbathi's walkthrough on 1 Sep 2026, the recording reviewed screen by screen, plus the transcript and three screenshots Ritwik supplied. Target: Eval_Journey_V10.html. This ledger is refreshed per version. If an item is not built inside Evaluate, the product boundary and destination are stated here, so scope is a decision and not a discovery.
+Source: Uday Kumar Pabbathi's walkthrough on 1 Sep 2026, the recording reviewed screen by screen, plus the transcript and three screenshots Ritwik supplied. Target: Eval_Journey_V11.html. This ledger is refreshed per version. If an item is not built inside Evaluate, the product boundary and destination are stated here, so scope is a decision and not a discovery.
+
+V11 preserves every Prism capability accounted for in V10. Its new immutable run receipt, evaluator provenance, and version-safe comparison rules are Humain ONE safeguards, not claims about Prism screens that Uday did not show. The external benchmark and release rationale are in `EVAL_STATE_OF_THE_ART_AUDIT.md`.
 
 Status key: built, covered at journey boundary, excluded by decision. V10 has no unaccounted walkthrough item; each is implemented, represented at its real journey boundary, or deliberately excluded.
 
