@@ -2,17 +2,17 @@
 
 Date: 2 Sep 2026
 
-Current prototype: `Eval_Journey_V13.html`
+Current prototype: `Eval_Journey_V14.html`
 
 ## Verdict
 
-V13 is ready for the product conversation. It covers the full Prism flow shown by Uday, keeps V11's reproducibility safeguards and V12's user-scoped metric library, and removes the remaining ambiguity between a saved metric and an attached metric. Step 5 now makes the improvement loop explicit: reviewed failure -> Prompt regression metric -> human calibration -> save and attach -> developer changes the agent -> rerun and compare. Nothing is learned from earlier agent uploads, selected by a hidden LLM, or attached automatically.
+V14 is ready for the product conversation. It covers the full Prism flow shown by Uday and retains the reproducibility, personal-library, and explicit-attachment safeguards from V11-V13. The complete improvement loop is now causal and state-consistent: reviewed failure -> Prompt regression metric -> human calibration -> save and attach -> developer changes the agent -> rerun and compare. Regression-metric state is shared across the personal library, calibration, evidence, and attach/detach controls. Nothing is learned from earlier agent uploads, selected by a hidden LLM, or attached automatically.
 
 This benchmark does not turn unconfirmed competitor behavior into a Prism claim. Prism-confirmed behavior remains in `PRISM_DEMO_COVERAGE.md`. The additions below are explicitly Humain ONE product safeguards around the Prism execution layer.
 
 ## Release bar
 
-| Product requirement | V13 behavior | Why it matters |
+| Product requirement | V14 behavior | Why it matters |
 |---|---|---|
 | No universal metric scorecard | A new evaluation starts with zero attached. The developer creates or reuses a Prompt, Deterministic, REST API, or Agentic definition for the agent. | A metric that is meaningful for one agent may be meaningless for another. |
 | Personal metric library | The signed-in user's library holds previously created or used definitions, with version and usage history. The library remains visible when a new evaluation has zero attached. | Reuse saves work without implying universal applicability or automatic selection. |
@@ -22,6 +22,18 @@ This benchmark does not turn unconfirmed competitor behavior into a Prism claim.
 | Comparisons are valid | Case IDs are matched. Only identical metric definition versions are eligible for score deltas. Dataset, metric-set, and version differences stay visible outside the delta. | Evaluator drift cannot be mistaken for an agent regression. |
 | Human judgment stays central | Developers inspect traces and outputs, write notes, group failures, and calibrate judge metrics against their verdicts. | LLM judge output is evidence, not unquestioned truth. |
 | Verification is honest | The pack includes the receipt, coverage, checks not run, open issues, and human-review count. No platform score blocks submission. | The verifier sees omissions and limitations, not a cleaned-up headline. |
+
+## V14 overall release review
+
+| Review dimension | Result | Evidence |
+|---|---|---|
+| Prism fidelity | Pass | Every visible walkthrough capability is accounted for in `PRISM_DEMO_COVERAGE.md`; Humain ONE additions are labelled as such. |
+| End-to-end causality | Pass | Failure grouping now leads to regression-metric creation before the agent-change rerun action appears. |
+| Metric semantics | Pass | Personal-library membership, current-dataset compatibility, and evaluation attachment are distinct. Prompt, Deterministic, REST API, and Agentic definitions remain explicit. |
+| State integrity | Pass | Saving, deduplication, attach/detach, calibration, evidence, and deletion use the same regression-metric identity. No seeded ghost metric appears in evidence. |
+| Reproducibility and comparison | Pass | Run receipts remain immutable, and deltas require shared case IDs plus identical metric versions. |
+| Interaction and markup | Pass | Incompatible attached metrics remain removable; generated metric controls no longer contain nested buttons. |
+| Regression suite | Pass | V14 passes 63/63 headless interaction and content checks. Frozen V13 remains 53/53 and V12 remains 44/44. |
 
 ## Benchmark evidence
 
@@ -48,5 +60,5 @@ Then show the six-box explainer in `Eval_Platform_How_It_Works.html`:
 2. Create and attach agent-specific metrics.
 3. Freeze the exact configuration and run every datapoint.
 4. Read scores with their coverage and provenance.
-5. Inspect cases, group failures, and turn notes into calibrated checks.
+5. Select a reviewed failure, calibrate and attach a regression metric, then change the agent outside the screen.
 6. Compare like for like, then submit the full evidence pack.

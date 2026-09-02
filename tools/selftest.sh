@@ -59,6 +59,7 @@ harness = r"""
   T('dropping {expected_output} moves coverage to 347',function(){return /347 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   click('mbSave');
   T('saved metric is in the library, marked yours, v1.0.0',function(){var y=USER_METRICS.length===1&&rowEl(USER_METRICS[0].n); return !!y && !!y.querySelector('.yours') && y.querySelector('.verchip').textContent==='v1.0.0'});
+  if(typeof RELEASE_REVIEW_V14!=='undefined')T('generated metric rows contain no nested buttons',function(){return document.querySelectorAll('#agentSetup button button').length===0});
   if(typeof SNAP!=='undefined'){
     T('setup freezes a reproducibility snapshot before run',function(){return /Run snapshot/.test(document.getElementById('evalSum').innerText) && document.getElementById('evalSum').innerText.indexOf(SNAP.id)>-1});
   }
@@ -92,7 +93,12 @@ harness = r"""
   if(document.getElementById('cmpBasis')){
     T('Prism setup tabs are real navigation buttons',function(){return document.querySelectorAll('.prismtabs button[data-setup-target]').length===4});
   }
-  var before=CHECKS.length; nav('s5');
+  var before=CHECKS.length;
+  if(typeof RELEASE_REVIEW_V14!=='undefined'){
+    nav('s4');
+    T('failure grouping leads to measurement before rerun',function(){return !document.querySelector('#s4 #rerunBtn')&&!!document.querySelector('#s4 [data-go="s5"]')});
+  }
+  nav('s5');
   if(typeof METRIC_SECTION_V13!=='undefined'){
     T('step five says it measures a fix rather than editing the agent',function(){var x=document.getElementById('s5').innerText;return /Make the fix measurable/.test(x)&&/does not change your agent/.test(x)&&/outside this screen/.test(x)});
     T('regression metric starts from a named reviewed failure',function(){var x=document.getElementById('s5').innerText;return /Stops before the end of the input/i.test(x)&&/2 reviewed cases/i.test(x)});
@@ -100,10 +106,23 @@ harness = r"""
     T('calibration sample is distinguished from current attention cases',function(){var x=document.getElementById('s5').innerText;return /20 previously human-reviewed calibration cases/.test(x)&&/separate from the 14 attention cases/.test(x)});
     T('save scope is library plus this evaluation only',function(){var x=document.getElementById('s5').innerText;return /personal metric library/.test(x)&&/attaches it to this evaluation/.test(x)&&!/every future run/.test(x)});
   }
+  if(typeof RELEASE_REVIEW_V14!=='undefined'){
+    T('selected regression source follows the largest reviewed failure group',function(){var g=groupCounts(),ks=Object.keys(g).sort(function(a,b){return g[b]-g[a]});return document.getElementById('checkGroupTitle').textContent===TAGS[ks[0]]&&document.getElementById('checkGroupBadge').textContent===g[ks[0]]+' reviewed cases'});
+    T('actual agent-change rerun appears only after the metric workflow',function(){return !!document.querySelector('#s5 #rerunBtn')&&/changed the agent/i.test(document.querySelector('#s5 #rerunBtn').textContent)});
+    T('seeded evidence has no ghost regression metric',function(){return CHECKS.length===0&&!/Your regression metrics/.test(document.getElementById('covBox').innerText)});
+  }
   document.getElementById('chkDraft').value='The output must name the reference number when one exists.';
   var sb=Array.from(document.querySelectorAll('#s5 button')).filter(function(b){return /^save (check|v1\.0\.0 and attach)$/i.test(b.textContent.trim())})[0]; sb.click();
   T('saving one check adds exactly one',function(){return CHECKS.length===before+1});
   if(typeof METRIC_SECTION_V13!=='undefined')T('saved regression metric is versioned, attached, and uses the stated contract',function(){var m=USER_METRICS[USER_METRICS.length-1];return m.on&&m.ver==='v1.0.0'&&m.need==='inOutTrace'&&/attached to this evaluation/.test(document.getElementById('chkLib').innerText)});
+  if(typeof RELEASE_REVIEW_V14!=='undefined'){
+    var savedCount=CHECKS.length, savedMetric=USER_METRICS[USER_METRICS.length-1]; sb.click();
+    T('saving the same regression metric twice does not duplicate it',function(){return CHECKS.length===savedCount});
+    document.querySelector('#chkLib [data-togglechk]').click();
+    T('detaching a regression metric keeps it in the library and removes it from evaluation evidence',function(){return !savedMetric.on&&CHECKS.length===savedCount&&/not attached/.test(document.getElementById('chkLib').innerText)&&/not attached/.test(document.getElementById('covBox').innerText)});
+    document.querySelector('#chkLib [data-togglechk]').click();
+    T('a saved regression metric can be explicitly reattached',function(){return savedMetric.on&&/attached to this evaluation/.test(document.getElementById('chkLib').innerText)});
+  }
   nav('s6');
   T('comparison reports 2 new safety flags',function(){return /2 new safety flags/.test(document.getElementById('cmpHint').innerText)});
   if(document.getElementById('cmpScope')){
@@ -125,6 +144,12 @@ harness = r"""
     T('Edit returns to the saved evaluation pairing',function(){return document.querySelector('.screen.on').id==='s1' && !!document.getElementById('agentSetup')});
     nav('s2'); document.querySelector('.prismtabs [data-setup-target="importSources"]').click();
     T('Import tab returns to the existing import sources',function(){return document.querySelector('.screen.on').id==='s1' && !!document.getElementById('importSources')});
+  }
+  if(typeof RELEASE_REVIEW_V14!=='undefined'){
+    nav('s1'); var del=document.querySelector('[data-rmmet="'+savedMetric.k+'"]');
+    T('saved regression metric exposes a separate library delete control',function(){return !!del});
+    if(del)del.click();
+    T('deleting a regression metric removes the same identity from library, calibration, and checks',function(){return !USER_METRICS.some(function(m){return m.k===savedMetric.k})&&!CHECKS.some(function(c){return c.metricKey===savedMetric.k})&&!document.querySelector('[data-rmmet="'+savedMetric.k+'"]')});
   }
   var t=''; ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(function(id){nav(id); t+=document.getElementById(id).innerText;});
   T('no undefined, NaN or [object on any screen',function(){return !/undefined|NaN|\[object/.test(t)});

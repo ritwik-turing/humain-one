@@ -97,12 +97,12 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <div class="answer">
   <p class="eyebrow">Humain ONE &middot; Evaluate &middot; step 6 of 9</p>
   <h1>We built a machine that tells you what it did not check.</h1>
-  <p class="lede">Any agent, any dataset, any input type. It runs, it scores, it groups what went wrong, and it turns your own words into checks that run forever. The part that makes it an evaluation platform rather than a score printer is the last one: it states its own coverage, every time.</p>
+  <p class="lede">Any agent, any dataset, any input type. It runs, it scores, it groups what went wrong, and it turns a reviewed failure into a versioned regression metric you can attach and rerun. The part that makes it an evaluation platform rather than a score printer is the last one: it states its own coverage, every time.</p>
   <div class="rec"><p>If you say one thing to the team, say this. <b>Prism gives us four ways to author a metric, but it does not give every agent the same metrics.</b> The developer's personal library holds definitions they previously created or used. A new evaluation starts at zero, and metrics are deliberately attached only after their inputs are checked against the current data.</p></div>
   <div class="claims">
     <div class="cl"><div class="num">01</div><b>A case is five things</b><p>Input, output, an optional expected answer, a trace, metadata. None of them is a question. There is no agent type anywhere in the product.</p></div>
     <div class="cl"><div class="num">02</div><b>Coverage is a count</b><p>The Al Noor expected-output definition ran on 349 of 380. Its citizen-actionability definition ran on 161. The product says so on screen, because a metric that quietly covered less than half the run reads exactly like one that covered all of it.</p></div>
-    <div class="cl"><div class="num">03</div><b>What you write becomes the check</b><p>On a failing case you type one sentence, like "stopped reading at page two". We group matching sentences, count them, and turn a group into a check that runs on every job after. Judge scores are labelled as a signal, not a measurement.</p></div>
+    <div class="cl"><div class="num">03</div><b>A reviewed failure becomes measurable</b><p>On a failing case you type one sentence, like "stopped reading at page two". We group matching sentences, count them, and turn the selected failure into a calibrated regression metric. Saving adds it to your personal library and attaches it to this evaluation.</p></div>
   </div>
 </div>
 
