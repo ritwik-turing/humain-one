@@ -8,10 +8,10 @@ Owner: Ritwik Chakradhar, PM at Turing, ritwik.c@turing.com. Atlassian account 6
 
 All live on GitHub Pages from this repo.
 
-- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html  (file Eval_Journey_V7.html). Setup is three steps mirroring Prism's Create Evaluation: name the fields with role dropdowns (coverage is computed from the mapping), a metric library with search and a builder for Prompt (variables with test values, run once, versions), Deterministic (Prism's evaluate() contract, data input from the dataset, language tabs), REST API and Agentic, then a named evaluation with description, typed agent, Number of runs, Parallel datapoints, and Metric calibration. Results carry the job list under the evaluation (including a failed 0 of 380 job), aggregation Average or Sum with a percent / 0 to 10 / 0 to 1 scale, per datapoint metric score columns that reconcile with the grid, and an opt in AI summary written from the job's numbers.
-- Explainer for the team, five diagrams, fifteen embedded prototype screenshots, every box in the flow chart clickable: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
+- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V8.html  (file Eval_Journey_V8.html). V8 keeps V7's three-step Prism-shaped setup, metric builders, jobs, aggregation, coverage, calibration, AI summary, and evidence flow. It closes the remaining product gap with job-to-job and evaluation-to-evaluation comparison using shared case IDs, places calibration in Prism's visible tab sequence, and states the per-datapoint execution and input-limit preflight model explicitly.
+- Explainer for the team, a six-box presenter flow first, the detailed screen map behind a disclosure, refreshed V8 screenshots, and every box clickable: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
 - Presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html
-- Earlier versions, frozen at their own links: Eval_Journey_V6.html, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
+- Earlier versions, frozen at their own links: Eval_Journey_V7.html, V6, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
 - Coverage ledger, the Prism demo item by item against the current prototype: PRISM_DEMO_COVERAGE.md. Refresh it per version before calling a version done.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
 
@@ -69,7 +69,7 @@ JIRA worklogs go on tickets assigned to him; Sprint 8 buckets are HUMAIN-2413 (p
 
 ## Before calling a version done
 
-Run `tools/selftest.sh Eval_Journey_V7.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
+Run `tools/selftest.sh Eval_Journey_V8.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check, the calibration tab sequence, per-datapoint execution copy, and cross-evaluation matching. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
 
 ## Verification habits that caught real bugs here
 

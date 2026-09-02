@@ -5,11 +5,11 @@ Written 2 Sep 2026, meeting records added the same day, for whoever picks this u
 ## Start here, in order
 
 1. Read this whole document once.
-2. Open the current prototype and click through all nine screens: [Eval_Journey_V7.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V7.html) , live at https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html
+2. Open the current prototype and click through all nine screens: [Eval_Journey_V8.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V8.html) , live at https://ritwik-turing.github.io/humain-one/Eval_Journey_V8.html
 3. Open the explainer, which is the product explained to the team with the real screens embedded: [Eval platform - how it works.html](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Eval%20platform%20-%20how%20it%20works.html) , live at https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
-4. Read the coverage ledger, which is the Prism demo checked item by item against V7: [PRISM_DEMO_COVERAGE.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/PRISM_DEMO_COVERAGE.md)
+4. Read the coverage ledger, which is the Prism demo checked item by item against V8: [PRISM_DEMO_COVERAGE.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/PRISM_DEMO_COVERAGE.md)
 5. Read the six working rules under "Working rules learned from Ritwik" below. He rejected three versions in a row before they existed. They are not optional.
-6. Before you change anything, run the self test so you know the baseline is green: `bash "/Users/ritwikmac/Documents/GitHub/humain-one/tools/selftest.sh" "/Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V7.html"`
+6. Before you change anything, run the self test so you know the baseline is green: `bash "/Users/ritwikmac/Documents/GitHub/humain-one/tools/selftest.sh" "/Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V8.html"`
 
 ## Meeting records
 
@@ -33,7 +33,7 @@ Read these before you form a view on Prism or on why the prototype looks the way
 - Ritesh Sinha, owns Prism, stakeholder on evaluation. Rejected V1 as dense and not exhaustive, said V2 was too question and answer shaped. Both fixed since.
 - Sandip Parekh, stakeholder.
 - Chandrasen Bireddy, called Chandra, engineering lead. Owns the technical how, including batching.
-- Uday Kumar Pabbathi, Prism POC. Has been sent V5; V7 supersedes it. Reviewing the mockup.
+- Uday Kumar Pabbathi, Prism POC. Has been sent V5; V8 supersedes it. Reviewing the mockup.
 - Yasir, Humain decision maker. Mockups route through him.
 - Nikhil, reviewer; Kartik Pardeshi and Siddharth Keshar, engineering; Madan Shah, DevOps; Andrew Mavliev, external on the H2O-O substrate integration.
 
@@ -50,7 +50,7 @@ The nine screens, in order:
 3. What the agent did: one case, every step with timing, what went in, what was expected, what came back, each rendered as its type.
 4. What went wrong: the developer's one sentence notes grouped, biggest group first.
 5. Turn notes into checks: a check is a Prompt metric with a yes or no answer, tried on real cases, with its agreement against twenty hand judged cases. Saving one puts it in the library.
-6. What broke since last time: this job against the previous, fixed, worse, and new safety flags counted as regressions even when every column stayed green.
+6. Compare runs and evaluations: compare two jobs inside one evaluation or two saved evaluations, match shared case IDs first, then show fixed, worse, unmatched, and new safety flags even when every other column stayed green.
 7. Evidence: every check with what happened to it, including the ones that did not run and why, with coverage counts.
 8. Submit for verification: available after one run, no pass mark, open issues sent as they are.
 9. Verification status lives in the parent journey.
@@ -79,10 +79,9 @@ The nine screens, in order:
 
 ## Open items
 
-- Batching: batch size, how per batch results aggregate, partial batch failure. Owner Chandra. Not answered by the Uday call.
-- Judge agreement against a human has not been run, so calibration reads 0 of 20 for the built in judges and every judge score carries the signal caveat.
-- The Metric calibration tab in Prism itself: ask Uday what it does.
-- Compare across evaluations, see above.
+- Judge agreement against a human has not been run, so calibration reads 0 of 20 for the built in judges and every judge score carries the signal caveat. This is missing evidence, not missing product capability.
+- Uday did not open Prism's Metric calibration tab in the recording. V8 shows the tab and the agreed human-verdict workflow without inventing hidden fields.
+- Internal transport batch size and retry policy remain Chandra's engineering implementation detail. V8 settles the product behavior: one independently scored datapoint at a time, optional parallel delivery, and input-limit preflight before the run.
 - Uday's review of the mockup, and a written Phase 1 agent type list from Humain, are still awaited.
 
 ## Working rules learned from Ritwik
@@ -126,18 +125,19 @@ Local root: [/Users/ritwikmac/Documents/GitHub/humain-one](file:///Users/ritwikm
 
 | File | What it is | Live |
 |---|---|---|
-| [Eval_Journey_V7.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V7.html) | CURRENT prototype. The Evaluate step, nine screens. Setup in three Prism shaped steps: name the fields, metric library and builder, evaluation with jobs and calibration. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html) |
+| [Eval_Journey_V8.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V8.html) | CURRENT prototype. Closes the V7 capability gaps with cross-evaluation comparison, Prism's calibration tab sequence, and explicit per-datapoint execution and input-limit preflight. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V8.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V8.html) |
+| [Eval_Journey_V7.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V7.html) | Previous: full three-step setup, jobs, calibration, aggregation controls, and job-to-job comparison. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html) |
 | [Eval_Journey_V6.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V6.html) | Previous: three step setup without jobs, calibration, aggregation controls. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V6.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V6.html) |
 | [Eval_Journey_V5.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V5.html) | Vocabulary reconciled with Prism, tokens instead of invented cost, datapoint grid. No real mapping or builder. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V5.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V5.html) |
 | [Eval_Journey_V4.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V4.html) | Modality moved onto the case; eight input types in one dataset; coverage as a count. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V4.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V4.html) |
 | [Eval_Journey_V3.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V3.html) | Two agent profiles with a switch. Superseded by V4's typed parts. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V3.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V3.html) |
 | [Eval_Journey_V2.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V2.html) | The version Ritesh reviewed on 28 Aug and called too question and answer shaped. Frozen. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V2.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V2.html) |
 | [Eval_Journey_V1.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V1.html) | Rejected 27 Aug as dense and not exhaustive. Frozen. | [https://ritwik-turing.github.io/humain-one/Eval_Journey_V1.html](https://ritwik-turing.github.io/humain-one/Eval_Journey_V1.html) |
-| [Eval_Platform_How_It_Works.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Platform_How_It_Works.html) | The explainer for the team: five diagrams, nine embedded prototype screenshots, every box in the flow chart opens its screen. Canonical copy is in the project folder. | [https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html](https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html) |
+| [Eval_Platform_How_It_Works.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Platform_How_It_Works.html) | The explainer for the team: a six-box presenter flow first, the detailed screen map behind a disclosure, nine embedded prototype screenshots, and clickable boxes. Canonical copy is in the project folder. | [https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html](https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html) |
 | [Eval_Cheat_Sheet.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Cheat_Sheet.html) | The presenter playbook: primer, walkthrough with click order and objections, room handling, 56 question lookup. | [https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html](https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html) |
 | [Eval_Session_Runbook.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Eval_Session_Runbook.html) | Redirect stub to the playbook. Keep, old links point here. | [https://ritwik-turing.github.io/humain-one/Eval_Session_Runbook.html](https://ritwik-turing.github.io/humain-one/Eval_Session_Runbook.html) |
 | [Agent_Lifecycle_V12.html](file:///Users/ritwikmac/Documents/GitHub/humain-one/Agent_Lifecycle_V12.html) | The parent developer journey, nine steps. Evaluate is step 6 and links here from the rail. | [https://ritwik-turing.github.io/humain-one/Agent_Lifecycle_V12.html](https://ritwik-turing.github.io/humain-one/Agent_Lifecycle_V12.html) |
-| [PRISM_DEMO_COVERAGE.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/PRISM_DEMO_COVERAGE.md) | The ledger: every item from Uday's Prism demo against V7, built, partial, or not built with reason. 51 rows. Refresh per version. | [https://github.com/ritwik-turing/humain-one/blob/main/PRISM_DEMO_COVERAGE.md](https://github.com/ritwik-turing/humain-one/blob/main/PRISM_DEMO_COVERAGE.md) |
+| [PRISM_DEMO_COVERAGE.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/PRISM_DEMO_COVERAGE.md) | The ledger: every item from Uday's Prism demo against V8, built, covered at the journey boundary, or excluded by decision. No partial or unresolved rows. | [https://github.com/ritwik-turing/humain-one/blob/main/PRISM_DEMO_COVERAGE.md](https://github.com/ritwik-turing/humain-one/blob/main/PRISM_DEMO_COVERAGE.md) |
 | [HANDOFF.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/HANDOFF.md) | Repo level handoff for a fresh Claude session with the repo cloned. Shorter than this document. | [https://github.com/ritwik-turing/humain-one/blob/main/HANDOFF.md](https://github.com/ritwik-turing/humain-one/blob/main/HANDOFF.md) |
 | [selftest.sh](file:///Users/ritwikmac/Documents/GitHub/humain-one/tools/selftest.sh) | Headless self test: drives a prototype from disk in Chrome, 19 checks that reconcile numbers across screens, exit 1 on failure. Run before calling a version done. | [https://github.com/ritwik-turing/humain-one/blob/main/tools/selftest.sh](https://github.com/ritwik-turing/humain-one/blob/main/tools/selftest.sh) |
 | [MOM_Eval_Discussion_2_28Aug.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/MOM_Eval_Discussion_2_28Aug.md) | Minutes of the 28 Aug review with Ritesh, Sandip, Tirthankar, Chandrasen, in Ritwik's voice, including the defence of the current state. | [https://github.com/ritwik-turing/humain-one/blob/main/MOM_Eval_Discussion_2_28Aug.md](https://github.com/ritwik-turing/humain-one/blob/main/MOM_Eval_Discussion_2_28Aug.md) |
@@ -216,4 +216,4 @@ Root: [/Users/ritwikmac/.claude/projects/-Users-ritwikmac-Documents-Claude-Proje
 
 Paste this verbatim as the opening message:
 
-> You are taking over the Humain ONE eval workstream from a previous assistant. Read the takeover document in full before doing anything: [Eval workstream - takeover handoff.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Eval%20workstream%20-%20takeover%20handoff.md) (also at https://github.com/ritwik-turing/humain-one/blob/main/TAKEOVER.md). Follow its working rules exactly, especially the completion gate, the delivery rule, and the writing rules. The current prototype is V7; never edit a version that has been sent, copy to the next number. When I give you a task, produce the deliverable with full local and live links, and the ledger of what you built against what was asked. Confirm you have read it by telling me, in one line each, what coverage means in this product and why there is no pass mark.
+> You are taking over the Humain ONE eval workstream from a previous assistant. Read the takeover document in full before doing anything: [Eval workstream - takeover handoff.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Eval%20workstream%20-%20takeover%20handoff.md) (also at https://github.com/ritwik-turing/humain-one/blob/main/TAKEOVER.md). Follow its working rules exactly, especially the completion gate, the delivery rule, and the writing rules. The current prototype is V8; never edit a version that has been sent, copy to the next number. When I give you a task, produce the deliverable with full local and live links, and the ledger of what you built against what was asked. Confirm you have read it by telling me, in one line each, what coverage means in this product and why there is no pass mark.

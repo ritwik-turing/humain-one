@@ -50,11 +50,19 @@ harness = r"""
   click('scoreCols');
   nav('s1');
   T('calibration lists every judge metric',function(){return document.querySelectorAll('#calibBox tbody tr').length===allMetrics().filter(function(m){return m.by==='judge'}).length});
+  if(document.querySelector('.prismtabs')){
+    T('V8 calibration is placed in the Prism tab sequence',function(){return /AgentDataMetriccalibrationImport/.test(document.querySelector('.prismtabs').innerText.replace(/\s/g,'')) && document.querySelector('.prismtab.on').textContent==='Metric calibration'});
+    T('V8 explains per-datapoint execution before run',function(){return /380 independent datapoints/.test(document.querySelector('.execnote').innerText)});
+  }
   var before=CHECKS.length; nav('s5'); document.getElementById('chkDraft').value='The output must name the reference number when one exists.';
   var sb=Array.from(document.querySelectorAll('#s5 button')).filter(function(b){return /^save check$/i.test(b.textContent.trim())})[0]; sb.click();
   T('saving one check adds exactly one',function(){return CHECKS.length===before+1});
   nav('s6');
   T('comparison reports 2 new safety flags',function(){return /2 new safety flags/.test(document.getElementById('cmpHint').innerText)});
+  if(document.getElementById('cmpScope')){
+    var cp=document.getElementById('cmpScope'); cp.value='evals'; cp.dispatchEvent(new Event('change',{bubbles:true}));
+    T('V8 compares two evaluations on shared case IDs',function(){return /342 shared cases matched by case ID/.test(document.getElementById('cmpMatch').innerText) && /Safety baseline v2/i.test(document.getElementById('cmpPrevH').innerText)});
+  }
   var t=''; ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(function(id){nav(id); t+=document.getElementById(id).innerText;});
   T('no undefined, NaN or [object on any screen',function(){return !/undefined|NaN|\[object/.test(t)});
   T('no runtime errors',function(){return errs.length===0 ? true : errs.join(' | ')});
