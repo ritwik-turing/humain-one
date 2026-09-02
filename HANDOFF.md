@@ -8,9 +8,9 @@ Owner: Ritwik Chakradhar, PM at Turing, ritwik.c@turing.com. Atlassian account 6
 
 All live on GitHub Pages from this repo.
 
-- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V9.html (file Eval_Journey_V9.html). V9 preserves V8 and closes the audit gaps: evaluation comparison selectors drive real state, unmatched cases and metric-set differences remain visible, the performance strip includes range, total and completion, and Edit plus setup-tab navigation work.
-- Explainer for the team, a six-box presenter flow first, the detailed screen map behind a disclosure, refreshed V9 comparison imagery, and every box clickable. The last box opens compare, evidence and submit together: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
-- Presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html
+- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V10.html (file Eval_Journey_V10.html). V10 preserves V9 and corrects the metric model from Uday's 1 Sep walkthrough: no universal metric shortlist, a new evaluation starts with 0 attached metrics, and every attached definition is Prompt, Deterministic, REST API or Agentic. Humain ONE operational and safety observations are a separate evidence layer and never enter the Prism metric aggregate.
+- Explainer for the team, a six-box presenter flow first, the detailed screen map behind a disclosure, refreshed V10 metric-library and results imagery, and every box clickable. The last box opens compare, evidence and submit together: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
+- Historical V9 presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html. Do not use its generic metric-palette talk track for V10; the current six-box explainer above replaces it.
 - Earlier versions, frozen at their own links: Eval_Journey_V8.html, V7, V6, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
 - Coverage ledger, the Prism demo item by item against the current prototype: PRISM_DEMO_COVERAGE.md. Refresh it per version before calling a version done.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
@@ -19,11 +19,12 @@ Version rule: never edit a version someone has been sent. Copy to the next numbe
 
 ## What the product is, in one paragraph
 
-The Evaluate step (6 of 9) of the developer journey. A case is input, output, an optional expected answer, a trace, metadata. Input and output are lists of typed parts: text, image, video, audio, document, table, structured, raw file. There is no agent type anywhere. Every metric declares the one part it cannot work without, so whether it runs is answered per case, and coverage is a count shown on screen (accuracy 349 of 380, helpfulness 161 of 380, and so on). Developer writes what went wrong in a sentence; notes are grouped and counted; a group becomes a saved check that runs on every later job. No pass mark. The evidence pack lists every check with what happened to it, including the ones that did not run.
+The Evaluate step (6 of 9) of the developer journey. A case is input, output, an optional expected answer, a trace, metadata. Input and output are lists of typed parts: text, image, video, audio, document, table, structured, raw file. There is no agent type anywhere. Prism does not choose a universal metric set: a developer creates a Prompt, Deterministic, REST API or Agentic definition for the use case, then attaches it to an evaluation. A new evaluation starts with 0. Every attached definition declares what it needs, so coverage is a count shown on screen. The developer writes what went wrong in a sentence; notes are grouped and counted; a group becomes a saved check that runs on every later job. No pass mark. The evidence pack lists every check with what happened to it, including the ones that did not run.
 
 ## What Prism actually does (Uday Kumar Pabbathi walkthrough, 1 Sep, recording reviewed)
 
 - A metric is one of four kinds: Prompt, Deterministic, REST API, Agentic. Agents are typed by the same four. Nothing is scored by modality; a metric can only read what the agent returned, so a trace must come back in the response to be scoreable.
+- Metrics are separate from the dataset and arbitrary by use case. Prism's "Global Metrics" screen is a library of definitions, not a universal default scorecard. The developer explicitly creates or reuses definitions and attaches them to an evaluation.
 - No schema file. Datasets keep whatever shape they arrive in; input, expected output and metadata keys are named by hand, once per agent and dataset pairing. Every row in a run shares a shape because every row goes to the same agent.
 - Media never enters the dataset. The row carries a link in metadata; the agent fetches it.
 - Per job Prism reports datapoints x of y, avg and P50/P95/P99 latency, min-to-max range, total, completion, and tokens in and out. Cost derives from tokens. Never show an invented per-case price.
@@ -69,7 +70,7 @@ JIRA worklogs go on tickets assigned to him; Sprint 8 buckets are HUMAIN-2413 (p
 
 ## Before calling a version done
 
-Run `tools/selftest.sh Eval_Journey_V9.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check, setup-tab actions, the performance fields, per-datapoint execution copy, cross-evaluation selection, and unmatched-case visibility. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
+Run `tools/selftest.sh Eval_Journey_V10.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: the zero-metric new-evaluation state, all four Prism definition types, mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check, setup-tab actions, the performance fields, per-datapoint execution copy, cross-evaluation selection, and unmatched-case visibility. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
 
 ## Verification habits that caught real bugs here
 

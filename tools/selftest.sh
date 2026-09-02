@@ -21,25 +21,36 @@ harness = r"""
   try{localStorage.clear();}catch(e){}
   var errs=[]; window.onerror=function(m){errs.push(m)};
   nav('s1');
+  var PRIMARY=(typeof metricTitle==='function')?metricTitle('acc'):'Accuracy';
+  if(document.getElementById('newEvalBlank')){
+    T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('catRows').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
+    T('setup states that Prism metrics are not universal',function(){return /does not mean that a metric applies to every agent/.test(document.getElementById('agentSetup').innerText)});
+    click('newEvalBlank');
+    T('a new evaluation starts with zero attached metrics',function(){return document.getElementById('catBadge').textContent==='0 of 4 attached' && /0 metrics are attached/.test(document.getElementById('metricContext').innerText)});
+    nav('s2');
+    T('zero metrics produces no fabricated metric score',function(){return /No evaluation metric was attached/.test(document.getElementById('scoreBox').innerText) && document.querySelectorAll('#scoreBox .bcell').length===0});
+    nav('s1'); click('newEvalBlank');
+    T('saved evaluation restores only its attached definitions',function(){return document.getElementById('catBadge').textContent==='4 of 4 attached'});
+  }
   T('mapping table renders 8 keys',function(){return document.querySelectorAll('#mapBox tr').length===8});
   setMap('expected','ignore');
-  T('unmapping expected makes Accuracy unavailable with the reason',function(){var r=rowEl('Accuracy'); return r.classList.contains('mna') && /No field is mapped to Expected output/.test(r.querySelector('.mwhy').innerText)});
-  T('badge drops to 3 of 4',function(){return document.getElementById('catBadge').textContent==='3 of 4 on'});
+  T('unmapping expected makes the expected-output metric unavailable with the reason',function(){var r=rowEl(PRIMARY); return r.classList.contains('mna') && /No field is mapped to Expected output/.test(r.querySelector('.mwhy').innerText)});
+  T('badge drops to 3 of 4',function(){return /3 of 4 (on|attached)/.test(document.getElementById('catBadge').textContent)});
   setMap('expected','expected');
-  T('restoring expected brings Accuracy back to 349 of 380',function(){return /349 of 380/.test(rowEl('Accuracy').querySelector('.mcov').innerText)});
+  T('restoring expected brings the metric back to 349 of 380',function(){return /349 of 380/.test(rowEl(PRIMARY).querySelector('.mcov').innerText)});
   click('newMetric');
   T('builder opens needing expected output at 349',function(){return /expected output/.test(document.querySelector('#mbuild .needline').innerText) && /349 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   var ta=document.getElementById('mbPrompt'); ta.value='Given the reply {output}, answer yes if it states a decision.'; ta.dispatchEvent(new Event('input',{bubbles:true}));
   T('dropping {expected_output} moves coverage to 347',function(){return /347 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   click('mbSave');
-  T('saved metric is in the library, marked yours, v1.0.0',function(){var y=Array.from(document.querySelectorAll('#catRows .mtog')).filter(function(n){return n.querySelector('.yours')}); return y.length===1 && y[0].querySelector('.verchip').textContent==='v1.0.0'});
+  T('saved metric is in the library, marked yours, v1.0.0',function(){var y=USER_METRICS.length===1&&rowEl(USER_METRICS[0].n); return !!y && !!y.querySelector('.yours') && y.querySelector('.verchip').textContent==='v1.0.0'});
   nav('s2');
   T('jobs list includes a failed job at 0 of total',function(){return Array.from(document.querySelectorAll('#jobsBox tbody tr')).some(function(r){return /failed/.test(r.innerText) && /0\//.test(r.innerText)})});
   T('newest job is LATEST',function(){return !!document.querySelector('#jobsBox tbody tr:first-child .latest')});
   var ag=document.getElementById('aggSel'); ag.value='Sum'; ag.dispatchEvent(new Event('change',{bubbles:true}));
-  T('Sum shows Accuracy as 272 of 349 on the board',function(){return document.querySelector('#scoreBox .bv').textContent==='272 of 349'});
+  T('Sum shows the expected-output metric as 272 of 349 on the board',function(){return document.querySelector('#scoreBox .bv').textContent==='272 of 349'});
   nav('s7');
-  T('evidence pack shows the same Sum',function(){return Array.from(document.querySelectorAll('#covBox .cov')).some(function(r){return /Accuracy/.test(r.innerText)&&/272 of 349/.test(r.innerText)})});
+  T('evidence pack shows the same Sum',function(){return Array.from(document.querySelectorAll('#covBox .cov')).some(function(r){return r.innerText.indexOf(PRIMARY)>-1&&/272 of 349/.test(r.innerText)})});
   nav('s2'); ag=document.getElementById('aggSel'); ag.value='Average'; ag.dispatchEvent(new Event('change',{bubbles:true}));
   document.querySelector('[data-scale="0-10"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));
   T('0 to 10 scale shows 7.8',function(){return document.querySelector('#scoreBox .bv').textContent==='7.8'});
