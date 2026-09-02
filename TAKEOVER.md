@@ -1,6 +1,6 @@
 # Humain ONE eval workstream: takeover handoff
 
-Written 2 Sep 2026 for whoever picks this up next, including a system with no access to the previous sessions. Everything load bearing is written out here. Every file is linked by its full local path, and live copies are linked where they exist. If you can read files, read the ones marked CANONICAL and CURRENT first. If you cannot, this document is enough to work from.
+Written 2 Sep 2026, meeting records added the same day, for whoever picks this up next, including a system with no access to the previous sessions. Everything load bearing is written out here. Every file is linked by its full local path, and live copies are linked where they exist. If you can read files, read the ones marked CANONICAL and CURRENT first. If you cannot, this document is enough to work from.
 
 ## Start here, in order
 
@@ -10,6 +10,14 @@ Written 2 Sep 2026 for whoever picks this up next, including a system with no ac
 4. Read the coverage ledger, which is the Prism demo checked item by item against V7: [PRISM_DEMO_COVERAGE.md](file:///Users/ritwikmac/Documents/GitHub/humain-one/PRISM_DEMO_COVERAGE.md)
 5. Read the six working rules under "Working rules learned from Ritwik" below. He rejected three versions in a row before they existed. They are not optional.
 6. Before you change anything, run the self test so you know the baseline is green: `bash "/Users/ritwikmac/Documents/GitHub/humain-one/tools/selftest.sh" "/Users/ritwikmac/Documents/GitHub/humain-one/Eval_Journey_V7.html"`
+
+## Meeting records
+
+Read these before you form a view on Prism or on why the prototype looks the way it does. They are the sources; everything else here was written from them.
+
+- [Transcript - Prism walkthrough with Uday, 1 Sep 2026.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Transcript%20-%20Prism%20walkthrough%20with%20Uday%2C%201%20Sep%202026.md) : the complete verbatim transcript of the 1 Sep Prism walkthrough, 273 speaker turns with timestamps, Gemini's summary and decisions, and a frame by frame account of what was on screen in the recording, with video times. The primary source for every Prism fact in this document.
+- [Meeting notes - Eval prototype discussion 2, 28 Aug 2026.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Meeting%20notes%20-%20Eval%20prototype%20discussion%202%2C%2028%20Aug%202026.md) : the 28 Aug review with Ritesh, Sandip, Tirthankar and Chandrasen. Gemini's summary in full, the next steps and what became of them, and a link to the Google Doc that holds the transcript tab. A verbatim transcript of this meeting was never shared into the working sessions and is not on this machine; do not present the summary as speech.
+- [PRISM walkthrough with Uday - 1 Sep 2026 - recording.mp4](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/PRISM%20walkthrough%20with%20Uday%20-%201%20Sep%202026%20-%20recording.mp4) : the 1 Sep recording itself, 21 min 47 s, local copy. Not in the public repo on purpose: it shows a colleague on camera walking through an internal platform. The transcript file states the offset between transcript timestamps and video time.
 
 ## Who and what
 
@@ -143,6 +151,9 @@ Root: [/Users/ritwikmac/Documents/Claude/Projects/Humain AI agent marketplace pr
 
 | File | What it is |
 |---|---|
+| [Transcript - Prism walkthrough with Uday, 1 Sep 2026.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Transcript%20-%20Prism%20walkthrough%20with%20Uday%2C%201%20Sep%202026.md) | Full verbatim transcript of the 1 Sep Prism walkthrough with timestamps, summary, decisions, and what was on screen. |
+| [Meeting notes - Eval prototype discussion 2, 28 Aug 2026.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Meeting%20notes%20-%20Eval%20prototype%20discussion%202%2C%2028%20Aug%202026.md) | The 28 Aug review: Gemini summary in full, next steps, link to the Google Doc with the transcript tab. |
+| [PRISM walkthrough with Uday - 1 Sep 2026 - recording.mp4](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/PRISM%20walkthrough%20with%20Uday%20-%201%20Sep%202026%20-%20recording.mp4) | Local copy of the 1 Sep recording, 90 MB. Not pushed. |
 | [Eval platform - how it works.html](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/Eval%20platform%20-%20how%20it%20works.html) | CANONICAL explainer file. Same content as the repo copy. Open from disk; it is standalone with images embedded. | |
 | [HANDOFF - Eval Product Workstream.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/HANDOFF%20-%20Eval%20Product%20Workstream.md) | The 24 Aug handoff that started the eval workstream: the Yasir pivot, Prism as Ritesh's REST first engine, the 26 Aug mockup deadline. Historical context. | |
 | [eval-scope-alignment-note.md](file:///Users/ritwikmac/Documents/Claude/Projects/Humain%20AI%20agent%20marketplace%20project%20by%20Turing/eval-scope-alignment-note.md) | Note to Ritesh and Sandip after the 24 Aug scope call. The agent abstraction is deliberately loose: a prompt, code, or a REST API can be an agent. | |
