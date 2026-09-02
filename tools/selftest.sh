@@ -16,34 +16,43 @@ harness = r"""
   var R=[]; function T(name,fn){try{var v=fn(); R.push({n:name,ok:!!v,d:String(v).slice(0,90)});}catch(e){R.push({n:name,ok:false,d:'THROW '+e.message});}}
   function click(id){var b=document.getElementById(id); b.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));}
   function nav(id){var b=document.querySelector('[data-go="'+id+'"]'); if(b)b.click();}
-  function rowEl(name){return Array.from(document.querySelectorAll('#catRows .mtog')).filter(function(n){return n.innerText.indexOf(name)===0})[0];}
+  function rowEl(name){return Array.from(document.querySelectorAll('#agentSetup .mtog')).filter(function(n){return n.innerText.indexOf(name)===0})[0];}
   function setMap(k,v){var sel=document.querySelector('[data-map="'+k+'"]'); sel.value=v; sel.dispatchEvent(new Event('change',{bubbles:true}));}
   try{localStorage.clear();}catch(e){}
   var errs=[]; window.onerror=function(m){errs.push(m)};
   nav('s1');
   var PRIMARY=(typeof metricTitle==='function')?metricTitle('acc'):'Accuracy';
   if(document.getElementById('newEvalBlank')){
-    T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('catRows').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
+    T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('agentSetup').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
     T('setup states that Prism metrics are not universal',function(){return /does not mean that a metric applies to every agent/.test(document.getElementById('agentSetup').innerText)});
     if(typeof METRIC_LIBRARY!=='undefined'){
-      T('personal metric library is explicit and user scoped',function(){var x=document.getElementById('agentSetup').innerText;return /Your metric library/.test(x)&&/Private to Ritwik/.test(x)&&/previously created or used/.test(x)});
+      T('personal metric library is explicit and user scoped',function(){var x=document.getElementById('agentSetup').innerText;return /Your (personal )?library|personal metric library/i.test(x)&&/Private to Ritwik/.test(x)&&/previously created or used/.test(x)});
       T('library copy rules out learning and silent LLM selection',function(){var x=document.getElementById('agentSetup').innerText;return /does not learn from earlier agent uploads/.test(x)&&/no LLM selects metrics for you/.test(x)});
-      T('library rows show prior usage history',function(){return document.querySelectorAll('#catRows .mhist').length===allMetrics().length&&/Last used/.test(document.querySelector('#catRows .mhist').innerText)});
+      T('library rows show prior usage history',function(){var root=typeof METRIC_SECTION_V13!=='undefined'?'#agentSetup':'#catRows';var expected=typeof METRIC_SECTION_V13!=='undefined'?allMetrics().length+EXTRA_METRICS.length:allMetrics().length;return document.querySelectorAll(root+' .mhist').length===expected&&/Last used/.test(document.querySelector(root+' .mhist').innerText)});
     }
     click('newEvalBlank');
-    T('a new evaluation starts with zero attached metrics',function(){return document.getElementById('catBadge').textContent==='0 of 4 attached' && /0 metrics are attached/.test(document.getElementById('metricContext').innerText)});
-    if(typeof METRIC_LIBRARY!=='undefined')T('new evaluation keeps the personal library available',function(){return /your library is available/.test(document.getElementById('metricContext').innerText)&&document.querySelectorAll('#catRows .mtog').length===allMetrics().length});
+    T('a new evaluation starts with zero attached metrics',function(){var badge=document.getElementById('catBadge').textContent;return (/^0 attached$/.test(badge)||badge==='0 of 4 attached') && /0 (metrics are )?attached/.test(document.getElementById('metricContext').innerText)});
+    if(typeof METRIC_LIBRARY!=='undefined')T('new evaluation keeps the personal library available',function(){var expected=typeof METRIC_SECTION_V13!=='undefined'?allMetrics().length+EXTRA_METRICS.length:allMetrics().length;return /library (remains|is) available/.test(document.getElementById('metricContext').innerText)&&document.querySelectorAll('#catRows .mtog').length===expected});
     nav('s2');
     T('zero metrics produces no fabricated metric score',function(){return /No evaluation metric was attached/.test(document.getElementById('scoreBox').innerText) && document.querySelectorAll('#scoreBox .bcell').length===0});
     nav('s1'); click('newEvalBlank');
-    T('saved evaluation restores only its attached definitions',function(){return document.getElementById('catBadge').textContent==='4 of 4 attached'});
+    T('saved evaluation restores only its attached definitions',function(){return /^4 of 4 attached/.test(document.getElementById('catBadge').textContent)});
+    if(typeof METRIC_SECTION_V13!=='undefined'){
+      T('attached and available metrics render in separate sections',function(){return document.querySelectorAll('#attachedRows .mtog').length===4&&document.querySelectorAll('#catRows .mtog').length===3});
+      T('library and attached counts are independently visible',function(){return document.getElementById('libBadge').textContent==='7 saved'&&/^4 of 4 attached/.test(document.getElementById('catBadge').textContent)});
+    }
   }
   T('mapping table renders 8 keys',function(){return document.querySelectorAll('#mapBox tr').length===8});
   setMap('expected','ignore');
   T('unmapping expected makes the expected-output metric unavailable with the reason',function(){var r=rowEl(PRIMARY); return r.classList.contains('mna') && /No field is mapped to Expected output/.test(r.querySelector('.mwhy').innerText)});
   T('badge drops to 3 of 4',function(){return /3 of 4 (on|attached)/.test(document.getElementById('catBadge').textContent)});
+  if(typeof METRIC_SECTION_V13!=='undefined'){
+    rowEl(PRIMARY).click();
+    T('an attached metric that becomes incompatible can still be removed',function(){return document.querySelectorAll('#attachedRows .mtog').length===3&&rowEl(PRIMARY).classList.contains('mna')});
+  }
   setMap('expected','expected');
   T('restoring expected brings the metric back to 349 of 380',function(){return /349 of 380/.test(rowEl(PRIMARY).querySelector('.mcov').innerText)});
+  if(typeof METRIC_SECTION_V13!=='undefined')rowEl(PRIMARY).click();
   click('newMetric');
   T('builder opens needing expected output at 349',function(){return /expected output/.test(document.querySelector('#mbuild .needline').innerText) && /349 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   var ta=document.getElementById('mbPrompt'); ta.value='Given the reply {output}, answer yes if it states a decision.'; ta.dispatchEvent(new Event('input',{bubbles:true}));
@@ -83,9 +92,18 @@ harness = r"""
   if(document.getElementById('cmpBasis')){
     T('Prism setup tabs are real navigation buttons',function(){return document.querySelectorAll('.prismtabs button[data-setup-target]').length===4});
   }
-  var before=CHECKS.length; nav('s5'); document.getElementById('chkDraft').value='The output must name the reference number when one exists.';
-  var sb=Array.from(document.querySelectorAll('#s5 button')).filter(function(b){return /^save check$/i.test(b.textContent.trim())})[0]; sb.click();
+  var before=CHECKS.length; nav('s5');
+  if(typeof METRIC_SECTION_V13!=='undefined'){
+    T('step five says it measures a fix rather than editing the agent',function(){var x=document.getElementById('s5').innerText;return /Make the fix measurable/.test(x)&&/does not change your agent/.test(x)&&/outside this screen/.test(x)});
+    T('regression metric starts from a named reviewed failure',function(){var x=document.getElementById('s5').innerText;return /Stops before the end of the input/i.test(x)&&/2 reviewed cases/i.test(x)});
+    T('judge contract names all inputs and limits the LLM role',function(){var x=document.getElementById('s5').innerText;return /Input \+ Output \+ Trace/.test(x)&&/as the judge only/.test(x)&&/does not edit the agent/.test(x)});
+    T('calibration sample is distinguished from current attention cases',function(){var x=document.getElementById('s5').innerText;return /20 previously human-reviewed calibration cases/.test(x)&&/separate from the 14 attention cases/.test(x)});
+    T('save scope is library plus this evaluation only',function(){var x=document.getElementById('s5').innerText;return /personal metric library/.test(x)&&/attaches it to this evaluation/.test(x)&&!/every future run/.test(x)});
+  }
+  document.getElementById('chkDraft').value='The output must name the reference number when one exists.';
+  var sb=Array.from(document.querySelectorAll('#s5 button')).filter(function(b){return /^save (check|v1\.0\.0 and attach)$/i.test(b.textContent.trim())})[0]; sb.click();
   T('saving one check adds exactly one',function(){return CHECKS.length===before+1});
+  if(typeof METRIC_SECTION_V13!=='undefined')T('saved regression metric is versioned, attached, and uses the stated contract',function(){var m=USER_METRICS[USER_METRICS.length-1];return m.on&&m.ver==='v1.0.0'&&m.need==='inOutTrace'&&/attached to this evaluation/.test(document.getElementById('chkLib').innerText)});
   nav('s6');
   T('comparison reports 2 new safety flags',function(){return /2 new safety flags/.test(document.getElementById('cmpHint').innerText)});
   if(document.getElementById('cmpScope')){

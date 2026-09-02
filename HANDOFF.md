@@ -8,12 +8,12 @@ Owner: Ritwik Chakradhar, PM at Turing, ritwik.c@turing.com. Atlassian account 6
 
 All live on GitHub Pages from this repo.
 
-- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V12.html (file Eval_Journey_V12.html). V12 preserves V11 and makes metric reuse explicit through the signed-in user's personal library. It houses definitions the user previously created or used, shows usage history, remains available when a new evaluation has zero attached, and never learns from agent uploads or silently selects metrics with an LLM.
+- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V13.html (file Eval_Journey_V13.html). V13 preserves V12 and makes the metric model legible as three separate states: saved in the user's personal library, compatible with the current dataset, and explicitly attached to this evaluation. Step 5 now starts from a reviewed failure, defines and calibrates a Prompt regression metric, then makes clear that the developer changes the agent outside the screen and reruns.
 - Explainer for the team, a six-box presenter flow first, the detailed screen map behind a disclosure, refreshed V10 metric-library and results imagery, and every box clickable. The last box opens compare, evidence and submit together: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
 - Historical V9 presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html. Do not use its generic metric-palette talk track for V10; the current six-box explainer above replaces it.
 - Earlier versions, frozen at their own links: Eval_Journey_V8.html, V7, V6, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
 - Coverage ledger, the Prism demo item by item against the current prototype: PRISM_DEMO_COVERAGE.md. Refresh it per version before calling a version done.
-- State-of-the-art benchmark and V12 release bar: EVAL_STATE_OF_THE_ART_AUDIT.md.
+- State-of-the-art benchmark and V13 release bar: EVAL_STATE_OF_THE_ART_AUDIT.md.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
 
 Version rule: never edit a version someone has been sent. Copy to the next number, leave the old file untouched.
@@ -71,7 +71,7 @@ JIRA worklogs go on tickets assigned to him; Sprint 8 buckets are HUMAIN-2413 (p
 
 ## Before calling a version done
 
-Run `tools/selftest.sh Eval_Journey_V12.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: the personal library and its usage history, the zero-metric new-evaluation state, all four Prism definition types, mapping against coverage, board against evidence pack, the immutable run receipt, metric execution provenance, table cell against grid cell, one save against one check, setup-tab actions, performance, cross-evaluation selection, version-drift exclusion, and unmatched-case visibility. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
+Run `tools/selftest.sh Eval_Journey_V13.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: personal-library versus attachment state, usage history, zero-metric new evaluations, all four Prism definition types, mapping against coverage, removable incompatible attachments, board against evidence pack, the immutable run receipt, metric execution provenance, the failure-to-regression-metric workflow, calibration scope, one save against one check, setup-tab actions, performance, cross-evaluation selection, version-drift exclusion, and unmatched-case visibility. V13's current baseline is 53/53; V12 remains 44/44. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
 
 ## Verification habits that caught real bugs here
 
