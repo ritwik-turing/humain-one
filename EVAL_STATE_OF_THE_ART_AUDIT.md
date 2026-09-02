@@ -67,6 +67,11 @@ experiments, and regression comparison. Humain ONE's clearest product additions
 are the visible coverage denominator, strict metric-version comparison rule, and
 verification receipt.
 
+The six-box presenter chart now carries this evidence directly. Each step names
+the current-framework pattern and the corresponding defense, so the chart alone
+is sufficient for the meeting narrative. The detailed source table remains as
+citation backup rather than required study material.
+
 ## Deliberate non-goals for this prototype
 
 - Statistical confidence intervals are not fabricated from the mock data. A production comparison service should calculate paired uncertainty when the sample and metric support it.

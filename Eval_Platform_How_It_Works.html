@@ -58,6 +58,7 @@ b{font-weight:720;color:var(--ink)}
 section{padding:44px 0}
 .fig{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:24px 0}
 .fig svg{display:block;width:100%;height:auto}
+.truthscroll{overflow-x:auto}
 .cap{font-size:.88rem;color:var(--dim);margin:14px 0 0;line-height:1.5;max-width:74ch}
 .cap b{color:var(--ink)}
 .shot{margin:18px 0 0;padding:0}
@@ -94,7 +95,7 @@ td:nth-child(2){font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.83
 .defcall{background:var(--ok-soft);border-radius:14px;padding:18px 20px;margin-top:18px}
 .defcall p{margin:0;max-width:72ch;font-size:.93rem}
 hr{border:0;border-top:1px solid var(--line);margin:0}
-@media(max-width:760px){.claims,.grid2{grid-template-columns:1fr}}
+@media(max-width:760px){.claims,.grid2{grid-template-columns:1fr}.truthscroll svg{min-width:900px}}
 text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .sl{font-size:9px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}
 </style>
@@ -117,67 +118,103 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 
 <section>
 <h2 id="six-box-flow">The whole product in six boxes</h2>
-<p>Read left to right, then down. The blue boxes are the Prism foundation. The green boxes are what Humain ONE adds so a developer can understand, improve, and submit the evaluation. <b>Every box is clickable.</b></p>
+<p>This is the source of truth for the presentation. Read left to right, then down. Every box contains the product action, the concrete behavior, the matching industry pattern, and the defense to say aloud. Blue is the Prism foundation; green is the Humain ONE judgement loop. <b>Every box is clickable.</b></p>
 
 <div class="fig">
-<svg viewBox="0 0 940 330" role="img" aria-label="The evaluation product in six steps">
+<div class="truthscroll">
+<svg viewBox="0 0 940 535" role="img" aria-label="The evaluation product in six steps, with industry evidence and a defense for each design choice">
 <defs>
  <marker id="simpleArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--dim)"/></marker>
 </defs>
 <text x="0" y="15" class="sl" fill="var(--acc)">PRISM FOUNDATION</text>
-<text x="0" y="178" class="sl" fill="var(--ok)">HUMAIN ONE JUDGEMENT LOOP</text>
+<text x="0" y="251" class="sl" fill="var(--ok)">HUMAIN ONE JUDGEMENT LOOP</text>
 
-<rect x="0" y="28" width="260" height="104" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
-<text x="18" y="54" font-size="11" font-weight="700" fill="var(--acc)">1</text>
-<text x="18" y="78" font-size="16" font-weight="750" fill="var(--ink)">Map the data</text>
-<text x="18" y="100" font-size="11.5" fill="var(--dim)">380 cases. Name input, expected output,</text>
-<text x="18" y="118" font-size="11.5" fill="var(--dim)">and metadata. No schema file.</text>
-<line x1="260" y1="80" x2="334" y2="80" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
+<rect x="0" y="28" width="286" height="190" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
+<text x="16" y="53" font-size="11" font-weight="700" fill="var(--acc)">1</text>
+<text x="16" y="77" font-size="16" font-weight="750" fill="var(--ink)">Map the data</text>
+<text x="16" y="100" font-size="11" fill="var(--dim)">380 cases: input, expected output, metadata.</text>
+<text x="16" y="118" font-size="11" fill="var(--dim)">Name each field once; no schema file.</text>
+<line x1="16" y1="132" x2="270" y2="132" stroke="var(--line)"/>
+<text x="16" y="151" font-size="9.5" font-weight="700" fill="var(--acc)">MARKET: LANGSMITH + PHOENIX</text>
+<text x="16" y="169" font-size="10.5" fill="var(--ink)">Pattern: explicit datasets and input mapping.</text>
+<text x="16" y="188" font-size="10.5" font-weight="700" fill="var(--ink)">Defend: mapping proves what each metric can read.</text>
+<text x="16" y="204" font-size="10.5" font-weight="700" fill="var(--ink)">Coverage cannot be silently assumed.</text>
+<line x1="286" y1="123" x2="324" y2="123" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
 
-<rect x="336" y="28" width="268" height="104" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
-<text x="354" y="54" font-size="11" font-weight="700" fill="var(--acc)">2</text>
-<text x="354" y="78" font-size="16" font-weight="750" fill="var(--ink)">Create and attach metrics</text>
-<text x="354" y="100" font-size="11.5" fill="var(--dim)">Your library keeps metrics used before.</text>
-<text x="354" y="118" font-size="11.5" fill="var(--dim)">Reuse is explicit. New evaluation: zero.</text>
-<line x1="604" y1="80" x2="678" y2="80" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
+<rect x="326" y="28" width="288" height="190" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
+<text x="342" y="53" font-size="11" font-weight="700" fill="var(--acc)">2</text>
+<text x="342" y="77" font-size="16" font-weight="750" fill="var(--ink)">Choose and attach metrics</text>
+<text x="342" y="100" font-size="11" fill="var(--dim)">Prompt, function, API, or evaluator agent.</text>
+<text x="342" y="118" font-size="11" fill="var(--dim)">Personal library; new evaluation starts at zero.</text>
+<line x1="342" y1="132" x2="598" y2="132" stroke="var(--line)"/>
+<text x="342" y="151" font-size="9.5" font-weight="700" fill="var(--acc)">MARKET: DEEPEVAL + BRAINTRUST + PHOENIX</text>
+<text x="342" y="169" font-size="9.5" font-weight="700" fill="var(--acc)">LANGSMITH + WEAVE + PROMPTFOO</text>
+<text x="342" y="188" font-size="10.5" font-weight="700" fill="var(--ink)">Defend: success criteria are use-case specific.</text>
+<text x="342" y="204" font-size="10.5" font-weight="700" fill="var(--ink)">A saved definition is not silently attached.</text>
+<line x1="614" y1="123" x2="652" y2="123" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
 
-<rect x="680" y="28" width="260" height="104" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
-<text x="698" y="54" font-size="11" font-weight="700" fill="var(--acc)">3</text>
-<text x="698" y="78" font-size="16" font-weight="750" fill="var(--ink)">Run the evaluation</text>
-<text x="698" y="100" font-size="11.5" fill="var(--dim)">Freeze exact versions, then send every</text>
-<text x="698" y="118" font-size="11.5" fill="var(--dim)">datapoint and score what each metric can.</text>
+<rect x="654" y="28" width="286" height="190" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
+<text x="670" y="53" font-size="11" font-weight="700" fill="var(--acc)">3</text>
+<text x="670" y="77" font-size="16" font-weight="750" fill="var(--ink)">Freeze and run</text>
+<text x="670" y="100" font-size="11" fill="var(--dim)">Pin agent, dataset, metric versions, and settings.</text>
+<text x="670" y="118" font-size="11" fill="var(--dim)">Then run every independent datapoint.</text>
+<line x1="670" y1="132" x2="924" y2="132" stroke="var(--line)"/>
+<text x="670" y="151" font-size="9.5" font-weight="700" fill="var(--acc)">MARKET: BRAINTRUST EXPERIMENTS</text>
+<text x="670" y="169" font-size="10.5" fill="var(--ink)">Pattern: immutable, comparable run records.</text>
+<text x="670" y="188" font-size="10.5" font-weight="700" fill="var(--ink)">Defend: every score has a reproducible receipt.</text>
+<text x="670" y="204" font-size="10.5" font-weight="700" fill="var(--ink)">Later edits cannot rewrite an old result.</text>
 
-<path d="M810 132 L810 154 L130 154 L130 190" fill="none" stroke="var(--acc)" marker-end="url(#simpleArrow)"/>
-<text x="360" y="149" font-size="10.5" fill="var(--dim)">Prism returns scores, coverage, latency, tokens, and job history</text>
+<path d="M797 218 L797 238 L143 238 L143 263" fill="none" stroke="var(--acc)" marker-end="url(#simpleArrow)"/>
+<text x="362" y="234" font-size="10" fill="var(--dim)">Prism returns the job; Humain ONE makes the evidence interpretable</text>
 
-<rect x="0" y="192" width="260" height="104" rx="12" fill="var(--gov-bg)" stroke="var(--ok)"/>
-<text x="18" y="218" font-size="11" font-weight="700" fill="var(--ok)">4</text>
-<text x="18" y="242" font-size="16" font-weight="750" fill="var(--ink)">Read what happened</text>
-<text x="18" y="264" font-size="11.5" fill="var(--dim)">Expected-output match is 78% on 349 of 380.</text>
-<text x="18" y="282" font-size="11.5" fill="var(--dim)">Skipped cases are named, never hidden.</text>
-<line x1="260" y1="244" x2="334" y2="244" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
+<rect x="0" y="265" width="286" height="190" rx="12" fill="var(--gov-bg)" stroke="var(--ok)"/>
+<text x="16" y="290" font-size="11" font-weight="700" fill="var(--ok)">4</text>
+<text x="16" y="314" font-size="16" font-weight="750" fill="var(--ink)">Inspect scores and coverage</text>
+<text x="16" y="337" font-size="11" fill="var(--dim)">Score, denominator, skipped cases, trace, provenance.</text>
+<text x="16" y="355" font-size="11" fill="var(--dim)">Example: 78% on 349 of 380, not just 78%.</text>
+<line x1="16" y1="369" x2="270" y2="369" stroke="var(--line)"/>
+<text x="16" y="388" font-size="9.5" font-weight="700" fill="var(--ok)">MARKET: PHOENIX + OPENAI TRACE GRADING</text>
+<text x="16" y="406" font-size="10.5" fill="var(--ink)">Pattern: inspect agent and evaluator traces.</text>
+<text x="16" y="425" font-size="10.5" font-weight="700" fill="var(--ink)">Defend: a judge is evidence, not an oracle.</text>
+<text x="16" y="441" font-size="10.5" font-weight="700" fill="var(--ink)">Skipped cases and judge provenance stay visible.</text>
+<line x1="286" y1="360" x2="324" y2="360" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
 
-<rect x="336" y="192" width="268" height="104" rx="12" fill="var(--gov-bg)" stroke="var(--ok)"/>
-<text x="354" y="218" font-size="11" font-weight="700" fill="var(--ok)">5</text>
-<text x="354" y="242" font-size="16" font-weight="750" fill="var(--ink)">Make the fix measurable</text>
-<text x="354" y="264" font-size="11.5" fill="var(--dim)">Turn a reviewed failure into a regression</text>
-<text x="354" y="282" font-size="11.5" fill="var(--dim)">metric. Then change the agent and run again.</text>
-<line x1="604" y1="244" x2="678" y2="244" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
+<rect x="326" y="265" width="288" height="190" rx="12" fill="var(--gov-bg)" stroke="var(--ok)"/>
+<text x="342" y="290" font-size="11" font-weight="700" fill="var(--ok)">5</text>
+<text x="342" y="314" font-size="16" font-weight="750" fill="var(--ink)">Turn a failure into a test</text>
+<text x="342" y="337" font-size="11" fill="var(--dim)">Human review -> calibrated regression metric.</text>
+<text x="342" y="355" font-size="11" fill="var(--dim)">Then change the agent outside and rerun.</text>
+<line x1="342" y1="369" x2="598" y2="369" stroke="var(--line)"/>
+<text x="342" y="388" font-size="9.5" font-weight="700" fill="var(--ok)">MARKET: LANGSMITH + BRAINTRUST</text>
+<text x="342" y="406" font-size="10.5" fill="var(--ink)">Pattern: human findings feed regression datasets.</text>
+<text x="342" y="425" font-size="10.5" font-weight="700" fill="var(--ink)">Defend: real failures become reusable coverage.</text>
+<text x="342" y="441" font-size="10.5" font-weight="700" fill="var(--ink)">The evaluation measures; it does not edit the agent.</text>
+<line x1="614" y1="360" x2="652" y2="360" stroke="var(--dim)" marker-end="url(#simpleArrow)"/>
 
-<rect x="680" y="192" width="260" height="104" rx="12" fill="var(--gov-bg)" stroke="var(--ok)"/>
-<text x="698" y="218" font-size="11" font-weight="700" fill="var(--ok)">6</text>
-<text x="698" y="242" font-size="16" font-weight="750" fill="var(--ink)">Prove and submit</text>
-<text x="698" y="264" font-size="11.5" fill="var(--dim)">Compare runs or evaluations, attach the</text>
-<text x="698" y="282" font-size="11.5" fill="var(--dim)">evidence, and submit with no pass mark.</text>
+<rect x="654" y="265" width="286" height="190" rx="12" fill="var(--gov-bg)" stroke="var(--ok)"/>
+<text x="670" y="290" font-size="11" font-weight="700" fill="var(--ok)">6</text>
+<text x="670" y="314" font-size="16" font-weight="750" fill="var(--ink)">Compare, prove, and submit</text>
+<text x="670" y="337" font-size="11" fill="var(--dim)">Match cases and metric versions; show differences.</text>
+<text x="670" y="355" font-size="11" fill="var(--dim)">Send the receipt, evidence, omissions, and issues.</text>
+<line x1="670" y1="369" x2="924" y2="369" stroke="var(--line)"/>
+<text x="670" y="388" font-size="9.5" font-weight="700" fill="var(--ok)">MARKET: BRAINTRUST COMPARISON</text>
+<text x="670" y="406" font-size="10.5" fill="var(--ink)">Pattern: aligned cases reveal gains and regressions.</text>
+<text x="670" y="425" font-size="10.5" font-weight="700" fill="var(--ink)">Defend: evaluator drift cannot look like progress.</text>
+<text x="670" y="441" font-size="10.5" font-weight="700" fill="var(--ink)">No pass mark; the evidence remains honest.</text>
 
-<rect class="hot" data-shot="mapping" x="0" y="28" width="260" height="104" rx="12" tabindex="0" role="button" aria-label="Open Map the data"><title>Map the data. Click to see the screen.</title></rect>
-<rect class="hot" data-shot="library" x="336" y="28" width="268" height="104" rx="12" tabindex="0" role="button" aria-label="Open Create and attach metrics"><title>Create and attach metrics. Click to see the screen.</title></rect>
-<rect class="hot" data-shot="perf" x="680" y="28" width="260" height="104" rx="12" tabindex="0" role="button" aria-label="Open Run the evaluation"><title>Run the evaluation. Click to see the screen.</title></rect>
-<rect class="hot" data-shot="scores" x="0" y="192" width="260" height="104" rx="12" tabindex="0" role="button" aria-label="Open Read what happened"><title>Read what happened. Click to see the screen.</title></rect>
-<rect class="hot" data-shot="checks" x="336" y="192" width="268" height="104" rx="12" tabindex="0" role="button" aria-label="Open Make the fix measurable"><title>Make the fix measurable. Click to see the screen.</title></rect>
-<rect class="hot" data-shot="proof" x="680" y="192" width="260" height="104" rx="12" tabindex="0" role="button" aria-label="Open Prove and submit"><title>Prove and submit. Click to see all three screens.</title></rect>
+<rect class="hot" data-shot="mapping" x="0" y="28" width="286" height="190" rx="12" tabindex="0" role="button" aria-label="Open Map the data"><title>Map the data. Click to see the screen.</title></rect>
+<rect class="hot" data-shot="library" x="326" y="28" width="288" height="190" rx="12" tabindex="0" role="button" aria-label="Open Choose and attach metrics"><title>Choose and attach metrics. Click to see the screen.</title></rect>
+<rect class="hot" data-shot="perf" x="654" y="28" width="286" height="190" rx="12" tabindex="0" role="button" aria-label="Open Freeze and run"><title>Freeze and run. Click to see the screen.</title></rect>
+<rect class="hot" data-shot="scores" x="0" y="265" width="286" height="190" rx="12" tabindex="0" role="button" aria-label="Open Inspect scores and coverage"><title>Inspect scores and coverage. Click to see the screen.</title></rect>
+<rect class="hot" data-shot="checks" x="326" y="265" width="288" height="190" rx="12" tabindex="0" role="button" aria-label="Open Turn a failure into a test"><title>Turn a failure into a test. Click to see the screen.</title></rect>
+<rect class="hot" data-shot="proof" x="654" y="265" width="286" height="190" rx="12" tabindex="0" role="button" aria-label="Open Compare, prove, and submit"><title>Compare, prove, and submit. Click to see all three screens.</title></rect>
+
+<text x="0" y="486" class="sl" fill="var(--dim)">THE FULL DEFENSE</text>
+<text x="0" y="505" font-size="11.5" font-weight="700" fill="var(--ink)">Use-case metrics + explicit attachment + frozen runs + inspectable evidence + human regression loop + like-for-like proof.</text>
+<text x="0" y="528" font-size="10.5" fill="var(--dim)">Safe claim: market convergence, not feature parity. Blue is Prism-confirmed; green safeguards are Humain ONE additions.</text>
 </svg>
-<p class="cap"><b>The one sentence to say:</b> Prism runs every case and reports what it could score; Humain ONE makes missing coverage visible, turns a reviewed failure into a versioned regression metric, and packages the result for verification.</p>
+</div>
+<p class="cap"><b>The one sentence to say:</b> We use the same primitives that current evaluation frameworks converge on, while making coverage, evaluator versions, and the verification receipt explicit so a partial or changed evaluation cannot masquerade as proof.</p>
 
 <details class="disc flowdetail"><summary>Open the detailed screen-by-screen map</summary><div class="discb">
 <svg viewBox="0 0 940 700" role="img" aria-label="End to end flow of the evaluation product in five bands">
