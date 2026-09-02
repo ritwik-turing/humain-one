@@ -12,6 +12,7 @@ All live on GitHub Pages from this repo.
 - Explainer for the team, five diagrams, fifteen embedded prototype screenshots, every box in the flow chart clickable: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
 - Presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html
 - Earlier versions, frozen at their own links: Eval_Journey_V6.html, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
+- Coverage ledger, the Prism demo item by item against the current prototype: PRISM_DEMO_COVERAGE.md. Refresh it per version before calling a version done.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
 
 Version rule: never edit a version someone has been sent. Copy to the next number, leave the old file untouched.
@@ -65,6 +66,10 @@ JIRA worklogs go on tickets assigned to him; Sprint 8 buckets are HUMAIN-2413 (p
 - Drive his Chrome (Jibble, anything needing his logged in browser).
 - Read his local folders: ~/Documents/Claude/Projects (the canonical copy of the explainer also lives there), ~/SecondBrain (decision records), this machine's Claude memory directory. Everything decision-relevant from those is summarised above.
 - Take screenshots of the prototype without a browser. Locally this was done with headless Chrome against a copy of the prototype with a small query param harness (screen, case, only=selector, wide=1). The technique is described in Eval_V3_Plan.md.
+
+## Before calling a version done
+
+Run `tools/selftest.sh Eval_Journey_V7.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
 
 ## Verification habits that caught real bugs here
 
