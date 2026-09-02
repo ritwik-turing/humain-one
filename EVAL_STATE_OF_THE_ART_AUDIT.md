@@ -2,19 +2,20 @@
 
 Date: 2 Sep 2026
 
-Current prototype: `Eval_Journey_V11.html`
+Current prototype: `Eval_Journey_V12.html`
 
 ## Verdict
 
-V11 is ready for the product conversation. It covers the full Prism flow shown by Uday and closes the most important gap found in a benchmark against current evaluation products: reproducibility. A job now has an immutable receipt that pins the agent, dataset snapshot, metric definition IDs and versions, evaluator execution, and run settings. Results, comparison, evidence, and verification all carry that receipt.
+V12 is ready for the product conversation. It covers the full Prism flow shown by Uday, keeps V11's reproducibility safeguards, and makes metric reuse explicit through a personal library for the signed-in user. The library contains definitions the user previously created or used. Nothing is learned from earlier agent uploads, selected by a hidden LLM, or attached automatically.
 
 This benchmark does not turn unconfirmed competitor behavior into a Prism claim. Prism-confirmed behavior remains in `PRISM_DEMO_COVERAGE.md`. The additions below are explicitly Humain ONE product safeguards around the Prism execution layer.
 
 ## Release bar
 
-| Product requirement | V11 behavior | Why it matters |
+| Product requirement | V12 behavior | Why it matters |
 |---|---|---|
 | No universal metric scorecard | A new evaluation starts with zero attached. The developer creates or reuses a Prompt, Deterministic, REST API, or Agentic definition for the agent. | A metric that is meaningful for one agent may be meaningless for another. |
+| Personal metric library | The signed-in user's library holds previously created or used definitions, with version and usage history. The library remains visible when a new evaluation has zero attached. | Reuse saves work without implying universal applicability or automatic selection. |
 | Coverage is explicit | Every definition declares what it needs; the UI shows how many mapped datapoints it can and cannot read. | A headline score without its denominator is misleading. |
 | Evaluators are inspectable | A score drilldown shows definition ID and version, mechanism, owner, frozen execution detail, and run snapshot. | A reviewer can identify the thing that produced the score. |
 | Runs are reproducible | The run snapshot pins agent, dataset, definitions, runtime, and settings before execution. | A later edit cannot silently rewrite what an old score means. |

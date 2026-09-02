@@ -25,8 +25,14 @@ harness = r"""
   if(document.getElementById('newEvalBlank')){
     T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('catRows').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
     T('setup states that Prism metrics are not universal',function(){return /does not mean that a metric applies to every agent/.test(document.getElementById('agentSetup').innerText)});
+    if(typeof METRIC_LIBRARY!=='undefined'){
+      T('personal metric library is explicit and user scoped',function(){var x=document.getElementById('agentSetup').innerText;return /Your metric library/.test(x)&&/Private to Ritwik/.test(x)&&/previously created or used/.test(x)});
+      T('library copy rules out learning and silent LLM selection',function(){var x=document.getElementById('agentSetup').innerText;return /does not learn from earlier agent uploads/.test(x)&&/no LLM selects metrics for you/.test(x)});
+      T('library rows show prior usage history',function(){return document.querySelectorAll('#catRows .mhist').length===allMetrics().length&&/Last used/.test(document.querySelector('#catRows .mhist').innerText)});
+    }
     click('newEvalBlank');
     T('a new evaluation starts with zero attached metrics',function(){return document.getElementById('catBadge').textContent==='0 of 4 attached' && /0 metrics are attached/.test(document.getElementById('metricContext').innerText)});
+    if(typeof METRIC_LIBRARY!=='undefined')T('new evaluation keeps the personal library available',function(){return /your library is available/.test(document.getElementById('metricContext').innerText)&&document.querySelectorAll('#catRows .mtog').length===allMetrics().length});
     nav('s2');
     T('zero metrics produces no fabricated metric score',function(){return /No evaluation metric was attached/.test(document.getElementById('scoreBox').innerText) && document.querySelectorAll('#scoreBox .bcell').length===0});
     nav('s1'); click('newEvalBlank');
