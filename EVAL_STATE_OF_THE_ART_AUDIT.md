@@ -67,10 +67,13 @@ experiments, and regression comparison. Humain ONE's clearest product additions
 are the visible coverage denominator, strict metric-version comparison rule, and
 verification receipt.
 
-The six-box presenter chart now carries this evidence directly. Each step names
-the current-framework pattern and the corresponding defense, so the chart alone
-is sufficient for the meeting narrative. The detailed source table remains as
-citation backup rather than required study material.
+The presenter flowchart now carries the full narrative directly. It defines the
+four core objects, then shows the six product decisions with a current-framework
+pattern and spoken defense in every box. Its end-to-end checklist includes the
+important inputs, state transitions, controls, and outputs for every step; the
+bottom strips state the trust contract and separate production delivery surfaces
+from actual product-flow gaps. The flowchart alone is sufficient study material.
+The detailed source table remains citation backup rather than required study.
 
 ## Deliberate non-goals for this prototype
 
@@ -85,7 +88,7 @@ Use this sentence:
 
 > The developer decides what good means for this agent, implements that definition as a prompt, function, endpoint, or evaluator agent, and attaches it. When the job starts we freeze the exact agent, data, metrics, and settings, so every result can be explained, compared fairly, and submitted with an honest evidence trail.
 
-Then show the six-box explainer in `Eval_Platform_How_It_Works.html`:
+Then study and show the complete flowchart in `Eval_Platform_How_It_Works.html`:
 
 1. Map the data.
 2. Create and attach agent-specific metrics.

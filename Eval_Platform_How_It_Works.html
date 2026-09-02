@@ -117,15 +117,47 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 </div>
 
 <section>
-<h2 id="six-box-flow">The whole product in six boxes</h2>
-<p>This is the source of truth for the presentation. Read left to right, then down. Every box contains the product action, the concrete behavior, the matching industry pattern, and the defense to say aloud. Blue is the Prism foundation; green is the Humain ONE judgement loop. <b>Every box is clickable.</b></p>
+<h2 id="six-box-flow">The complete evaluation product, end to end</h2>
+<p>This flowchart is the source material for the presentation. Read the four objects first, the six clickable decisions second, and the end-to-end checklist and trust contract last. It contains the product behavior, state changes, industry pattern, defense, and honest prototype boundary in one place.</p>
 
 <div class="fig">
 <div class="truthscroll">
-<svg viewBox="0 0 940 535" role="img" aria-label="The evaluation product in six steps, with industry evidence and a defense for each design choice">
+<svg viewBox="0 0 940 1350" role="img" aria-label="The complete evaluation product: four core objects, six steps, operational details, industry evidence, trust rules, and prototype boundaries">
 <defs>
  <marker id="simpleArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--dim)"/></marker>
 </defs>
+<text x="0" y="15" class="sl" fill="var(--dim)">READ THIS FIRST: THE FOUR OBJECTS</text>
+<rect x="0" y="28" width="220" height="104" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="14" y="50" font-size="12" font-weight="700" fill="var(--ink)">ANY AGENT</text>
+<text x="14" y="69" font-size="9.5" fill="var(--dim)">No agent type. Text, image, video,</text>
+<text x="14" y="84" font-size="9.5" fill="var(--dim)">audio, docs, tables, structured,</text>
+<text x="14" y="99" font-size="9.5" fill="var(--dim)">or raw payloads.</text>
+<text x="14" y="114" font-size="9.5" font-weight="700" fill="var(--ink)">Evaluation observes;</text>
+<text x="14" y="127" font-size="9.5" font-weight="700" fill="var(--ink)">editing happens elsewhere.</text>
+
+<rect x="240" y="28" width="220" height="104" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="254" y="50" font-size="12" font-weight="700" fill="var(--ink)">CASE</text>
+<text x="254" y="69" font-size="9.5" fill="var(--dim)">Input + actual output + optional</text>
+<text x="254" y="84" font-size="9.5" fill="var(--dim)">expected output + trace + metadata.</text>
+<text x="254" y="104" font-size="9.5" font-weight="700" fill="var(--ink)">Stable unit for scoring</text>
+<text x="254" y="119" font-size="9.5" font-weight="700" fill="var(--ink)">and like-for-like comparison.</text>
+
+<rect x="480" y="28" width="220" height="104" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="494" y="50" font-size="12" font-weight="700" fill="var(--ink)">METRIC DEFINITION</text>
+<text x="494" y="69" font-size="9.5" fill="var(--dim)">Prompt judge, strict function,</text>
+<text x="494" y="84" font-size="9.5" fill="var(--dim)">API endpoint, or evaluator agent;</text>
+<text x="494" y="99" font-size="9.5" fill="var(--dim)">versioned and reusable.</text>
+<text x="494" y="114" font-size="9.5" font-weight="700" fill="var(--ink)">Saved is not attached.</text>
+<text x="494" y="127" font-size="9.5" font-weight="700" fill="var(--ink)">No universal scores.</text>
+
+<rect x="720" y="28" width="220" height="104" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="734" y="50" font-size="12" font-weight="700" fill="var(--ink)">EVALUATION VS JOB</text>
+<text x="734" y="69" font-size="9.5" fill="var(--dim)">Evaluation: durable workspace</text>
+<text x="734" y="84" font-size="9.5" fill="var(--dim)">and metric set. Job: one frozen</text>
+<text x="734" y="99" font-size="9.5" fill="var(--dim)">execution and its evidence.</text>
+<text x="734" y="119" font-size="9.5" font-weight="700" fill="var(--ink)">Many jobs prove change over time.</text>
+
+<g transform="translate(0 148)">
 <text x="0" y="15" class="sl" fill="var(--acc)">PRISM FOUNDATION</text>
 <text x="0" y="251" class="sl" fill="var(--ok)">HUMAIN ONE JUDGEMENT LOOP</text>
 
@@ -212,6 +244,67 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <text x="0" y="486" class="sl" fill="var(--dim)">THE FULL DEFENSE</text>
 <text x="0" y="505" font-size="11.5" font-weight="700" fill="var(--ink)">Use-case metrics + explicit attachment + frozen runs + inspectable evidence + human regression loop + like-for-like proof.</text>
 <text x="0" y="528" font-size="10.5" fill="var(--dim)">Safe claim: market convergence, not feature parity. Blue is Prism-confirmed; green safeguards are Humain ONE additions.</text>
+</g>
+
+<text x="0" y="700" class="sl" fill="var(--dim)">END-TO-END CHECKLIST: WHAT EACH CLICKABLE BOX CONTAINS</text>
+
+<rect x="0" y="716" width="456" height="122" rx="10" fill="var(--acc-soft)" stroke="var(--acc)"/>
+<text x="14" y="739" font-size="12" font-weight="700" fill="var(--acc)">1  MAP AGENT AND DATA</text>
+<text x="14" y="759" font-size="10.5" fill="var(--ink)">Select agent; import CSV, warehouse, bucket, or traffic sample.</text>
+<text x="14" y="777" font-size="10.5" fill="var(--ink)">Map each field to input, expected, metadata, ignore, or media link.</text>
+<text x="14" y="795" font-size="10.5" fill="var(--ink)">Preview typed payloads; confirm shared shape; run preflight validation.</text>
+<text x="14" y="816" font-size="10" font-weight="700" fill="var(--ink)">Output: validated cases + which metric inputs can be supplied.</text>
+
+<rect x="484" y="716" width="456" height="122" rx="10" fill="var(--acc-soft)" stroke="var(--acc)"/>
+<text x="498" y="739" font-size="12" font-weight="700" fill="var(--acc)">2  DEFINE GOOD, THEN ATTACH</text>
+<text x="498" y="759" font-size="10.5" fill="var(--ink)">Create or reuse a prompt, function, API, or evaluator-agent metric.</text>
+<text x="498" y="777" font-size="10.5" fill="var(--ink)">Definition stores purpose, inputs, scale, config, owner, and version.</text>
+<text x="498" y="795" font-size="10.5" fill="var(--ink)">Library shows saved, compatible, and attached as separate states.</text>
+<text x="498" y="816" font-size="10" font-weight="700" fill="var(--ink)">No learning across agents and no hidden LLM; user attaches explicitly.</text>
+
+<rect x="0" y="852" width="456" height="122" rx="10" fill="var(--acc-soft)" stroke="var(--acc)"/>
+<text x="14" y="875" font-size="12" font-weight="700" fill="var(--acc)">3  FREEZE CONFIGURATION AND RUN</text>
+<text x="14" y="895" font-size="10.5" fill="var(--ink)">Name job; set 1-5 runs, parallelism, and operational settings.</text>
+<text x="14" y="913" font-size="10.5" fill="var(--ink)">Freeze agent, dataset, mappings, metrics, versions, and settings.</text>
+<text x="14" y="931" font-size="10.5" fill="var(--ink)">Execute independent cases; retain outputs, traces, errors, and skips.</text>
+<text x="14" y="952" font-size="10" font-weight="700" fill="var(--ink)">Output: immutable job receipt + history + tokens and P50/P95/P99.</text>
+
+<rect x="484" y="852" width="456" height="122" rx="10" fill="var(--gov-bg)" stroke="var(--ok)"/>
+<text x="498" y="875" font-size="12" font-weight="700" fill="var(--ok)">4  READ, INSPECT, EXPLAIN FAILURES</text>
+<text x="498" y="895" font-size="10.5" fill="var(--ink)">Read averages/sums with scale, denominator, coverage, and skips.</text>
+<text x="498" y="913" font-size="10.5" fill="var(--ink)">Keep safety separate; optional AI summary links back to evidence.</text>
+<text x="498" y="931" font-size="10.5" fill="var(--ink)">Filter full case table; inspect typed I/O, trace, metric rationale.</text>
+<text x="498" y="952" font-size="10" font-weight="700" fill="var(--ink)">Human notes group failure themes without replacing source cases.</text>
+
+<rect x="0" y="988" width="456" height="122" rx="10" fill="var(--gov-bg)" stroke="var(--ok)"/>
+<text x="14" y="1011" font-size="12" font-weight="700" fill="var(--ok)">5  MAKE THE SELECTED FIX MEASURABLE</text>
+<text x="14" y="1031" font-size="10.5" fill="var(--ink)">Select a reviewed failure group; use input, output, and trace.</text>
+<text x="14" y="1049" font-size="10.5" fill="var(--ink)">Draft a candidate metric; calibrate on 20 human-labeled cases.</text>
+<text x="14" y="1067" font-size="10.5" fill="var(--ink)">Revise until agreement is credible; save a new immutable version.</text>
+<text x="14" y="1088" font-size="10" font-weight="700" fill="var(--ink)">Attach/detach/delete deliberately; edit agent elsewhere; rerun here.</text>
+
+<rect x="484" y="988" width="456" height="122" rx="10" fill="var(--gov-bg)" stroke="var(--ok)"/>
+<text x="498" y="1011" font-size="12" font-weight="700" fill="var(--ok)">6  COMPARE LIKE-FOR-LIKE, PROVE, SUBMIT</text>
+<text x="498" y="1031" font-size="10.5" fill="var(--ink)">Compare jobs or evaluations only on matched cases and versions.</text>
+<text x="498" y="1049" font-size="10.5" fill="var(--ink)">Block invalid deltas; show unmatched cases and changed evaluators.</text>
+<text x="498" y="1067" font-size="10.5" fill="var(--ink)">Inspect gains, regressions, safety flags, cost, and performance.</text>
+<text x="498" y="1088" font-size="10" font-weight="700" fill="var(--ink)">Output: evidence pack with receipt, omissions, issues; no forced pass.</text>
+
+<text x="0" y="1140" class="sl" fill="var(--dim)">TRUST CONTRACT: SIX THINGS THE PRODUCT NEVER HIDES</text>
+<rect x="0" y="1155" width="940" height="78" rx="10" fill="var(--mid-soft)" stroke="var(--mid)"/>
+<text x="15" y="1178" font-size="10" font-weight="700" fill="var(--ink)">1  NO UNIVERSAL SCORES</text>
+<text x="320" y="1178" font-size="10" font-weight="700" fill="var(--ink)">2  NO SILENT ATTACHMENT</text>
+<text x="625" y="1178" font-size="10" font-weight="700" fill="var(--ink)">3  NO HIDDEN SKIPS</text>
+<text x="15" y="1198" font-size="10" font-weight="700" fill="var(--ink)">4  NO LLM ORACLE</text>
+<text x="320" y="1198" font-size="10" font-weight="700" fill="var(--ink)">5  NO INVALID DELTA</text>
+<text x="625" y="1198" font-size="10" font-weight="700" fill="var(--ink)">6  NO FORCED PASS BAR</text>
+<text x="15" y="1220" font-size="10" fill="var(--dim)">Every score keeps its definition, version, evidence, coverage, skipped cases, provenance, and comparison eligibility.</text>
+
+<text x="0" y="1260" class="sl" fill="var(--dim)">BOUNDARIES, NOT PRODUCT-FLOW GAPS</text>
+<rect x="0" y="1274" width="940" height="62" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
+<text x="14" y="1292" font-size="9.5" fill="var(--ink)">Agent editing lives in Submit Agent. Organization governance and dataset storage live in admin.</text>
+<text x="14" y="1308" font-size="9.5" fill="var(--ink)">Batching, retries, CI, online monitoring, permissions, and reviewer assignment are production delivery surfaces.</text>
+<text x="14" y="1324" font-size="9.5" fill="var(--ink)">Prototype truth: calibration is 0/20 until humans label cases; IDs/hashes are illustrative; this is not a production backend.</text>
 </svg>
 </div>
 <p class="cap"><b>The one sentence to say:</b> We use the same primitives that current evaluation frameworks converge on, while making coverage, evaluator versions, and the verification receipt explicit so a partial or changed evaluation cannot masquerade as proof.</p>
