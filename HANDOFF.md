@@ -8,10 +8,10 @@ Owner: Ritwik Chakradhar, PM at Turing, ritwik.c@turing.com. Atlassian account 6
 
 All live on GitHub Pages from this repo.
 
-- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V5.html  (V5.1, file Eval_Journey_V5.html)
+- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V6.html  (file Eval_Journey_V6.html). Setup is three steps mirroring Prism's Create Evaluation: name the fields with role dropdowns (coverage is computed from the mapping), a metric library with a builder for Prompt, Deterministic, REST API and Agentic, then agent + dataset + metrics with Number of runs and Parallel datapoints.
 - Explainer for the team, five diagrams, fifteen embedded prototype screenshots, every box in the flow chart clickable: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
 - Presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html
-- Earlier versions, frozen at their own links: Eval_Journey_V4.html, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
+- Earlier versions, frozen at their own links: Eval_Journey_V5.html, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
 
 Version rule: never edit a version someone has been sent. Copy to the next number, leave the old file untouched.
@@ -35,7 +35,7 @@ The Evaluate step (6 of 9) of the developer journey. A case is input, output, an
 
 - Batching: batch size, how per batch results aggregate, partial batch failure. Owner Chandrasen Bireddy (Chandra). Not answered by the Uday call.
 - Judge agreement against a human not run; every judge score carries that caveat.
-- Two known prototype inconsistencies in V5, not fixed: (1) the checks screen "Does this check agree with you" table lists three question and answer cases from the old dataset; (2) the run comparison calls all three safety flags new since run 4 because SAFE_PREV was not updated for the mixed dataset, while the trend strip says safety was 1 last run. Both are one-line data fixes; re-capture the checks and compare screenshots in the explainer after fixing.
+- V5 had two inconsistencies (agreement table showed old question and answer cases; comparison counted three new safety flags against a trend strip saying one). Both fixed in V6.
 
 ## People
 
