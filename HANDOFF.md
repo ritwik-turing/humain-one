@@ -8,10 +8,10 @@ Owner: Ritwik Chakradhar, PM at Turing, ritwik.c@turing.com. Atlassian account 6
 
 All live on GitHub Pages from this repo.
 
-- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V6.html  (file Eval_Journey_V6.html). Setup is three steps mirroring Prism's Create Evaluation: name the fields with role dropdowns (coverage is computed from the mapping), a metric library with a builder for Prompt, Deterministic, REST API and Agentic, then agent + dataset + metrics with Number of runs and Parallel datapoints.
+- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V7.html  (file Eval_Journey_V7.html). Setup is three steps mirroring Prism's Create Evaluation: name the fields with role dropdowns (coverage is computed from the mapping), a metric library with search and a builder for Prompt (variables with test values, run once, versions), Deterministic (Prism's evaluate() contract, data input from the dataset, language tabs), REST API and Agentic, then a named evaluation with description, typed agent, Number of runs, Parallel datapoints, and Metric calibration. Results carry the job list under the evaluation (including a failed 0 of 380 job), aggregation Average or Sum with a percent / 0 to 10 / 0 to 1 scale, per datapoint metric score columns that reconcile with the grid, and an opt in AI summary written from the job's numbers.
 - Explainer for the team, five diagrams, fifteen embedded prototype screenshots, every box in the flow chart clickable: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
 - Presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html
-- Earlier versions, frozen at their own links: Eval_Journey_V5.html, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
+- Earlier versions, frozen at their own links: Eval_Journey_V6.html, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
 
 Version rule: never edit a version someone has been sent. Copy to the next number, leave the old file untouched.
