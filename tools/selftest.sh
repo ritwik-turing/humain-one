@@ -1,6 +1,6 @@
 #!/bin/bash
 # Drives a prototype headlessly and reconciles numbers across screens.
-# Usage: tools/selftest.sh Eval_Journey_V7.html
+# Usage: tools/selftest.sh Eval_Journey_V9.html
 # No preview pane, no server: file:// plus Chrome --dump-dom. Exit 1 on any FAIL.
 set -u
 F="${1:?usage: tools/selftest.sh <prototype.html>}"
@@ -51,8 +51,11 @@ harness = r"""
   nav('s1');
   T('calibration lists every judge metric',function(){return document.querySelectorAll('#calibBox tbody tr').length===allMetrics().filter(function(m){return m.by==='judge'}).length});
   if(document.querySelector('.prismtabs')){
-    T('V8 calibration is placed in the Prism tab sequence',function(){return /AgentDataMetriccalibrationImport/.test(document.querySelector('.prismtabs').innerText.replace(/\s/g,'')) && document.querySelector('.prismtab.on').textContent==='Metric calibration'});
-    T('V8 explains per-datapoint execution before run',function(){return /380 independent datapoints/.test(document.querySelector('.execnote').innerText)});
+    T('calibration is placed in the Prism tab sequence',function(){return /AgentDataMetriccalibrationImport/.test(document.querySelector('.prismtabs').innerText.replace(/\s/g,'')) && document.querySelector('.prismtab.on').textContent==='Metric calibration'});
+    T('setup explains independent per-datapoint execution',function(){return /380 independent datapoints/.test(document.querySelector('.execnote').innerText)});
+  }
+  if(document.getElementById('cmpBasis')){
+    T('Prism setup tabs are real navigation buttons',function(){return document.querySelectorAll('.prismtabs button[data-setup-target]').length===4});
   }
   var before=CHECKS.length; nav('s5'); document.getElementById('chkDraft').value='The output must name the reference number when one exists.';
   var sb=Array.from(document.querySelectorAll('#s5 button')).filter(function(b){return /^save check$/i.test(b.textContent.trim())})[0]; sb.click();
@@ -61,7 +64,22 @@ harness = r"""
   T('comparison reports 2 new safety flags',function(){return /2 new safety flags/.test(document.getElementById('cmpHint').innerText)});
   if(document.getElementById('cmpScope')){
     var cp=document.getElementById('cmpScope'); cp.value='evals'; cp.dispatchEvent(new Event('change',{bubbles:true}));
-    T('V8 compares two evaluations on shared case IDs',function(){return /342 shared cases matched by case ID/.test(document.getElementById('cmpMatch').innerText) && /Safety baseline v2/i.test(document.getElementById('cmpPrevH').innerText)});
+    T('comparison matches evaluations on shared case IDs',function(){return /342 shared cases matched by case ID/.test(document.getElementById('cmpMatch').innerText) && /Safety baseline v2/i.test(document.getElementById('cmpPrevH').innerText)});
+    if(document.getElementById('cmpBasis')){
+      T('unmatched cases and metric differences stay visible',function(){return /38 cases/.test(document.getElementById('cmpUnmatched').innerText) && /Metric-set difference/.test(document.getElementById('cmpUnmatched').innerText)});
+      var from=document.getElementById('cmpFrom'); from.value='quality'; from.dispatchEvent(new Event('change',{bubbles:true}));
+      T('changing the source evaluation changes the comparison',function(){return /305 shared cases matched by case ID/.test(document.getElementById('cmpMatch').innerText) && /Service quality v1/i.test(document.getElementById('cmpPrevH').innerText)});
+      T('current evaluation is fixed as the destination',function(){return document.getElementById('cmpTo').disabled && document.getElementById('cmpTo').options.length===1});
+    }
+  }
+  nav('s2');
+  if(document.getElementById('cmpBasis')){
+    T('evaluation actions include Edit, Duplicate and Run again',function(){var x=document.querySelector('#jobsBox .hd').innerText;return /Edit/.test(x)&&/Duplicate/.test(x)&&/Run again/.test(x)});
+    T('performance includes range, total and completion',function(){var x=document.getElementById('perfStrip').innerText;return /range/.test(x)&&/total/.test(x)&&/complete/.test(x)});
+    document.querySelector('#jobsBox [data-setup-target="agentSetup"]').click();
+    T('Edit returns to the saved evaluation pairing',function(){return document.querySelector('.screen.on').id==='s1' && !!document.getElementById('agentSetup')});
+    nav('s2'); document.querySelector('.prismtabs [data-setup-target="importSources"]').click();
+    T('Import tab returns to the existing import sources',function(){return document.querySelector('.screen.on').id==='s1' && !!document.getElementById('importSources')});
   }
   var t=''; ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(function(id){nav(id); t+=document.getElementById(id).innerText;});
   T('no undefined, NaN or [object on any screen',function(){return !/undefined|NaN|\[object/.test(t)});

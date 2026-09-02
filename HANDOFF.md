@@ -4,14 +4,14 @@ Read this first if you are a fresh session, cloud or local. It carries everythin
 
 Owner: Ritwik Chakradhar, PM at Turing, ritwik.c@turing.com. Atlassian account 6123eb593fe26c0069357e16, site turingservices.atlassian.net, cloudId d2de1b28-d027-49bb-ba65-320a8970cf8c. JIRA project HUMAIN.
 
-## Where things are, 1 Sep 2026
+## Where things are, 2 Sep 2026
 
 All live on GitHub Pages from this repo.
 
-- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V8.html  (file Eval_Journey_V8.html). V8 keeps V7's three-step Prism-shaped setup, metric builders, jobs, aggregation, coverage, calibration, AI summary, and evidence flow. It closes the remaining product gap with job-to-job and evaluation-to-evaluation comparison using shared case IDs, places calibration in Prism's visible tab sequence, and states the per-datapoint execution and input-limit preflight model explicitly.
-- Explainer for the team, a six-box presenter flow first, the detailed screen map behind a disclosure, refreshed V8 screenshots, and every box clickable: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
+- Prototype, current: https://ritwik-turing.github.io/humain-one/Eval_Journey_V9.html (file Eval_Journey_V9.html). V9 preserves V8 and closes the audit gaps: evaluation comparison selectors drive real state, unmatched cases and metric-set differences remain visible, the performance strip includes range, total and completion, and Edit plus setup-tab navigation work.
+- Explainer for the team, a six-box presenter flow first, the detailed screen map behind a disclosure, refreshed V9 comparison imagery, and every box clickable. The last box opens compare, evidence and submit together: https://ritwik-turing.github.io/humain-one/Eval_Platform_How_It_Works.html
 - Presenter playbook: https://ritwik-turing.github.io/humain-one/Eval_Cheat_Sheet.html
-- Earlier versions, frozen at their own links: Eval_Journey_V7.html, V6, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
+- Earlier versions, frozen at their own links: Eval_Journey_V8.html, V7, V6, V5, V4, V3, V2 (V2 is what Ritesh reviewed on 28 Aug), V1.
 - Coverage ledger, the Prism demo item by item against the current prototype: PRISM_DEMO_COVERAGE.md. Refresh it per version before calling a version done.
 - Notes: MOM_Eval_Discussion_2_28Aug.md, Eval_Generic_Research.md, Eval_V3_Plan.md (has the build log per version at the bottom).
 
@@ -26,13 +26,13 @@ The Evaluate step (6 of 9) of the developer journey. A case is input, output, an
 - A metric is one of four kinds: Prompt, Deterministic, REST API, Agentic. Agents are typed by the same four. Nothing is scored by modality; a metric can only read what the agent returned, so a trace must come back in the response to be scoreable.
 - No schema file. Datasets keep whatever shape they arrive in; input, expected output and metadata keys are named by hand, once per agent and dataset pairing. Every row in a run shares a shape because every row goes to the same agent.
 - Media never enters the dataset. The row carries a link in metadata; the agent fetches it.
-- Per job Prism reports datapoints x of y, avg and P50/P95/P99 latency, tokens in and out. Cost derives from tokens. Never show an invented per-case price.
+- Per job Prism reports datapoints x of y, avg and P50/P95/P99 latency, min-to-max range, total, completion, and tokens in and out. Cost derives from tokens. Never show an invented per-case price.
 - Evaluation = saved pairing of agent, dataset, metrics, versioned in lineages. Job = one execution. Number of runs is a native field capped at 5; Parallel Datapoints is a native toggle.
 - Aggregation per metric across datapoints (average or sum) with a scale toggle. Opt-in AI Evaluation Summary per job with a model picker.
 - No pass mark; AI-suggested metrics or thresholds deferred past V1 by joint decision (Ritwik + Uday).
 - A Metric calibration tab exists in Create Evaluation. Not explored. Worth asking Uday.
 
-## Open items
+## External follow-ups, not prototype omissions
 
 - Batching: batch size, how per batch results aggregate, partial batch failure. Owner Chandrasen Bireddy (Chandra). Not answered by the Uday call.
 - Judge agreement against a human not run; every judge score carries that caveat.
@@ -69,7 +69,7 @@ JIRA worklogs go on tickets assigned to him; Sprint 8 buckets are HUMAIN-2413 (p
 
 ## Before calling a version done
 
-Run `tools/selftest.sh Eval_Journey_V8.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check, the calibration tab sequence, per-datapoint execution copy, and cross-evaluation matching. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
+Run `tools/selftest.sh Eval_Journey_V9.html` (or the current version). It drives the prototype headlessly, no preview pane, no server, and reconciles numbers across screens: mapping against coverage, board against evidence pack, table cell against grid cell, one save against one check, setup-tab actions, the performance fields, per-datapoint execution copy, cross-evaluation selection, and unmatched-case visibility. Then refresh PRISM_DEMO_COVERAGE.md against the source. Ship only when both are clean.
 
 ## Verification habits that caught real bugs here
 
