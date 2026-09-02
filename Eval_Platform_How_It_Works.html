@@ -84,6 +84,15 @@ td:nth-child(2){font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.83
 .risk h3{margin-bottom:4px}
 .risk p{margin:0;font-size:.93rem;color:var(--ink);opacity:.85}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.market{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-top:20px;overflow:hidden}
+.market summary{cursor:pointer;padding:17px 20px;font-weight:750;color:var(--ink)}
+.market summary:hover,.market summary:focus-visible{color:var(--acc);outline:none}
+.marketbody{border-top:1px solid var(--line);padding:4px 20px 18px;overflow-x:auto}
+.market td:nth-child(2){font-family:inherit;font-size:.88rem;color:var(--ink);white-space:normal}
+.market td:first-child{white-space:normal;min-width:150px}
+.market a{color:var(--acc);text-underline-offset:2px}
+.defcall{background:var(--ok-soft);border-radius:14px;padding:18px 20px;margin-top:18px}
+.defcall p{margin:0;max-width:72ch;font-size:.93rem}
 hr{border:0;border-top:1px solid var(--line);margin:0}
 @media(max-width:760px){.claims,.grid2{grid-template-columns:1fr}}
 text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -348,6 +357,33 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 
 <hr>
 
+<section id="industry-cross-check">
+<p class="eyebrow">Optional presenter defense &middot; official docs checked 2 Sep 2026</p>
+<h2>Why this design holds up against current eval frameworks</h2>
+<p>This is evidence of convergent product patterns, not a claim that the products are identical or that every Humain ONE safeguard is already in Prism. Open this only when someone asks whether the design matches the market.</p>
+
+<details class="market">
+<summary>Open the industry cross-check: six design defenses</summary>
+<div class="marketbody">
+<table>
+<thead><tr><th>Our design choice</th><th>Current framework evidence</th><th>What you can defend</th></tr></thead>
+<tbody>
+<tr><td>Start with use-case-specific success criteria</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> says to first identify what matters for the application and its components. <a href="https://deepeval.com/docs/metrics-introduction" target="_blank" rel="noopener">DeepEval</a> recommends a mix that includes custom, use-case-specific metrics rather than relying entirely on generic metrics.</td><td>Zero metrics on a new evaluation is intentional. The developer defines what good means for this agent.</td></tr>
+<tr><td>Support more than one scoring mechanism</td><td><a href="https://www.braintrust.dev/docs/evaluate/write-scorers" target="_blank" rel="noopener">Braintrust</a> supports prebuilt, LLM-as-judge, and custom-code scorers. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Arize Phoenix</a> supports deterministic and LLM evaluators. <a href="https://docs.wandb.ai/weave/guides/evaluation/scorers" target="_blank" rel="noopener">W&amp;B Weave</a> supports function- and class-based custom scorers. <a href="https://www.promptfoo.dev/docs/configuration/expected-outputs/" target="_blank" rel="noopener">Promptfoo</a> supports deterministic, model-graded, code, and webhook assertions.</td><td>Prism's Prompt, Deterministic, REST API, and Agentic definitions fit a proven multi-mechanism model; they are not four universal scores.</td></tr>
+<tr><td>Separate reusable definitions from attachment</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> treats evaluators as reusable resources that are attached to projects or datasets. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> lets users configure evaluators and attach them to datasets.</td><td>A personal library can preserve reuse while each evaluation still starts with zero attached. Availability never means silent selection.</td></tr>
+<tr><td>Freeze runs before comparing them</td><td><a href="https://www.braintrust.dev/docs/evaluate" target="_blank" rel="noopener">Braintrust</a> describes experiments as immutable, comparable records and <a href="https://www.braintrust.dev/docs/evaluate/compare-experiments" target="_blank" rel="noopener">aligns test cases across experiments</a> for deltas.</td><td>Our run receipt and same-case, same-metric-version comparison rules prevent dataset or evaluator drift from masquerading as agent improvement.</td></tr>
+<tr><td>Inspect traces and the evaluator itself</td><td><a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> traces evaluator inputs, prompts, outputs, scores, and timing. <a href="https://developers.openai.com/api/docs/guides/trace-grading" target="_blank" rel="noopener">OpenAI trace grading</a> uses structured labels over an agent's end-to-end trace to diagnose where behavior succeeded or failed.</td><td>An LLM judge is evidence, not an oracle. Reviewers can inspect both the agent trace and the mechanism that produced the score.</td></tr>
+<tr><td>Turn human findings into regression coverage</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> connects human annotation, production findings, offline datasets, regression testing, and continuous improvement. <a href="https://www.braintrust.dev/docs/evaluate" target="_blank" rel="noopener">Braintrust</a> similarly feeds interesting production traces back into test datasets.</td><td>Step 5 closes the loop: review a real failure, calibrate a regression metric, change the agent, and rerun against a comparable baseline.</td></tr>
+</tbody>
+</table>
+</div>
+</details>
+
+<div class="defcall"><p><b>The sentence to use in the room:</b> We are using the same durable primitives the leading eval systems converge on: explicit datasets, application-specific evaluators, human review, traces, immutable experiments, and regression comparison. Humain ONE adds an unusually explicit coverage denominator and verification receipt so nobody mistakes a partial or changed evaluation for proof.</p></div>
+</section>
+
+<hr>
+
 <section>
 <h2>A case is five things, and none of them is a question</h2>
 <p>The first version of this product assumed a question came in and an answer went out. Ritesh was right that this made us narrower than the platform underneath us. The fix was to stop describing agents and start describing cases.</p>
@@ -575,7 +611,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 
 <section style="padding-bottom:80px">
 <h2>The one sentence to close on</h2>
-<div class="rec"><p>Every other tool tells you a score. This one tells you the score <b>and how much of the run it is standing on</b>, then turns a reviewed failure into a regression metric you can deliberately attach and rerun after changing the agent. That is the whole product, and it works for an image agent and a text agent without changing a single screen.</p></div>
+<div class="rec"><p>A score alone is not enough. This product tells you the score <b>and how much of the run it is standing on</b>, then turns a reviewed failure into a regression metric you can deliberately attach and rerun after changing the agent. That is the whole product, and it works for an image agent and a text agent without changing a single screen.</p></div>
 </section>
 
 </div>

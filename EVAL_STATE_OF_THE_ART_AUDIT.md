@@ -35,11 +35,37 @@ This benchmark does not turn unconfirmed competitor behavior into a Prism claim.
 | Interaction and markup | Pass | Incompatible attached metrics remain removable; generated metric controls no longer contain nested buttons. |
 | Regression suite | Pass | V14 passes 63/63 headless interaction and content checks. Frozen V13 remains 53/53 and V12 remains 44/44. |
 
-## Benchmark evidence
+## External framework defenses
 
-- Braintrust supports prebuilt, LLM-as-judge, and custom-code scorers; experiments are immutable snapshots designed for comparison and CI. Sources: https://www.braintrust.dev/docs/evaluate/write-scorers and https://www.braintrust.dev/docs/evaluate/run-evaluations
-- Arize Phoenix models evaluators as functions over input, output, and expected output, and exposes evaluator traces for debugging and refinement. Sources: https://arize.com/docs/phoenix/datasets-and-experiments/how-to-experiments/using-evaluators and https://arize.com/docs/phoenix/evaluation/server-evals/overview
-- LangSmith separates reusable evaluators, offline and online evaluation, and human annotation workflows. Sources: https://docs.langchain.com/langsmith/evaluation-concepts and https://docs.langchain.com/langsmith/evaluators
+Official product documentation was rechecked on 2 Sep 2026. These are
+corroborating market patterns, not claims of exact feature parity and not claims
+that Humain ONE additions already exist in Prism.
+
+| Design defense | Current primary-source evidence | Why V14 holds up |
+|---|---|---|
+| Success criteria are application-specific | LangSmith says teams should first identify what matters for their application and critical components. DeepEval recommends a mix that includes custom, use-case-specific metrics rather than relying entirely on generic predefined metrics. | Starting a new evaluation with zero attached metrics is a defensible default. The developer decides what good means for this agent. |
+| Evaluators need multiple mechanisms | Braintrust supports prebuilt, LLM-as-judge, and custom-code scorers. Phoenix supports deterministic and LLM evaluators. Promptfoo supports deterministic, model-graded, code, and webhook assertions. | Prism's Prompt, Deterministic, REST API, and Agentic definitions match a well-established multi-mechanism pattern without implying universal applicability. |
+| Reuse and attachment are different states | LangSmith describes evaluators as reusable resources that are attached to projects or datasets. Phoenix lets users configure evaluators and attach them to datasets. | A personal library can preserve prior work while each evaluation still starts with zero attached. No hidden system has to infer intent. |
+| Comparable runs need stable records | Braintrust describes experiments as immutable, comparable records and aligns test cases when presenting deltas. | The Humain ONE run receipt plus same-case and same-metric-version gating prevents dataset or evaluator drift from being misread as agent improvement. |
+| Agent and evaluator traces need inspection | Phoenix traces evaluator inputs, prompts, model behavior, scores, and timing. OpenAI trace grading applies structured scores or labels to an agent's end-to-end trace to diagnose behavior. | A judge score remains inspectable evidence rather than an unquestioned truth. The result can be traced to both agent behavior and evaluator execution. |
+| Human findings should become regression coverage | LangSmith connects human annotation, production findings, offline datasets, and regression testing. Braintrust feeds interesting production traces back into datasets. | Step 5 closes the accepted improvement loop: reviewed failure -> calibrated metric -> external agent change -> comparable rerun. |
+| Custom scorer objects should carry evidence | W&B Weave supports function- and class-based custom scorers that can return multiple metrics and non-numeric explanations. | Versioned metric definitions and evidence-level explanations are consistent with modern evaluator-as-code patterns. |
+
+Primary sources:
+
+- Braintrust: https://www.braintrust.dev/docs/evaluate, https://www.braintrust.dev/docs/evaluate/write-scorers, and https://www.braintrust.dev/docs/evaluate/compare-experiments
+- Arize Phoenix: https://arize.com/docs/phoenix/evaluation/llm-evals
+- LangSmith: https://docs.langchain.com/langsmith/evaluation-concepts
+- W&B Weave: https://docs.wandb.ai/weave/guides/evaluation/scorers
+- DeepEval: https://deepeval.com/docs/metrics-introduction
+- Promptfoo: https://www.promptfoo.dev/docs/configuration/expected-outputs/
+- OpenAI trace grading: https://developers.openai.com/api/docs/guides/trace-grading
+
+The strongest defensible claim is convergence, not uniqueness: leading systems
+use explicit data, configurable evaluators, traces, human review, stable
+experiments, and regression comparison. Humain ONE's clearest product additions
+are the visible coverage denominator, strict metric-version comparison rule, and
+verification receipt.
 
 ## Deliberate non-goals for this prototype
 
