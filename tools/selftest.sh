@@ -124,6 +124,27 @@ harness = r"""
   if(document.getElementById('cmpBasis')){
     T('Prism setup tabs are real navigation buttons',function(){return document.querySelectorAll('.prismtabs button[data-setup-target]').length===4});
   }
+  if(typeof RELEASE_REVIEW_V16!=='undefined'){
+    T('Prism note generation exposes reviewed, pending, and unavailable states',function(){var n=noteCounts();return n.generated===9&&n.accepted===5&&n.edited===1&&n.pending===3&&n.unavailable===1});
+    nav('s2');
+    T('note-unavailable case is first and marked high priority',function(){var r=document.querySelector('#caserows tr');return r&&r.dataset.case==='5'&&/note unavailable/.test(r.innerText)&&/high priority/.test(r.innerText)});
+    T('results distinguish Prism drafts from accepted and edited notes',function(){var x=document.getElementById('caserows').innerText;return /Prism draft/.test(x)&&/accepted/.test(x)&&/edited/.test(x)});
+    goCase(8);
+    T('generated default note can be accepted without retyping',function(){return document.getElementById('caseNote').value===CASES[8].autoNote&&/Accept Prism note/.test(document.getElementById('saveNote').textContent)});
+    click('saveNote');
+    T('accepting a Prism draft stores it as reviewed',function(){return CASES[8].noteState==='accepted'&&CASES[8].note===CASES[8].autoNote&&!!CASES[8].tag});
+    CASES[8].note='';CASES[8].noteDraft=CASES[8].autoNote;CASES[8].noteState='draft';CASES[8].tag=null;
+    goCase(5);
+    T('missing generated note becomes a high-priority human task',function(){var x=document.getElementById('s3').innerText;return /High priority/.test(x)&&/could not generate a reliable note/.test(x)&&/Save human note/.test(x)});
+    document.getElementById('caseNote').value='Human review found an incomplete response after the timeout.';click('saveNote');
+    T('saving an unavailable note resolves it with human provenance',function(){return CASES[5].noteState==='edited'&&!!CASES[5].note&&!!CASES[5].tag});
+    CASES[5].note='';CASES[5].noteDraft='';CASES[5].noteState='unavailable';CASES[5].tag=null;
+    nav('s4');
+    T('failure page explains draft review before grouping',function(){var x=document.getElementById('s4').innerText;return /Prism drafts/.test(x)&&/A draft is not ground truth/.test(x)&&/Only accepted or edited notes/.test(x)});
+    T('failure page keeps the unavailable note above grouped patterns',function(){var p=document.getElementById('notePriority'),g=document.getElementById('groupBox');return /High priority/.test(p.innerText)&&p.compareDocumentPosition(g)&Node.DOCUMENT_POSITION_FOLLOWING});
+    nav('s7');
+    T('evidence separates generated drafts from human-reviewed notes',function(){var x=document.getElementById('evBox').innerText;return /Prism draft notes/.test(x)&&/Accepted or edited notes/.test(x)&&/Note unavailable/.test(x)});
+  }
   var before=CHECKS.length;
   if(typeof RELEASE_REVIEW_V14!=='undefined'){
     nav('s4');

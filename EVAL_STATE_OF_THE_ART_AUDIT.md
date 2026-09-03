@@ -2,17 +2,17 @@
 
 Date: 2 Sep 2026
 
-Current prototype: `Eval_Journey_V15.html`
+Current prototype: `Eval_Journey_V16.html`
 
 ## Verdict
 
-V15 is ready for the product conversation. It covers the full Prism flow shown by Uday and retains V14's causal improvement loop. It adds the missing input lifecycle: choose Snowflake, validate read-only access, browse only after success, preview the unknown object, import it, review the suggested mapping, recalculate compatibility, and confirm before run. The metric library now distinguishes Yours, Team metric, and governed HUMAIN template provenance without implying that any definition is universal. Draft changes cannot rewrite a completed job receipt or be submitted under it. Nothing is learned from earlier agent uploads, selected by a hidden LLM, or attached automatically.
+V16 is ready for the product conversation. It covers the full Prism flow shown by Uday and retains V15's input lifecycle, metric provenance, immutable receipts, and causal improvement loop. It also makes the new failure-note contract explicit: Prism drafts from the actual run evidence, a developer accepts or edits before grouping, and evidence-insufficient cases rise first for human review rather than receiving fabricated certainty. Nothing is learned from earlier agent uploads, selected by a hidden LLM, or attached automatically.
 
 This benchmark does not turn unconfirmed competitor behavior into a Prism claim. Prism-confirmed behavior remains in `PRISM_DEMO_COVERAGE.md`. The additions below are explicitly Humain ONE product safeguards around the Prism execution layer.
 
 ## Release bar
 
-| Product requirement | V15 behavior | Why it matters |
+| Product requirement | V16 behavior | Why it matters |
 |---|---|---|
 | Data connection has explicit states | Snowflake moves through provider, credential contract, connection validation, object browser, preview, import, suggested mapping, and confirmation. The unknown dataset does not exist in the UI before the connection succeeds. | The demo explains where data came from and prevents a warehouse object from appearing magically. |
 | No universal metric scorecard | A new evaluation starts with zero attached. The developer creates or reuses a Prompt, Deterministic, REST API, or Agentic definition for the agent. | A metric that is meaningful for one agent may be meaningless for another. |
@@ -21,21 +21,22 @@ This benchmark does not turn unconfirmed competitor behavior into a Prism claim.
 | Evaluators are inspectable | A score drilldown shows definition ID and version, mechanism, owner, frozen execution detail, and run snapshot. | A reviewer can identify the thing that produced the score. |
 | Runs are reproducible | The run snapshot pins agent, dataset, definitions, run count, parallel setting, runtime, and creation time. Draft edits are labelled not evaluated, and submission is unavailable until the draft runs. | A later edit cannot silently rewrite what an old score means or borrow an older receipt. |
 | Comparisons are valid | Case IDs are matched. Only identical metric definition versions are eligible for score deltas. Dataset, metric-set, and version differences stay visible outside the delta. | Evaluator drift cannot be mistaken for an agent regression. |
-| Human judgment stays central | Developers inspect traces and outputs, write notes, group failures, and calibrate judge metrics against their verdicts. | LLM judge output is evidence, not unquestioned truth. |
+| Human judgment stays central | Prism drafts a failure note from run evidence; developers accept or edit it before it can be grouped, and calibrate judge metrics against their verdicts. Evidence-insufficient cases rise for human review instead of receiving fabricated certainty. | AI output remains a reviewable proposal, not unquestioned truth. |
 | Verification is honest | The pack includes the receipt, coverage, checks not run, open issues, and human-review count. No platform score blocks submission. | The verifier sees omissions and limitations, not a cleaned-up headline. |
 
-## V15 overall release review
+## V16 overall release review
 
 | Review dimension | Result | Evidence |
 |---|---|---|
 | Prism fidelity | Pass | Every visible walkthrough capability is accounted for in `PRISM_DEMO_COVERAGE.md`; Humain ONE additions are labelled as such. |
 | Input lifecycle | Pass | The Snowflake walkthrough includes pre-connection absence, failed-validation recovery with no leaked objects, post-connection discovery, preview, import, mapping review, compatibility recalculation, and an explicit confirmation gate. |
 | End-to-end causality | Pass | Failure grouping now leads to regression-metric creation before the agent-change rerun action appears. |
+| Failure-note integrity | Pass | Nine Prism drafts are visibly separated from six reviewed notes; three remain pending, and one evidence-insufficient case is placed first as high priority. Only accepted or edited notes enter group counts. |
 | Metric semantics | Pass | Personal-library membership, current-dataset compatibility, and evaluation attachment are distinct. Prompt, Deterministic, REST API, and Agentic definitions remain explicit. |
 | State integrity | Pass | Saving, deduplication, attach/detach, calibration, evidence, and deletion use the same regression-metric identity. Dataset, mapping, metrics, run count, and parallel changes dirty only the draft; the last job receipt stays frozen. |
 | Reproducibility and comparison | Pass | Run receipts remain immutable, and deltas require shared case IDs plus identical metric versions. |
 | Interaction and markup | Pass | Incompatible attached metrics remain removable; generated metric controls no longer contain nested buttons. |
-| Regression suite | Pass | V15 passes 77/77 headless interaction and content checks. Frozen V14 remains 63/63, V13 remains 53/53, and V12 remains 44/44. |
+| Regression suite | Pass | V16 passes 87/87 headless interaction and content checks. Frozen V15 remains 77/77, V14 remains 63/63, V13 remains 53/53, and V12 remains 44/44. |
 
 ## External framework defenses
 
@@ -43,7 +44,7 @@ Official product documentation was rechecked on 2 Sep 2026. These are
 corroborating market patterns, not claims of exact feature parity and not claims
 that Humain ONE additions already exist in Prism.
 
-| Design defense | Current primary-source evidence | Why V15 holds up |
+| Design defense | Current primary-source evidence | Why V16 holds up |
 |---|---|---|
 | Success criteria are application-specific | LangSmith says teams should first identify what matters for their application and critical components. DeepEval recommends a mix that includes custom, use-case-specific metrics rather than relying entirely on generic predefined metrics. | Starting a new evaluation with zero attached metrics is a defensible default. The developer decides what good means for this agent. |
 | Evaluators need multiple mechanisms | Braintrust supports prebuilt, LLM-as-judge, and custom-code scorers. Phoenix supports deterministic and LLM evaluators. Promptfoo supports deterministic, model-graded, code, and webhook assertions. | Prism's Prompt, Deterministic, REST API, and Agentic definitions match a well-established multi-mechanism pattern without implying universal applicability. |
