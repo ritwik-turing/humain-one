@@ -75,7 +75,9 @@ section{padding:44px 0}
 .lbhd button{font:inherit;font-size:.85rem;font-weight:650;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
 .lbhd button:hover{border-color:var(--acc);color:var(--acc)}
 .lbin img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:10px}
-.lbin p{margin:12px 0 0;font-size:.9rem;color:var(--dim);line-height:1.5;max-width:none}
+.lbsum{margin:12px 0 0;padding:14px 16px;background:var(--ok-soft);border-radius:10px}
+.lbsum>b{display:block;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.lbin .lbsum p{margin:0;font-size:.9rem;color:var(--ink);line-height:1.5;max-width:none}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:18px 0 0}
 th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);font-weight:750}
@@ -480,7 +482,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <line x1="0" y1="252" x2="940" y2="252" stroke="var(--line)" stroke-dasharray="3 5"/>
 <text x="700" y="248" font-size="10" fill="var(--dim)">above: once per run</text>
 <text x="700" y="266" font-size="10" fill="var(--dim)">below: because a run found something</text>
-<rect class="hot" data-shot="mapping" x="0" y="24" width="180" height="76" rx="10" tabindex="0" role="button" aria-label="Open the screen for Set up: sources"><title>Set up: sources. Click to see this screen.</title></rect>
+<rect class="hot" data-shot="sources" x="0" y="24" width="180" height="76" rx="10" tabindex="0" role="button" aria-label="Open the screen for Set up: sources"><title>Set up: sources. Click to see this screen.</title></rect>
 <rect class="hot" data-shot="mapping" x="232" y="24" width="196" height="76" rx="10" tabindex="0" role="button" aria-label="Open the screen for Set up: name the fields"><title>Set up: name the fields. Click to see this screen.</title></rect>
 <rect class="hot" data-shot="library" x="480" y="24" width="200" height="76" rx="10" tabindex="0" role="button" aria-label="Open the screen for Set up: attach metrics"><title>Set up: attach metrics. Click to see this screen.</title></rect>
 <rect class="hot" data-shot="evalcard" x="732" y="24" width="208" height="76" rx="10" tabindex="0" role="button" aria-label="Open the screen for Set up: run settings"><title>Set up: run settings. Click to see this screen.</title></rect>
@@ -854,7 +856,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
   <div class="lbin">
     <div class="lbhd"><span id="lbtitle"></span><button id="lbclose" type="button" aria-label="Close">Close</button></div>
     <img id="lbimg" alt="">
-    <p id="lbcap"></p>
+    <div class="lbsum"><b>What this screen means</b><p id="lbcap"></p></div>
   </div>
 </div>
 <script>
@@ -866,9 +868,12 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
   META.checks.c='Select a reviewed failure, define a yes or no Prompt metric over Input, Output, and Trace, compare it with 20 human verdicts, then save it to your personal library and attach it to this evaluation. This screen measures the fix; you change the agent outside it and run again.';
   META.builder.c='Create a Prompt, Deterministic, REST API, or Agentic definition. Saving puts a versioned definition in your personal library and attaches it only to the evaluation you are working on.';
   META.evalcard.c='The evaluation stores the explicit pairing of this agent, confirmed mapped dataset, and deliberately attached definitions. The next immutable receipt is created at run start; draft changes never rewrite the latest completed job.';
+  META.sources={t:'Set up: connect the data source',c:'Connect to Snowflake with read-only credentials, test access, and browse objects only after the connection succeeds. A failed check reveals no warehouse objects and creates no dataset.'};
+  META.cases.c='Attention cases are the small set we want a human to inspect closely. Most are selected because they failed a check, raised a safety flag, or are unusual. Some are healthy controls. We include those so the developer can compare a good trace with a bad one, validate that the metric is not flagging everything, and avoid treating the queue as a pre-decided failure list.';
   var lb=document.getElementById('lb'),img=document.getElementById('lbimg'),
       cap=document.getElementById('lbcap'),ttl=document.getElementById('lbtitle'),last=null;
   var CURRENT_SHOTS={
+    sources:'assets/eval-v15-snowflake-connect.png',
     mapping:'assets/eval-v15-snowflake-import.png',
     library:'assets/eval-v15-metric-library.png'
   };
