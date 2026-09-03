@@ -26,21 +26,52 @@ harness = r"""
     T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('agentSetup').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
     T('setup states that Prism metrics are not universal',function(){return /does not mean that a metric applies to every agent/.test(document.getElementById('agentSetup').innerText)});
     if(typeof METRIC_LIBRARY!=='undefined'){
-      T('personal metric library is explicit and user scoped',function(){var x=document.getElementById('agentSetup').innerText;return /Your (personal )?library|personal metric library/i.test(x)&&/Private to Ritwik/.test(x)&&/previously created or used/.test(x)});
+      T('metric library scopes are explicit',function(){var x=document.getElementById('agentSetup').innerText;return typeof RELEASE_REVIEW_V15!=='undefined'?/Yours are private to Ritwik/.test(x)&&/Team metric/.test(x)&&/HUMAIN template/.test(x):/Your (personal )?library|personal metric library/i.test(x)&&/Private to Ritwik/.test(x)&&/previously created or used/.test(x)});
       T('library copy rules out learning and silent LLM selection',function(){var x=document.getElementById('agentSetup').innerText;return /does not learn from earlier agent uploads/.test(x)&&/no LLM selects metrics for you/.test(x)});
       T('library rows show prior usage history',function(){var root=typeof METRIC_SECTION_V13!=='undefined'?'#agentSetup':'#catRows';var expected=typeof METRIC_SECTION_V13!=='undefined'?allMetrics().length+EXTRA_METRICS.length:allMetrics().length;return document.querySelectorAll(root+' .mhist').length===expected&&/Last used/.test(document.querySelector(root+' .mhist').innerText)});
+      if(typeof RELEASE_REVIEW_V15!=='undefined'){
+        T('metric rows distinguish personal, team, and HUMAIN template provenance',function(){return document.querySelectorAll('#agentSetup .scopechip.personal').length>0&&document.querySelectorAll('#agentSetup .scopechip.workspace').length>0&&document.querySelectorAll('#agentSetup .scopechip.template').length>0});
+        T('HUMAIN template is a governed starting point, not universal truth',function(){var x=document.getElementById('agentSetup').innerText;return /governed starting points/.test(x)&&/None is universal/.test(x)&&/reviewed and attached for this use case/.test(x)});
+      }
     }
     click('newEvalBlank');
     T('a new evaluation starts with zero attached metrics',function(){var badge=document.getElementById('catBadge').textContent;return (/^0 attached$/.test(badge)||badge==='0 of 4 attached') && /0 (metrics are )?attached/.test(document.getElementById('metricContext').innerText)});
-    if(typeof METRIC_LIBRARY!=='undefined')T('new evaluation keeps the personal library available',function(){var expected=typeof METRIC_SECTION_V13!=='undefined'?allMetrics().length+EXTRA_METRICS.length:allMetrics().length;return /library (remains|is) available/.test(document.getElementById('metricContext').innerText)&&document.querySelectorAll('#catRows .mtog').length===expected});
+    if(typeof METRIC_LIBRARY!=='undefined')T('new evaluation keeps the metric library available',function(){var expected=typeof METRIC_SECTION_V13!=='undefined'?allMetrics().length+EXTRA_METRICS.length:allMetrics().length;return /(library (is|remains) available|definitions remain available)/.test(document.getElementById('metricContext').innerText)&&document.querySelectorAll('#catRows .mtog').length===expected});
     nav('s2');
     T('zero metrics produces no fabricated metric score',function(){return /No evaluation metric was attached/.test(document.getElementById('scoreBox').innerText) && document.querySelectorAll('#scoreBox .bcell').length===0});
     nav('s1'); click('newEvalBlank');
     T('saved evaluation restores only its attached definitions',function(){return /^4 of 4 attached/.test(document.getElementById('catBadge').textContent)});
     if(typeof METRIC_SECTION_V13!=='undefined'){
       T('attached and available metrics render in separate sections',function(){return document.querySelectorAll('#attachedRows .mtog').length===4&&document.querySelectorAll('#catRows .mtog').length===3});
-      T('library and attached counts are independently visible',function(){return document.getElementById('libBadge').textContent==='7 saved'&&/^4 of 4 attached/.test(document.getElementById('catBadge').textContent)});
+      T('library and attached counts are independently visible',function(){return /7 (saved|available)/.test(document.getElementById('libBadge').textContent)&&/^4 of 4 attached/.test(document.getElementById('catBadge').textContent)});
     }
+  }
+  if(typeof RELEASE_REVIEW_V15!=='undefined'){
+    T('warehouse flow starts without inventing an unknown dataset',function(){return !/UNKNOWN_DATASET_2026_09_02/.test(document.getElementById('warehouseFlow').innerText)});
+    click('connectWarehouse');
+    T('Connect to data warehouse opens provider choice',function(){return !document.getElementById('warehouseFlow').hidden&&!!document.querySelector('[data-wh-provider="snowflake"]')});
+    document.querySelector('[data-wh-provider="snowflake"]').click();
+    T('Snowflake opens a read-only connection contract',function(){var x=document.getElementById('warehouseFlow').innerText;return /Connect Snowflake/.test(x)&&/Read-only/.test(x)&&/HUMAIN secrets service/.test(x)});
+    document.getElementById('whAccount').value=''; click('whTest');
+    T('failed Snowflake validation creates no dataset or object list',function(){var x=document.getElementById('warehouseFlow').innerText;return /Snowflake connection failed/.test(x)&&/No warehouse objects were loaded/.test(x)&&!/UNKNOWN_DATASET_2026_09_02/.test(x)});
+    document.querySelector('[data-wh-back="credentials"]').click(); document.getElementById('whAccount').value='humain-one.snowflakecomputing.com';
+    click('whTest');
+    T('connection exposes a loading state before objects',function(){return /Connecting to Snowflake/.test(document.getElementById('warehouseFlow').innerText)&&!/UNKNOWN_DATASET_2026_09_02/.test(document.getElementById('warehouseFlow').innerText)});
+    WAREHOUSE.connected=true;WAREHOUSE.step='browse';renderWarehouse();
+    T('unknown dataset appears only after Snowflake succeeds',function(){var x=document.getElementById('warehouseFlow').innerText;return /Snowflake connected/.test(x)&&/UNKNOWN_DATASET_2026_09_02/.test(x)});
+    document.querySelector('[data-wh-asset="unknown"]').click();
+    T('dataset preview explains unknown state before import',function(){var x=document.getElementById('warehouseFlow').innerText;return /Unknown dataset/.test(x)&&/no HUMAIN display name or field roles/.test(x)&&/Add dataset and review mapping/.test(x)});
+    click('whUse');
+    T('dataset import exposes a loading state',function(){return /Reading 380 rows/.test(document.getElementById('warehouseFlow').innerText)});
+    activateWarehouseDataset();
+    T('import changes the active dataset and requires mapping review',function(){return CFG.dsName==='unknown-dataset-2026-09-02'&&!MAP_CONFIRMED&&document.getElementById('runBtn').disabled&&/Suggested mapping/.test(document.getElementById('mapState').innerText)});
+    click('confirmMapping');
+    T('confirmed mapping unlocks the evaluation run',function(){return MAP_CONFIRMED&&!document.getElementById('runBtn').disabled&&/Run 6 on 380 cases/.test(document.getElementById('runBtn').textContent)});
+    nav('s7');
+    T('draft dataset change cannot rewrite completed-job evidence',function(){var x=document.getElementById('evBox').innerText;return /Current draft differs/.test(x)&&x.indexOf(SNAP.dataset)>-1&&!/UNKNOWN_DATASET_2026_09_02 is now/.test(x)});
+    nav('s8');
+    T('submission warns when current draft has not been evaluated',function(){var x=document.getElementById('subBox').innerText;return /Dataset in this evidence/.test(x)&&/Current draft differs/.test(x)&&/Run again/.test(x)});
+    nav('s1');
   }
   T('mapping table renders 8 keys',function(){return document.querySelectorAll('#mapBox tr').length===8});
   setMap('expected','ignore');
@@ -58,10 +89,10 @@ harness = r"""
   var ta=document.getElementById('mbPrompt'); ta.value='Given the reply {output}, answer yes if it states a decision.'; ta.dispatchEvent(new Event('input',{bubbles:true}));
   T('dropping {expected_output} moves coverage to 347',function(){return /347 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   click('mbSave');
-  T('saved metric is in the library, marked yours, v1.0.0',function(){var y=USER_METRICS.length===1&&rowEl(USER_METRICS[0].n); return !!y && !!y.querySelector('.yours') && y.querySelector('.verchip').textContent==='v1.0.0'});
+  T('saved metric is in the library, marked yours, v1.0.0',function(){var y=USER_METRICS.length===1&&rowEl(USER_METRICS[0].n); return !!y && !!y.querySelector(typeof RELEASE_REVIEW_V15!=='undefined'?'.scopechip.personal':'.yours') && y.querySelector('.verchip').textContent==='v1.0.0'});
   if(typeof RELEASE_REVIEW_V14!=='undefined')T('generated metric rows contain no nested buttons',function(){return document.querySelectorAll('#agentSetup button button').length===0});
   if(typeof SNAP!=='undefined'){
-    T('setup freezes a reproducibility snapshot before run',function(){return /Run snapshot/.test(document.getElementById('evalSum').innerText) && document.getElementById('evalSum').innerText.indexOf(SNAP.id)>-1});
+    T('setup defines the next reproducibility receipt before run',function(){var x=document.getElementById('evalSum').innerText;return typeof RELEASE_REVIEW_V15!=='undefined'?/Next job receipt/.test(x)&&/Created at run start/.test(x)&&x.indexOf(CFG.dsName)>-1:/Run snapshot/.test(x)&&x.indexOf(SNAP.id)>-1});
   }
   nav('s2');
   T('jobs list includes a failed job at 0 of total',function(){return Array.from(document.querySelectorAll('#jobsBox tbody tr')).some(function(r){return /failed/.test(r.innerText) && /0\//.test(r.innerText)})});

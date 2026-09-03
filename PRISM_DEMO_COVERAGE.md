@@ -1,21 +1,21 @@
 # Prism demo, item by item, against the prototype
 
-Source: Uday Kumar Pabbathi's walkthrough on 1 Sep 2026, the recording reviewed screen by screen, plus the transcript and three screenshots Ritwik supplied. Target: Eval_Journey_V14.html. This ledger is refreshed per version. If an item is not built inside Evaluate, the product boundary and destination are stated here, so scope is a decision and not a discovery.
+Source: Uday Kumar Pabbathi's walkthrough on 1 Sep 2026, the recording reviewed screen by screen, plus the transcript and three screenshots Ritwik supplied. Target: Eval_Journey_V15.html. This ledger is refreshed per version. If an item is not built inside Evaluate, the product boundary and destination are stated here, so scope is a decision and not a discovery.
 
-V14 preserves every Prism capability accounted for in V10, every reproducibility safeguard in V11, V12's personal per-user metric library, and V13's explicit library/compatibility/attachment model. It closes the improvement loop and keeps regression-metric attachment, calibration, evidence, and deletion synchronized. These are Humain ONE clarity and integrity safeguards; they do not change the underlying Prism claims. The external benchmark and release rationale are in `EVAL_STATE_OF_THE_ART_AUDIT.md`.
+V15 preserves every Prism capability and the complete V14 improvement loop. It adds an explicit Snowflake connection and import state machine, personal/team/governed-template metric provenance, and draft-versus-completed-job isolation. These are Humain ONE clarity and integrity safeguards; they do not change the underlying Prism claims. The external benchmark and release rationale are in `EVAL_STATE_OF_THE_ART_AUDIT.md`.
 
-Status key: built, covered at journey boundary, excluded by decision. V14 has no unaccounted walkthrough item; each is implemented, represented at its real journey boundary, or deliberately excluded.
+Status key: built, covered at journey boundary, excluded by decision. V15 has no unaccounted walkthrough item; each is implemented, represented at its real journey boundary, or deliberately excluded.
 
 ## Agents page
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
 | Agents typed Prompt, Agentic, Deterministic, REST API, with counts | The evaluation card shows the selected agent as a typed REST API object with its endpoint; the metric library exposes all four Prism execution kinds | covered at journey boundary: agent selection and management live in Submit agent, step 1 |
 | Add Agent, Import, Bulk upload, Collections, Specs, Export | The rail links back to Submit agent | covered at journey boundary: these manage agents before Evaluate and are not duplicated in step 6 |
 
 ## Create Evaluation
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
 | Name (required) | Step 3, Name field; the results screen carries it as the evaluation title | built |
 | Agent (REST API or Prompt) | Step 3, typed agent line | built |
@@ -23,15 +23,15 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 | Description, not read by any model | Step 3, Description field, labelled as saved with the run and not read | built |
 | Number of Runs, 1 to 5 | Step 3, select 1 to 5; estimate multiplies | built |
 | Parallel Datapoints toggle | Step 3, checkbox; estimate and job duration respond | built |
-| Global Metrics tabbed Prompt, Agentic, Deterministic, REST API with counts | Step 2 shows the signed-in user's personal library, with one example of each mechanism. Saved, compatible, and attached are separate states; a new evaluation starts with zero attached | built |
+| Global Metrics tabbed Prompt, Agentic, Deterministic, REST API with counts | Step 2 shows definitions with Yours, Team metric, or HUMAIN template provenance and examples across all four mechanisms. Saved, compatible, and attached are separate states; a template is not universal and a new evaluation starts with zero attached | built |
 | Metric search | Step 2 search box | built |
 | "N metric(s) selected" | "N of N attached" badge and the step 3 metrics line. "Show new evaluation state" proves a new evaluation starts at 0, and the results board shows no fabricated score | built |
 | Metric calibration tab | The Prism tab sequence is functional under step 3; Metric calibration opens the Humain ONE human-verdict workflow, where each judge metric shows version and agreement or "not yet checked against a human, 0 of 20" | built without inventing the hidden Prism tab fields that were not shown |
-| Import tab | The functional tab takes the developer to the existing CSV, documents, JSON, Drive, warehouse, bucket and production-traffic sources in step 1 | covered at journey boundary: one import path, not a duplicate form |
+| Import tab | The functional tab takes the developer to CSV, documents, JSON, Drive, warehouse, bucket and production-traffic sources in step 1. The Snowflake path is interactive from provider selection through import and mapping confirmation | built at the shared dataset boundary: one import path, not a duplicate form |
 
 ## Evaluations list
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
 | Evaluations grouped as lineages with versions (v2, v3) | Results screen, lineage line: v3, 2 earlier versions kept | built |
 | Jobs under an evaluation with status, JOB id, DATAPOINTS x/y, DURATION, SCORE, LATEST | Results screen, jobs table | built |
@@ -42,7 +42,7 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 
 ## Job results
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
 | Performance strip: datapoints, avg, P50, P95, P99, min-to-max range, total, completion | Results screen performance strip with all fields visible | built |
 | Tokens in and out | Tiles and strip; cost derives from tokens, no invented price | built |
@@ -56,9 +56,9 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 
 ## Dataset
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
-| Upload in any shape: documents, CSV, JSON, drive links | Sources: CSV, Documents or JSON, Drive link, warehouse, bucket, production traffic | built |
+| Upload in any shape: documents, CSV, JSON, drive links | Sources: CSV, Documents or JSON, Drive link, warehouse, bucket, production traffic. Snowflake proves provider choice, read-only connection validation, object browse after success, preview, import, mapping review, and confirmation | built |
 | Free form JSON, fields named later when pointed at an agent | Step 1 mapping table, a role dropdown per key: Input, Expected output, Metadata, Ignore | built |
 | Media as links that map to the input | attachment_url mapped to Input; caption says the agent fetches it | built |
 | Every row in a run shares a shape | Summary line: all 380 of 380 rows share this shape | built |
@@ -67,7 +67,7 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 
 ## Deterministic metric playground
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
 | Python, with JavaScript, Java, Go pending, Live runtime | Language tabs, same states | built, inert tabs |
 | evaluate(input, expected_output, agent_response) contract returning float, bool or dict | Prefilled source with the exact contract | built |
@@ -77,7 +77,7 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 
 ## Prompt playground
 
-| Prism showed | In V14 | Status |
+| Prism showed | In V15 | Status |
 |---|---|---|
 | Versioned prompt, v1.0.0, major, Current | Saves as v1.0.0; saved Prompt judge definitions carry versions | built |
 | Model picker | Model select | built |
@@ -89,7 +89,7 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 
 ## Transcript points
 
-| Uday said | In V14 | Status |
+| Uday said | In V15 | Status |
 |---|---|---|
 | No schema file; you name the fields | Mapping table | built |
 | Three metric kinds plus agentic; a metric reads what the agent returned | Four kinds in the library; the steps metric says the trace must be returned | built |
@@ -98,12 +98,12 @@ Status key: built, covered at journey boundary, excluded by decision. V14 has no
 | No pass or fail; Prism has no domain knowledge for thresholds | No pass mark anywhere; submit available after one run | built |
 | AI suggested metrics and thresholds deferred past V1 | Absent by decision; the AI summary reads numbers and suggests nothing | built as an absence |
 
-## Completeness statement for V14
+## Completeness statement for V15
 
-No visible capability from the 1 Sep Prism walkthrough is unaccounted for in the V14 product flow. "Accounted for" does not mean every Prism administration screen is cloned: the table above distinguishes what is built in Evaluate, what belongs to another journey step, and what was deliberately excluded. V14 retains V10's correction of V9's misleading universal-looking metric shortlist.
+No visible capability from the 1 Sep Prism walkthrough is unaccounted for in the V15 product flow. "Accounted for" does not mean every Prism administration screen is cloned: the table above distinguishes what is built in Evaluate, what belongs to another journey step, and what was deliberately excluded. V15 retains V10's correction of V9's misleading universal-looking metric shortlist and makes definition provenance explicit without turning governed templates into defaults.
 
 Three facts remain external to the prototype, but none is a missing product capability:
 
 - Judge agreement is correctly shown as 0 of 20 until a human labels the cases. The calibration workflow exists; the evidence does not yet.
 - Uday did not open the Metric calibration tab in the recording, so V10 does not claim its hidden fields are Prism behavior. It reflects the visible tab and clearly presents the human-verdict contract as the Humain ONE workflow.
-- Prism evaluates each datapoint independently and can deliver independent datapoints in parallel. V14 states that explicitly and preflights each mapped input against the agent limit. Internal transport batch size and retry policy remain Chandra's engineering implementation detail; they do not change the product flow or score semantics.
+- Prism evaluates each datapoint independently and can deliver independent datapoints in parallel. V15 states that explicitly and preflights each mapped input against the agent limit. Internal transport batch size and retry policy remain Chandra's engineering implementation detail; they do not change the product flow or score semantics.

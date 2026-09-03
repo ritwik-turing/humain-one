@@ -108,7 +108,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
   <p class="eyebrow">Humain ONE &middot; Evaluate &middot; step 6 of 9</p>
   <h1>We built a machine that tells you what it did not check.</h1>
   <p class="lede">Any agent, any dataset, any input type. It runs, it scores, it groups what went wrong, and it turns a reviewed failure into a versioned regression metric you can attach and rerun. The part that makes it an evaluation platform rather than a score printer is the last one: it states its own coverage, every time.</p>
-  <div class="rec"><p>If you say one thing to the team, say this. <b>Prism gives us four ways to author a metric, but it does not give every agent the same metrics.</b> The developer's personal library holds definitions they previously created or used. A new evaluation starts at zero, and metrics are deliberately attached only after their inputs are checked against the current data.</p></div>
+  <div class="rec"><p>If you say one thing to the team, say this. <b>Prism gives us four ways to author a metric, but it does not give every agent the same metrics.</b> The library can contain definitions owned by you, shared by a team, or published as a governed HUMAIN template. None is universal: a new evaluation starts at zero, and each metric is reviewed for compatibility and deliberately attached.</p></div>
   <div class="claims">
     <div class="cl"><div class="num">01</div><b>A case is five things</b><p>Input, output, an optional expected answer, a trace, metadata. None of them is a question. There is no agent type anywhere in the product.</p></div>
     <div class="cl"><div class="num">02</div><b>Coverage is a count</b><p>The Al Noor expected-output definition ran on 349 of 380. Its citizen-actionability definition ran on 161. The product says so on screen, because a metric that quietly covered less than half the run reads exactly like one that covered all of it.</p></div>
@@ -145,8 +145,8 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <rect x="480" y="28" width="220" height="104" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
 <text x="494" y="50" font-size="12" font-weight="700" fill="var(--ink)">METRIC DEFINITION</text>
 <text x="494" y="69" font-size="9.5" fill="var(--dim)">Prompt judge, strict function,</text>
-<text x="494" y="84" font-size="9.5" fill="var(--dim)">API endpoint, or evaluator agent;</text>
-<text x="494" y="99" font-size="9.5" fill="var(--dim)">versioned and reusable.</text>
+<text x="494" y="84" font-size="9.5" fill="var(--dim)">API endpoint, or evaluator agent.</text>
+<text x="494" y="99" font-size="9.5" fill="var(--dim)">Yours, Team, or HUMAIN template.</text>
 <text x="494" y="114" font-size="9.5" font-weight="700" fill="var(--ink)">Saved is not attached.</text>
 <text x="494" y="127" font-size="9.5" font-weight="700" fill="var(--ink)">No universal scores.</text>
 
@@ -164,8 +164,8 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <rect x="0" y="28" width="286" height="190" rx="12" fill="var(--acc-soft)" stroke="var(--acc)"/>
 <text x="16" y="53" font-size="11" font-weight="700" fill="var(--acc)">1</text>
 <text x="16" y="77" font-size="16" font-weight="750" fill="var(--ink)">Map the data</text>
-<text x="16" y="100" font-size="11" fill="var(--dim)">380 cases: input, expected output, metadata.</text>
-<text x="16" y="118" font-size="11" fill="var(--dim)">Name each field once; no schema file.</text>
+<text x="16" y="100" font-size="11" fill="var(--dim)">Connect or upload; preview before adding.</text>
+<text x="16" y="118" font-size="11" fill="var(--dim)">Then map and confirm each field role once.</text>
 <line x1="16" y1="132" x2="270" y2="132" stroke="var(--line)"/>
 <text x="16" y="151" font-size="9.5" font-weight="700" fill="var(--acc)">MARKET: LANGSMITH + PHOENIX</text>
 <text x="16" y="169" font-size="10.5" fill="var(--ink)">Pattern: explicit datasets and input mapping.</text>
@@ -177,7 +177,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <text x="342" y="53" font-size="11" font-weight="700" fill="var(--acc)">2</text>
 <text x="342" y="77" font-size="16" font-weight="750" fill="var(--ink)">Choose and attach metrics</text>
 <text x="342" y="100" font-size="11" fill="var(--dim)">Prompt, function, API, or evaluator agent.</text>
-<text x="342" y="118" font-size="11" fill="var(--dim)">Personal library; new evaluation starts at zero.</text>
+<text x="342" y="118" font-size="11" fill="var(--dim)">Yours, Team, or HUMAIN template; starts at zero.</text>
 <line x1="342" y1="132" x2="598" y2="132" stroke="var(--line)"/>
 <text x="342" y="151" font-size="9.5" font-weight="700" fill="var(--acc)">MARKET: DEEPEVAL + BRAINTRUST + PHOENIX</text>
 <text x="342" y="169" font-size="9.5" font-weight="700" fill="var(--acc)">LANGSMITH + WEAVE + PROMPTFOO</text>
@@ -250,17 +250,17 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 
 <rect x="0" y="716" width="456" height="122" rx="10" fill="var(--acc-soft)" stroke="var(--acc)"/>
 <text x="14" y="739" font-size="12" font-weight="700" fill="var(--acc)">1  MAP AGENT AND DATA</text>
-<text x="14" y="759" font-size="10.5" fill="var(--ink)">Select agent; import CSV, warehouse, bucket, or traffic sample.</text>
-<text x="14" y="777" font-size="10.5" fill="var(--ink)">Map each field to input, expected, metadata, ignore, or media link.</text>
-<text x="14" y="795" font-size="10.5" fill="var(--ink)">Preview typed payloads; confirm shared shape; run preflight validation.</text>
-<text x="14" y="816" font-size="10" font-weight="700" fill="var(--ink)">Output: validated cases + which metric inputs can be supplied.</text>
+<text x="14" y="759" font-size="10.5" fill="var(--ink)">Choose source. Snowflake: credentials -&gt; test -&gt; retry or browse.</text>
+<text x="14" y="777" font-size="10.5" fill="var(--ink)">The unknown dataset appears only after connection; preview, then add.</text>
+<text x="14" y="795" font-size="10.5" fill="var(--ink)">Review suggested roles: input, expected, metadata, ignore, media link.</text>
+<text x="14" y="816" font-size="10" font-weight="700" fill="var(--ink)">Confirm mapping to unlock run; compatibility recalculates first.</text>
 
 <rect x="484" y="716" width="456" height="122" rx="10" fill="var(--acc-soft)" stroke="var(--acc)"/>
 <text x="498" y="739" font-size="12" font-weight="700" fill="var(--acc)">2  DEFINE GOOD, THEN ATTACH</text>
 <text x="498" y="759" font-size="10.5" fill="var(--ink)">Create or reuse a prompt, function, API, or evaluator-agent metric.</text>
-<text x="498" y="777" font-size="10.5" fill="var(--ink)">Definition stores purpose, inputs, scale, config, owner, and version.</text>
-<text x="498" y="795" font-size="10.5" fill="var(--ink)">Library shows saved, compatible, and attached as separate states.</text>
-<text x="498" y="816" font-size="10" font-weight="700" fill="var(--ink)">No learning across agents and no hidden LLM; user attaches explicitly.</text>
+<text x="498" y="777" font-size="10.5" fill="var(--ink)">Provenance is Yours, Team metric, or governed HUMAIN template.</text>
+<text x="498" y="795" font-size="10.5" fill="var(--ink)">Saved/available, compatible, and attached remain separate states.</text>
+<text x="498" y="816" font-size="10" font-weight="700" fill="var(--ink)">Templates are not universal; no hidden LLM; attachment is explicit.</text>
 
 <rect x="0" y="852" width="456" height="122" rx="10" fill="var(--acc-soft)" stroke="var(--acc)"/>
 <text x="14" y="875" font-size="12" font-weight="700" fill="var(--acc)">3  FREEZE CONFIGURATION AND RUN</text>
@@ -335,9 +335,9 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <line x1="428" y1="62" x2="478" y2="62" stroke="var(--dim)" marker-end="url(#ar)"/>
 
 <rect x="480" y="24" width="200" height="76" rx="10" fill="var(--sunk)" stroke="var(--line)"/>
-<text x="494" y="46" font-size="13" font-weight="700" fill="var(--ink)">Your personal metric library</text>
-<text x="494" y="64" font-size="11" fill="var(--dim)">previously created or used; attach</text>
-<text x="494" y="80" font-size="11" fill="var(--dim)">deliberately after compatibility check</text>
+<text x="494" y="46" font-size="13" font-weight="700" fill="var(--ink)">Metric library with provenance</text>
+<text x="494" y="64" font-size="11" fill="var(--dim)">Yours, Team, or HUMAIN template;</text>
+<text x="494" y="80" font-size="11" fill="var(--dim)">review compatibility, then attach</text>
 
 <line x1="680" y1="62" x2="730" y2="62" stroke="var(--dim)" marker-end="url(#ar)"/>
 
@@ -500,7 +500,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <tbody>
 <tr><td>Start with use-case-specific success criteria</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> says to first identify what matters for the application and its components. <a href="https://deepeval.com/docs/metrics-introduction" target="_blank" rel="noopener">DeepEval</a> recommends a mix that includes custom, use-case-specific metrics rather than relying entirely on generic metrics.</td><td>Zero metrics on a new evaluation is intentional. The developer defines what good means for this agent.</td></tr>
 <tr><td>Support more than one scoring mechanism</td><td><a href="https://www.braintrust.dev/docs/evaluate/write-scorers" target="_blank" rel="noopener">Braintrust</a> supports prebuilt, LLM-as-judge, and custom-code scorers. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Arize Phoenix</a> supports deterministic and LLM evaluators. <a href="https://docs.wandb.ai/weave/guides/evaluation/scorers" target="_blank" rel="noopener">W&amp;B Weave</a> supports function- and class-based custom scorers. <a href="https://www.promptfoo.dev/docs/configuration/expected-outputs/" target="_blank" rel="noopener">Promptfoo</a> supports deterministic, model-graded, code, and webhook assertions.</td><td>Prism's Prompt, Deterministic, REST API, and Agentic definitions fit a proven multi-mechanism model; they are not four universal scores.</td></tr>
-<tr><td>Separate reusable definitions from attachment</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> treats evaluators as reusable resources that are attached to projects or datasets. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> lets users configure evaluators and attach them to datasets.</td><td>A personal library can preserve reuse while each evaluation still starts with zero attached. Availability never means silent selection.</td></tr>
+<tr><td>Separate reusable definitions from attachment</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> treats evaluators as reusable resources that are attached to projects or datasets. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> lets users configure evaluators and attach them to datasets.</td><td>A library can preserve personal, team, and governed-template definitions while every evaluation still starts with zero attached. Availability never means universal applicability or silent selection.</td></tr>
 <tr><td>Freeze runs before comparing them</td><td><a href="https://www.braintrust.dev/docs/evaluate" target="_blank" rel="noopener">Braintrust</a> describes experiments as immutable, comparable records and <a href="https://www.braintrust.dev/docs/evaluate/compare-experiments" target="_blank" rel="noopener">aligns test cases across experiments</a> for deltas.</td><td>Our run receipt and same-case, same-metric-version comparison rules prevent dataset or evaluator drift from masquerading as agent improvement.</td></tr>
 <tr><td>Inspect traces and the evaluator itself</td><td><a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> traces evaluator inputs, prompts, outputs, scores, and timing. <a href="https://developers.openai.com/api/docs/guides/trace-grading" target="_blank" rel="noopener">OpenAI trace grading</a> uses structured labels over an agent's end-to-end trace to diagnose where behavior succeeded or failed.</td><td>An LLM judge is evidence, not an oracle. Reviewers can inspect both the agent trace and the mechanism that produced the score.</td></tr>
 <tr><td>Turn human findings into regression coverage</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> connects human annotation, production findings, offline datasets, regression testing, and continuous improvement. <a href="https://www.braintrust.dev/docs/evaluate" target="_blank" rel="noopener">Braintrust</a> similarly feeds interesting production traces back into test datasets.</td><td>Step 5 closes the loop: review a real failure, calibrate a regression metric, change the agent, and rerun against a comparable baseline.</td></tr>
@@ -585,7 +585,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 
 <section>
 <h2>An authored metric declares what it needs, so coverage is a count</h2>
-<p>There is no universal checklist. The signed-in developer's personal library holds definitions they previously created or used. Nothing is learned from earlier agent uploads and no LLM silently chooses a metric. Reuse is explicit: attach a Prompt, Deterministic, REST API or Agentic definition only after its declared inputs are checked against the current data.</p>
+<p>There is no universal checklist. The library holds definitions marked Yours, Team metric, or HUMAIN template, with owner and usage history. A governed template is still only a starting point. Nothing is learned from earlier agent uploads and no LLM silently chooses a metric. Reuse is explicit: attach a Prompt, Deterministic, REST API, or Agentic definition only after its declared inputs are checked against the current data.</p>
 
 <div class="fig">
 <svg viewBox="0 0 940 396" role="img" aria-label="Metrics sorted by what input they require">
@@ -757,14 +757,24 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <script>
 (function(){
   var META={"proof": {"t": "Prove: compare, evidence, submit", "c": "First compare only shared cases and metrics, while unmatched items stay visible. Then open the evidence pack and submit it for verification. No pass mark blocks submission."}, "perf": {"t": "Run: one job, every datapoint", "c": "What Prism reports back per job: datapoints attempted, average, P50, P95, P99, min-to-max latency, total, completion, and tokens in and out. Cost follows from the tokens, so nothing here is an invented price."}, "scores": {"t": "Read: scores with their coverage", "c": "Every metric this job. The dropdown switches the aggregation between Average and Sum, and the toggle switches the scale between percent, 0 to 10 and 0 to 1, the way Prism's results page does. Judge scores carry the label that they are a signal."}, "note": {"t": "Improve: say what went wrong", "c": "One sentence in your words. The suggested groups underneath are ours; the sentence is yours, and it is what gets grouped next."}, "groups": {"t": "Improve: notes become groups", "c": "The same complaint counted together, each with the sentences behind it. Rename or merge. The biggest group is the biggest fix, so it says start here."}, "checks": {"t": "Improve: a group becomes a check", "c": "A check in plain words with a yes or no answer, tried on real cases, then saved to run on every job after this one. Below it, how often the check agreed with you on the cases you judged by hand."}, "compare": {"t": "Prove: compare jobs or evaluations", "c": "Match shared case IDs, then see what improved and what broke. New safety flags sit above the table because a flag can appear while every other column stays green."}, "submit": {"t": "Prove: submit for verification", "c": "What the verifier receives. Open issues are sent as they are. There is no minimum score to reach."}, "grid": {"t": "Read: datapoint by metric", "c": "One cell per datapoint per metric. Grey is where the metric could not read the case."}, "cases": {"t": "Read: the attention set", "c": "The complete 380 row table with a filter on, never a smaller one. Eight input types in one table."}, "trace": {"t": "Improve: open one case", "c": "Every step the agent took on the left. What went in, what you expected and what came back on the right, each rendered as its type."}, "evid": {"t": "Prove: the evidence pack", "c": "Every check with what happened to it, including the ones that did not run and why. The page the verifier reads."}, "mapping": {"t": "Set up: name the fields", "c": "The file's keys with a sample value each, and a role for every one: Input, Expected output, Metadata or Ignore. No schema file. A link field mapped to Input is how media rides. The line underneath confirms all 380 rows share the shape."}, "library": {"t": "Set up: create and attach metrics", "c": "A new evaluation starts with zero attached. This saved evaluation shows definitions created for Al Noor, tabbed by Prism's four mechanisms. Every row names its mechanism and coverage from the mapped data; Global Metrics means library scope, not a universal scorecard."}, "builder": {"t": "Set up: build a metric", "c": "A prompt with variables, and the coverage it implies read back from the variables it uses. Deterministic gets Prism's evaluate() contract and a sandbox run, REST API gets the endpoint and the score field, Agentic gets a description."}, "evalcard": {"t": "Set up: the evaluation", "c": "A named evaluation with a description saved alongside it, the agent as a typed object with its endpoint, the dataset with the fields you mapped as input, the metrics by kind, Number of runs 1 to 5, Parallel datapoints, and the run with its estimate."}, "results": {"t": "Read: the results screen", "c": "The evaluation and its jobs at the top, including a failed job at 0 of 380, then where to look first, the safety band, tokens and latency."}};
-  META.library.c='Your personal library holds definitions you previously created or used. Nothing is learned from earlier agent uploads or selected by a hidden LLM. A new evaluation starts with zero attached, and reuse is deliberate after the current mapping is checked.';
+  META.mapping.c='Connect to Snowflake and test read-only access. A failed check exposes no objects and returns to connection details; a successful check unlocks browsing. Then preview UNKNOWN_DATASET_2026_09_02, add it as a draft, review the suggested field roles, and confirm the mapping before run. Compatibility recalculates against the confirmed data.';
+  META.library.c='The library distinguishes Yours, Team metric, and governed HUMAIN template provenance. A template is a starting point, not a universal score. Nothing is learned from earlier uploads or selected by a hidden LLM; a new evaluation starts with zero attached.';
   META.checks.t='Measure: a failure becomes a regression metric';
   META.checks.c='Select a reviewed failure, define a yes or no Prompt metric over Input, Output, and Trace, compare it with 20 human verdicts, then save it to your personal library and attach it to this evaluation. This screen measures the fix; you change the agent outside it and run again.';
   META.builder.c='Create a Prompt, Deterministic, REST API, or Agentic definition. Saving puts a versioned definition in your personal library and attaches it only to the evaluation you are working on.';
-  META.evalcard.c='The evaluation stores the explicit pairing of this agent, mapped dataset, and the definitions selected from your personal library. Library availability never means automatic attachment.';
+  META.evalcard.c='The evaluation stores the explicit pairing of this agent, confirmed mapped dataset, and deliberately attached definitions. The next immutable receipt is created at run start; draft changes never rewrite the latest completed job.';
   var lb=document.getElementById('lb'),img=document.getElementById('lbimg'),
       cap=document.getElementById('lbcap'),ttl=document.getElementById('lbtitle'),last=null;
+  var CURRENT_SHOTS={
+    mapping:'assets/eval-v15-snowflake-import.png',
+    library:'assets/eval-v15-metric-library.png'
+  };
+  Object.keys(CURRENT_SHOTS).forEach(function(k){
+    var shot=document.querySelector('figure.shot img[alt^="'+k+' "]');
+    if(shot)shot.src=CURRENT_SHOTS[k];
+  });
   function srcFor(k){
+    if(CURRENT_SHOTS[k])return CURRENT_SHOTS[k];
     var a=document.querySelector('figure.shot img[alt^="'+k+' "]');
     var b=document.querySelector('#shotstore img[data-key="'+k+'"]');
     return (a||b)?(a||b).getAttribute('src'):null;
