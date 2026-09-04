@@ -7,7 +7,7 @@ artifact = root / "Eval_Platform_Final_Yasser.html"
 text = artifact.read_text()
 
 required = {
-    "V17 prototype entry point": "Eval_Journey_V17.html",
+    "V19 prototype entry point": "Eval_Journey_V19.html",
     "Prompt-first path": "Prompt metrics by default",
     "phased capability": "Advanced and phased",
     "OpenTelemetry evidence": "OpenTelemetry trace",
@@ -23,8 +23,8 @@ for name, needle in required.items():
     if needle not in text:
         errors.append(f"missing {name}: {needle}")
 
-if "Eval_Journey_V16.html" in text:
-    errors.append("legacy V16 prototype link remains")
+if "Eval_Journey_V17.html" in text or "Eval_Journey_V18.html" in text:
+    errors.append("legacy prototype link remains")
 
 main_shots = re.findall(r'<rect class="hot" data-shot="([^"]+)"[^>]+simpleArrow|<rect class="hot" data-shot="([^"]+)"', text)
 flat_shots = [a or b for a, b in main_shots]
@@ -46,4 +46,4 @@ print("FINAL ARTIFACT CHECK: PASS")
 print(f"- {len(required)} narrative contracts present")
 print("- six primary flow boxes are clickable")
 print("- all current screenshot assets resolve")
-print("- V17 is the only prototype entry point")
+print("- V19 is the only prototype entry point")
