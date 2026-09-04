@@ -23,7 +23,10 @@ harness = r"""
   nav('s1');
   var PRIMARY=(typeof metricTitle==='function')?metricTitle('acc'):'Accuracy';
   if(document.getElementById('newEvalBlank')){
-    T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('agentSetup').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
+    if(typeof RELEASE_REVIEW_V17!=='undefined'){
+      T('saved agent metric set covers all four Prism definition types in user language',function(){var x=document.getElementById('agentSetup').innerText;return /Prompt/.test(x)&&/Code/.test(x)&&/REST API/.test(x)&&/Evaluation agent/.test(x)});
+      T('Prompt is the recommended metric path and advanced mechanisms are phased',function(){var x=document.getElementById('agentSetup').innerText;return /Recommended: start with a Prompt metric/.test(x)&&/advanced, phased integrations/.test(x)});
+    } else T('saved agent metric set covers all four Prism definition types',function(){var x=document.getElementById('agentSetup').innerText;return /Prompt/.test(x)&&/Deterministic/.test(x)&&/REST API/.test(x)&&/Agentic/.test(x)});
     T('setup states that Prism metrics are not universal',function(){return /does not mean that a metric applies to every agent/.test(document.getElementById('agentSetup').innerText)});
     if(typeof METRIC_LIBRARY!=='undefined'){
       T('metric library scopes are explicit',function(){var x=document.getElementById('agentSetup').innerText;return typeof RELEASE_REVIEW_V15!=='undefined'?/Yours are private to Ritwik/.test(x)&&/Team metric/.test(x)&&/HUMAIN template/.test(x):/Your (personal )?library|personal metric library/i.test(x)&&/Private to Ritwik/.test(x)&&/previously created or used/.test(x)});
@@ -86,6 +89,7 @@ harness = r"""
   if(typeof METRIC_SECTION_V13!=='undefined')rowEl(PRIMARY).click();
   click('newMetric');
   T('builder opens needing expected output at 349',function(){return /expected output/.test(document.querySelector('#mbuild .needline').innerText) && /349 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
+  if(typeof RELEASE_REVIEW_V17!=='undefined')T('Prompt builder constrains judge output and explains model credentials',function(){var x=document.getElementById('mbuild').textContent;return /Allowed response/.test(x)&&/PASS or FAIL/.test(x)&&/HUMAIN Model Gateway/.test(x)&&/organization credentials/.test(x)&&/BYOK/.test(x)});
   var ta=document.getElementById('mbPrompt'); ta.value='Given the reply {output}, answer yes if it states a decision.'; ta.dispatchEvent(new Event('input',{bubbles:true}));
   T('dropping {expected_output} moves coverage to 347',function(){return /347 of 380/.test(document.querySelector('#mbuild .needline').innerText)});
   click('mbSave');
@@ -120,6 +124,7 @@ harness = r"""
   if(document.querySelector('.prismtabs')){
     T('calibration is placed in the Prism tab sequence',function(){return /AgentDataMetriccalibrationImport/.test(document.querySelector('.prismtabs').innerText.replace(/\s/g,'')) && document.querySelector('.prismtab.on').textContent==='Metric calibration'});
     T('setup explains independent per-datapoint execution',function(){return /380 independent datapoints/.test(document.querySelector('.execnote').innerText)});
+    if(typeof RELEASE_REVIEW_V17!=='undefined')T('benchmark size is distinguished from developer evaluation size',function(){var x=document.querySelector('.execnote').innerText;return /Benchmark evaluation/.test(x)&&/10 to 50 cases/.test(x)});
   }
   if(document.getElementById('cmpBasis')){
     T('Prism setup tabs are real navigation buttons',function(){return document.querySelectorAll('.prismtabs button[data-setup-target]').length===4});
@@ -148,11 +153,18 @@ harness = r"""
   var before=CHECKS.length;
   if(typeof RELEASE_REVIEW_V14!=='undefined'){
     nav('s4');
-    T('failure grouping leads to measurement before rerun',function(){return !document.querySelector('#s4 #rerunBtn')&&!!document.querySelector('#s4 [data-go="s5"]')});
+    if(typeof RELEASE_REVIEW_V17!=='undefined'){
+      T('core loop leads from evidence to edit, deploy, and rerun',function(){var x=document.getElementById('s4').innerText;return /Inspect/.test(x)&&/Edit agent/.test(x)&&/Deploy version/.test(x)&&/Evaluate again/.test(x)});
+      T('failure grouping is optional advanced analysis',function(){var x=document.getElementById('s4').innerText;return /Advanced analysis/.test(x)&&/Why optional/.test(x)&&!!document.querySelector('#s4 [data-go="s5"]')});
+      click('deployAgent');
+      T('deploy creates a new agent version before rerun',function(){return AGENT_VERSION==='v1.5.0'&&AGENT_DEPLOYED&&/v1.5.0 is deployed/.test(document.getElementById('deployStatus').innerText)&&!document.getElementById('runDeployed').disabled});
+      AGENT_VERSION='v1.4.0';AGENT_DEPLOYED=false;renderImprove();
+    } else T('failure grouping leads to measurement before rerun',function(){return !document.querySelector('#s4 #rerunBtn')&&!!document.querySelector('#s4 [data-go="s5"]')});
   }
   nav('s5');
   if(typeof METRIC_SECTION_V13!=='undefined'){
-    T('step five says it measures a fix rather than editing the agent',function(){var x=document.getElementById('s5').innerText;return /Make the fix measurable/.test(x)&&/does not change your agent/.test(x)&&/outside this screen/.test(x)});
+    if(typeof RELEASE_REVIEW_V17!=='undefined')T('step five is optional regression measurement, not agent editing',function(){var x=document.getElementById('s5').innerText;return /Advanced: create a regression metric/.test(x)&&/optional screen does not change your agent/.test(x)&&/Return to the core loop/.test(x)});
+    else T('step five says it measures a fix rather than editing the agent',function(){var x=document.getElementById('s5').innerText;return /Make the fix measurable/.test(x)&&/does not change your agent/.test(x)&&/outside this screen/.test(x)});
     T('regression metric starts from a named reviewed failure',function(){var x=document.getElementById('s5').innerText;return /Stops before the end of the input/i.test(x)&&/2 reviewed cases/i.test(x)});
     T('judge contract names all inputs and limits the LLM role',function(){var x=document.getElementById('s5').innerText;return /Input \+ Output \+ Trace/.test(x)&&/as the judge only/.test(x)&&/does not edit the agent/.test(x)});
     T('calibration sample is distinguished from current attention cases',function(){var x=document.getElementById('s5').innerText;return /20 previously human-reviewed calibration cases/.test(x)&&/separate from the 14 attention cases/.test(x)});
@@ -160,7 +172,8 @@ harness = r"""
   }
   if(typeof RELEASE_REVIEW_V14!=='undefined'){
     T('selected regression source follows the largest reviewed failure group',function(){var g=groupCounts(),ks=Object.keys(g).sort(function(a,b){return g[b]-g[a]});return document.getElementById('checkGroupTitle').textContent===TAGS[ks[0]]&&document.getElementById('checkGroupBadge').textContent===g[ks[0]]+' reviewed cases'});
-    T('actual agent-change rerun appears only after the metric workflow',function(){return !!document.querySelector('#s5 #rerunBtn')&&/changed the agent/i.test(document.querySelector('#s5 #rerunBtn').textContent)});
+    if(typeof RELEASE_REVIEW_V17!=='undefined')T('regression workflow returns to the primary improve and deploy loop',function(){return !!document.querySelector('#s5 [data-go="s4"]')&&/improve and deploy/i.test(document.querySelector('#s5 [data-go="s4"]').textContent)});
+    else T('actual agent-change rerun appears only after the metric workflow',function(){return !!document.querySelector('#s5 #rerunBtn')&&/changed the agent/i.test(document.querySelector('#s5 #rerunBtn').textContent)});
     T('seeded evidence has no ghost regression metric',function(){return CHECKS.length===0&&!/Your regression metrics/.test(document.getElementById('covBox').innerText)});
   }
   document.getElementById('chkDraft').value='The output must name the reference number when one exists.';
@@ -204,6 +217,7 @@ harness = r"""
     T('deleting a regression metric removes the same identity from library, calibration, and checks',function(){return !USER_METRICS.some(function(m){return m.k===savedMetric.k})&&!CHECKS.some(function(c){return c.metricKey===savedMetric.k})&&!document.querySelector('[data-rmmet="'+savedMetric.k+'"]')});
   }
   var t=''; ['s1','s2','s3','s4','s5','s6','s7','s8'].forEach(function(id){nav(id); t+=document.getElementById(id).innerText;});
+  if(typeof RELEASE_REVIEW_V17!=='undefined')T('case inspection identifies an OpenTelemetry trace and standard fields',function(){nav('s3');var x=document.getElementById('caseTrace').innerText;return /OTLP \/ OpenTelemetry/.test(x)&&/trace_id/.test(x)&&/span.kind/.test(x)&&/duration_ms/.test(x)});
   T('no undefined, NaN or [object on any screen',function(){return !/undefined|NaN|\[object/.test(t)});
   T('no runtime errors',function(){return errs.length===0 ? true : errs.join(' | ')});
   var pre=document.createElement('pre'); pre.id='__selftest'; pre.textContent=JSON.stringify(R); document.body.appendChild(pre);
