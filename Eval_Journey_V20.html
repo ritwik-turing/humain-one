@@ -897,7 +897,7 @@ table{font-size:13px}th,td{padding:12px 13px}thead th{background:#f7f8f4}
   <div class="dec"><b>No universal evaluation metrics</b><span>Prism supplies four ways to define a metric: Prompt, Code, REST API and Evaluation agent. The developer creates a metric or deliberately reuses one from their personal library, then attaches it to an evaluation. A new evaluation starts with zero attached. A saved definition can be reused, but that never means it applies automatically to another agent.</span></div>
   <div class="dec"><b>The happy path is edit, deploy, evaluate, repeat</b><span>Results lead directly back to the agent editor. Every deployed change creates a new agent version and every evaluation job freezes that version. Reviewed-note grouping and regression metrics remain available as an advanced analysis path, not a mandatory detour.</span></div>
   <div class="dec"><b>The metric library has provenance, not universal truth</b><span>Definitions can be Yours, shared by a Team, or published as a governed HUMAIN template. A template is a reviewed starting point, not a universal score and never an automatic attachment. Nothing is inferred from earlier uploads or selected by a hidden model.</span></div>
-  <div class="dec"><b>In V19</b><span>The complete V17 product contract is preserved. Common choices lead; every advanced source, evaluator, analysis, evidence, and submission capability remains available through progressive disclosure.</span></div>
+  <div class="dec"><b>In V20</b><span>The complete V17 product contract is preserved. Common choices lead; every advanced source, evaluator, analysis, evidence, and submission capability remains available through progressive disclosure.</span></div>
   <div class="dec"><b>Execution is per datapoint</b><span>Prism evaluates each datapoint independently and can deliver independent datapoints in parallel. The dataset is never placed into one model context. Input-limit validation belongs before the run; internal transport batching is an engineering concern and does not change a score or the developer flow.</span></div>
   <div style="margin-top:18px"><button class="btn" id="aboutClose">Close</button></div>
 </div></div>
@@ -1442,7 +1442,7 @@ table{font-size:13px}th,td{padding:12px 13px}thead th{background:#f7f8f4}
   <div class="rlog" id="rLog"></div>
 </div></div>
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<div class="wm">HUMAIN ONE Evaluate - V19</div>
+<div class="wm">HUMAIN ONE Evaluate - V20</div>
 
 <script>
 /* ---------- case data ---------- */
@@ -2556,6 +2556,7 @@ var RELEASE_REVIEW_V15=true;
 var RELEASE_REVIEW_V16=true;
 var RELEASE_REVIEW_V17=true;
 var RELEASE_REVIEW_V19=true;
+var RELEASE_REVIEW_V20=true;
 function metricVersionList(){
   var on=allMetrics().concat(EXTRA_METRICS).filter(function(m){return m.on&&metricAvailable(m).ok});
   return on.map(function(m){return 'met-aln-'+m.k+'@'+(m.ver||'v1.0.0')}).join(', ')||'no attached metric definitions';
@@ -3164,7 +3165,7 @@ function mergeGroups(from,to){
   toast(moved+' note'+(moved===1?'':'s')+' moved into "'+TAGS[to]+'"');
 }
 /* ---------- persistence ---------- */
-var KEY='eval_journey_v19';
+var KEY='eval_journey_v20';
 function skey(){return KEY+':final';}
 function persist(){
   try{localStorage.setItem(skey(),JSON.stringify({
