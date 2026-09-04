@@ -137,10 +137,10 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     <div class="cl"><div class="num">02</div><b>Coverage is a count</b><p>The Al Noor expected-output definition ran on 349 of 380. Its citizen-actionability definition ran on 161. The product says so on screen, because a metric that quietly covered less than half the run reads exactly like one that covered all of it.</p></div>
     <div class="cl"><div class="num">03</div><b>The agent change is the loop</b><p>Inspect evidence, edit the prompt, code, tools, or configuration, deploy a new agent version, and rerun. Grouping failures into a regression metric is powerful, but optional.</p></div>
   </div>
-  <a class="prototypecta" href="Eval_Journey_V22.html" target="_blank" rel="noopener">Open the finished interactive V22 prototype</a>
+  <a class="prototypecta" href="Eval_Journey_V23.html" target="_blank" rel="noopener">Open the finished interactive V23 prototype</a>
   <div class="scopegrid" aria-label="Phased product scope">
     <div class="scopeitem launch"><b>Launch path</b>Upload or warehouse data, Prompt metrics by default, Code for strict rules, OpenTelemetry trace inspection, versioned edit-deploy-evaluate loop, comparison, and evidence.</div>
-    <div class="scopeitem phase"><b>Advanced and phased</b>REST API after the Humain use case is confirmed. Evaluation agents after model gateway, supported-agent, subscription, and BYOK policies are finalized.</div>
+    <div class="scopeitem phase"><b>Advanced and phased</b>REST API after the Humain use case is confirmed. Evaluation agents use a standard CLI adapter contract: Claude Code CLI is preselected, Codex CLI is the primary alternative, and tenant admins choose managed identity, BYOK, or a customer runner.</div>
     <div class="scopeitem"><b>Preserved capability</b>The UI shows all four Prism mechanisms and their contracts. Phasing controls delivery order, not the target product model.</div>
   </div>
 </div>
@@ -550,7 +550,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     <div class="demostep">
       <div class="demotime">3:00-4:15</div>
       <div class="demoact"><b>2. Explain the metrics</b><span>Scroll to Choose evaluation metrics. Point; do not toggle.</span></div>
-      <div class="demosay">Prompt is the recommended default because most evaluation criteria can be expressed as a constrained judge. Code handles strict functions. REST API and Evaluation agent preserve Prism's complete capability as advanced, phased paths. HUMAIN ONE does not infer metrics from earlier uploads: library availability, compatibility, and attachment remain separate decisions.</div>
+      <div class="demosay">Prompt is the recommended default because most evaluation criteria can be expressed as one constrained judgment. Use an Evaluation agent only when the metric must inspect several sources, follow an OpenTelemetry trace, or call an approved tool. Choosing that mechanism preselects Claude Code CLI; Codex CLI is the primary alternative. Prism gives the runner one redacted read-only case, launches it without cross-case memory, validates score, label, explanation, and evidence against a strict JSON schema, and records the exact runner, model, prompt, evidence snapshot, sandbox, tools, network, and credential policy in the job receipt. A timeout or invalid response creates a metric error with no score—it never becomes a failed-agent verdict.</div>
     </div>
 
     <div class="demostep">
@@ -592,7 +592,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 
   <div class="demofinish">
     <div><b>If you have only five minutes</b>Show Snowflake and mapping, Prompt-first metrics and provenance, results with coverage, one OpenTelemetry trace, edit and deploy v1.5.0, then comparison and evidence. Skip advanced sources, metric creation, grouping, calibration, filters, AI summary, and extra cases.</div>
-    <div><b>Avoid these claims</b>Do not call HUMAIN templates universal. Do not say an LLM selects metrics. Do not present REST API or Evaluation agent as launch commitments. Do not call a score pass or fail. Say the Snowflake experience is a product simulation, not a live production connector.</div>
+    <div><b>Avoid these claims</b>Do not call HUMAIN templates universal. Do not say an LLM selects metrics. Do not say Claude Code or Codex evaluates every agent by default: they are selectable runners inside the advanced Evaluation agent metric. Do not present REST API or Evaluation agent as launch commitments. Do not call a score pass or fail. Say the Snowflake and CLI runs are product simulations, not live production integrations.</div>
   </div>
 
   <div class="democlose"><b>Close with this sentence</b>HUMAIN ONE lets the developer define what good means for this agent, inspect scores and OpenTelemetry evidence, change and deploy a new agent version, compare it fairly, and submit an honest evidence trail for verification.</div>
@@ -602,18 +602,19 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 <hr>
 
 <section id="industry-cross-check">
-<p class="eyebrow">Optional presenter defense &middot; official docs checked 2 Sep 2026</p>
+<p class="eyebrow">Optional presenter defense &middot; official docs checked 4 Sep 2026</p>
 <h2>Why this design holds up against current eval frameworks</h2>
 <p>This is evidence of convergent product patterns, not a claim that the products are identical or that every Humain ONE safeguard is already in Prism. Open this only when someone asks whether the design matches the market.</p>
 
 <details class="market">
-<summary>Open the industry cross-check: six design defenses</summary>
+<summary>Open the industry cross-check: seven design defenses</summary>
 <div class="marketbody">
 <table>
 <thead><tr><th>Our design choice</th><th>Current framework evidence</th><th>What you can defend</th></tr></thead>
 <tbody>
 <tr><td>Start with use-case-specific success criteria</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> says to first identify what matters for the application and its components. <a href="https://deepeval.com/docs/metrics-introduction" target="_blank" rel="noopener">DeepEval</a> recommends a mix that includes custom, use-case-specific metrics rather than relying entirely on generic metrics.</td><td>Zero metrics on a new evaluation is intentional. The developer defines what good means for this agent.</td></tr>
 <tr><td>Support more than one scoring mechanism</td><td><a href="https://www.braintrust.dev/docs/evaluate/write-scorers" target="_blank" rel="noopener">Braintrust</a> supports prebuilt, LLM-as-judge, and custom-code scorers. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Arize Phoenix</a> supports deterministic and LLM evaluators. <a href="https://docs.wandb.ai/weave/guides/evaluation/scorers" target="_blank" rel="noopener">W&amp;B Weave</a> supports function- and class-based custom scorers. <a href="https://www.promptfoo.dev/docs/configuration/expected-outputs/" target="_blank" rel="noopener">Promptfoo</a> supports deterministic, model-graded, code, and webhook assertions.</td><td>Prism's Prompt, Code, REST API, and Evaluation agent definitions fit a proven multi-mechanism model; Prompt is the default experience, not a universal score.</td></tr>
+<tr><td>Run standard CLI agents as bounded evaluators</td><td><a href="https://code.claude.com/docs/en/headless" target="_blank" rel="noopener">Claude Code</a> documents non-interactive print mode, JSON Schema output, permission controls, turn and spend caps, and non-persistent sessions. <a href="https://learn.chatgpt.com/docs/non-interactive-mode" target="_blank" rel="noopener">Codex CLI</a> documents non-interactive execution, read-only sandboxing, ephemeral sessions, structured output, and scoped automation credentials.</td><td>Claude Code and Codex are adapters behind one Prism contract—not special cases. Prism still revalidates the final JSON, records errors separately from agent quality, and freezes the resolved model and access policy in the receipt.</td></tr>
 <tr><td>Separate reusable definitions from attachment</td><td><a href="https://docs.langchain.com/langsmith/evaluation-concepts" target="_blank" rel="noopener">LangSmith</a> treats evaluators as reusable resources that are attached to projects or datasets. <a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> lets users configure evaluators and attach them to datasets.</td><td>A library can preserve personal, team, and governed-template definitions while every evaluation still starts with zero attached. Availability never means universal applicability or silent selection.</td></tr>
 <tr><td>Freeze runs before comparing them</td><td><a href="https://www.braintrust.dev/docs/evaluate" target="_blank" rel="noopener">Braintrust</a> describes experiments as immutable, comparable records and <a href="https://www.braintrust.dev/docs/evaluate/compare-experiments" target="_blank" rel="noopener">aligns test cases across experiments</a> for deltas.</td><td>Our run receipt and same-case, same-metric-version comparison rules prevent dataset or evaluator drift from masquerading as agent improvement.</td></tr>
 <tr><td>Inspect traces and the evaluator itself</td><td><a href="https://arize.com/docs/phoenix/evaluation/llm-evals" target="_blank" rel="noopener">Phoenix</a> traces evaluator inputs, prompts, outputs, scores, and timing. <a href="https://developers.openai.com/api/docs/guides/trace-grading" target="_blank" rel="noopener">OpenAI trace grading</a> uses structured labels over an agent's end-to-end trace to diagnose where behavior succeeded or failed.</td><td>An LLM judge is evidence, not an oracle. The case drilldown uses OpenTelemetry fields so existing agent traces can be compared without inventing a proprietary format.</td></tr>
@@ -876,7 +877,7 @@ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
   META.library.c='The library distinguishes Yours, Team metric, and governed HUMAIN template provenance. A template is a starting point, not a universal score. Nothing is learned from earlier uploads or selected by a hidden LLM; a new evaluation starts with zero attached.';
    META.checks.t='Advanced: a failure becomes a regression metric';
    META.checks.c='Optionally select a reviewed failure, define a constrained Prompt metric over Input, Output, and Trace, compare it with 20 human verdicts, then save it to your personal library and attach it to this evaluation.';
-   META.builder.c='Prompt is the recommended default and returns a constrained value. Code handles strict rules. REST API and Evaluation agent preserve Prism capability as advanced, phased paths. The model version and credential policy are pinned through the HUMAIN Model Gateway.';
+   META.builder.c='Prompt is the recommended default and returns a constrained value. Evaluation agent is the advanced multi-step path: Claude Code CLI is preselected and Codex CLI is the primary alternative. Prism launches one fresh, least-privilege runner per case, validates a strict JSON result, writes no score on runner failure, and pins runner version, resolved model, prompt, evidence snapshot, sandbox, tools, network, and credential policy in the receipt.';
    META.evalcard.c='The evaluation stores the explicit pairing of this agent, confirmed mapped dataset, and deliberately attached definitions. Repetitions run each datapoint 1 to 5 times to expose nondeterminism. The next immutable receipt is created at run start.';
   META.note.t='Improve: review Prism\'s draft';
   META.note.c='Prism drafts a default failure note from failed checks, safety flags, output differences, and the trace. Accept it unchanged or edit it. The draft is a starting point, not reviewed truth, and does not enter a failure group until you confirm it.';
