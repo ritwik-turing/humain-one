@@ -1190,7 +1190,7 @@ table{font-size:13px}th,td{padding:12px 13px}thead th{background:#f7f8f4}
           <div><b id="dataReceiptName">alnoor-mixed-eval · snapshot ds-2026-09-02.4</b><span id="dsSource">Snowflake + S3 · ALNOOR.EVAL_V4 · synced 2 hours ago</span></div>
           <div class="data-stat"><b id="caseCount">380 cases</b><span>Realistic test set</span></div>
           <div class="data-stat"><b id="coverage">342 references</b><span>Expected-output coverage</span></div>
-          <div class="data-stat"><b id="dataContractState">Mapped fields</b><span>Ready to run</span></div>
+          <div class="data-stat"><b id="dataContractState">Field mapping</b><span id="dataContractStatus">Review required</span></div>
         </div>
         <p class="muted" id="caseDef" style="margin:12px 0 0;font-size:12px">Each case is one thing the agent must handle. Expected outputs are optional; checks that need one run only where it exists.</p>
         <div class="data-actions"><button class="btn ghost sm" id="dsBrowse">Review cases</button><button class="btn ghost sm" id="editCases">Edit cases</button><button class="btn ghost sm" id="addCase">Add production failure</button><button class="btn sm replace-source" id="replaceSource">Replace source</button></div>
@@ -3512,7 +3512,8 @@ function renderSetup(){
   el.textContent=draftTotalCases()+' cases';
   var fail=CASES.filter(function(c){return fails(c)||c.flag}).length, nc=noteCounts();
   var refCov=metricCov({need:'label'});document.getElementById('coverage').textContent=refCov.ran+' expected outputs';
-  var dcs=document.getElementById('dataContractState');if(dcs)dcs.textContent=INPUT_MODE==='record'?'Whole record':'Mapped fields';
+  var dcs=document.getElementById('dataContractState');if(dcs)dcs.textContent=INPUT_MODE==='record'?'Whole record':'Field mapping';
+  var dcstatus=document.getElementById('dataContractStatus');if(dcstatus)dcstatus.textContent=MAP_CONFIRMED?'Confirmed':'Review required';
   alwaysEg();
   var rb=document.getElementById('runBtn');
   var canStart=DATA_ATTACHED&&draftTotalCases()&&MAP_CONFIRMED&&mapHas('input');
