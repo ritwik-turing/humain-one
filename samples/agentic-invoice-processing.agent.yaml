@@ -1,0 +1,47 @@
+name: agentic-invoice-processing
+version: 4.1.4
+entry: main
+nodes:
+  - name: main
+    type: action
+  - name: extract_invoice
+    type: action
+  - name: vendor_reconciliation
+    type: action
+edges:
+  - from: main
+    to: extract_invoice
+  - from: extract_invoice
+    to: vendor_reconciliation
+deployment:
+  runtime: python
+  source_commit: "0a36a1b4a7a2b8c6e24fce82715723452335678a"
+  source_repo: "https://goat-advertisers-plot-turning.trycloudflare.com"
+  resources:
+    cpu: "1"
+    memory: 4Gi
+  secrets:
+    - GEMINI_API_KEY
+    - OPENAI_API_KEY
+  agents:
+    - key: orchestrator
+      name: Invoice Orchestrator
+      entry: main
+      path: /api/research
+      role: orchestrator
+      input_field: query
+      output_field: answer
+    - key: invoice-extractor
+      name: Invoice Extractor
+      entry: extract_invoice
+      path: /api/extract
+      role: sub_agent
+      input_field: document
+      output_field: fields
+    - key: reconciler
+      name: Vendor Reconciler
+      entry: vendor_reconciliation
+      path: /api/reconcile
+      role: sub_agent
+      input_field: query
+      output_field: answer
