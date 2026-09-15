@@ -1,0 +1,23 @@
+
+/* V64 modes */
+.mode-hub .setup-progress,.mode-hub .draft-summary,.mode-hub .workflow-footer,.mode-hub .page-back-navigation,.mode-hub .prev,.mode-hub .runbar,.mode-hub #evalName,.mode-hub #evalNameLabel,.mode-hub #loadEvalControl,.mode-hub #baselineHistory,.mode-hub #baselineControl,.mode-hub #runSetup .run-ready-head,.mode-hub #baselineLockedNotice [data-nav-dest="run"]{display:none!important}
+.mode-hub #s1 .setup-step>summary{display:none}
+.mode-hub.baseline-saved #dataSetup .setup-step-body,.mode-hub.baseline-saved #agentSetup .setup-step-body{display:block!important}
+.mode-hub.baseline-saved #dataSetup .setup-step-body>.bd>*:not(#datasetVersions),.mode-hub.baseline-saved #agentSetup .setup-step-body>.bd>*{opacity:.72}
+.mode-hub #baselineLockedNotice{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.mode-hub #baselineLockedNotice[hidden]{display:none}
+.mode-hub #reviewReceipt .kv>:nth-child(-n+2){display:none}
+.mode-console .setup-progress,.mode-console .draft-summary,.mode-console .prev,.mode-console #loadEvalControl,.mode-console #dataSetup,.mode-console #agentSetup,.mode-console #baselineControl,.mode-console #baselineLockedNotice,.mode-console #runSetup .run-ready-head{display:none!important}
+.mode-console #runSetup>summary,.mode-console #s1 .page-back-navigation{display:none}
+.mode-console .workflow-footer .wf-prev[data-nav-dest="improve"],.mode-console .workflow-footer .wf-next[data-nav-dest="improve"]{visibility:hidden}
+.hub-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.hub-card{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;font:inherit;color:var(--text);display:grid;gap:4px}
+.hub-card:hover{border-color:var(--line-2);background:#fafbf9}
+.hub-card b{font-size:26px;line-height:1}.hub-card span{font-size:13px}.hub-card small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dataset-versions{margin:0 0 16px}
+.hub-save{display:flex;align-items:center;gap:12px;margin:0 0 16px;font-size:12.5px}
+.console-bar{display:flex;gap:14px;flex-wrap:wrap;align-items:end;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#fafbf9;margin:0 0 16px}
+.console-bar label{display:grid;gap:4px;font-size:12px;color:var(--muted);min-width:240px}
+.console-bar select{min-height:40px;padding:6px 10px;border:1px solid var(--line-2);border-radius:8px;font:inherit;font-size:13px;background:#fff}
+@media(max-width:900px){.hub-cards{grid-template-columns:repeat(2,1fr)}}
+</style>
