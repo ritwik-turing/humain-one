@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMAIN ONE — Create an Agent</title>
+<meta name="description" content="One prompt to a live, certified, sovereign AI agent. HUMAIN ONE — LEAP 2026 demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* surfaces */
+  --bg:#070c0b;
+  --bg2:#0a1211;
+  --card:#0f1917;
+  --card2:#0b1412;
+  --well:#050908;
+  --line:#1a2723;
+  --line2:#25352f;
+
+  /* ink */
+  --ink:#eaf1ee;
+  --ink-dim:#8fa39b;
+  --ink-faint:#556760;
+
+  /* platform accent — teal */
+  --tl:#16b39c;
+  --tl-hi:#5fe8d3;
+  --tl-deep:#0a6a5f;
+  --tl-glow:rgba(22,179,156,.55);
+
+  /* buyer / market accent — desert gold */
+  --gd:#e0a64b;
+  --gd-hi:#f5cd88;
+  --gd-deep:#8a5f1c;
+
+  --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+  --sans:'Instrument Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+  --ar:'IBM Plex Sans Arabic',var(--sans);
+
+  --maxw:min(1140px,84vw);
+  --ease:cubic-bezier(.22,.75,.24,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--sans);
+  overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+button{font-family:inherit}
+
+/* ═══════════ ambient stage ═══════════ */
+.amb{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1100px 620px at 50% -14%, rgba(22,179,156,.15), transparent 62%),
+    radial-gradient(820px 560px at 88% 112%, rgba(22,179,156,.06), transparent 60%);
+  transition:background 1s ease;
+}
+body.market .amb{
+  background:
+    radial-gradient(1100px 620px at 50% -14%, rgba(224,166,75,.13), transparent 62%),
+    radial-gradient(820px 560px at 12% 112%, rgba(22,179,156,.05), transparent 60%);
+}
+/* architectural grid — appears only while the machine is working */
+.mesh{position:fixed;inset:-10%;pointer-events:none;z-index:0;opacity:0;
+  transition:opacity 1.1s var(--ease);
+  background-image:
+    linear-gradient(rgba(22,179,156,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(22,179,156,.07) 1px,transparent 1px);
+  background-size:58px 58px;
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,#000 10%,transparent 72%);
+  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,#000 10%,transparent 72%);
+}
+body.working .mesh{opacity:1;animation:drift 26s linear infinite}
+@keyframes drift{to{background-position:58px 58px,58px 58px}}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.55;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.03'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* corner ticks — instrument-panel framing */
+.frame{position:fixed;inset:16px;pointer-events:none;z-index:2;opacity:.4}
+.frame i{position:absolute;width:13px;height:13px;border:1px solid var(--line2)}
+.frame i:nth-child(1){top:0;left:0;border-right:0;border-bottom:0}
+.frame i:nth-child(2){top:0;right:0;border-left:0;border-bottom:0}
+.frame i:nth-child(3){bottom:0;left:0;border-right:0;border-top:0}
+.frame i:nth-child(4){bottom:0;right:0;border-left:0;border-top:0}
+
+/* ═══════════ header ═══════════ */
+header{position:fixed;top:0;left:0;right:0;z-index:60;
+  display:flex;align-items:center;justify-content:space-between;padding:26px 40px;}
+.brand{display:flex;align-items:center;gap:11px}
+.brand .dia{color:var(--tl);font-size:15px;animation:breathe 4.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
+.brand .wm{font-weight:700;letter-spacing:.17em;font-size:12.5px}
+.brand .one{color:var(--ink-faint);font-weight:500}
+.brand .ar{font-family:var(--ar);font-size:11px;color:var(--ink-faint);margin-inline-start:9px;
+  padding-inline-start:10px;border-inline-start:1px solid var(--line2)}
+.env{display:flex;align-items:center;gap:10px;font-size:10.5px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.06em}
+.pill{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:99px;padding:6px 13px;background:rgba(10,18,17,.55);backdrop-filter:blur(6px)}
+.pill .dot{width:5px;height:5px;border-radius:50%;background:var(--tl);box-shadow:0 0 9px var(--tl)}
+.pill.auto{cursor:pointer;transition:all .25s;user-select:none}
+.pill.auto:hover{border-color:var(--line2);color:var(--ink-dim)}
+.pill.auto.on{border-color:rgba(22,179,156,.5);color:var(--tl-hi);background:rgba(22,179,156,.08)}
+.pill.auto .ai{width:0;height:0;border-style:solid;border-width:4px 0 4px 6px;border-color:transparent transparent transparent currentColor}
+.pill.auto.on .ai{border-width:0;width:6px;height:6px;border-radius:1px;background:currentColor}
+
+/* ═══════════ context bar — who is acting, and what one sentence started it ═══════════ */
+.ctxbar{position:fixed;top:64px;left:0;right:0;z-index:55;
+  display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:0 32px;opacity:0;transition:opacity .55s var(--ease);pointer-events:none}
+.ctxbar.on{opacity:1}
+.ctxwho{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-dim);
+  transition:color .5s}
+.ctxwho b{color:var(--ink);font-weight:600}
+.ctxav{width:21px;height:21px;border-radius:50%;flex:none;font-size:8.5px;font-weight:700;
+  letter-spacing:.02em;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(140deg,var(--tl-deep),var(--tl));color:#03211c;transition:background .5s}
+body.market .ctxav{background:linear-gradient(140deg,var(--gd-deep),var(--gd));color:#241503}
+.ctxsep{width:1px;height:16px;background:var(--line2);transition:opacity .4s}
+.ctxorigin{font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.02em;
+  transition:opacity .4s;
+  max-width:min(620px,52vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctxorigin b{color:var(--ink-dim);font-weight:400}
+.ctxorigin .dia{color:var(--tl);margin-inline-end:7px;font-size:8px;vertical-align:1.5px}
+body.market .ctxorigin .dia{color:var(--gd)}
+
+/* ═══════════ journey ribbon — the whole arc, always legible ═══════════ */
+.rail{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;
+  display:flex;align-items:flex-end;gap:20px;opacity:1;transition:opacity .5s}
+.rail.hide{opacity:0;pointer-events:none}
+.act{display:flex;flex-direction:column;align-items:center;gap:7px}
+.actlbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-faint);opacity:.55;transition:all .5s var(--ease);white-space:nowrap}
+.act.live .actlbl{opacity:1;color:var(--tl)}
+.act[data-act="buyer"].live .actlbl{color:var(--gd)}
+.actrow{display:flex;align-items:center}
+.rstep{display:flex;align-items:center;gap:7px;background:none;border:0;cursor:pointer;
+  padding:3px 1px;font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink-faint);transition:color .35s var(--ease);white-space:nowrap}
+.rdot{width:6px;height:6px;border-radius:50%;background:var(--line2);flex:none;
+  transition:all .4s var(--ease)}
+.rstep:hover{color:var(--ink-dim)}
+.rstep.done{color:var(--tl-deep)}
+.rstep.done .rdot{background:var(--tl-deep)}
+.rstep.now{color:var(--tl-hi)}
+.rstep.now .rdot{background:var(--tl);box-shadow:0 0 13px var(--tl-glow);transform:scale(1.45)}
+.act[data-act="buyer"] .rstep.now{color:var(--gd-hi)}
+.act[data-act="buyer"] .rstep.now .rdot{background:var(--gd);box-shadow:0 0 13px rgba(224,166,75,.55)}
+.act[data-act="buyer"] .rstep.done{color:var(--gd-deep)}
+.act[data-act="buyer"] .rstep.done .rdot{background:var(--gd-deep)}
+.rline{width:22px;height:1px;background:var(--line2);margin:0 2px;transition:background .5s}
+.rline.done{background:var(--tl-deep)}
+.actgap{width:1px;height:20px;background:var(--line2);align-self:center;margin-bottom:2px}
+
+/* presenter hint */
+.hint{position:fixed;bottom:31px;right:40px;z-index:60;font-family:var(--mono);
+  font-size:10px;letter-spacing:.1em;color:var(--ink-faint);opacity:.5;transition:opacity .6s;display:flex;gap:14px}
+.hint.fade{opacity:0}
+.hint kbd{border:1px solid var(--line2);border-radius:4px;padding:1px 5px;font-family:inherit;font-size:9px;color:var(--ink-dim)}
+
+/* ═══════════ scenes ═══════════ */
+.scene{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transform:translateY(16px) scale(.995);
+  transition:opacity .3s ease,transform .3s ease;
+  /* clears the header + context bar above and the journey ribbon below */
+  padding:clamp(104px,13vh,124px) 32px clamp(96px,13vh,116px);
+  overflow-y:auto;overflow-x:hidden}
+#s0{padding-top:clamp(70px,10vh,96px)}
+.scene.on{opacity:1;pointer-events:auto;transform:none;
+  transition:opacity .6s var(--ease) .2s,transform .7s var(--ease) .2s}
+.inner{margin:auto;width:100%;max-width:var(--maxw)}
+
+.kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--tl);margin-bottom:16px;display:flex;align-items:center;gap:11px}
+.kicker::before{content:'';width:26px;height:1px;background:currentColor;flex:none;opacity:.9}
+/* part two belongs to the buyer — carry the gold through the chrome too */
+body.market .kicker{color:var(--gd)}
+body.market .kicker::after{background:var(--gd)}
+.kicker .ar{font-family:var(--ar);letter-spacing:0;text-transform:none;font-size:11px;opacity:.55;color:var(--ink-dim)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.1vw,58px);line-height:1.08;letter-spacing:-.012em}
+h1 em{font-style:italic;color:var(--tl-hi)}
+h1 .gd{font-style:italic;color:var(--gd-hi)}
+.step h1{font-size:clamp(27px,2.9vw,42px)}
+.sub{color:var(--ink-dim);font-size:clamp(14px,1.07vw,16px);line-height:1.62;margin-top:14px;max-width:60ch}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;
+  border-radius:11px;padding:13px 22px;cursor:pointer;border:1px solid transparent;
+  transition:all .22s var(--ease);position:relative;letter-spacing:.005em}
+.btn-primary{background:var(--tl);color:#03211c}
+.btn-primary:hover{background:var(--tl-hi);transform:translateY(-1px);box-shadow:0 10px 34px rgba(22,179,156,.34)}
+.btn-gold{background:var(--gd);color:#241503}
+.btn-gold:hover{background:var(--gd-hi);transform:translateY(-1px);box-shadow:0 10px 34px rgba(224,166,75,.32)}
+.btn-ghost{background:transparent;color:var(--ink-dim);border-color:var(--line2)}
+.btn-ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+.btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
+/* autopilot is about to press this */
+.btn.armed::after{content:'';position:absolute;inset:-4px;border-radius:14px;
+  border:1px solid currentColor;opacity:.55;animation:arm 1s var(--ease) infinite}
+@keyframes arm{0%{transform:scale(.97);opacity:.6}100%{transform:scale(1.06);opacity:0}}
+
+/* ═══════════ S0 · cold open ═══════════ */
+#s0 .inner{text-align:center;max-width:min(920px,80vw)}
+.mark{width:96px;height:96px;margin:0 auto 34px;position:relative;
+  display:flex;align-items:center;justify-content:center}
+.mark .ring{position:absolute;inset:0;border:1px solid rgba(22,179,156,.32);
+  transform:rotate(45deg);border-radius:14px;animation:spinslow 14s linear infinite}
+.mark .ring:nth-child(2){inset:13px;border-color:rgba(22,179,156,.18);animation-direction:reverse;animation-duration:20s}
+@keyframes spinslow{to{transform:rotate(405deg)}}
+.mark .core{font-size:26px;color:var(--tl);text-shadow:0 0 26px var(--tl-glow)}
+#s0 h1{font-size:clamp(38px,5.4vw,76px)}
+.begin{margin-top:40px}
+.reveal{opacity:0;transform:translateY(12px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.on{opacity:1;transform:none}
+
+/* ═══════════ S1 · prompt ═══════════ */
+#s1 .inner{text-align:center;max-width:min(880px,80vw)}
+#s1 .kicker{justify-content:center}
+#s1 .kicker::after{content:'';width:26px;height:1px;background:var(--tl)}
+.promptbox{margin:40px auto 0;max-width:660px;background:var(--card);
+  border:1px solid var(--line2);border-radius:17px;padding:7px 7px 7px 22px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 26px 70px rgba(0,0,0,.55);transition:all .35s var(--ease)}
+.promptbox.lit{border-color:rgba(22,179,156,.55);
+  box-shadow:0 0 0 1px rgba(22,179,156,.22),0 0 52px rgba(22,179,156,.13),0 26px 70px rgba(0,0,0,.55)}
+.promptbox input{flex:1;background:transparent;border:none;outline:none;color:var(--ink);
+  font-size:15.5px;font-family:var(--sans);padding:13px 0}
+.promptbox input::placeholder{color:var(--ink-faint)}
+.sendbtn{width:44px;height:44px;border-radius:12px;border:none;cursor:pointer;flex:none;
+  background:var(--tl);color:#03211c;font-size:17px;display:flex;align-items:center;justify-content:center;
+  transition:all .2s}
+.sendbtn:hover{background:var(--tl-hi)}
+.chips{margin-top:24px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.chip{font-size:12.5px;color:var(--ink-dim);border:1px solid var(--line2);border-radius:99px;
+  padding:8px 16px;cursor:pointer;transition:all .22s;background:rgba(15,25,23,.7)}
+.chip:hover{color:var(--tl-hi);border-color:var(--tl-deep);background:rgba(22,179,156,.07)}
+.chip.lead{color:var(--ink);border-color:rgba(22,179,156,.35)}
+.chip.lead::before{content:'◆';color:var(--tl);font-size:8px;margin-inline-end:7px;vertical-align:1px}
+
+/* ═══════════ S2 · scope ═══════════ */
+/* The card exists from the first frame and fills itself in, row by row, while the
+   header narrates. Skeletons hold the exact final height, so nothing ever reflows. */
+.status{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink-dim);margin-top:3px}
+.status .stx{transition:opacity .25s}
+.status .stx.swap{opacity:0}
+.think-line .tick{color:var(--tl);width:14px;display:inline-flex;justify-content:center;flex:none}
+.spinner{width:11px;height:11px;border:1.4px solid var(--line2);border-top-color:var(--tl);
+  border-radius:50%;animation:spin .68s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.card{background:var(--card);border:1px solid var(--line2);border-radius:18px;overflow:hidden;
+  box-shadow:0 34px 90px rgba(0,0,0,.55)}
+.scopecard{margin-top:18px;opacity:0;transform:translateY(18px) scale(.985);
+  transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.scopecard.on{opacity:1;transform:none}
+.avatar .draftmark{font-size:15px;font-style:normal;animation:pulse 1.2s ease infinite}
+.chead{padding:17px 26px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:15px;
+  background:linear-gradient(180deg,rgba(22,179,156,.07),transparent)}
+.avatar{width:46px;height:46px;border-radius:13px;flex:none;position:relative;
+  background:linear-gradient(140deg,var(--tl-deep),var(--tl));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-size:23px;color:#eafffb;
+  box-shadow:0 0 0 1px rgba(22,179,156,.3),0 6px 22px rgba(22,179,156,.22)}
+.chead .name{font-size:17px;font-weight:600;letter-spacing:-.005em}
+.chead .role{font-size:12.5px;color:var(--ink-dim);margin-top:2px}
+.tag{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.13em;
+  color:var(--tl-hi);border:1px solid rgba(22,179,156,.3);border-radius:6px;padding:5px 10px;
+  background:rgba(22,179,156,.06)}
+.scope-body{padding:6px 26px 18px;position:relative}
+.srow{display:grid;grid-template-columns:132px 1fr;gap:18px;padding:12px 0;
+  border-bottom:1px solid var(--line)}
+.srow:last-child{border-bottom:none}
+.sk{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-faint);padding-top:4px}
+.scell{position:relative}
+.skel{position:absolute;inset:3px 0 0;transition:opacity .4s var(--ease)}
+.skel i{display:block;height:9px;border-radius:4px;margin-bottom:9px;
+  background:linear-gradient(90deg,var(--line) 0%,var(--line2) 50%,var(--line) 100%);
+  background-size:220% 100%;animation:shim 1.5s linear infinite}
+@keyframes shim{to{background-position:-220% 0}}
+.srow.on .skel{opacity:0}
+.sv{font-size:13.8px;line-height:1.56;opacity:0;transition:opacity .5s var(--ease)}
+.srow.on .sv{opacity:1}
+.sv.dim{color:var(--ink-dim);font-size:13.2px}
+.cap{display:inline-flex;align-items:center;gap:7px;margin:0 6px 6px 0;font-size:12.3px;
+  border:1px solid var(--line2);border-radius:8px;padding:5px 11px;background:var(--card2)}
+.cap::before{content:'◆';color:var(--tl);font-size:7.5px}
+.gr{color:var(--gd-hi)}
+.sactions{display:flex;gap:12px;margin-top:20px;align-items:center;opacity:0;transition:opacity .55s .1s}
+.sactions.on{opacity:1}
+.sactions .fine{font-size:12px;color:var(--ink-faint);margin-left:auto;font-family:var(--mono);letter-spacing:.04em}
+
+/* ═══════════ S3 · build ═══════════ */
+.buildhead{display:flex;align-items:flex-end;gap:20px;margin-top:6px}
+.clock{margin-left:auto;text-align:right;flex:none}
+.clock .cv{font-family:var(--mono);font-size:clamp(26px,2.5vw,36px);color:var(--tl-hi);
+  font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.clock .ck{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--ink-faint);
+  text-transform:uppercase;margin-top:2px}
+.clock .cost{letter-spacing:.09em;text-transform:none;margin-top:7px;color:var(--tl-deep)}
+.buildwrap{margin-top:26px}
+.bstep{display:grid;grid-template-columns:26px 1fr auto;gap:0 16px;position:relative;
+  opacity:.22;transition:opacity .45s var(--ease)}
+.bstep.active,.bstep.done{opacity:1}
+.spine{position:absolute;left:10px;top:24px;bottom:-4px;width:1px;background:var(--line2)}
+.bstep:last-child .spine{display:none}
+.bstep.done .spine{background:var(--tl-deep)}
+.borb{width:21px;height:21px;border-radius:50%;margin-top:2px;border:1.4px solid var(--line2);
+  background:var(--bg2);display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:transparent;transition:all .35s var(--ease);z-index:2;position:relative}
+.bstep.active .borb{border-color:var(--tl);box-shadow:0 0 16px rgba(22,179,156,.45)}
+.bstep.active .borb::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--tl);animation:pulse 1.15s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.65)}}
+.bstep.done .borb{border-color:var(--tl);background:var(--tl);color:#03211c}
+.bstep.done .borb::after{display:none}
+.bt{font-size:14.5px;font-weight:600;padding-top:2px;letter-spacing:-.004em}
+.bsub{font-size:12.3px;color:var(--ink-dim);margin-top:3px;max-height:22px;overflow:hidden;
+  transition:max-height .5s var(--ease),opacity .4s,margin .4s}
+.bstep.done .bsub{max-height:0;opacity:0;margin-top:0}
+.btime{font-family:var(--mono);font-size:11px;color:var(--ink-faint);padding-top:5px;
+  opacity:0;transition:opacity .35s;font-variant-numeric:tabular-nums}
+.bstep.done .btime{opacity:1;color:var(--tl)}
+.blog{grid-column:2/4;margin:0;border-radius:9px;background:var(--well);border:1px solid var(--line);
+  font-family:var(--mono);font-size:11.2px;line-height:1.95;color:var(--ink-dim);
+  padding:0 15px;max-height:0;overflow:hidden;
+  transition:max-height .5s var(--ease),padding .45s,margin .45s,opacity .45s,border-color .45s}
+.bstep.active .blog{max-height:120px;padding:9px 15px;margin:9px 0 16px}
+.bstep.done .blog{max-height:0;padding:0 15px;margin:0 0 14px;opacity:0;border-color:transparent}
+.blog .ln{opacity:0;transform:translateY(3px);transition:all .3s}
+.blog .ln.on{opacity:1;transform:none}
+.blog .ok{color:var(--tl)}
+.blog .key{color:var(--tl-hi)}
+
+/* registry manifest — the artifact */
+.manifest{margin-top:8px;border:1px solid rgba(22,179,156,.28);border-radius:15px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(22,179,156,.07),rgba(22,179,156,.015));
+  opacity:0;transform:translateY(14px) scale(.98);transition:all .7s var(--ease)}
+.manifest.on{opacity:1;transform:none}
+.mf-top{display:flex;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line)}
+.mf-top .seal-mini{width:22px;height:22px;border:1px solid rgba(22,179,156,.5);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;color:var(--tl);font-size:10px;flex:none}
+.mf-top .mt{font-family:var(--mono);font-size:10.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--tl-hi)}
+.mf-top .live{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.15em;color:var(--tl)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--tl);flex:none;
+  box-shadow:0 0 0 0 rgba(22,179,156,.5);animation:ripple 1.7s ease infinite}
+@keyframes ripple{0%{box-shadow:0 0 0 0 rgba(22,179,156,.45)}100%{box-shadow:0 0 0 13px rgba(22,179,156,0)}}
+.mf-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.mf-cell{padding:15px 20px;border-right:1px solid var(--line)}
+.mf-cell:last-child{border-right:none}
+.mf-cell .mk{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint)}
+.mf-cell .mv{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:6px;word-break:break-all}
+.mf-cell .mv.tlc{color:var(--tl-hi)}
+.mf-foot{padding:15px 20px;border-top:1px solid var(--line);display:flex;align-items:center;gap:16px}
+.mf-foot .fine{font-size:12.3px;color:var(--ink-dim)}
+.mf-foot .btn{margin-left:auto;flex:none}
+
+/* ═══════════ S4 · playground ═══════════ */
+/* narrower than the other scenes — chat needs a readable measure, not the full stage */
+#s4 .inner{max-width:min(920px,84vw)}
+.chatframe{margin-top:24px;background:var(--card);border:1px solid var(--line2);border-radius:18px;
+  /* take whatever the heading and the publish CTA leave behind, so the scene never
+     outgrows the viewport on a 16:9 stage screen */
+  display:flex;flex-direction:column;height:clamp(290px,calc(100vh - 470px),566px);
+  box-shadow:0 34px 90px rgba(0,0,0,.55);overflow:hidden}
+.chat-top{padding:13px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;
+  background:linear-gradient(180deg,rgba(22,179,156,.055),transparent);flex:none}
+.chat-top .avatar{width:33px;height:33px;border-radius:9px;font-size:16px}
+.chat-top .cn{font-size:13.8px;font-weight:600}
+.chat-top .cs{font-size:10.5px;color:var(--tl);display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);letter-spacing:.13em;margin-top:2px}
+.chat-top .cs i{width:5px;height:5px;border-radius:50%;background:var(--tl);display:block}
+.chat-top .reg{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:.04em}
+/* no scroll-behavior:smooth — the thread is scrolled continuously as text streams in,
+   and a smooth animation restarts on every write and never reaches the bottom */
+.chat-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:15px}
+/* pushes the thread to the bottom of the pane until it overflows, like a real chat */
+.chat-pad{flex:1 1 0;min-height:0}
+.msg{max-width:84%;font-size:13.8px;line-height:1.62;opacity:0;transform:translateY(8px);
+  transition:all .4s var(--ease)}
+.msg.on{opacity:1;transform:none}
+.msg.user{align-self:flex-end;background:var(--tl-deep);color:#e8fffb;border-radius:14px 14px 4px 14px;padding:11px 16px}
+.msg.bot{align-self:flex-start;color:var(--ink);width:100%;max-width:88%}
+.who{font-family:var(--mono);font-size:9.5px;letter-spacing:.17em;color:var(--tl);
+  margin-bottom:7px;text-transform:uppercase}
+/* tool trace — the observability beat */
+.trace{border-inline-start:1px solid var(--line2);padding-inline-start:14px;margin:2px 0 11px;
+  display:flex;flex-direction:column;gap:6px}
+.trace .tr{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.8px;
+  color:var(--ink-faint);opacity:0;transform:translateX(-5px);transition:all .32s var(--ease)}
+.trace .tr.on{opacity:1;transform:none}
+.trace .tr .ts{width:11px;flex:none;display:inline-flex;justify-content:center;color:var(--tl)}
+.trace .tr b{color:var(--ink-dim);font-weight:400}
+.trace .tr .ms{margin-left:auto;color:var(--ink-faint);opacity:.7}
+.pocard{margin-top:11px;border:1px solid var(--line2);border-radius:12px;background:var(--card2);
+  overflow:hidden;font-size:12.8px;opacity:0;transform:translateY(8px);transition:all .5s var(--ease)}
+.pocard.on{opacity:1;transform:none}
+.poh{padding:11px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.poh .pid{font-family:var(--mono);font-size:11.5px;color:var(--tl-hi);letter-spacing:.05em}
+.poh .pst{font-size:10px;font-family:var(--mono);color:var(--gd);border:1px solid rgba(224,166,75,.32);
+  padding:3px 9px;border-radius:5px;letter-spacing:.1em}
+.por{display:flex;justify-content:space-between;gap:16px;padding:9px 16px;border-bottom:1px solid var(--line);color:var(--ink-dim)}
+.por b{color:var(--ink);font-weight:500;text-align:right}
+.por:last-child{border-bottom:none}
+.por .ok{color:var(--tl)}
+.chat-in{flex:none;border-top:1px solid var(--line);padding:11px;display:flex;gap:10px;align-items:center}
+.chat-in input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+  padding:11px 14px;color:var(--ink);font-size:13.2px;outline:none;font-family:var(--sans)}
+.chat-in input:focus{border-color:var(--tl-deep)}
+.chat-in .sendbtn{width:40px;height:40px;border-radius:9px;font-size:15px}
+.playchips{display:flex;gap:8px;padding:0 20px 3px;flex-wrap:wrap;flex:none}
+.playchips .chip{font-size:11.5px;padding:6px 12px}
+.publish-cta{margin-top:20px;display:flex;align-items:center;gap:16px;
+  opacity:0;transform:translateY(8px);transition:all .55s var(--ease)}
+.publish-cta.on{opacity:1;transform:none}
+.publish-cta .note{font-size:13.2px;color:var(--ink-dim);line-height:1.55}
+.publish-cta .btn{margin-left:auto;flex:none}
+.typing{display:inline-flex;gap:4px;align-items:center;padding:5px 2px}
+.typing i{width:5px;height:5px;border-radius:50%;background:var(--ink-faint);animation:tp 1.1s ease infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.cursor{display:inline-block;width:7px;height:1.05em;background:var(--tl-hi);
+  vertical-align:-2px;margin-inline-start:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ═══════════ S5 · certify ═══════════ */
+.pubwrap{margin-top:24px;display:flex;flex-direction:column;gap:9px}
+.pubstep{display:flex;align-items:center;gap:15px;font-size:13.8px;color:var(--ink-dim);
+  border:1px solid var(--line);border-radius:12px;padding:13px 20px;background:var(--card2);
+  opacity:.3;transition:all .4s var(--ease)}
+.pubstep.active{opacity:1;border-color:var(--line2);color:var(--ink);transform:translateX(3px)}
+.pubstep.done{opacity:1;color:var(--ink);border-color:rgba(22,179,156,.26);transform:none}
+.pico{width:18px;text-align:center;color:var(--tl);flex:none;font-size:12px}
+.pubstep.active .pico{animation:pulse 1.1s ease infinite}
+.pscore{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--tl);opacity:0;
+  transition:opacity .35s;flex:none;letter-spacing:.03em}
+.pubstep.done .pscore{opacity:1}
+.sealwrap{margin-top:20px;display:flex;align-items:center;gap:26px;
+  opacity:0;transform:scale(.9);transition:all .8s cubic-bezier(.18,1.3,.35,1)}
+.sealwrap.on{opacity:1;transform:none}
+.seal{width:108px;height:108px;flex:none;border-radius:50%;position:relative;
+  border:1px solid rgba(22,179,156,.45);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:radial-gradient(circle at 50% 32%,rgba(22,179,156,.18),transparent 70%);
+  box-shadow:0 0 70px rgba(22,179,156,.22)}
+.seal::before{content:'';position:absolute;inset:7px;border-radius:50%;border:1px dashed rgba(22,179,156,.2);
+  animation:spinslow 30s linear infinite}
+.seal .d{color:var(--tl);font-size:22px}
+.seal .t{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;color:var(--tl-hi)}
+.sealtext .st{font-family:var(--serif);font-size:clamp(21px,2.1vw,30px);line-height:1.2}
+.sealtext .ss{font-size:13.5px;color:var(--ink-dim);margin-top:9px;line-height:1.6;max-width:44ch}
+.sealtext .btn{margin-top:18px}
+
+/* ═══════════ S6 · handoff ═══════════ */
+/* The whole point of the scene is one motion: the agent leaves the person who built
+   it and arrives at the person who will use it. Everything else waits on that. */
+#s6 .inner{max-width:min(940px,84vw);text-align:center}
+.handoff{display:flex;align-items:center;justify-content:center;
+  gap:clamp(16px,3.2vw,42px);margin-top:38px}
+.hp{display:flex;flex-direction:column;align-items:center;gap:10px;flex:none;
+  opacity:.3;filter:grayscale(.6);transition:opacity .8s var(--ease),filter .8s var(--ease)}
+.hp.lit{opacity:1;filter:none}
+.hp.dim{opacity:.2;filter:grayscale(.85)}
+.hav{width:60px;height:60px;border-radius:18px;display:flex;align-items:center;
+  justify-content:center;font-size:17px;font-weight:700;letter-spacing:.03em}
+.hp.dev .hav{background:linear-gradient(140deg,var(--tl-deep),var(--tl));color:#03211c}
+.hp.buy .hav{background:linear-gradient(140deg,var(--gd-deep),var(--gd));color:#241503}
+.hn{font-size:14px;font-weight:600}
+.hr{font-size:10.5px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.07em}
+
+.track{position:relative;flex:1;max-width:330px;min-width:130px;padding-top:30px}
+.tracklbl{position:absolute;top:0;left:50%;white-space:nowrap;
+  transform:translateX(-50%) translateY(5px);opacity:0;transition:all .55s var(--ease);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint)}
+.tracklbl.on{opacity:1;transform:translateX(-50%)}
+.trackline{position:relative;height:1px;background:var(--line2)}
+.trackfill{position:absolute;inset:0 auto 0 0;width:0;
+  background:linear-gradient(90deg,var(--tl),var(--gd));transition:width 1.5s var(--ease)}
+.miatok{position:absolute;top:15px;left:0;width:30px;height:30px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-style:italic;font-size:15px;color:#eafffb;
+  background:linear-gradient(140deg,var(--tl-deep),var(--tl));
+  box-shadow:0 0 0 5px var(--bg),0 0 22px rgba(22,179,156,.45);
+  transition:left 1.5s var(--ease),background .9s var(--ease),box-shadow .9s var(--ease)}
+.miatok.moved{left:calc(100% - 30px)}
+.miatok.arrived{background:linear-gradient(140deg,var(--gd-deep),var(--gd));color:#241503;
+  box-shadow:0 0 0 5px var(--bg),0 0 26px rgba(224,166,75,.5)}
+
+/* ═══════════ S7 · marketplace ═══════════ */
+.persona{display:inline-flex;align-items:center;gap:11px;margin-bottom:18px;
+  border:1px solid rgba(224,166,75,.32);background:rgba(224,166,75,.07);
+  border-radius:99px;padding:6px 16px 6px 6px;font-size:12.3px;color:var(--gd-hi)}
+.persona b{color:#fff;font-weight:600;margin:0 4px}
+.persona .pv{width:25px;height:25px;border-radius:50%;flex:none;
+  background:linear-gradient(140deg,var(--gd),var(--gd-deep));
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#241503}
+.shelf{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.stile{flex:1;min-width:120px;border:1px solid var(--line);border-radius:11px;padding:9px 14px;
+  background:var(--card2);opacity:.4;transition:all .5s var(--ease)}
+.stile .sn{font-size:12.3px;font-weight:600}
+.stile .sd{font-size:10.5px;color:var(--ink-faint);margin-top:3px;font-family:var(--mono);letter-spacing:.04em}
+.mktcard{margin-top:10px;opacity:0;transform:translateY(16px);transition:all .7s var(--ease)}
+.mktcard.on{opacity:1;transform:none}
+.mkt-head{padding:22px 26px;display:flex;gap:18px;align-items:flex-start;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(22,179,156,.06),transparent)}
+.mkt-head .avatar{width:52px;height:52px;border-radius:15px;font-size:25px}
+.mn{font-size:19px;font-weight:600;display:flex;align-items:center;gap:11px;flex-wrap:wrap;letter-spacing:-.01em}
+.badge-cert{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:#03211c;
+  background:var(--tl);border-radius:5px;padding:4px 9px;font-weight:500}
+.badge-new{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--gd-hi);
+  border:1px solid rgba(224,166,75,.4);border-radius:5px;padding:3px 8px}
+.md{font-size:12.8px;color:var(--ink-dim);margin-top:6px;line-height:1.55;max-width:54ch}
+.mkt-meta{margin-left:auto;text-align:right;font-family:var(--mono);font-size:10.5px;
+  color:var(--ink-faint);line-height:2;flex:none;letter-spacing:.03em}
+.mkt-meta b{color:var(--ink-dim);font-weight:500}
+.evalhead{display:flex;align-items:center;gap:10px;padding:13px 26px 0;font-family:var(--mono);
+  font-size:9.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--ink-faint)}
+.evalhead::after{content:'';flex:1;height:1px;background:var(--line)}
+.evalgrid{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.evalcell{padding:14px 22px 20px;border-right:1px solid var(--line)}
+.evalcell:last-child{border-right:none}
+.ek{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint)}
+.ev{font-family:var(--serif);font-size:clamp(26px,2.6vw,36px);font-weight:400;margin-top:7px;
+  color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ev small{font-size:.48em;color:var(--ink-dim)}
+.ev .pre{font-size:.42em;color:var(--ink-dim);margin-inline-end:4px}
+.bar{height:3px;border-radius:2px;background:var(--line);margin-top:11px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--tl-deep),var(--tl-hi));
+  width:0;transition:width 1.2s var(--ease)}
+.evx{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);margin-top:7px;letter-spacing:.03em}
+.evx b{color:var(--tl);font-weight:400}
+.mkt-foot{padding:18px 26px;display:flex;align-items:center;gap:16px}
+.mkt-foot .fine{font-size:12.2px;color:var(--ink-faint);line-height:1.6}
+.mkt-foot .btn{margin-left:auto;flex:none}
+.provision-flash{margin-top:16px;font-family:var(--mono);font-size:11.8px;color:var(--ink-dim);
+  display:flex;flex-direction:column;gap:8px}
+.provision-flash .ln{opacity:0;transform:translateY(4px);transition:all .35s var(--ease)}
+.provision-flash .ln.on{opacity:1;transform:none}
+.provision-flash .ok{color:var(--tl)}
+.provision-flash b{color:var(--ink);font-weight:500}
+
+/* ═══════════ S8 · finale ═══════════ */
+#s8 .inner{text-align:center;max-width:min(1180px,88vw)}
+#s8 .kicker{justify-content:center}
+#s8 .kicker::after{content:'';width:26px;height:1px;background:var(--tl)}
+.bignums{margin:44px auto 0;display:flex;justify-content:center;gap:clamp(20px,5vw,76px);flex-wrap:wrap}
+.bn{opacity:0;transform:translateY(12px);transition:all .6s var(--ease)}
+.bn.on{opacity:1;transform:none}
+.bn .bnv{font-family:var(--serif);font-size:clamp(38px,4.6vw,64px);line-height:1;
+  color:var(--tl-hi);font-variant-numeric:tabular-nums}
+.bn .bnv small{font-size:.4em;color:var(--ink-dim)}
+.bn .bnk{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:11px}
+.finale-actions{margin-top:44px;display:flex;gap:12px;justify-content:center}
+
+/* ═══════════ responsive / a11y ═══════════ */
+/* big stage screens: lift the small type so it still reads from the back of a hall */
+@media (min-width:1600px) and (min-height:900px){
+  :root{--maxw:min(1300px,84vw)}
+  .sub{font-size:17px}
+  .sv{font-size:15px} .sv.dim{font-size:14.2px} .cap{font-size:13.2px}
+  .bt{font-size:16px} .bsub{font-size:13.4px} .blog{font-size:12.2px}
+  .msg{font-size:15px} .trace .tr{font-size:11.8px} .pocard{font-size:13.8px}
+  .pubstep{font-size:15.4px} .pscore{font-size:12.4px}
+  .md{font-size:14px} .mf-cell .mv{font-size:13.6px} .mkt-foot .fine{font-size:13.2px}
+  .think-line,.status{font-size:13.4px}
+  .ctxorigin{font-size:12px} .rstep{font-size:10.5px} .actlbl{font-size:9.5px}
+}
+/* short stage screens (720p projectors): drop the garnish, keep the substance */
+@media (max-height:820px){
+  .shelf{display:none}
+  .mktcard{margin-top:8px}
+  .sub{margin-top:11px}
+  .mkt-head{padding:16px 24px}
+  .evalcell{padding:11px 20px 15px}
+  .mkt-foot{padding:14px 24px}
+  .evalhead{padding-top:10px}
+  .provision-flash{gap:6px;font-size:11px;margin-top:12px}
+  .persona{margin-bottom:12px}
+  .srow{padding:9px 0}
+  .scope-body{padding:4px 24px 12px}
+  .chead{padding:13px 24px}
+  .scopecard{margin-top:12px}
+  .sactions{margin-top:14px}
+  .evalcell .ev{font-size:26px}
+  .evx{margin-top:5px}
+  .begin{margin-top:26px}
+  .bignums{margin-top:26px}
+  #s8 .sub{display:none}
+  .finale-actions{margin-top:24px}
+  .mark{width:76px;height:76px;margin-bottom:24px}
+}
+@media (max-width:860px){
+  header{padding:18px 20px}
+  .env .pill:not(.auto){display:none}
+  .mf-grid,.evalgrid{grid-template-columns:repeat(2,1fr)}
+  .mf-cell:nth-child(2),.evalcell:nth-child(2){border-right:none}
+  .mf-cell,.evalcell{border-bottom:1px solid var(--line)}
+  .srow{grid-template-columns:1fr;gap:5px}
+  .mkt-meta{display:none}
+  .link{width:22px}
+  .hint{display:none}
+  .scene{padding:80px 20px 96px}
+  .publish-cta,.mkt-foot,.mf-foot{flex-direction:column;align-items:flex-start}
+  .publish-cta .btn,.mkt-foot .btn,.mf-foot .btn{margin-left:0}
+}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+:focus-visible{outline:2px solid var(--tl);outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+</style>
+</head>
+<body>
+<div class="amb"></div>
+<div class="mesh"></div>
+<div class="grain"></div>
+<div class="frame"><i></i><i></i><i></i><i></i></div>
+
+<header>
+  <div class="brand">
+    <span class="dia">◆</span>
+    <span class="wm">HUMAIN <span class="one">ONE</span></span>
+    <span class="ar">منصّة الوكلاء السياديّة</span>
+  </div>
+  <div class="env">
+    <div class="pill"><span class="dot"></span> SOVEREIGN RUNTIME · KSA-EAST</div>
+    <div class="pill">LEAP 2026</div>
+    <div class="pill auto" id="autoPill" title="Autopilot — run the whole demo hands-free (A)">
+      <span class="ai"></span> AUTOPILOT
+    </div>
+  </div>
+</header>
+
+<div class="ctxbar" id="ctxbar">
+  <div class="ctxwho" id="ctxWho"><span class="ctxav">RC</span><span><b>Rashid</b> · Builder</span></div>
+  <div class="ctxsep" id="ctxsep"></div>
+  <div class="ctxorigin" id="ctxOrigin"><span class="dia">◆</span>one sentence</div>
+</div>
+
+<nav class="rail hide" id="rail" aria-label="Demo progress"></nav>
+<div class="hint" id="hint">
+  <span><kbd>→</kbd> next</span><span><kbd>A</kbd> autopilot</span><span><kbd>R</kbd> replay</span>
+</div>
+
+<!-- ══════════ S0 · COLD OPEN ══════════ -->
+<section class="scene" id="s0">
+  <div class="inner">
+    <div class="mark reveal" data-d="0"><span class="ring"></span><span class="ring"></span><span class="core">◆</span></div>
+    <h1 class="reveal" data-d="1">From one sentence<br>to a <em>sovereign agent</em>.</h1>
+    <div class="begin reveal" data-d="2"><button class="btn btn-primary" id="beginBtn">Begin demo <span>→</span></button></div>
+  </div>
+</section>
+
+<!-- ══════════ S1 · PROMPT ══════════ -->
+<section class="scene step" id="s1">
+  <div class="inner">
+    <div class="kicker">Part one · The builder <span class="ar">المطوّر</span></div>
+    <h1>What should your<br><em>agent</em> do?</h1>
+    <div class="promptbox" id="promptbox">
+      <input id="promptInput" type="text" placeholder="Describe the agent you want to build…" autocomplete="off" aria-label="Describe your agent">
+      <button class="sendbtn" id="promptSend" aria-label="Create agent">↑</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S2 · SCOPE ══════════ -->
+<section class="scene step" id="s2">
+  <div class="inner">
+    <div class="kicker">Step 01 · Scope <span class="ar">النطاق</span></div>
+    <h1 id="scopeTitle">Scoping your agent<span class="cursor"></span></h1>
+
+    <div class="card scopecard" id="scopecard">
+      <div class="chead">
+        <div class="avatar" id="scopeAvatar"><span class="draftmark">◆</span></div>
+        <div>
+          <div class="name" id="scopeName">Drafting scope</div>
+          <div class="status" id="scopeStatus"><span class="spinner"></span><span class="stx" id="scopeRole">Reading your request…</span></div>
+        </div>
+        <div class="tag" id="scopeTag">IN PROGRESS</div>
+      </div>
+      <div class="scope-body">
+        <div class="srow"><div class="sk">Mission</div>
+          <div class="scell"><div class="skel"><i style="width:96%"></i><i style="width:78%"></i></div>
+            <div class="sv" id="missionText">Automate enterprise purchasing end to end — from request to approved order — inside company policy, with a human gate above spending thresholds.</div></div></div>
+        <div class="srow"><div class="sk">Capabilities</div>
+          <div class="scell"><div class="skel"><i style="width:88%"></i><i style="width:52%"></i></div>
+            <div class="sv">
+              <span class="cap">Raise &amp; track purchase orders</span>
+              <span class="cap">Supplier lookup &amp; comparison</span>
+              <span class="cap">Policy &amp; budget checks</span>
+              <span class="cap">Approval routing</span>
+            </div></div></div>
+        <div class="srow"><div class="sk">Connects to</div>
+          <div class="scell"><div class="skel"><i style="width:71%"></i></div>
+            <div class="sv dim">ERP (purchase orders) · Supplier catalog · Procurement policy knowledge base</div></div></div>
+        <div class="srow"><div class="sk">Guardrails</div>
+          <div class="scell"><div class="skel"><i style="width:84%"></i></div>
+            <div class="sv dim"><span class="gr">Human approval</span> above SAR 50,000 · Approved suppliers only · Full audit trail on every action</div></div></div>
+        <div class="srow"><div class="sk">Runtime</div>
+          <div class="scell"><div class="skel"><i style="width:64%"></i></div>
+            <div class="sv dim">ALLaM · Sovereign runtime, KSA-East · Data never leaves the Kingdom</div></div></div>
+      </div>
+    </div>
+
+    <div class="sactions" id="scopeActions">
+      <button class="btn btn-primary" id="approveBtn">Approve &amp; build <span>→</span></button>
+      <button class="btn btn-ghost" id="editBtn">Adjust scope</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S3 · BUILD ══════════ -->
+<section class="scene step" id="s3">
+  <div class="inner">
+    <div class="buildhead">
+      <div>
+        <div class="kicker">Step 02 · Autonomous build <span class="ar">البناء</span></div>
+        <h1>HUMAIN ONE is building <em>Mia</em></h1>
+      </div>
+      <div class="clock">
+        <div class="cv" id="clock">0.0s</div>
+        <div class="ck">Elapsed</div>
+      </div>
+    </div>
+    <div class="buildwrap" id="buildwrap"></div>
+
+    <div class="manifest" id="manifest">
+      <div class="mf-top">
+        <span class="seal-mini">◆</span>
+        <span class="mt">Agent Registry · signed manifest</span>
+        <span class="live"><span class="live-dot"></span> LIVE</span>
+      </div>
+      <div class="mf-grid">
+        <div class="mf-cell"><div class="mk">Identity</div><div class="mv tlc">agent://ksa-east/mia</div></div>
+        <div class="mf-cell"><div class="mk">Version</div><div class="mv">v1.0.0</div></div>
+        <div class="mf-cell"><div class="mk">Signature</div><div class="mv">sha256:4f9c…a71e</div></div>
+        <div class="mf-cell"><div class="mk">Residency</div><div class="mv">KSA-East · sovereign</div></div>
+      </div>
+      <div class="mf-foot">
+        <div class="fine"><b>Mia is live.</b></div>
+        <button class="btn btn-primary" id="tryBtn">Try your agent <span>→</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S4 · PLAYGROUND ══════════ -->
+<section class="scene step" id="s4">
+  <div class="inner">
+    <div class="kicker">Step 03 · Test it live <span class="ar">الاختبار</span></div>
+    <h1>Put <em>Mia</em> to work</h1>
+    <div class="card chatframe">
+      <div class="chat-top">
+        <div class="avatar">M</div>
+        <div>
+          <div class="cn">Mia — Procurement Agent</div>
+          <div class="cs"><i></i>LIVE · <span style="font-family:var(--ar)">مباشر</span></div>
+        </div>
+        <div class="reg">agent://ksa-east/mia · v1.0.0</div>
+      </div>
+      <div class="chat-scroll" id="chatScroll"></div>
+      <div class="playchips" id="playchips"></div>
+      <div class="chat-in">
+        <input id="chatInput" type="text" placeholder="Ask Mia anything…" autocomplete="off" aria-label="Message Mia">
+        <button class="sendbtn" id="chatSend" aria-label="Send">↑</button>
+      </div>
+    </div>
+    <div class="publish-cta" id="publishCta">
+      <button class="btn btn-primary" id="publishBtn">Publish to Marketplace <span>→</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S5 · CERTIFY ══════════ -->
+<section class="scene step" id="s5">
+  <div class="inner">
+    <div class="kicker">Step 04 · Certification <span class="ar">الاعتماد</span></div>
+    <h1>HUMAIN <em>Guardian</em> evaluates the agent</h1>
+    <div class="pubwrap" id="pubwrap"></div>
+    <div class="sealwrap" id="sealwrap">
+      <div class="seal"><div class="d">◆</div><div class="t">HUMAIN</div><div class="t">CERTIFIED</div></div>
+      <div class="sealtext">
+        <div class="st">Mia is listed on the <em style="font-style:italic;color:var(--tl-hi)">Marketplace</em>.</div>
+        <button class="btn btn-primary" id="toMarketBtn">See it as a buyer <span>→</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S6 · HANDOFF ══════════ -->
+<section class="scene" id="s6">
+  <div class="inner">
+    <div class="kicker" style="justify-content:center">Part two · The buyer <span class="ar">المشتري</span></div>
+    <h1>The agent <em>changes hands</em>.</h1>
+    <div class="handoff">
+      <div class="hp dev" id="hpDev">
+        <div class="hav">RC</div>
+        <div class="hn">Rashid</div>
+        <div class="hr">BUILT &amp; PUBLISHED</div>
+      </div>
+
+      <div class="track">
+        <div class="tracklbl" id="trackLbl">HUMAIN Marketplace</div>
+        <div class="trackline"><i class="trackfill" id="trackFill"></i></div>
+        <div class="miatok" id="miaTok">M</div>
+      </div>
+
+      <div class="hp buy" id="hpBuy">
+        <div class="hav">SA</div>
+        <div class="hn">Sara Al-Rashid</div>
+        <div class="hr">ACQUIRES &amp; RUNS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ S7 · MARKETPLACE ══════════ -->
+<section class="scene step" id="s7">
+  <div class="inner">
+    <div class="kicker">Step 05 · Acquire <span class="ar">السوق</span></div>
+    <h1>Sara needs exactly this <span class="gd">agent</span></h1>
+    <div class="shelf" id="shelf">
+      <div class="stile"><div class="sn">Noor</div><div class="sd">HR ONBOARDING</div></div>
+      <div class="stile"><div class="sn">Sanad</div><div class="sd">CITIZEN SERVICES</div></div>
+      <div class="stile"><div class="sn">Rakiz</div><div class="sd">LOGISTICS PLANNING</div></div>
+      <div class="stile"><div class="sn">Dalil</div><div class="sd">LEGAL REVIEW</div></div>
+    </div>
+
+    <div class="card mktcard" id="mktcard">
+      <div class="mkt-head">
+        <div class="avatar">M</div>
+        <div>
+          <div class="mn">Mia <span class="badge-cert">◆ HUMAIN CERTIFIED</span> <span class="badge-new">NEW</span></div>
+          <div class="md">Enterprise procurement agent. Raises purchase orders, compares approved suppliers, enforces policy and routes approvals — end to end.</div>
+        </div>
+        <div class="mkt-meta">
+          v1.0.0 · <b>KSA-East</b><br>Publisher · <b>Verified</b><br>Evaluated · <b>Today</b>
+        </div>
+      </div>
+      <div class="evalhead">Evaluation · 200 scenarios · HUMAIN Guardian</div>
+      <div class="evalgrid" id="evalgrid">
+        <div class="evalcell"><div class="ek">Task success</div>
+          <div class="ev"><span class="num" data-to="96" data-dec="0">0</span><small>%</small></div>
+          <div class="bar"><i data-w="96%"></i></div><div class="evx">category avg <b>81%</b></div></div>
+        <div class="evalcell"><div class="ek">Policy &amp; safety</div>
+          <div class="ev"><span class="num" data-to="100" data-dec="0">0</span><small>%</small></div>
+          <div class="bar"><i data-w="100%"></i></div><div class="evx">0 violations in 200 runs</div></div>
+        <div class="evalcell"><div class="ek">Avg response</div>
+          <div class="ev"><span class="num" data-to="1.8" data-dec="1">0</span><small>s</small></div>
+          <div class="bar"><i data-w="88%"></i></div><div class="evx">category avg <b>4.1s</b></div></div>
+        <div class="evalcell"><div class="ek">Cost / task</div>
+          <div class="ev"><span class="pre">SAR</span><span class="num" data-to="0.14" data-dec="2">0</span></div>
+          <div class="bar"><i data-w="93%"></i></div><div class="evx">category avg <b>SAR 0.39</b></div></div>
+      </div>
+      <div class="mkt-foot">
+        <div class="fine">Runs in your own sovereign workspace.</div>
+        <button class="btn btn-gold" id="acquireBtn">Provision to my workspace <span>→</span></button>
+      </div>
+    </div>
+    <div class="provision-flash" id="provFlash"></div>
+  </div>
+</section>
+
+<!-- ══════════ S8 · FINALE ══════════ -->
+<section class="scene" id="s8">
+  <div class="inner">
+    <div class="kicker">HUMAIN ONE</div>
+    <h1>One prompt.<br><em>Live, certified, in the market.</em></h1>
+    <div class="bignums" id="bignums">
+      <div class="bn"><div class="bnv">1</div><div class="bnk">Prompt written</div></div>
+      <div class="bn"><div class="bnv">1</div><div class="bnk">Human approval</div></div>
+      <div class="bn"><div class="bnv">37<small>s</small></div><div class="bnk">To live agent</div></div>
+      <div class="bn"><div class="bnv">0</div><div class="bnk">Lines of config</div></div>
+      <div class="bn"><div class="bnv">2</div><div class="bnk">Sovereign workspaces</div></div>
+    </div>
+    <p class="sub" style="margin:34px auto 0;text-align:center">Built, evaluated, distributed and run inside the Kingdom.</p>
+    <div class="finale-actions">
+      <button class="btn btn-ghost" id="replayBtn">↺ Replay demo</button>
+      <button class="btn btn-primary" id="againBtn">Build another agent <span>→</span></button>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   HUMAIN ONE — Submit-Agent flow · single-thread keynote demo
+   Scenes: open → prompt → scope → build → test → certify
+           → handoff → marketplace → finale
+   ══════════════════════════════════════════════════════════════ */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const wait = ms => new Promise(r => setTimeout(r, ms));
+/* Flush pending style so the next class change animates from the current state.
+   Deliberately NOT requestAnimationFrame: rAF is suspended outright in a hidden tab,
+   which would freeze the demo permanently if the presenter ever backgrounds it. */
+const enter = el => { void el.offsetWidth; el.classList.add('on'); };
+
+const SCENE_COUNT = 9;
+/* The ribbon is the narrative spine: two acts, one actor each, always on screen. */
+const RAIL = [
+  {i:1, en:'Prompt',  act:'builder'},
+  {i:2, en:'Scope',   act:'builder'},
+  {i:3, en:'Build',   act:'builder'},
+  {i:4, en:'Test',    act:'builder'},
+  {i:5, en:'Certify', act:'builder'},
+  {i:7, en:'Acquire', act:'buyer'},
+];
+const ACTS = [
+  {key:'builder', label:'The builder'},
+  {key:'buyer',   label:'The buyer'},
+];
+
+let current = -1;
+let run = 0;                       // cancellation token for async scene scripts
+let auto = false;                  // autopilot
+const alive = t => t === run;
+
+/* ── autopilot: press a decision button for the presenter ── */
+async function autoPress(btn, token, delay = 1500){
+  if(!auto || !alive(token)) return;
+  btn.classList.add('armed');
+  await wait(delay);
+  btn.classList.remove('armed');
+  if(auto && alive(token)) btn.click();
+}
+function setAuto(on){
+  auto = on;
+  $('#autoPill').classList.toggle('on', auto);
+  $('#hint').classList.toggle('fade', auto);
+  if(auto) resumeAuto();
+}
+/* re-arm the current scene's pending decision when autopilot flips on mid-demo */
+function resumeAuto(){
+  const pending = {2:'#approveBtn', 3:'#tryBtn', 4:'#publishBtn', 5:'#toMarketBtn', 7:'#acquireBtn'}[current];
+  const btn = pending && $(pending);
+  if(btn && !btn.disabled && btn.offsetParent !== null) autoPress(btn, run, 900);
+  if(current === 0) autoPress($('#beginBtn'), run, 900);
+}
+$('#autoPill').onclick = () => setAuto(!auto);
+
+/* ── journey ribbon ── */
+const railEl = $('#rail');
+ACTS.forEach((act, ai) => {
+  if(ai) railEl.appendChild(Object.assign(document.createElement('div'), {className:'actgap'}));
+  const wrap = document.createElement('div');
+  wrap.className = 'act'; wrap.dataset.act = act.key;
+  const row = document.createElement('div'); row.className = 'actrow';
+  RAIL.filter(s => s.act === act.key).forEach((s, k) => {
+    if(k) row.appendChild(Object.assign(document.createElement('span'), {className:'rline'}));
+    const b = document.createElement('button');
+    b.className = 'rstep'; b.type = 'button'; b.dataset.i = s.i;
+    b.innerHTML = `<i class="rdot"></i>${s.en}`;
+    b.onclick = () => go(s.i);
+    row.appendChild(b);
+  });
+  wrap.innerHTML = `<span class="actlbl">${act.label}</span>`;
+  wrap.appendChild(row);
+  railEl.appendChild(wrap);
+});
+function paintRail(){
+  railEl.classList.toggle('hide', current <= 0);
+  const done = current === 8;                // finale: show the whole arc complete
+  /* On the handoff scene the builder's act is over but the buyer's has not begun until
+     the agent actually arrives — eff 6 matches no step, so nothing is lit in between. */
+  const eff = current === 6 ? (actor === 'buyer' ? 7 : 6) : current;
+  $$('.rail .rstep').forEach(b => {
+    const i = +b.dataset.i;
+    b.classList.toggle('now',  !done && i === eff);
+    b.classList.toggle('done', done || i < eff);
+  });
+  $$('.rail .rline').forEach(l => l.classList.toggle('done', done));
+  $$('.rail .act').forEach(a => a.classList.toggle('live',
+    !done && (a.dataset.act === 'buyer' ? actor === 'buyer' : actor === 'builder')));
+}
+
+/* ── context bar: keeps the actor and the originating sentence on screen all demo,
+      so the handoff reads as a role change and "one prompt" is shown, not claimed ── */
+let originPrompt = 'Build Mia — an agent that automates enterprise procurement';
+/* Who the interface currently belongs to. Every buyer-facing cue — the gold accent, the
+   context bar, the ribbon's active act — reads this one value, so they can never
+   disagree with what the scene is showing. The handoff scene flips it mid-sequence. */
+let actor = 'builder';
+/* Token-guarded: only the sequence that currently owns the stage may change hands.
+   Without this a handoff still in flight when the presenter arrows onward lands its
+   late write on the next scene and shows the wrong person in the chrome. */
+function setActor(a, token){
+  if(token !== undefined && token !== run) return;
+  actor = a;
+  document.body.classList.toggle('market', a === 'buyer');
+  paintCtx(); paintRail();
+}
+function paintCtx(){
+  const buyer = actor === 'buyer';
+  $('#ctxbar').classList.toggle('on', current >= 1 && current <= 7);
+  $('#ctxWho').innerHTML = buyer
+    ? '<span class="ctxav">SA</span><span><b>Sara Al-Rashid</b> · Buyer</span>'
+    : '<span class="ctxav">RC</span><span><b>Rashid</b> · Builder</span>';
+  /* nothing has been written yet on the prompt scene — don't quote a sentence that
+     does not exist, or the claim reads as scripted rather than earned */
+  const showOrigin = current >= 2;
+  $('#ctxsep').style.opacity = $('#ctxOrigin').style.opacity = showOrigin ? '' : '0';
+  $('#ctxOrigin').innerHTML = buyer
+    ? '<span class="dia">◆</span>Mia · HUMAIN Certified · <b>listed 4 minutes ago</b>'
+    : `<span class="dia">◆</span><b>“${originPrompt}”</b>`;
+}
+
+/* ── scene switch ── */
+const STARTERS = {};
+function go(n){
+  if(n < 0 || n >= SCENE_COUNT) return;
+  current = n; run++;
+  $$('.scene').forEach((s, i) => s.classList.toggle('on', i === n));
+  document.body.classList.toggle('working', n === 3 || n === 5);
+  /* scene 6 always opens as the builder and earns the switch on screen */
+  actor = n >= 7 ? 'buyer' : 'builder';
+  document.body.classList.toggle('market', actor === 'buyer');
+  paintRail(); paintCtx();
+  STARTERS[n] && STARTERS[n](run);
+}
+
+/* ══════════ S0 · COLD OPEN ══════════ */
+STARTERS[0] = async token => {
+  const items = $$('#s0 .reveal');
+  items.forEach(el => el.classList.remove('on'));
+  for(const el of items){
+    await wait(el.dataset.d === '0' ? 200 : 170);
+    if(!alive(token)) return;
+    el.classList.add('on');
+  }
+  autoPress($('#beginBtn'), token, 2400);
+};
+$('#beginBtn').onclick = () => go(1);
+
+/* ══════════ S1 · PROMPT ══════════ */
+const DEMO_PROMPT = 'Build Mia — an agent that automates enterprise procurement';
+const promptInput = $('#promptInput');
+STARTERS[1] = token => {
+  promptInput.value = '';
+  $('#promptbox').classList.remove('lit');
+  setTimeout(() => { if(alive(token)) promptInput.focus({preventScroll:true}); }, 500);
+  if(auto) setTimeout(() => { if(alive(token) && auto) autotype(DEMO_PROMPT, token); }, 1300);
+};
+async function autotype(text, token){
+  promptInput.value = '';
+  $('#promptbox').classList.add('lit');
+  promptInput.focus({preventScroll:true});
+  const dur = 1500 + text.length * 5, t0 = performance.now();
+  for(;;){
+    if(!alive(token)) return;
+    const k = Math.min(1, (performance.now() - t0) / dur);
+    promptInput.value = text.slice(0, Math.round(k * text.length));
+    if(k >= 1) break;
+    await wait(26);
+  }
+  await wait(420);
+  originPrompt = text;
+  if(alive(token)) go(2);
+}
+promptInput.addEventListener('input', () =>
+  $('#promptbox').classList.toggle('lit', promptInput.value.length > 0));
+const submitPrompt = () => {
+  const v = promptInput.value.trim();
+  if(!v) return;
+  originPrompt = v;              // the context bar quotes what was actually typed
+  go(2);
+};
+$('#promptSend').onclick = submitPrompt;
+promptInput.addEventListener('keydown', e => { if(e.key === 'Enter') submitPrompt(); });
+
+/* ══════════ S2 · SCOPE ══════════ */
+/* each beat narrates in the header, then resolves the rows it just decided */
+const SCOPE_BEATS = [
+  { say:'Reading intent — enterprise procurement',        rows:[0] },
+  { say:'Selecting capabilities & tool integrations',     rows:[1, 2] },
+  { say:'Applying Kingdom procurement policy guardrails', rows:[3] },
+  { say:'Choosing model & sovereign runtime',             rows:[4] },
+];
+async function sayStatus(text, token){
+  const el = $('#scopeRole');
+  el.classList.add('swap');
+  await wait(220); if(!alive(token)) return;
+  el.textContent = text;
+  el.classList.remove('swap');
+}
+STARTERS[2] = async token => {
+  const rows = $$('#scopecard .srow');
+  rows.forEach(r => r.classList.remove('on'));
+  $('#scopecard').classList.remove('on');
+  $('#scopeActions').classList.remove('on');
+  $('#scopeTitle').innerHTML = 'Scoping your agent<span class="cursor"></span>';
+  $('#scopeAvatar').innerHTML = '<span class="draftmark">◆</span>';
+  $('#scopeName').textContent = 'Drafting scope';
+  $('#scopeStatus').innerHTML = '<span class="spinner"></span><span class="stx" id="scopeRole">Reading your request…</span>';
+  $('#scopeTag').textContent = 'IN PROGRESS';
+
+  await wait(200); if(!alive(token)) return;
+  $('#scopecard').classList.add('on');          // shell first — then it fills itself in
+  await wait(700); if(!alive(token)) return;
+
+  for(const beat of SCOPE_BEATS){
+    if(!alive(token)) return;
+    await sayStatus(beat.say, token);
+    await wait(620); if(!alive(token)) return;
+    for(const i of beat.rows){ rows[i].classList.add('on'); await wait(180); }
+    await wait(240);
+  }
+  if(!alive(token)) return;
+
+  $('#scopeTitle').innerHTML = 'Here is the plan for <em>Mia</em>';
+  $('#scopeAvatar').textContent = 'M';
+  $('#scopeName').textContent = 'Mia';
+  $('#scopeStatus').innerHTML = '<span class="stx">Enterprise Procurement Agent</span>';
+  $('#scopeTag').textContent = 'PROPOSED SCOPE · v1';
+
+  await wait(320); if(!alive(token)) return;
+  $('#scopeActions').classList.add('on');
+  autoPress($('#approveBtn'), token, 2600);
+};
+$('#approveBtn').onclick = () => go(3);
+$('#editBtn').onclick = function(){
+  const m = $('#missionText');
+  const editing = m.isContentEditable;
+  m.contentEditable = editing ? 'false' : 'true';
+  m.style.outline = editing ? 'none' : '1px dashed var(--tl-deep)';
+  m.style.outlineOffset = '5px';
+  m.style.borderRadius = '5px';
+  this.textContent = editing ? 'Adjust scope' : 'Done editing';
+  if(!editing) m.focus();
+};
+
+/* ══════════ S3 · BUILD ══════════ */
+const BUILD_STEPS = [
+  { t:'Provision sovereign infrastructure', s:'Dedicated compute in KSA-East · isolated network', sec:6.2,
+    logs:['allocating GPU pool <span class="key">ksa-east-a3</span> … <span class="ok">ready</span>',
+          'private VPC · encryption at rest … <span class="ok">ok</span>'] },
+  { t:'Deploy the agent runtime', s:'ALLaM + sandboxed tool layer', sec:9.8,
+    logs:['pulling <span class="key">humain/agent-runtime:1.7</span>',
+          'mounting model <span class="key">ALLaM</span> … <span class="ok">warm</span>'] },
+  { t:'Connect tools &amp; data', s:'ERP · supplier catalog · policy knowledge base', sec:7.4,
+    logs:['ERP connector handshake … <span class="ok">authorized</span>',
+          'policy KB indexed · <span class="key">1,284</span> rules … <span class="ok">ok</span>'] },
+  { t:'Register the agent', s:'Identity, signed manifest &amp; version in the Agent Registry', sec:2.1,
+    logs:['minting identity <span class="key">agent://ksa-east/mia</span>',
+          'manifest signed · <span class="key">v1.0.0</span> … <span class="ok">registered</span>'] },
+  { t:'Guardian pre-flight checks', s:'Automated QA and safety evaluation before go-live', sec:11.6,
+    logs:['guardrail suite · 48/48 policies … <span class="ok">pass</span>',
+          'red-team probes · 0 violations … <span class="ok">pass</span>'] },
+];
+/* smoothly walk the elapsed clock toward a target */
+async function tickClock(from, to, ms, token){
+  const t0 = performance.now();
+  for(;;){
+    if(!alive(token)) return;
+    const k = Math.min(1, (performance.now() - t0) / ms);
+    $('#clock').textContent = (from + (to - from) * k).toFixed(1) + 's';
+    if(k >= 1) return;
+    await wait(40);
+  }
+}
+STARTERS[3] = async token => {
+  const w = $('#buildwrap');
+  w.innerHTML = BUILD_STEPS.map(st => `
+    <div class="bstep">
+      <div class="borb">✓</div>
+      <div>
+        <div class="bt">${st.t}</div>
+        <div class="bsub">${st.s}</div>
+        <div class="blog">${st.logs.map(l => `<div class="ln">${l}</div>`).join('')}</div>
+      </div>
+      <div class="btime">${st.sec.toFixed(1)}s</div>
+      <div class="spine"></div>
+    </div>`).join('');
+  $('#manifest').classList.remove('on');
+  $('#clock').textContent = '0.0s';
+
+  await wait(650);
+  const steps = $$('#buildwrap .bstep');
+  let elapsed = 0;
+  for(let i = 0; i < steps.length; i++){
+    if(!alive(token)) return;
+    const el = steps[i], st = BUILD_STEPS[i];
+    el.classList.add('active');
+    const lines = [...el.querySelectorAll('.blog .ln')];
+    const target = elapsed + st.sec;
+    tickClock(elapsed, target, 1400, token);        // runs alongside the log lines
+    for(const ln of lines){
+      await wait(460); if(!alive(token)) return;
+      ln.classList.add('on');
+    }
+    await wait(520); if(!alive(token)) return;
+    elapsed = target;
+    $('#clock').textContent = elapsed.toFixed(1) + 's';
+    el.classList.remove('active'); el.classList.add('done');
+  }
+  await wait(420); if(!alive(token)) return;
+  $('#manifest').classList.add('on');
+  autoPress($('#tryBtn'), token, 2600);
+};
+$('#tryBtn').onclick = () => go(4);
+
+/* ══════════ S4 · PLAYGROUND ══════════ */
+/* replies are segment arrays so they can stream safely without breaking markup */
+const SEG = (t, cls) => ({t, cls});
+const DEMO_QA = [
+  {
+    q:'Order 500 laptops for the Riyadh office',
+    trace:[
+      ['policy.check',       'IT-HW-2026 · budget line', '120ms'],
+      ['suppliers.search',   '3 approved vendors compared', '410ms'],
+      ['erp.create_po',      'draft purchase order', '260ms'],
+      ['approvals.route',    'threshold rule → CFO', '95ms'],
+    ],
+    reply:[SEG('Found the best approved supplier and prepared the order.')],
+    card:{ id:'PO-2481', status:'AWAITING APPROVAL', rows:[
+      ['Item','ThinkPad X1 Carbon G12 × 500'],
+      ['Supplier','Alfanar Digital · approved · best of 3 quotes'],
+      ['Total','SAR 2,340,000 · 6.1% under budget line'],
+      ['Policy check','<span class="ok">✓ Compliant</span> · IT-HW-2026'],
+      ['Approval','Routed to CFO · above SAR 50,000'],
+    ]},
+    after:[SEG('Every step is on the audit trail. Want me to notify the CFO now?')],
+  },
+  {
+    q:"What's the status of PO-2481?",
+    trace:[['erp.get_po','PO-2481','88ms'], ['approvals.status','pending · CFO','74ms']],
+    reply:[
+      SEG('PO-2481 is '), SEG('awaiting CFO approval','ok'),
+      SEG(' — routed 20 seconds ago. Alfanar Digital confirmed stock and a 12-day delivery window once signed. I will alert you the moment it clears.'),
+    ],
+    card:null, after:null,
+  },
+];
+const FALLBACK = {
+  trace:[['policy.check','scope match','110ms']],
+  reply:[SEG('For this stage demo I am scripted to the two suggested requests — the live Mia answers this against your real ERP.')],
+  card:null, after:null,
+};
+let chatBusy = false, firstAnswer = false;
+
+function addMsg(cls, html=''){
+  const m = document.createElement('div');
+  m.className = 'msg ' + cls; m.innerHTML = html;
+  $('#chatScroll').appendChild(m);
+  enter(m);
+  return m;
+}
+const scrollChat = () => { $('#chatScroll').scrollTop = $('#chatScroll').scrollHeight; };
+/* the PO card is the payload of this scene — make sure the pane actually lands on it
+   after the last element has been laid out, not on the frame before */
+async function settleScroll(){ scrollChat(); await wait(90); scrollChat(); await wait(260); scrollChat(); }
+
+/* Time-based typewriter: each tick reveals however many characters the clock says are
+   due, so a throttled or dropped frame catches up instead of stalling the sequence. */
+async function streamSegs(host, segs, token, cps = 78){
+  const spans = segs.map(s => {
+    const el = document.createElement('span');
+    if(s.cls) el.className = s.cls;
+    host.appendChild(el);
+    return el;
+  });
+  const total = segs.reduce((n, s) => n + s.t.length, 0);
+  const dur = (total / cps) * 1000, t0 = performance.now();
+  for(;;){
+    if(!alive(token)) return;
+    const k = Math.min(1, (performance.now() - t0) / dur);
+    let n = Math.round(k * total);
+    segs.forEach((s, i) => {
+      spans[i].textContent = s.t.slice(0, Math.max(0, Math.min(s.t.length, n)));
+      n -= s.t.length;
+    });
+    scrollChat();
+    if(k >= 1) return;
+    await wait(28);
+  }
+}
+function resetChips(){
+  $('#playchips').innerHTML = DEMO_QA
+    .map((d, i) => `<div class="chip" data-q="${i}">${d.q}</div>`).join('');
+  $$('#playchips .chip').forEach(c => c.onclick = () => {
+    const i = +c.dataset.q; c.remove(); askMia(DEMO_QA[i].q, i);
+  });
+}
+STARTERS[4] = async token => {
+  if(!$('#chatScroll').children.length){
+    $('#chatScroll').innerHTML = '<div class="chat-pad"></div>';
+    resetChips();
+    const m = addMsg('bot', '<div class="who">◆ Mia</div>');
+    const body = document.createElement('span'); m.appendChild(body);
+    await wait(450); if(!alive(token)) return;
+    await streamSegs(body, [SEG('I am Mia, your procurement agent. Purchase orders, supplier comparison, policy checks, approval routing. What do you need?')], token, 105);
+    if(auto){
+      await wait(900); if(!alive(token) || !auto) return;
+      const c = $('#playchips .chip'); if(c){ const i = +c.dataset.q; c.remove(); askMia(DEMO_QA[i].q, i); }
+    }
+  } else if(firstAnswer && auto){
+    autoPress($('#publishBtn'), token, 1600);
+  }
+};
+async function askMia(text, idx){
+  if(chatBusy) return;
+  const token = run;
+  chatBusy = true;
+  addMsg('user', text); scrollChat();
+
+  const qa = DEMO_QA[idx] ?? FALLBACK;
+  const bot = addMsg('bot', '<div class="who">◆ Mia</div>');
+  const traceEl = document.createElement('div'); traceEl.className = 'trace';
+  bot.appendChild(traceEl);
+
+  /* tool trace — show the platform's work, not just its answer */
+  for(const [name, note, ms] of qa.trace){
+    if(!alive(token)){ chatBusy = false; return; }
+    const tr = document.createElement('div');
+    tr.className = 'tr';
+    tr.innerHTML = `<span class="ts"><span class="spinner"></span></span><b>${name}</b> · ${note}<span class="ms">${ms}</span>`;
+    traceEl.appendChild(tr);
+    enter(tr); scrollChat();
+    await wait(330);
+    if(!alive(token)){ chatBusy = false; return; }
+    tr.querySelector('.ts').textContent = '✓';
+  }
+  await wait(220);
+  if(!alive(token)){ chatBusy = false; return; }
+
+  const body = document.createElement('div'); bot.appendChild(body);
+  await streamSegs(body, qa.reply, token);
+  if(!alive(token)){ chatBusy = false; return; }
+
+  if(qa.card){
+    const c = qa.card;
+    const card = document.createElement('div');
+    card.className = 'pocard';
+    card.innerHTML =
+      `<div class="poh"><span class="pid">${c.id}</span><span class="pst">${c.status}</span></div>` +
+      c.rows.map(r => `<div class="por"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
+    bot.appendChild(card);
+    enter(card); scrollChat();
+    await wait(420);
+  }
+  if(qa.after && alive(token)){
+    const a = document.createElement('div');
+    a.style.marginTop = '11px'; bot.appendChild(a);
+    await streamSegs(a, qa.after, token);
+  }
+  await settleScroll();
+  chatBusy = false;
+  if(!alive(token)) return;
+
+  if(!firstAnswer){
+    firstAnswer = true;
+    await wait(700); if(!alive(token)) return;
+    $('#publishCta').classList.add('on');
+    autoPress($('#publishBtn'), token, 3000);
+  }
+}
+function sendChat(){
+  const v = $('#chatInput').value.trim(); if(!v) return;
+  $('#chatInput').value = '';
+  const idx = /status|PO-/i.test(v) ? 1 : /laptop|order|buy|purchas/i.test(v) ? 0 : -1;
+  const chip = $(`#playchips .chip[data-q="${idx}"]`); if(chip) chip.remove();
+  askMia(v, idx);
+}
+$('#chatSend').onclick = sendChat;
+$('#chatInput').addEventListener('keydown', e => { if(e.key === 'Enter') sendChat(); });
+$('#publishBtn').onclick = () => go(5);
+
+/* ══════════ S5 · CERTIFY ══════════ */
+const PUB_STEPS = [
+  ['◆','Guardian evaluation — 200 scripted procurement scenarios','96% task success'],
+  ['◆','Safety &amp; policy compliance sweep','100% · 0 violations'],
+  ['◆','Performance benchmark on the sovereign runtime','1.8s avg · SAR 0.14/task'],
+  ['◆','Listing published — pricing, docs &amp; evaluation report attached','ready'],
+];
+STARTERS[5] = async token => {
+  const w = $('#pubwrap');
+  w.innerHTML = PUB_STEPS.map(([i, t, s]) =>
+    `<div class="pubstep"><span class="pico">${i}</span><span>${t}</span><span class="pscore">${s}</span></div>`).join('');
+  $('#sealwrap').classList.remove('on');
+  await wait(520);
+  for(const el of $$('#pubwrap .pubstep')){
+    if(!alive(token)) return;
+    el.classList.add('active');
+    await wait(900); if(!alive(token)) return;
+    el.classList.remove('active'); el.classList.add('done');
+  }
+  await wait(380); if(!alive(token)) return;
+  $('#sealwrap').classList.add('on');
+  autoPress($('#toMarketBtn'), token, 2600);
+};
+$('#toMarketBtn').onclick = () => go(6);
+
+/* ══════════ S6 · HANDOFF ══════════ */
+STARTERS[6] = async token => {
+  const dev = $('#hpDev'), buy = $('#hpBuy'), tok = $('#miaTok'), fill = $('#trackFill');
+  setActor('builder', token);                // the scene opens still belonging to Rashid
+  dev.className = 'hp dev lit';
+  buy.className = 'hp buy';
+  tok.className = 'miatok';
+  fill.style.width = '0';
+  $('#trackLbl').classList.remove('on');
+
+  await wait(750); if(!alive(token)) return;
+  $('#trackLbl').classList.add('on');        // it goes to the marketplace…
+  await wait(600); if(!alive(token)) return;
+
+  tok.classList.add('moved');                // …and travels, 1.5s, in full view
+  fill.style.width = '100%';
+  await wait(1550); if(!alive(token)) return;
+
+  tok.classList.add('arrived');              // arrival is the moment everything turns over
+  buy.classList.add('lit');
+  dev.classList.add('dim');
+  setActor('buyer', token);
+  await wait(1700); if(!alive(token)) return;
+  go(7);                                     // a transition, not a step — always auto-advances
+};
+
+/* ══════════ S7 · MARKETPLACE ══════════ */
+async function countUp(el, token){
+  const to = parseFloat(el.dataset.to), dec = +el.dataset.dec, dur = 1200, t0 = performance.now();
+  for(;;){
+    if(!alive(token)) return;
+    const k = Math.min(1, (performance.now() - t0) / dur);
+    el.textContent = (to * (1 - Math.pow(1 - k, 3))).toFixed(dec);
+    if(k >= 1){ el.textContent = to.toFixed(dec); return; }
+    await wait(32);
+  }
+}
+STARTERS[7] = async token => {
+  $('#provFlash').innerHTML = '';
+  const btn = $('#acquireBtn');
+  btn.disabled = false;
+  btn.innerHTML = 'Provision to my workspace <span>→</span>';
+  $('#mktcard').classList.remove('on');
+  $$('#evalgrid .bar i').forEach(b => b.style.width = '0');
+  $$('#evalgrid .num').forEach(n => n.textContent = '0');
+
+  await wait(450); if(!alive(token)) return;
+  $('#mktcard').classList.add('on');
+  await wait(500); if(!alive(token)) return;
+  $$('#evalgrid .bar i').forEach(b => b.style.width = b.dataset.w);
+  $$('#evalgrid .num').forEach(n => countUp(n, token));
+  await wait(1500); if(!alive(token)) return;
+  autoPress(btn, token, 1800);
+};
+$('#acquireBtn').onclick = async function(){
+  const token = run;
+  this.disabled = true;
+  this.innerHTML = 'Provisioning…';
+  const flash = $('#provFlash');
+  flash.innerHTML = '';
+  const lines = [
+    'cloning agent into <b>Sara’s sovereign workspace</b> … <span class="ok">done</span>',
+    'binding to <b>her</b> ERP, suppliers and policies … <span class="ok">done</span>',
+    'residency check · KSA-East · publisher has no access … <span class="ok">verified</span>',
+    '<span class="ok">✓ Mia is live in Sara’s workspace — ready to work</span>',
+  ];
+  for(const l of lines){
+    const el = document.createElement('div');
+    el.className = 'ln'; el.innerHTML = l;
+    flash.appendChild(el);
+    enter(el);
+    await wait(680); if(!alive(token)) return;
+  }
+  this.innerHTML = '✓ Provisioned';
+  await wait(1300); if(!alive(token)) return;
+  go(8);
+};
+
+/* ══════════ S8 · FINALE ══════════ */
+STARTERS[8] = async token => {
+  const nums = $$('#bignums .bn');
+  nums.forEach(b => b.classList.remove('on'));
+  await wait(380);
+  for(const n of nums){
+    if(!alive(token)) return;
+    n.classList.add('on'); await wait(150);
+  }
+  if(auto){ await wait(6500); if(alive(token) && auto) fullReset(); }
+};
+
+/* ══════════ reset & controls ══════════ */
+function fullReset(){
+  $('#chatScroll').innerHTML = '';
+  firstAnswer = false; chatBusy = false;
+  $('#publishCta').classList.remove('on');
+  resetChips();
+  $('#chatInput').value = '';
+  go(0);
+}
+$('#replayBtn').onclick = fullReset;
+$('#againBtn').onclick  = () => { fullReset(); setTimeout(() => go(1), 60); };
+
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'INPUT' || e.target.isContentEditable) return;
+  const k = e.key.toLowerCase();
+  if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(current + 1); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); go(current - 1); }
+  else if(k === 'r'){ e.preventDefault(); fullReset(); }
+  else if(k === 'a'){ e.preventDefault(); setAuto(!auto); }
+});
+/* fade the presenter hint once the demo is under way */
+setTimeout(() => $('#hint').classList.add('fade'), 9000);
+
+/* Browsers suspend (not merely slow) timers in a backgrounded tab, so a scene that was
+   mid-sequence when the presenter switched away can come back stranded half-played.
+   Every scene script resets its own state on entry, so replaying the current one is the
+   safe recovery. Only for a real absence — a glance away shouldn't restart anything. */
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){ hiddenAt = Date.now(); return; }
+  if(hiddenAt && Date.now() - hiddenAt > 2500 && current > 0) go(current);
+  hiddenAt = 0;
+});
+
+/* rehearsal shortcuts:  ?scene=3   ?auto=1 */
+const qs = new URLSearchParams(location.search);
+if(qs.get('auto') === '1') setAuto(true);
+go(Math.min(SCENE_COUNT - 1, Math.max(0, +qs.get('scene') || 0)));
+</script>
+</body>
+</html>

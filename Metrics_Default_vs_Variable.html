@@ -1,0 +1,181 @@
+<title>Default and variable metrics</title>
+<style>
+:root{--ink:#0e1419;--bg:#f5f7f8;--panel:#fff;--line:#e7eaee;--line-2:#d7dce2;
+--text:#16201c;--muted:#697079;--teal:#0e9b76;--teal-d:#0b6f54;
+--gov:#1f9d62;--gov-bg:#e7f5ee;--gov-bd:#bfe3d3;
+--preview:#c0791e;--preview-bg:#fbf1dd;--preview-bd:#eddbb4;
+--alert:#c2554a;--alert-bg:#f7e7e5;--alert-bd:#eecfca;
+--lock:#5b6470;--lock-bg:#eef1f4;--lock-bd:#dbe0e6;
+--shadow:0 1px 2px rgba(14,20,25,.05);--radius:12px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:15px/1.62 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+-webkit-font-smoothing:antialiased}
+.top{background:var(--ink);color:#fff;padding:13px 26px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.top b{font-size:14px;letter-spacing:.14em}
+.top span{font-size:12.5px;color:#9aa4ae}
+.wrap{max-width:860px;margin:0 auto;padding:34px 22px 90px}
+h1{font-size:30px;line-height:1.2;margin:0 0 8px;letter-spacing:-.02em}
+.deck{font-size:16px;color:var(--muted);margin:0 0 26px}
+h2{font-size:20px;line-height:1.3;margin:40px 0 10px;letter-spacing:-.01em}
+h3{font-size:15px;margin:26px 0 7px}
+p{margin:0 0 13px}
+.answer{background:var(--gov-bg);border:1px solid var(--gov-bd);border-radius:var(--radius);padding:18px 20px;margin:0 0 30px}
+.answer p{margin:0 0 9px}.answer p:last-child{margin:0}
+.answer b{color:var(--teal-d)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+box-shadow:var(--shadow);padding:18px 20px;margin:16px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
+tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll table{min-width:600px}
+.tier{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.t0{background:var(--gov-bg);color:var(--gov);border:1px solid var(--gov-bd)}
+.t1{background:var(--gov-bg);color:var(--gov);border:1px solid var(--gov-bd)}
+.t2{background:var(--preview-bg);color:var(--preview);border:1px solid var(--preview-bd)}
+.t3{background:var(--alert-bg);color:var(--alert);border:1px solid var(--alert-bd)}
+.t4{background:var(--lock-bg);color:var(--lock);border:1px solid var(--lock-bd)}
+.flag{border-left:3px solid var(--alert);background:var(--alert-bg);padding:13px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.flag b{color:var(--alert)}
+.ok{border-left:3px solid var(--gov);background:var(--gov-bg);padding:13px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.ok b{color:var(--teal-d)}
+dl{margin:0}
+dt{font-weight:700;font-size:13.5px;margin-top:12px}
+dd{margin:1px 0 0;font-size:13.5px;color:var(--muted)}
+ul{margin:0 0 13px;padding-left:20px}li{margin-bottom:5px}
+.src{font-size:12.5px;color:var(--muted)}
+.src a{color:var(--teal-d)}
+.foot{margin-top:44px;padding-top:18px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--muted)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--lock-bg);padding:1px 5px;border-radius:4px}
+@media(max-width:620px){.wrap{padding:24px 16px 70px}h1{font-size:25px}}
+</style>
+
+<div class="top"><b>HUMAIN ONE</b><span>Eval workstream / Metric architecture / 26 Aug 2026</span></div>
+<div class="wrap">
+
+<h1>Which metrics are default, and which are a choice</h1>
+<p class="deck">Research note for the eval workstream. Written against the metric palette mockup with eight chips.</p>
+
+<div class="answer">
+<p><b>The answer.</b> A metric's place in the product is decided by one thing: what it needs as input. Not how important it sounds.</p>
+<p>Sort the eight chips by that and they fall into five tiers with very different costs and dependencies. Two of them are in the wrong place, one of them cannot run at all without a commitment we have not made yet, and two of them are not metrics.</p>
+</div>
+
+<h2>The eight chips are not the same kind of thing</h2>
+
+<p>Presented as identical toggles, they read as eight equivalent choices. They are not. Latency is a number we already have. Safety is a classifier on the output. Accuracy needs somebody to have written down the right answer. Bias needs the whole run done twice. The cost difference across that row is roughly a hundred to one, and the UI hides it.</p>
+
+<div class="scroll"><table>
+<thead><tr><th>Tier</th><th>Needs</th><th>Who can own it</th><th>Chips that land here</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td><span class="tier t0">0 Trace</span></td><td>Nothing but the run record</td><td>Platform</td><td>Latency</td><td>Free</td></tr>
+<tr><td><span class="tier t1">1 Output only</span></td><td>The response text</td><td>Platform</td><td>Safety, Multilingual</td><td>One classifier call</td></tr>
+<tr><td><span class="tier t2">2 Input plus output</span></td><td>Question and answer together</td><td>Platform, weakly</td><td>Helpfulness, Trustworthiness</td><td>One judge call</td></tr>
+<tr><td><span class="tier t3">3 Ground truth</span></td><td>A written correct answer</td><td>Whoever owns the dataset</td><td>Accuracy</td><td>Dataset must exist</td></tr>
+<tr><td><span class="tier t4">4 Extra runs</span></td><td>The case run again, altered</td><td>Platform, expensively</td><td>Bias and fairness, Robustness</td><td>2x to 10x the run</td></tr>
+</tbody>
+</table></div>
+
+<h2>Safety and Multilingual are in the wrong tier</h2>
+
+<p>Both are tier 1. They read the output and nothing else. They do not need to know what the agent is for, they do not need a correct answer, and they work on the first upload from a developer nobody has met. That makes them exactly as ownable by the platform as latency is.</p>
+
+<div class="flag">
+<p><b>The design problem.</b> Safety is currently an unticked chip. The developer most likely to ship an agent that leaks a citizen's national ID is the developer least likely to tick the box that would have caught it. An opt-in safety check protects the developers who did not need protecting.</p>
+</div>
+
+<p>Microsoft reached the same conclusion in their own evaluator guidance. Their combining-evaluators advice ends with a line that applies to every application type without exception: add the risk and safety evaluators. They ship ten of them, including one called Sensitive Data Leakage that does precisely the citizen-data job, and one called Indirect Attack for instructions smuggled in through retrieved content.</p>
+
+<p>Multilingual has the same shape and a sharper local case. The coverage line already says Arabic and English. A citizen asks in Arabic and gets English back. That is a failure any agent in the catalogue can commit, it needs no domain knowledge to detect, and it is invisible to all four of the mechanical checks. Saudi dialect is also now covered by published benchmarks rather than being an open research problem, so there is something to test against.</p>
+
+<h2>Accuracy is a commitment, not a toggle</h2>
+
+<p>The dataset in the mockup reads <code>gov-services-eval &middot; 380 cases</code>. That single line is the biggest architectural claim on the screen, and it is worth being explicit about what it commits us to.</p>
+
+<p>Accuracy is tier 3. It cannot be computed unless somebody has written down what the right answer was. So either the platform owns a labelled dataset for the government services category, or the developer supplies expected answers with their own cases. Those are different products.</p>
+
+<div class="scroll"><table>
+<thead><tr><th></th><th>Platform owns the dataset</th><th>Developer brings their own</th></tr></thead>
+<tbody>
+<tr><td>Accuracy possible</td><td>Yes, on day one</td><td>Only if they wrote expected answers</td></tr>
+<tr><td>Agents comparable</td><td>Yes, same 380 cases</td><td>No, every agent scored differently</td></tr>
+<tr><td>Works for a new category</td><td>No, somebody must build the set</td><td>Yes</td></tr>
+<tr><td>Who maintains it</td><td>Us, forever</td><td>Them</td></tr>
+<tr><td>Cost to launch</td><td>High, a labelled set per category</td><td>Near zero</td></tr>
+</tbody>
+</table></div>
+
+<p>The platform-owned version is much stronger, because it is the only way two agents in the same category are ever comparable to a buyer. It is also the only version where a certification badge means anything, since a badge earned against a dataset the developer wrote themselves certifies nothing.</p>
+
+<p>The cost is that the marketplace stops being open-ended. Every category needs somebody to build and maintain a labelled set, and an agent that does not fit a category has no accuracy score at all. That is a real trade, and it is the decision behind the chip.</p>
+
+<h2>Bias and Robustness are run strategies, not metrics</h2>
+
+<p>Everything else in the palette scores a run that already happened. These two cannot. Bias is measured by counterfactual pairs: run the same case twice with one attribute swapped, name, gender, region, and compare the two answers. Robustness is measured by perturbing the input, typos, rephrasing, adversarial framing, and checking the answer holds.</p>
+
+<p>Both mean the platform generates additional cases and runs them. On 380 cases, bias is 760 runs minimum. That is not a chip that behaves like the others, and ticking it should show a changed case count and a changed cost before the run starts, not after the bill arrives.</p>
+
+<div class="ok">
+<p><b>Worth keeping.</b> Bias on a government citizen-services marketplace is not an optional nicety, and counterfactual testing is the established method for it. The argument here is about where it sits in the interface, not whether to build it.</p>
+</div>
+
+<h2>Nobody else is doing this, which cuts both ways</h2>
+
+<p>Microsoft Marketplace certifies third-party AI apps and agents. Their published certification covers listing metadata, accessibility, webhook and billing correctness, and a security review conducted on documents, data flow diagrams and secret handling. It does not run evaluations on the agent's outputs at all.</p>
+
+<p>The established pattern for third-party agent trust is tiered attestation rather than measurement. Tier one is the vendor self-declaring. Tier two is an accredited third party running a published suite. Tier three adds continuous re-testing. That maps almost exactly onto the four certification tiers Prism already has.</p>
+
+<p>So running real behavioural evaluation at submission would put Humain ahead of the largest agent marketplace in the world. It also means there is no template to copy and no industry default to point at when somebody asks why these metrics and not others.</p>
+
+<h2>What I would propose</h2>
+
+<p>Four layers, where the layer is decided by the dependency and the interface shows it.</p>
+
+<dl>
+<dt>Layer 1. Always on, never configurable.</dt>
+<dd>Tier 0 and tier 1. Finished, stayed on track, tool call success, latency and cost, plus safety, sensitive data leakage, prompt injection, and language match. This is the licence to publish. There is no toggle, because a check the developer can switch off is not a platform guarantee.</dd>
+
+<dt>Layer 2. On by default for the category, dismissible.</dt>
+<dd>Tier 2 and, where a category dataset exists, tier 3. Accuracy against the category set, relevance, helpfulness. Dismissible because a judge on the wrong domain is worse than no judge, and the developer is the one who knows.</dd>
+
+<dt>Layer 3. Opt in with the cost on screen.</dt>
+<dd>Tier 4. Bias and fairness, robustness, repeated runs for reliability. Ticking any of these should visibly change the case count and the estimate before the run.</dd>
+
+<dt>Layer 4. Written by the developer.</dt>
+<dd>Anything needing a domain rule we cannot know. Already deferred in the current release, correctly.</dd>
+</dl>
+
+<p>The rule underneath all four: a metric's tier is set by what it needs, and the interface should show that dependency rather than hide it behind a uniform chip. A developer who understands why Accuracy is unavailable for their agent will accept it. One who sees a greyed-out toggle with no explanation will file a ticket.</p>
+
+<h2>What would make this evidence rather than reasoning</h2>
+
+<p>None of the above is grounded in a single real Humain failure. The tiers come from the input-dependency logic, which is sound, and from what the large platforms ship, which is a reasonable prior. Neither tells us what actually breaks here.</p>
+
+<p>The way to fix that is the same loop we are asking developers to run. Take fifty to a hundred real failures from agents that exist today, whatever Prism has already run, describe each in plain language, then count the categories and mark which are detectable without domain knowledge. A day of work, and it converts every claim in this note into something with a number behind it. It also demonstrates the product's own method, which is a decent thing to have done before the meeting.</p>
+
+<h2>Plain words</h2>
+
+<dl>
+<dt>Reference-free</dt><dd>A check that needs only what came back. No correct answer required. Safety and language match are reference-free.</dd>
+<dt>Reference-based</dt><dd>A check that compares the answer to a correct answer somebody wrote down. Accuracy is reference-based.</dd>
+<dt>Ground truth</dt><dd>The written-down correct answer for a case. Expensive, because a human has to produce it.</dd>
+<dt>Counterfactual pair</dt><dd>The same question asked twice with one detail changed, to see whether the answer should not have changed but did.</dd>
+<dt>Judge</dt><dd>A model asked to score another model's answer. Cheaper than a person, less reliable, and it needs to understand the domain to be worth anything.</dd>
+<dt>Trace</dt><dd>The record of the steps the agent took, not the answer it gave.</dd>
+</dl>
+
+<h2>Sources</h2>
+<p class="src">
+Microsoft Foundry, <a href="https://learn.microsoft.com/en-us/azure/foundry/concepts/built-in-evaluators">Built-in evaluators reference</a> and <a href="https://learn.microsoft.com/en-us/azure/foundry/concepts/evaluation-evaluators/risk-safety-evaluators">Risk and safety evaluators</a>.<br>
+Microsoft Partner Center, <a href="https://learn.microsoft.com/en-us/partner-center/marketplace-offers/artificial-intelligence-app-agent-certification">Certification for AI apps and agents on Microsoft Marketplace</a>.<br>
+Evidently AI, <a href="https://www.evidentlyai.com/llm-guide/llm-evaluation-metrics">LLM evaluation metrics</a>, on the reference-free and reference-based split.<br>
+<a href="https://arxiv.org/abs/2510.27543">DialectalArabicMMLU</a>, dialect benchmarks including Saudi, and <a href="https://arxiv.org/pdf/2510.13430">Evaluating Arabic Large Language Models: a survey of benchmarks, methods and gaps</a>.<br>
+<a href="https://arxiv.org/pdf/2504.07982">Metamorphic testing for fairness evaluation in large language models</a> and <a href="https://arxiv.org/pdf/2604.05555">SCOPE</a>, on counterfactual pairs.<br>
+GaaS, <a href="https://gaas.co.com/trust/trust-certifications-a-proposed-standard-for-agent-vendors/">Trust certifications, a proposed standard for agent vendors</a>, on the three-tier attestation model.
+</p>
+
+<div class="foot">Written for the Humain ONE eval workstream. The tiering is reasoning from input dependency plus what the large platforms ship. It is not yet grounded in Humain failure data, and the last section says how to fix that.</div>
+
+</div>

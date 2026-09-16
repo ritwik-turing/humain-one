@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turing's Marketplace — powered by HUMAIN ONE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#f4f6f7;--panel:#fff;--panel2:#fafbfc;--rail:#eef1f3;
+ --line:#e0e5e9;--line2:#eceff2;
+ --ink:#11161b;--muted:#59636e;--faint:#8b959f;
+ --acc:#0f7355;--acc2:#0b5a42;--acc-soft:#e7f2ee;--acc-line:rgba(15,115,85,.32);
+ --blue:#1c5f96;--blue-soft:#e7eef6;
+ --amber:#8f5c07;--amber-soft:#faf0dd;
+ --red:#a3291e;--red-soft:#f9e8e5;
+ --sans:"Archivo",-apple-system,"Segoe UI",sans-serif;
+ --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+ --sh:0 1px 2px rgba(16,24,32,.05);--shlg:0 20px 50px rgba(16,24,32,.16);
+ --h-top:46px;--h-bar:44px;--h-status:28px;--w-side:210px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input{font-family:inherit}
+::selection{background:rgba(15,115,85,.16)}
+*:focus{outline:none}
+.fv:focus-visible,button:focus-visible,input:focus-visible{box-shadow:0 0 0 2px rgba(15,115,85,.35)!important;border-color:var(--acc-line)!important;position:relative;z-index:2}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:var(--w-side) 1fr;grid-template-rows:var(--h-top) 1fr var(--h-status);height:100vh;overflow:hidden}
+.top{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--line);z-index:5}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;white-space:nowrap}
+.lg-t{font-weight:700;font-size:14.5px;letter-spacing:-.03em;color:#0d1216}
+.lg-t i{font-style:normal;position:relative}
+.lg-t i::after{content:"";position:absolute;left:50%;top:-.44em;transform:translateX(-50%);width:.15em;height:.15em;border-radius:50%;background:var(--acc)}
+.lg-m{font-weight:400;color:var(--muted)}
+.lg-sep{width:1px;height:16px;background:var(--line)}
+.lg-h{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:10.5px;letter-spacing:.22em;color:var(--acc2)}
+.lg-one{font-size:8px;letter-spacing:.12em;color:#fff;background:var(--acc);padding:2px 5px;border-radius:4px}
+.kbd{font-family:var(--mono);font-size:10.5px;background:var(--rail);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:2px 6px;color:var(--muted)}
+.topright{margin-left:auto;display:flex;align-items:center;gap:10px}
+.cmdhint{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--faint);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer}
+.cmdhint:hover{border-color:#cdd4da;color:var(--muted)}
+
+/* ---------- sidebar ---------- */
+.side{background:var(--rail);border-right:1px solid var(--line);overflow-y:auto;padding:12px 9px}
+.sgrp{font-size:9.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);padding:12px 8px 6px}
+.snav{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:none;background:transparent;color:var(--muted);font-size:12.5px;font-weight:500;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .13s,color .13s}
+.snav:hover{background:rgba(15,23,32,.045);color:var(--ink)}
+.snav.on{background:var(--acc-soft);color:var(--acc2);font-weight:600}
+.snav .ct{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+.snav.on .ct{color:var(--acc2)}
+.sdot{width:6px;height:6px;border-radius:2px;background:currentColor;opacity:.55;flex:none}
+
+/* ---------- main split ---------- */
+.main{display:grid;grid-template-rows:var(--h-bar) 1fr;min-width:0;overflow:hidden}
+.bar{display:flex;align-items:center;gap:9px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.srch{display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 10px;width:270px;max-width:42vw;transition:border-color .15s,box-shadow .15s}
+.srch:focus-within{border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(15,115,85,.1);background:#fff}
+.srch input{flex:1;min-width:0;border:none;background:transparent;font-size:12.5px;color:var(--ink);outline:none}
+.barmeta{margin-left:auto;font-size:11.5px;color:var(--faint);display:flex;align-items:center;gap:9px}
+.split{display:grid;grid-template-columns:1fr 430px;min-height:0;overflow:hidden}
+@media(max-width:1120px){.split{grid-template-columns:1fr 370px}}
+.listwrap{overflow:auto;border-right:1px solid var(--line);background:var(--panel)}
+
+/* ---------- table ---------- */
+table.t{width:100%;border-collapse:collapse}
+table.t th{position:sticky;top:0;z-index:2;background:var(--panel2);border-bottom:1px solid var(--line);text-align:left;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:8px 12px;white-space:nowrap;cursor:pointer;user-select:none}
+table.t th:hover{color:var(--muted)}
+table.t th .ar{opacity:.45;font-size:9px;margin-left:3px}
+table.t td{border-bottom:1px solid var(--line2);padding:9px 10px;vertical-align:middle;white-space:nowrap}
+table.t td:last-child,table.t th:last-child{padding-right:14px;text-align:right}
+tr.r{cursor:pointer;transition:background .11s}
+tr.r:hover{background:var(--panel2)}
+tr.r.sel{background:var(--acc-soft)}
+tr.r.sel td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
+.aname{display:flex;align-items:center;gap:9px;min-width:0}
+.av{width:26px;height:26px;border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--acc2);background:var(--acc-soft);box-shadow:inset 0 0 0 1px rgba(15,115,85,.14)}
+.an{font-weight:600;font-size:12.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis}
+.ap{font-size:10.5px;color:var(--faint);margin-top:-1px}
+.dim{color:var(--muted);font-size:12px}
+.tbar{display:inline-flex;align-items:center;gap:7px}
+.tmeter{width:44px;height:4px;border-radius:3px;background:#e4e9ec;overflow:hidden}
+.tmeter i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.empty{padding:44px 20px;text-align:center;color:var(--faint);font-size:12.5px}
+
+/* ---------- pills ---------- */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;white-space:nowrap;letter-spacing:.01em}
+.pill.ok{background:var(--acc-soft);color:var(--acc2)}
+.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.pill.info{background:var(--blue-soft);color:var(--blue)}
+.pill.mut{background:#eef1f3;color:var(--muted)}
+.pill.bad{background:var(--red-soft);color:var(--red)}
+.pill i{font-style:normal;font-size:8px}
+
+/* ---------- detail pane ---------- */
+.pane{overflow:auto;background:var(--panel2);display:flex;flex-direction:column}
+.ph{padding:15px 17px 0;background:var(--panel);border-bottom:1px solid var(--line)}
+.phtop{display:flex;gap:12px;align-items:flex-start}
+.ph .av{width:38px;height:38px;border-radius:10px;font-size:12.5px}
+.ph h2{font-size:16.5px;font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.2}
+.ph .sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+.pacts{display:flex;gap:7px;margin:13px 0 12px}
+.ptabs{display:flex;gap:2px;margin-top:2px}
+.ptab{appearance:none;border:none;background:transparent;font-size:11.5px;font-weight:600;color:var(--muted);padding:8px 11px;cursor:pointer;border-bottom:2px solid transparent;transition:color .14s,border-color .14s}
+.ptab:hover{color:var(--ink)}
+.ptab.on{color:var(--acc2);border-bottom-color:var(--acc)}
+.pbody{padding:15px 17px 26px;flex:1}
+.grp{background:var(--panel);border:1px solid var(--line);border-radius:9px;margin-bottom:11px;overflow:hidden}
+.grph{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--panel2);border-bottom:1px solid var(--line2);font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--faint)}
+.grph .gd{width:6px;height:6px;border-radius:50%;background:currentColor}
+.grph .gm{margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:0;text-transform:none}
+.grp.g-guard .grph{color:#6b46c1}.grp.g-prism .grph{color:var(--acc2)}.grp.g-att .grph{color:var(--amber)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 12px;border-bottom:1px solid var(--line2);font-size:12px}
+.kv:last-child{border-bottom:none}
+.kv span{color:var(--muted);flex:none}
+.kv b{text-align:right;font-weight:600;color:var(--ink);min-width:0;word-break:break-word}
+.mn{font-family:var(--mono);font-size:10px;background:var(--rail);color:var(--muted);padding:2px 6px;border-radius:4px;cursor:pointer}
+.mn:hover{background:#e2e7eb;color:var(--ink)}
+.cells{display:grid;grid-template-columns:repeat(3,1fr)}
+.cell{padding:11px 12px;border-right:1px solid var(--line2)}
+.cell:last-child{border-right:none}
+.cell .n{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink);line-height:1.1}
+.cell .l{font-size:10px;color:var(--faint);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.vban{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:8px;background:var(--acc-soft);border:1px solid var(--acc-line);margin-bottom:11px}
+.vban.warn{background:var(--amber-soft);border-color:rgba(143,92,7,.28)}
+.vmk{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--acc);color:#fff}
+.vban.warn .vmk{background:var(--amber)}
+.vt{font-weight:700;font-size:12.5px}
+.vs{font-size:11px;color:var(--muted);margin-top:1px}
+.hint{font-size:11px;color:var(--faint);line-height:1.5;margin:9px 2px 0}
+.nosel{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--faint);text-align:center;padding:30px;gap:9px}
+.pback{display:none}
+
+/* ---------- buttons ---------- */
+.btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:600;font-size:12px;padding:7px 13px;border-radius:7px;cursor:pointer;transition:background .14s,border-color .14s,transform .06s,box-shadow .14s}
+.btn:hover{border-color:#cdd4da;box-shadow:var(--sh)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.pri:hover{background:var(--acc2);border-color:var(--acc2)}
+.btn.sm{padding:5px 10px;font-size:11.5px}
+
+/* ---------- status bar ---------- */
+.status{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:0 14px;background:var(--panel);border-top:1px solid var(--line);font-size:11px;color:var(--faint)}
+.status b{font-family:var(--mono);font-weight:500;color:var(--muted)}
+.status .r{margin-left:auto;display:flex;gap:12px;align-items:center}
+
+/* ---------- command palette ---------- */
+.ovl{position:fixed;inset:0;background:rgba(12,18,24,.42);backdrop-filter:blur(3px);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding-top:12vh}
+.pal{width:min(620px,94vw);background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shlg);overflow:hidden}
+.palin{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.palin input{flex:1;border:none;background:transparent;font-size:15px;color:var(--ink);outline:none}
+.pallist{max-height:340px;overflow:auto;padding:6px}
+.pitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:12.5px}
+.pitem.on{background:var(--acc-soft)}
+.pitem .pk{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--faint)}
+.palfoot{padding:7px 14px;border-top:1px solid var(--line2);font-size:10.5px;color:var(--faint);display:flex;gap:14px;background:var(--panel2)}
+
+/* ---------- runtime ---------- */
+.rt{max-width:900px;margin:0 auto;padding:20px}
+.chat{display:flex;flex-direction:column;gap:9px;padding:14px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;min-height:210px;max-height:340px;overflow:auto}
+.msg{max-width:78%;padding:9px 12px;border-radius:10px;font-size:12.5px;line-height:1.5}
+.msg.me{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:3px}
+.msg.ag{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:3px}
+.fin{flex:1;min-width:0;border:1px solid var(--line);background:#fff;border-radius:7px;padding:9px 12px;font-size:12.5px;outline:none}
+.fin:focus{border-color:var(--acc-line);box-shadow:0 0 0 3px rgba(15,115,85,.1)}
+.fb{appearance:none;border:1px solid var(--line);background:#fff;border-radius:999px;font-size:10.5px;padding:1px 8px;cursor:pointer;color:var(--muted)}
+.fb.on{border-color:var(--acc-line);background:var(--acc-soft);color:var(--acc2)}
+
+#toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(8px);background:#11161b;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:99}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:900px){
+ .app{grid-template-columns:1fr;grid-template-rows:var(--h-top) auto 1fr var(--h-status)}
+ .side{display:flex;gap:6px;overflow-x:auto;padding:8px;border-right:none;border-bottom:1px solid var(--line)}
+ .sgrp{display:none}.snav{width:auto;white-space:nowrap;background:#fff;border:1px solid var(--line)}
+ .split{grid-template-columns:1fr}.pane{display:none}.pane.mob{display:flex;position:fixed;inset:var(--h-top) 0 0;z-index:40}
+ .pback{display:inline-flex}
+ .cmdhint{display:none}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast"></div>
+
+<script>
+/* ================= catalog ================= */
+const AGENTS=[
+ {id:'invoiceapp',nm:'Invoice Processing App',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Finance',cap:'Reads supplier invoices end to end and posts them, holding anything that fails validation',ds:'Multi-agent app: an orchestrator with extraction, validation, and posting agents processing invoices end to end.',use:'3.4k',trust:89,kingdom:1,cert:1,multi:['Orchestrator','Extraction Agent','Validation Agent','Posting Agent']},
+ {id:'translate',nm:'Translation Agent',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Language',cap:'Translates documents and live chat between Arabic and English, including legal register',ds:'Arabic-English document and live-chat translation with legal-register support.',use:'18.2k',trust:94,kingdom:1,cert:1},
+ {id:'meeting',nm:'Meeting Manager',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Back office',cap:'Schedules meetings, circulates briefs, and chases follow-ups across the org calendar',ds:'Schedules, briefs, and follows up on meetings across your org calendar.',use:'8.6k',trust:91,kingdom:0,cert:1},
+ {id:'trip',nm:'Trip Planner',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Travel',cap:'Books policy-compliant business travel including visas and per-diem rules',ds:'Plans compliant business travel: flights, hotels, visas, per-diem rules.',use:'7.8k',trust:88,kingdom:0,cert:1},
+ {id:'hr',nm:'HR Onboarder',pub:'Turing Labs',origin:'internal',vrf:1,cat:'HR',cap:'Runs the full new-hire sequence from contract to GOSI registration and equipment',ds:'Runs new-hire onboarding: contracts, GOSI registration, equipment, buddy plan.',use:'3.7k',trust:85,kingdom:0,cert:1},
+ {id:'research',nm:'Research Assistant',pub:'Turing Labs',origin:'internal',vrf:1,cat:'Back office',cap:'Gathers sources, synthesizes findings, and drafts a fully cited brief',ds:'Single-agent research: gathers sources, synthesizes, and drafts a cited brief.',use:'5.1k',trust:90,kingdom:0,cert:1},
+ {id:'covey',nm:'Franklin Covey Coach',pub:'Franklin Covey · via Turing',origin:'external',vrf:1,cat:'HR',cap:'Coaches leaders through goal planning, habit tracking, and session prep',ds:'Multi-agent leadership coach: goal planning, habit tracking, and session-prep agents working as one team.',use:'2.1k',trust:86,kingdom:0,cert:1,multi:['Coach Orchestrator','Goal Planner','Habit Tracker']},
+ {id:'citizen',nm:'Citizen Support Agent',pub:'Ministry of Social Affairs',origin:'external',vrf:1,cat:'Citizen services',cap:'Answers citizen benefit and service queries in Arabic, escalating with full context',ds:'Answers citizen queries on benefits and services, escalates with full context.',use:'12.4k',trust:92,kingdom:1,cert:1},
+ {id:'invoice',nm:'Invoice Chaser',pub:'Riyadh FinTech Works',origin:'external',vrf:1,cat:'Finance',cap:'Chases unpaid invoices in Arabic and English and reconciles once payment lands',ds:'Follows up unpaid invoices in Arabic and English, reconciles on payment.',use:'6.3k',trust:87,kingdom:0,cert:1},
+ {id:'contract',nm:'Contract Summarizer',pub:'Jeddah Legal AI',origin:'external',vrf:1,cat:'Back office',cap:'Summarizes contracts and red-flags clauses against your playbook, Sharia-clause aware',ds:'Summarizes and red-flags contracts against your playbook. Sharia-clause aware.',use:'4.9k',trust:90,kingdom:1,cert:1},
+ {id:'procure',nm:'Procurement Copilot',pub:'Riyadh FinTech Works',origin:'external',vrf:1,cat:'Finance',cap:'Drafts RFQs, compares supplier quotes, and tracks Etimad tender deadlines',ds:'Drafts RFQs, compares supplier quotes, and tracks Etimad tender deadlines.',use:'2.9k',trust:83,kingdom:0,cert:0},
+ {id:'triage',nm:'Support Triage',pub:'Dammam Cloud Co.',origin:'external',vrf:0,cat:'Back office',cap:'Classifies inbound support tickets and routes them with SLA awareness',ds:'Classifies and routes inbound support tickets with SLA awareness.',use:'1.2k',trust:78,kingdom:0,cert:0},
+];
+const A=id=>AGENTS.find(a=>a.id===id);
+const CATS=[...new Set(AGENTS.map(a=>a.cat))].sort();
+
+/* ================= state ================= */
+const state={scope:'all',q:'',sel:AGENTS[0].id,tab:'overview',sort:'name',dir:1,pal:false,palQ:'',palIx:0,sessions:{},mobPane:false};
+const STANDALONE=(()=>{const id=new URLSearchParams(location.search).get('agent');return id&&A(id)?id:null;})();
+const shareUrl=id=>location.origin+location.pathname+'?agent='+id;
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._x);toast._x=setTimeout(()=>t.classList.remove('show'),2400);}
+function fmtK(n){return n>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,'')+'M':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'k':String(n);}
+function um(a){const m=Math.round(parseFloat(a.use)*1000);return {ltRuns:m*14,ltTasks:Math.round(m*14*2.6),t30:Math.round(m*2.6)};}
+function gmet(a){return {comp:Math.min(99,a.trust+6),lat:380+(a.trust%9)*15};}
+function av(a){return '<div class="av">'+a.nm.split(' ').map(w=>w[0]).slice(0,2).join('')+'</div>';}
+function mn(id){return '<span class="mn" data-copy="'+id+'">'+id+'</span>';}
+function certPill(a){return a.cert?'<span class="pill ok"><i>&#9679;</i>Certified</span>':'<span class="pill warn"><i>&#9679;</i>Attested</span>';}
+function originPill(a){return a.origin==='internal'?'<span class="pill info">Internal</span>':'<span class="pill mut">External</span>';}
+
+/* filtering + sorting */
+function rows(){
+ const q=state.q.toLowerCase().trim();
+ let list=AGENTS.filter(a=>{
+  if(state.scope==='internal'&&a.origin!=='internal')return false;
+  if(state.scope==='external'&&a.origin!=='external')return false;
+  if(state.scope.startsWith('cat:')&&a.cat!==state.scope.slice(4))return false;
+  if(state.scope==='attested'&&a.cert)return false;
+  return !q||(a.nm+' '+a.pub+' '+a.cat+' '+a.cap).toLowerCase().includes(q);
+ });
+ const k={name:a=>a.nm.toLowerCase(),trust:a=>a.trust,tasks:a=>um(a).t30,cat:a=>a.cat.toLowerCase(),cert:a=>a.cert}[state.sort]||(a=>a.nm);
+ return list.sort((x,y)=>{const A1=k(x),B1=k(y);return (A1<B1?-1:A1>B1?1:0)*state.dir;});
+}
+// ponytail: one runnable check — filters must partition, and the selection must always exist in the catalog
+(function(){
+ const i=AGENTS.filter(a=>a.origin==='internal').length,e=AGENTS.filter(a=>a.origin==='external').length;
+ console.assert(i+e===AGENTS.length,'internal+external must cover the catalog');
+ console.assert(!!A(state.sel),'default selection must be a real agent');
+})();
+
+/* ================= views ================= */
+function vSide(){
+ const n=o=>AGENTS.filter(a=>o==='all'?1:o==='internal'?a.origin==='internal':o==='external'?a.origin==='external':o==='attested'?!a.cert:a.cat===o).length;
+ const item=(k,label,count)=>`<button class="snav ${state.scope===k?'on':''}" data-scope="${k}"><span class="sdot"></span>${label}<span class="ct">${count}</span></button>`;
+ return `<aside class="side">
+  <div class="sgrp">Catalog</div>
+  ${item('all','All agents',n('all'))}
+  ${item('internal','Internal',n('internal'))}
+  ${item('external','External',n('external'))}
+  <div class="sgrp">Category</div>
+  ${CATS.map(c=>item('cat:'+c,c,n(c))).join('')}
+  <div class="sgrp">Governance</div>
+  ${item('attested','Needs audit',n('attested'))}
+ </aside>`;
+}
+function vTable(){
+ const list=rows();
+ const th=(k,l,extra)=>`<th data-sort="${k}" ${extra||''}>${l}${state.sort===k?`<span class="ar">${state.dir>0?'&#9650;':'&#9660;'}</span>`:''}</th>`;
+ return `<div class="listwrap"><table class="t">
+  <thead><tr>${th('name','Agent')}${th('cat','Category')}${th('cert','Certification')}${th('trust','Trust')}${th('tasks','Tasks 30d')}<th>Runtime</th></tr></thead>
+  <tbody>${list.length?list.map(a=>`<tr class="r ${a.id===state.sel?'sel':''}" data-sel="${a.id}">
+    <td><div class="aname">${av(a)}<div style="min-width:0"><div class="an">${esc(a.nm)}</div><div class="ap">${esc(a.pub)}</div></div></div></td>
+    <td><span class="dim">${esc(a.cat)}</span> ${originPill(a)}</td>
+    <td>${certPill(a)}${a.multi?' <span class="pill bad">multi-agent</span>':''}</td>
+    <td><span class="tbar"><span class="num" style="font-size:11.5px">${a.trust}</span><span class="tmeter"><i style="width:${a.trust}%"></i></span></span></td>
+    <td class="num dim" style="font-size:11.5px">${fmtK(um(a).t30)}</td>
+    <td><span class="dim">${a.kingdom?'In-Kingdom':'HUMAIN'}</span></td>
+   </tr>`).join(''):`<tr><td colspan="6"><div class="empty">No agents match this filter.<br><button class="btn sm" style="margin-top:10px" data-reset="1">Clear filters</button></div></td></tr>`}
+  </tbody></table></div>`;
+}
+function paneBody(a){
+ const g=gmet(a),u=um(a);
+ if(state.tab==='overview')return `
+  <div class="grp"><div class="cells">
+   <div class="cell"><div class="n">${fmtK(u.t30)}</div><div class="l">Tasks 30d</div></div>
+   <div class="cell"><div class="n">${fmtK(u.ltTasks)}</div><div class="l">Lifetime tasks</div></div>
+   <div class="cell"><div class="n">4</div><div class="l">Teams</div></div>
+  </div></div>
+  <div class="grp"><div class="grph"><span class="gd"></span>Profile</div>
+   <div class="kv"><span>What it does</span><b>${esc(a.cap)}</b></div>
+   <div class="kv"><span>Publisher</span><b>${esc(a.pub)}${a.vrf?' &#10003;':''}</b></div>
+   <div class="kv"><span>Origin</span><b>${a.origin==='internal'?'Internal (Turing-built)':'External (third-party, certified)'}</b></div>
+   <div class="kv"><span>Category</span><b>${esc(a.cat)}</b></div>
+   <div class="kv"><span>Protocols</span><b>MCP &#183; A2A</b></div>
+   <div class="kv"><span>Agent card</span><b>${mn('a2a_'+a.id+'_v1')}</b></div>
+   ${a.multi?`<div class="kv"><span>Agent team</span><b>${a.multi.join(' &#183; ')}</b></div>`:''}
+   <div class="kv"><span>Last updated</span><b>Jul 2026</b></div></div>
+  ${a.multi?'<p class="hint">Multi-agent application, shown as a product-roadmap showcase. Initial launch supports single-agent submissions; multi-agent orchestration lands next.</p>':''}`;
+ if(state.tab==='cert')return `
+  <div class="vban${a.cert?'':' warn'}"><div class="vmk">${a.cert?'&#10003;':'!'}</div><div style="flex:1">
+   <div class="vt">${a.cert?'Certified &#183; Guardian verdict: ready':'Not audited &#183; attestation only'}</div>
+   <div class="vs">${a.cert?'0 critical &#183; 5/5 platform checks &#183; policy gov-citizen-v1':'Self-declared by the publisher. No Guardian audit on file.'}</div></div></div>
+  ${a.cert?`
+  <div class="grp g-guard"><div class="grph"><span class="gd"></span>Guardian audit<span class="gm">${mn('thr_'+a.id+'_c2')}</span></div>
+   <div class="kv"><span>Verdict band</span><b>ready &#183; ship opinion attached</b></div>
+   <div class="kv"><span>Findings</span><b>0 critical &#183; 2 medium (resolved, cycle 2)</b></div>
+   <div class="kv"><span>Domains</span><b>security &#183; reliability &#183; functionality &#183; api_contracts</b></div>
+   <div class="kv"><span>Source integrity</span><b>SHA-256 ${mn('sha_9af3d1')}</b></div></div>
+  <div class="grp g-guard"><div class="grph"><span class="gd"></span>Platform checks<span class="gm">5 of 5</span></div>
+   ${['Package structure','Security scan','Config check','Dependencies','Evaluation validation'].map(c=>`<div class="kv"><span>${c}</span><b style="color:var(--acc2)">&#10003; pass</b></div>`).join('')}</div>
+  <div class="grp g-prism"><div class="grph"><span class="gd"></span>Measured &#183; Prism<span class="gm">${mn('pj_8812')}</span></div>
+   <div class="cells">
+    <div class="cell"><div class="n">${g.comp}%</div><div class="l">Completion</div></div>
+    <div class="cell"><div class="n">Pass</div><div class="l">Injection</div></div>
+    <div class="cell"><div class="n">${g.lat}</div><div class="l">p95 ms</div></div>
+   </div></div>`:''}
+  <div class="grp g-att"><div class="grph"><span class="gd"></span>Publisher-attested<span class="gm">not audited</span></div>
+   <div class="kv"><span>Data handling</span><b>tenant-scoped &#183; KSA &#183; 90-day retention</b></div>
+   <div class="kv"><span>Compliance</span><b>PDPL &#183; ISO 27001 (claimed)</b></div>
+   <div class="kv"><span>Residency</span><b>${a.kingdom?'In-Kingdom dedicated (Riyadh)':'HUMAIN-hosted (KSA)'}</b></div>
+   <div class="kv"><span>Evidence ref</span><b>${mn('cert_'+a.id+'_71a2')}</b></div></div>
+  <p class="hint">Three evidence tiers: Guardian audit (verdict and findings, per the frozen embedded_audit.v1 contract), measured Prism numbers with method and version, and publisher attestations published verbatim. Guardian integration is stubbed for LEAP.</p>`;
+ if(state.tab==='perf')return `
+  <div class="grp"><div class="cells">
+   <div class="cell"><div class="n">${g.comp}%</div><div class="l">Completion</div></div>
+   <div class="cell"><div class="n">${g.lat}</div><div class="l">p95 ms</div></div>
+   <div class="cell"><div class="n">${a.trust}</div><div class="l">Trust</div></div>
+  </div></div>
+  <div class="grp"><div class="grph"><span class="gd"></span>Response feedback<span class="gm">last 30d</span></div>
+   ${[['Thumbs up',88],['Edited before use',9],['Thumbs down',3]].map(r=>`<div class="kv"><span>${r[0]}</span><b class="num">${r[1]}%</b></div>`).join('')}</div>
+  <div class="grp"><div class="grph"><span class="gd"></span>Volume</div>
+   <div class="kv"><span>Tasks &#183; 30 days</span><b class="num">${fmtK(u.t30)}</b></div>
+   <div class="kv"><span>Lifetime runs</span><b class="num">${fmtK(u.ltRuns)}</b></div>
+   <div class="kv"><span>Lifetime tasks</span><b class="num">${fmtK(u.ltTasks)}</b></div></div>
+  <p class="hint">Figures are indicative until this version has enough volume.</p>`;
+ return `
+  <div class="grp"><div class="grph"><span class="gd"></span>Security posture</div>
+   <div class="kv"><span>Security review</span><b>${a.cert?'Passed adversarial review':'Pending'}</b></div>
+   <div class="kv"><span>Egress</span><b>Deny-all except approved endpoints</b></div>
+   <div class="kv"><span>Secrets</span><b>No secret values in logs or outputs</b></div>
+   <div class="kv"><span>Prompt-injection</span><b>Behavioral testing on every version</b></div></div>
+  <div class="grp"><div class="grph"><span class="gd"></span>Capabilities &amp; data</div>
+   <div class="kv"><span>Actions</span><b>12 declared actions</b></div>
+   <div class="kv"><span>Data access</span><b>Read: connected sources &#183; Write: drafts only</b></div>
+   <div class="kv"><span>Knowledge</span><b>Tenant-scoped, never shared across teams</b></div>
+   <div class="kv"><span>Rate limits</span><b>60 tasks/min per tenant</b></div></div>
+  <p class="hint">Infrastructure certificates alone do not cover agent behaviour; every version is re-reviewed.</p>`;
+}
+function vPane(){
+ const a=A(state.sel);
+ if(!a)return `<section class="pane"><div class="nosel"><div style="font-size:22px">&#9678;</div><div>Select an agent to inspect its evidence.</div></div></section>`;
+ const T=[['overview','Overview'],['cert','Certification'],['perf','Performance'],['sec','Security']];
+ return `<section class="pane${state.mobPane?' mob':''}">
+  <div class="ph">
+   <div class="phtop">${av(a)}<div style="flex:1;min-width:0">
+    <h2>${esc(a.nm)}</h2><div class="sub">${esc(a.pub)}${a.vrf?' &#10003; verified':''}</div>
+    <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap">${originPill(a)}${certPill(a)}${a.kingdom?'<span class="pill mut">In-Kingdom</span>':''}</div>
+   </div></div>
+   <div class="pacts">
+    <button class="btn sm pback" data-back="1">&#8592; List</button>
+    <button class="btn pri" data-launch="${a.id}">Launch</button>
+    <button class="btn" data-share="${a.id}">Copy link</button>
+    <button class="btn sm" data-tab="cert">Evidence</button>
+   </div>
+   <div class="ptabs">${T.map(t=>`<button class="ptab ${state.tab===t[0]?'on':''}" data-tab="${t[0]}">${t[1]}</button>`).join('')}</div>
+  </div>
+  <div class="pbody">${paneBody(a)}</div>
+ </section>`;
+}
+function vConsole(){
+ const list=rows(),cert=AGENTS.filter(a=>a.cert).length;
+ return `<div class="app">
+  <header class="top">
+   <div class="brand fv" tabindex="0" data-scope="all"><span class="lg-t">Tur<i>i</i>ng's <span class="lg-m">Marketplace</span></span>
+    <span class="lg-sep"></span><span class="lg-h">HUMAIN<span class="lg-one">ONE</span></span></div>
+   <div class="topright">
+    <div class="cmdhint" data-pal="1">Search or jump <span class="kbd">&#8984;K</span></div>
+    <span class="pill mut">Single tenant</span>
+   </div>
+  </header>
+  ${vSide()}
+  <div class="main">
+   <div class="bar">
+    <div class="srch"><span style="color:var(--faint)">&#9906;</span><input id="q" autocomplete="off" placeholder="Filter agents..." value="${esc(state.q)}" aria-label="Filter agents"/></div>
+    ${state.q||state.scope!=='all'?'<button class="btn sm" data-reset="1">Clear</button>':''}
+    <div class="barmeta"><span><b class="num">${list.length}</b> of ${AGENTS.length} agents</span><span class="kbd">&#8593;&#8595;</span></div>
+   </div>
+   <div class="split">${vTable()}${vPane()}</div>
+  </div>
+  <footer class="status">
+   <span>Turing workspace &#183; <b>alnoor-tenant</b></span>
+   <span>Certified <b>${cert}</b> / ${AGENTS.length}</span>
+   <span>Needs audit <b>${AGENTS.length-cert}</b></span>
+   <div class="r"><span>Guardian: <b>stubbed for LEAP</b></span><span>HUMAIN ONE substrate</span></div>
+  </footer>
+ </div>${state.pal?vPal():''}`;
+}
+function palItems(){
+ const q=state.palQ.toLowerCase().trim();
+ const cmds=[{k:'Show internal agents',run:()=>{state.scope='internal'}},{k:'Show external agents',run:()=>{state.scope='external'}},{k:'Show agents needing audit',run:()=>{state.scope='attested'}},{k:'Clear all filters',run:()=>{state.scope='all';state.q=''}}];
+ const ag=AGENTS.filter(a=>!q||(a.nm+' '+a.cat+' '+a.cap).toLowerCase().includes(q)).map(a=>({k:a.nm,sub:a.cat+' · '+(a.cert?'certified':'attested'),id:a.id}));
+ const cm=cmds.filter(c=>!q||c.k.toLowerCase().includes(q));
+ return [...ag,...cm];
+}
+function vPal(){
+ const items=palItems();
+ return `<div class="ovl" data-palclose="1"><div class="pal" role="dialog" aria-label="Command palette">
+  <div class="palin"><span style="color:var(--faint)">&#9906;</span><input id="palq" autocomplete="off" placeholder="Search agents or run a command..." value="${esc(state.palQ)}"/></div>
+  <div class="pallist">${items.length?items.map((it,i)=>`<div class="pitem ${i===state.palIx?'on':''}" data-palrun="${i}">
+    <span>${esc(it.k)}</span>${it.sub?`<span style="color:var(--faint);font-size:11px">${esc(it.sub)}</span>`:'<span class="pill mut">command</span>'}
+    ${i===state.palIx?'<span class="pk">&#8629;</span>':''}</div>`).join(''):'<div class="empty">No matches.</div>'}</div>
+  <div class="palfoot"><span><span class="kbd">&#8593;&#8595;</span> navigate</span><span><span class="kbd">&#8629;</span> select</span><span><span class="kbd">esc</span> close</span></div>
+ </div></div>`;
+}
+function vRuntime(){
+ const a=A(STANDALONE),s=state.sessions[STANDALONE]||{msgs:[],firstRun:false};
+ return `<div class="app" style="grid-template-columns:1fr;grid-template-rows:var(--h-top) 1fr var(--h-status)">
+  <header class="top"><div class="brand">${av(a)}<span class="lg-t" style="margin-left:2px">${esc(a.nm)}</span></div>
+   <div class="topright"><span class="pill ok"><i>&#9679;</i>Live</span><button class="btn sm" data-share="${a.id}">Copy link</button></div></header>
+  <div style="overflow:auto"><div class="rt">
+   <div class="vban"><div class="vmk">&#9654;</div><div style="flex:1"><div class="vt">Live runtime</div>
+    <div class="vs">${esc(a.nm)} is running in its own web container inside your Turing workspace.</div></div></div>
+   <div class="grp" style="padding:14px">
+    <div class="chat" id="chat">
+     <div class="msg ag">Marhaba! I am ${esc(a.nm)}. ${s.firstRun?'':'This is your first run, try me with a real task.'}</div>
+     ${(s.msgs||[]).map((m,i)=>`<div class="msg ${m.who}">${m.tx}${m.who==='ag'?`<div style="margin-top:6px;display:flex;gap:6px"><button class="fb ${m.fb==='up'?'on':''}" data-mfb="up:${i}">&#128077;</button><button class="fb ${m.fb==='down'?'on':''}" data-mfb="down:${i}">&#128078;</button></div>`:''}</div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:11px"><input class="fin" id="chatin" placeholder="Ask the agent to do something..." aria-label="Message the agent"/><button class="btn pri" data-send="1">Run</button></div>
+   </div>
+   <div class="grp"><div class="grph"><span class="gd"></span>Session</div>
+    <div class="kv"><span>Origin</span><b>${a.origin==='internal'?'Internal':'External'}</b></div>
+    <div class="kv"><span>Runtime</span><b>${a.kingdom?'In-Kingdom dedicated':'HUMAIN-hosted (KSA)'}</b></div>
+    <div class="kv"><span>Certification</span><b>${a.cert?'Guardian: ready &#183; 0 critical':'attested &#183; not audited'}</b></div>
+    <div class="kv"><span>Share link</span><b>${mn(shareUrl(a.id))}</b></div></div>
+  </div></div>
+  <footer class="status"><span>Live container &#183; <b>${a.id}</b></span><div class="r"><span>HUMAIN ONE substrate</span></div></footer>
+ </div>`;
+}
+
+/* ================= render ================= */
+function render(){
+ $('#root').innerHTML=STANDALONE?vRuntime():vConsole();
+ const c=$('#chat');if(c)c.scrollTop=c.scrollHeight;
+ if(state.pal){const p=$('#palq');if(p){p.focus();p.setSelectionRange(p.value.length,p.value.length);}}
+}
+
+/* ================= actions ================= */
+function launch(id){
+ const w=window.open(shareUrl(id),'agent_'+id,'width=640,height=880');
+ if(!w){toast('Popup blocked. Allow popups to launch the agent.');return;}
+ toast('Launched '+A(id).nm+' in its own window');
+}
+function select(id){state.sel=id;if(window.innerWidth<=900)state.mobPane=true;render();}
+function runPal(i){
+ const it=palItems()[i];if(!it)return;
+ state.pal=false;state.palQ='';state.palIx=0;
+ if(it.id){select(it.id);return;}
+ const cmds={'Show internal agents':()=>state.scope='internal','Show external agents':()=>state.scope='external','Show agents needing audit':()=>state.scope='attested','Clear all filters':()=>{state.scope='all';state.q='';}};
+ (cmds[it.k]||(()=>{}))();render();
+}
+document.addEventListener('click',e=>{
+ const t=s=>e.target.closest?e.target.closest(s):null;let n;
+ if(n=t('[data-copy]')){if(navigator.clipboard)navigator.clipboard.writeText(n.getAttribute('data-copy'));const o=n.textContent;n.textContent='copied';setTimeout(()=>n.textContent=o,1000);return;}
+ if(n=t('[data-palrun]')){runPal(+n.getAttribute('data-palrun'));return;}
+ if(t('[data-palclose]')&&!t('.pal')){state.pal=false;render();return;}
+ if(n=t('[data-pal]')){state.pal=true;state.palQ='';state.palIx=0;render();return;}
+ if(n=t('[data-launch]')){launch(n.getAttribute('data-launch'));return;}
+ if(n=t('[data-share]')){if(navigator.clipboard)navigator.clipboard.writeText(shareUrl(n.getAttribute('data-share')));toast('Share link copied');return;}
+ if(n=t('[data-scope]')){state.scope=n.getAttribute('data-scope');render();return;}
+ if(n=t('[data-reset]')){state.scope='all';state.q='';render();return;}
+ if(n=t('[data-sel]')){select(n.getAttribute('data-sel'));return;}
+ if(n=t('[data-tab]')){state.tab=n.getAttribute('data-tab');render();return;}
+ if(n=t('[data-sort]')){const k=n.getAttribute('data-sort');state.dir=(state.sort===k)?-state.dir:1;state.sort=k;render();return;}
+ if(n=t('[data-back]')){state.mobPane=false;render();return;}
+ if(n=t('[data-send]')){send();return;}
+ if(n=t('[data-mfb]')){const p=n.getAttribute('data-mfb').split(':'),id=STANDALONE||state.sel,s=state.sessions[id];
+  if(s&&s.msgs[+p[1]]){s.msgs[+p[1]].fb=(s.msgs[+p[1]].fb===p[0]?null:p[0]);render();toast(p[0]==='up'?'Counted toward standing':'Flagged for the publisher');}return;}
+});
+document.addEventListener('input',e=>{
+ if(e.target.id==='q'){state.q=e.target.value;render();const i=$('#q');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}}
+ if(e.target.id==='palq'){state.palQ=e.target.value;state.palIx=0;render();}
+});
+document.addEventListener('keydown',e=>{
+ if((e.metaKey||e.ctrlKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();state.pal=!state.pal;state.palQ='';state.palIx=0;render();return;}
+ if(state.pal){
+  const items=palItems();
+  if(e.key==='Escape'){e.preventDefault();state.pal=false;render();return;}
+  if(e.key==='ArrowDown'){e.preventDefault();state.palIx=Math.min(items.length-1,state.palIx+1);render();return;}
+  if(e.key==='ArrowUp'){e.preventDefault();state.palIx=Math.max(0,state.palIx-1);render();return;}
+  if(e.key==='Enter'){e.preventDefault();runPal(state.palIx);return;}
+  return;
+ }
+ if(e.key==='Enter'&&e.target.id==='chatin'){send();return;}
+ if(e.target.tagName==='INPUT')return;
+ if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+  const list=rows();if(!list.length)return;e.preventDefault();
+  const i=list.findIndex(a=>a.id===state.sel);
+  const nx=e.key==='ArrowDown'?Math.min(list.length-1,i+1):Math.max(0,i-1);
+  state.sel=list[nx<0?0:nx].id;render();
+  const el=document.querySelector('tr.sel');if(el)el.scrollIntoView({block:'nearest'});
+ }
+});
+function send(){
+ const i=$('#chatin');if(!i||!i.value.trim())return;
+ const id=STANDALONE||state.sel;
+ if(!state.sessions[id])state.sessions[id]={msgs:[],firstRun:false};
+ const s=state.sessions[id],a=A(id);
+ s.msgs.push({who:'me',tx:esc(i.value.trim())});render();
+ const f=$('#chatin');if(f)f.focus();
+ setTimeout(()=>{s.msgs.push({who:'ag',tx:reply(a),fb:null});s.firstRun=true;render();const f2=$('#chatin');if(f2)f2.focus();},700);
+}
+function reply(a){
+ const R={invoiceapp:'Orchestrator: routed your invoice to Extraction, parsed 12 line items, Validation flagged 1 mismatch against the PO, Posting held it for review. 11 posted, 1 pending.',
+  covey:'Coach Orchestrator: Goal Planner drafted your Q3 leadership goals, Habit Tracker scheduled weekly check-ins, session brief prepared.',
+  translate:'Translated your document to English in legal register, 4 pages. Draft saved to your workspace.',
+  meeting:'Scheduled the steering review for Sunday 10:00, brief circulated to 6 attendees, confirmations chased tomorrow.',
+  citizen:'Found the applicable benefit: housing support, eligibility confirmed. Drafted the citizen reply in Arabic.',
+  research:'Gathered 9 sources, synthesized findings, drafted a cited brief in your workspace.',
+  invoice:'Sent bilingual reminders on 14 overdue invoices, 3 promised payment this week, reconciliation will run automatically.',
+  contract:'Summarized the agreement and red-flagged 2 clauses: unlimited liability and an auto-renew window.',
+  procure:'Drafted the RFQ, compared 4 supplier quotes, flagged the Etimad deadline 6 days out.',
+  triage:'Classified 38 inbound tickets, routed 31 automatically, escalated 7 breaching SLA.',
+  trip:'Riyadh to Jeddah, Tue to Thu: flights held within policy, hotel at corporate rate, per-diem calculated.',
+  hr:'Onboarding started: contract issued, GOSI registration filed, laptop requested, buddy assigned.'};
+ return R[a.id]||'Task completed. The draft result is in your workspace for review.';
+}
+window.__mk={state,render,A,rows,palItems,STANDALONE};
+if(STANDALONE)state.sessions[STANDALONE]={msgs:[],firstRun:false};
+render();
+</script>
+</body>
+</html>

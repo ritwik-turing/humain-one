@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Prism Evaluation Studio - Interactive Prototype</title>
+  <style>
+    :root {
+      --ink: #171916;
+      --muted: #626860;
+      --soft: #8a9088;
+      --paper: #f6f6f2;
+      --card: #ffffff;
+      --line: #dedfd8;
+      --line-strong: #c9cbc3;
+      --green: #0b6b4f;
+      --green-dark: #07513d;
+      --green-soft: #e8f3ee;
+      --amber: #a85f0b;
+      --amber-soft: #fff3dd;
+      --red: #a23b35;
+      --red-soft: #fff0ed;
+      --blue: #315fb5;
+      --blue-soft: #edf3ff;
+      --shadow: 0 18px 55px rgba(20, 27, 20, .08);
+      --radius: 20px;
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(49,95,181,.25);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
+    .shell { min-height: 100vh; }
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 68px; padding: 0 32px;
+      background: rgba(246,246,242,.92); backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(201,203,195,.75);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .mark {
+      width: 32px; height: 32px; display: grid; place-items: center;
+      border-radius: 10px; color: white; background: var(--ink);
+      font-weight: 800; letter-spacing: -.04em;
+    }
+    .brand-name { font-weight: 760; letter-spacing: -.025em; }
+    .brand-sub { color: var(--soft); font-size: 12px; margin-left: 4px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .version-chip {
+      min-height: 38px; display: flex; align-items: center; gap: 8px;
+      padding: 0 12px; border: 1px solid var(--line); border-radius: 999px;
+      background: rgba(255,255,255,.72); font-size: 13px;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .quiet-btn, .link-btn, .primary-btn, .secondary-btn, .danger-btn {
+      min-height: 44px; border-radius: 12px; cursor: pointer; transition: all .16s var(--ease);
+    }
+    .quiet-btn { padding: 0 14px; background: transparent; border: 1px solid transparent; color: var(--muted); }
+    .quiet-btn:hover { background: white; color: var(--ink); border-color: var(--line); }
+    .primary-btn { padding: 0 18px; border: 1px solid var(--green); background: var(--green); color: white; font-weight: 700; }
+    .primary-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .secondary-btn { padding: 0 17px; border: 1px solid var(--line-strong); background: white; font-weight: 650; }
+    .secondary-btn:hover { border-color: var(--ink); transform: translateY(-1px); }
+    .danger-btn { padding: 0 17px; border: 1px solid #e6b6b1; background: white; color: var(--red); font-weight: 650; }
+    .link-btn { min-height: 38px; padding: 0; border: 0; background: transparent; color: var(--green); font-weight: 700; }
+    .link-btn:hover { color: var(--green-dark); text-decoration: underline; }
+    .workflow-wrap { border-bottom: 1px solid var(--line); background: var(--card); }
+    .workflow {
+      max-width: 1180px; margin: 0 auto; padding: 0 28px;
+      display: grid; grid-template-columns: repeat(5, 1fr);
+    }
+    .step-tab {
+      position: relative; min-height: 78px; padding: 0 10px;
+      border: 0; background: transparent; cursor: pointer; text-align: left;
+      color: var(--soft);
+    }
+    .step-tab:after {
+      content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px;
+      background: transparent; border-radius: 3px 3px 0 0;
+    }
+    .step-tab.active { color: var(--ink); }
+    .step-tab.active:after { background: var(--green); }
+    .step-tab.done .step-num { background: var(--green-soft); color: var(--green); }
+    .step-num {
+      display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 8px;
+      border-radius: 50%; background: #efefe9; font-size: 12px; font-weight: 800;
+    }
+    .step-label { font-size: 14px; font-weight: 720; }
+    main { max-width: 1180px; margin: 0 auto; padding: 56px 28px 96px; }
+    .screen { animation: rise .28s var(--ease); }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .eyebrow { margin: 0 0 12px; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 760px; font-size: clamp(38px, 5vw, 64px); line-height: .99; letter-spacing: -.055em; font-weight: 730; }
+    h2 { margin: 0; font-size: 27px; line-height: 1.1; letter-spacing: -.035em; }
+    h3 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    p { line-height: 1.55; }
+    .lede { max-width: 700px; margin: 20px 0 0; color: var(--muted); font-size: 18px; }
+    .hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 42px; }
+    .hero-actions { flex: 0 0 auto; }
+    .grid { display: grid; gap: 20px; }
+    .grid.two { grid-template-columns: minmax(0,1.45fr) minmax(300px,.75fr); }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    }
+    .card.pad { padding: 26px; }
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+    .card-kicker { color: var(--soft); font-size: 12px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 7px; }
+    .helper { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .mission {
+      width: 100%; min-height: 108px; padding: 16px 18px; resize: vertical;
+      border: 1px solid var(--line-strong); border-radius: 14px; background: #fbfbf8;
+      color: var(--ink); font-size: 17px; line-height: 1.5;
+    }
+    .mission:focus { background: white; border-color: var(--green); }
+    .divider { height: 1px; background: var(--line); margin: 24px 0; }
+    .source-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .source-meta { display: flex; align-items: center; gap: 14px; }
+    .source-icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue); font-weight: 850; }
+    .strong { font-weight: 720; }
+    .small { font-size: 13px; }
+    .muted { color: var(--muted); }
+    .metrics { display: grid; gap: 10px; }
+    .metric-row {
+      display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 14px;
+      min-height: 66px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px;
+      background: #fcfcfa;
+    }
+    .metric-name { font-weight: 700; }
+    .metric-desc { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .type-tag { padding: 5px 8px; border-radius: 8px; background: #efefe9; color: #4e554d; font-size: 11px; font-weight: 800; }
+    .ownership { color: var(--soft); font-size: 12px; white-space: nowrap; }
+    .metric-actions { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+    .observations {
+      margin-top: 18px; padding: 15px 16px; border-radius: 14px; background: var(--green-soft);
+      color: #31574a; font-size: 13px; line-height: 1.45;
+    }
+    .observations strong { color: var(--green-dark); }
+    .receipt { position: sticky; top: 166px; align-self: start; overflow: hidden; }
+    .receipt-top { padding: 24px; background: var(--ink); color: white; }
+    .receipt-top .card-kicker { color: #aab2a9; }
+    .receipt-title { font-size: 22px; font-weight: 720; letter-spacing: -.03em; }
+    .receipt-body { padding: 22px 24px; }
+    .receipt-item { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .receipt-item:last-child { border: 0; }
+    .receipt-item span:first-child { color: var(--muted); }
+    .receipt-cta { padding: 0 24px 24px; }
+    .receipt-cta button { width: 100%; }
+    .principle-note { margin-top: 18px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .run-frame { max-width: 820px; margin: 0 auto; }
+    .run-summary { margin-top: 34px; overflow: hidden; }
+    .run-line { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+    .run-line:last-child { border: 0; }
+    .run-check { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font-weight: 900; }
+    .run-value { font-weight: 730; }
+    .run-action { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 20px; padding: 24px; background: #ebece6; border-radius: var(--radius); }
+    .progress-wrap { margin-top: 22px; padding: 26px; }
+    .progress-track { width: 100%; height: 8px; border-radius: 99px; overflow: hidden; background: #e7e8e1; }
+    .progress-bar { height: 100%; width: 0; background: var(--green); border-radius: inherit; transition: width .75s var(--ease); }
+    .progress-meta { display: flex; justify-content: space-between; margin-top: 12px; color: var(--muted); font-size: 13px; }
+    .review-top { display: grid; grid-template-columns: 1.05fr 1.4fr; gap: 20px; margin: 34px 0 20px; }
+    .score-card { padding: 30px; color: white; background: var(--ink); border-color: var(--ink); }
+    .score-number { margin: 42px 0 8px; font-size: 80px; line-height: .8; letter-spacing: -.07em; font-weight: 720; }
+    .score-label { color: #bbc2ba; font-size: 14px; }
+    .score-foot { display: flex; gap: 18px; margin-top: 36px; padding-top: 18px; border-top: 1px solid #3a3d38; color: #d5d9d3; font-size: 13px; }
+    .signal-card { padding: 26px; }
+    .signal { display: grid; grid-template-columns: 1fr 130px 50px; align-items: center; gap: 15px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .signal:last-child { border: 0; }
+    .signal-track { height: 6px; border-radius: 99px; background: #ecece6; overflow: hidden; }
+    .signal-fill { height: 100%; background: var(--green); border-radius: inherit; }
+    .signal-score { text-align: right; font-weight: 780; }
+    .attention-card { padding: 26px; }
+    .attention-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 10px; }
+    .case-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .case-row:last-child { border: 0; }
+    .case-status { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 5px var(--amber-soft); }
+    .case-status.red { background: var(--red); box-shadow: 0 0 0 5px var(--red-soft); }
+    .case-status.green { background: var(--green); box-shadow: 0 0 0 5px var(--green-soft); }
+    .case-title { font-weight: 720; }
+    .case-reason { margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .case-kind { display: inline-block; padding: 4px 7px; border-radius: 7px; background: var(--amber-soft); color: var(--amber); font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
+    .case-kind.control { background: var(--green-soft); color: var(--green); }
+    .inspector { animation: rise .24s var(--ease); }
+    .back-row { margin-bottom: 24px; }
+    .inspector-grid { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(360px,.95fr); gap: 20px; }
+    .transcript, .trace { padding: 26px; }
+    .message { margin-top: 18px; padding: 17px; border-radius: 15px; border: 1px solid var(--line); }
+    .message.input { background: #f3f4ef; }
+    .message.output { background: white; }
+    .message.expected { border-color: #bdd5ca; background: var(--green-soft); }
+    .message-label { margin-bottom: 8px; color: var(--soft); font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+    .message p { margin: 0; font-size: 14px; }
+    .trace-list { margin-top: 22px; }
+    .span { position: relative; display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; padding: 0 0 21px; }
+    .span:not(:last-child):before { content:""; position:absolute; left: 10px; top: 19px; bottom: 0; width: 1px; background: var(--line); }
+    .span-dot { position: relative; z-index: 1; width: 20px; height: 20px; border: 5px solid var(--green-soft); background: var(--green); border-radius: 50%; }
+    .span.bad .span-dot { border-color: var(--red-soft); background: var(--red); }
+    .span-name { font-size: 13px; font-weight: 720; }
+    .span-detail { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .span-time { color: var(--soft); font-size: 11px; }
+    .failure-story { margin-top: 20px; padding: 17px; border: 1px solid #efc9c4; background: var(--red-soft); border-radius: 14px; }
+    .failure-story strong { color: var(--red); }
+    .decision-bar { margin-top: 20px; padding: 22px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .decision-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+    .note-box { margin-top: 20px; padding: 22px; }
+    .ai-label { display: inline-flex; align-items: center; gap: 7px; padding: 6px 9px; border-radius: 9px; background: var(--blue-soft); color: var(--blue); font-size: 11px; font-weight: 850; }
+    .note-text { width: 100%; min-height: 92px; margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; resize: vertical; line-height: 1.45; }
+    .note-actions { margin-top: 12px; display: flex; gap: 9px; }
+    .improve-grid { display: grid; grid-template-columns: 360px minmax(0,1fr); gap: 20px; margin-top: 34px; }
+    .evidence-card { padding: 25px; align-self: start; }
+    .evidence-quote { margin: 20px 0; padding: 18px; border-left: 3px solid var(--red); background: var(--red-soft); font-size: 14px; line-height: 1.5; }
+    .evidence-list { display: grid; gap: 10px; }
+    .evidence-item { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; }
+    .editor-card { overflow: hidden; }
+    .editor-head { padding: 23px 25px; display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
+    .editor-body { padding: 24px 25px; }
+    .recommendation { margin-bottom: 20px; padding: 15px; border-radius: 13px; background: var(--blue-soft); color: #2f4c83; font-size: 13px; line-height: 1.45; }
+    .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .diff-pane { min-height: 210px; padding: 17px; border: 1px solid var(--line); border-radius: 14px; background: #fbfbf8; }
+    .diff-pane.after { border-color: #afd1c1; background: #f5fbf8; }
+    .diff-label { margin-bottom: 12px; color: var(--soft); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; font-weight: 850; }
+    .diff-pane p { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.65; }
+    .added { background: #dcefe5; color: #0b5d44; }
+    .editor-foot { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 25px; border-top: 1px solid var(--line); background: #fafaf7; }
+    .deploy-state { padding: 30px; text-align: center; }
+    .success-ring { width: 64px; height: 64px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 26px; font-weight: 900; }
+    .compare-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 20px; margin-top: 34px; }
+    .comparison { padding: 26px; }
+    .version-head { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 18px; padding: 0 0 15px; border-bottom: 1px solid var(--line); color: var(--soft); font-size: 12px; font-weight: 800; }
+    .compare-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 18px; align-items: center; padding: 19px 0; border-bottom: 1px solid var(--line); }
+    .compare-row:last-child { border: 0; }
+    .old { color: var(--muted); }
+    .new { font-weight: 800; }
+    .delta-up { color: var(--green); font-size: 12px; font-weight: 850; }
+    .delta-down { color: var(--red); font-size: 12px; font-weight: 850; }
+    .verdict { padding: 26px; background: var(--ink); color: white; border-color: var(--ink); }
+    .verdict .card-kicker { color: #aeb5ad; }
+    .verdict h2 { font-size: 31px; }
+    .verdict ul { padding-left: 18px; color: #d6dad4; line-height: 1.7; font-size: 14px; }
+    .verdict .primary-btn { width: 100%; margin-top: 15px; background: white; border-color: white; color: var(--ink); }
+    .verdict .quiet-btn { width: 100%; margin-top: 8px; color: #d8ddd6; }
+    .verdict .quiet-btn:hover { background: #2d312c; border-color: #40453f; }
+    .modal-wrap { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 24px; background: rgba(18,22,18,.48); backdrop-filter: blur(8px); }
+    .modal { width: min(720px, 100%); max-height: calc(100vh - 48px); overflow: auto; background: var(--card); border-radius: 24px; box-shadow: var(--shadow); animation: modalIn .22s var(--ease); }
+    .modal.wide { width: min(980px, 100%); }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+    .modal-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 24px 26px 20px; background: white; border-bottom: 1px solid var(--line); }
+    .close-btn { width: 44px; height: 44px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 12px; background: white; cursor: pointer; font-size: 20px; }
+    .modal-body { padding: 26px; }
+    .modal-foot { position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 10px; padding: 18px 26px; border-top: 1px solid var(--line); background: rgba(255,255,255,.96); }
+    .source-options { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .source-choice { min-height: 118px; padding: 16px; text-align: left; border: 1px solid var(--line); border-radius: 15px; background: white; cursor: pointer; }
+    .source-choice:hover, .source-choice.selected { border-color: var(--green); background: var(--green-soft); }
+    .source-choice strong { display: block; margin: 8px 0 4px; }
+    .source-choice span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { display: block; color: var(--muted); font-size: 12px; font-weight: 750; }
+    input, select { width: 100%; min-height: 46px; margin-top: 7px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 11px; background: white; color: var(--ink); }
+    .connection-box { margin-top: 18px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; }
+    .object-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .object-row:last-child { border: 0; }
+    .object-row input { width: auto; margin: 0; }
+    .map-grid { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 14px; }
+    .metric-types { display: grid; gap: 10px; }
+    .metric-type { display: grid; grid-template-columns: 42px 1fr auto; gap: 13px; align-items: center; min-height: 76px; padding: 13px; border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+    .metric-type:hover, .metric-type.selected { border-color: var(--green); background: var(--green-soft); }
+    .type-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: #efefe9; font-size: 12px; font-weight: 850; }
+    .recommended { padding: 4px 7px; border-radius: 7px; background: var(--green); color: white; font-size: 10px; font-weight: 850; }
+    details { border: 1px solid var(--line); border-radius: 14px; background: white; }
+    details summary { min-height: 50px; padding: 0 15px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+    details .details-body { padding: 0 15px 15px; color: var(--muted); font-size: 13px; }
+    .presenter-layout { display: grid; grid-template-columns: 235px 1fr; min-height: 470px; }
+    .presenter-nav { padding: 18px; background: #f0f1ec; }
+    .tour-step { width: 100%; min-height: 48px; margin-bottom: 5px; padding: 0 12px; text-align: left; border: 0; border-radius: 10px; background: transparent; cursor: pointer; color: var(--muted); }
+    .tour-step.active { background: white; color: var(--ink); font-weight: 750; }
+    .tour-content { padding: 34px; }
+    .tour-number { color: var(--green); font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: .09em; }
+    .tour-content h2 { margin-top: 10px; font-size: 34px; }
+    .say-box { margin-top: 24px; padding: 20px; border-radius: 15px; background: var(--green-soft); color: #244f40; line-height: 1.55; }
+    .tour-actions { margin-top: 28px; display: flex; justify-content: space-between; }
+    .toast { position: fixed; left: 50%; bottom: 26px; z-index: 200; transform: translate(-50%, 18px); padding: 13px 17px; border-radius: 12px; background: var(--ink); color: white; box-shadow: var(--shadow); opacity: 0; pointer-events: none; transition: all .2s var(--ease); font-size: 13px; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    .evidence-sheet { display: grid; gap: 16px; }
+    .evidence-section { padding: 18px; border: 1px solid var(--line); border-radius: 14px; }
+    .evidence-section h3 { margin-bottom: 10px; }
+    .receipt-code { padding: 13px; border-radius: 10px; background: #f0f1ec; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; line-height: 1.6; }
+    .status-banner { margin: 18px 0 0; padding: 15px 17px; border-radius: 14px; background: var(--amber-soft); color: #744712; font-size: 13px; }
+    @media (max-width: 900px) {
+      .topbar { padding: 0 16px; }
+      .brand-sub, .version-chip { display: none; }
+      .workflow { padding: 0 10px; }
+      .step-label { display: none; }
+      .step-tab { text-align: center; }
+      .grid.two, .review-top, .inspector-grid, .improve-grid, .compare-grid { grid-template-columns: 1fr; }
+      .receipt { position: static; }
+      .hero-row { align-items: flex-start; flex-direction: column; }
+      .diff, .form-grid { grid-template-columns: 1fr; }
+      .source-options { grid-template-columns: 1fr; }
+      .presenter-layout { grid-template-columns: 1fr; }
+      .presenter-nav { display: flex; overflow: auto; }
+      .tour-step { min-width: 130px; }
+    }
+    @media (max-width: 600px) {
+      main { padding: 36px 16px 72px; }
+      .quiet-btn.presenter-trigger { display: none; }
+      .card.pad, .attention-card, .signal-card, .transcript, .trace { padding: 20px; }
+      h1 { font-size: 42px; }
+      .source-row, .run-action, .decision-bar, .editor-foot { align-items: stretch; flex-direction: column; }
+      .metric-row { grid-template-columns: 1fr auto; }
+      .ownership { grid-column: 1 / -1; }
+      .signal { grid-template-columns: 1fr 80px 42px; }
+      .case-row { grid-template-columns: auto 1fr; }
+      .case-row .secondary-btn { grid-column: 2; }
+      .decision-actions { width: 100%; }
+      .decision-actions button { flex: 1; }
+      .version-head, .compare-row { grid-template-columns: 1.2fr .8fr .8fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="mark">P</div><div><span class="brand-name">Prism</span><span class="brand-sub">Evaluation Studio</span></div></div>
+      <div class="top-actions">
+        <div class="version-chip"><span class="dot"></span><span id="agentChip">Civic Services Agent v1.4.0</span></div>
+        <button class="quiet-btn presenter-trigger" data-open="presenterModal">Presenter mode</button>
+        <button class="quiet-btn" id="resetDemo">Reset</button>
+      </div>
+    </header>
+
+    <nav class="workflow-wrap" aria-label="Evaluation workflow">
+      <div class="workflow">
+        <button class="step-tab active" data-stage="setup"><span class="step-num">1</span><span class="step-label">Design</span></button>
+        <button class="step-tab" data-stage="run"><span class="step-num">2</span><span class="step-label">Run</span></button>
+        <button class="step-tab" data-stage="review"><span class="step-num">3</span><span class="step-label">Review</span></button>
+        <button class="step-tab" data-stage="improve"><span class="step-num">4</span><span class="step-label">Improve</span></button>
+        <button class="step-tab" data-stage="compare"><span class="step-num">5</span><span class="step-label">Compare</span></button>
+      </div>
+    </nav>
+
+    <main>
+      <section class="screen" id="screen-setup">
+        <div class="hero-row">
+          <div>
+            <p class="eyebrow">Design the evaluation</p>
+            <h1>What should this agent be trusted to do?</h1>
+            <p class="lede">Start with the work and the meaning of good. Prism turns both into a reproducible evaluation.</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="grid">
+            <article class="card pad">
+              <div class="card-head"><div><div class="card-kicker">The job</div><h2>Serve residents accurately and clearly</h2><p class="helper">This anchors every case and every use-case metric.</p></div></div>
+              <label for="mission">Evaluation intent</label>
+              <textarea class="mission" id="mission">Help a resident understand a municipal service, use the correct government record, and leave them with a specific next action.</textarea>
+              <div class="divider"></div>
+              <div class="source-row">
+                <div class="source-meta"><div class="source-icon">24</div><div><div class="strong" id="datasetName">Civic service scenarios</div><div class="small muted" id="datasetMeta">24 development cases - uploaded CSV</div></div></div>
+                <button class="secondary-btn" data-open="dataModal">Change data</button>
+              </div>
+            </article>
+
+            <article class="card pad">
+              <div class="card-head"><div><div class="card-kicker">The meaning of good</div><h2>Three use-case metrics</h2><p class="helper">Each metric is deliberately attached to this agent. Nothing domain-specific is assumed.</p></div><button class="secondary-btn" data-open="metricModal">Add metric</button></div>
+              <div class="metrics" id="metricList">
+                <div class="metric-row"><div><div class="metric-name">Claims match the municipal record</div><div class="metric-desc">Judge groundedness against the provided record</div></div><span class="type-tag">Prompt</span><span class="ownership">HUMAIN template</span></div>
+                <div class="metric-row"><div><div class="metric-name">Citizen can take the next step</div><div class="metric-desc">Judge whether the answer gives a specific, usable action</div></div><span class="type-tag">Prompt</span><span class="ownership">Your library</span></div>
+                <div class="metric-row"><div><div class="metric-name">Required fields are present</div><div class="metric-desc">Exact check for service name, URL, and eligibility</div></div><span class="type-tag">Code</span><span class="ownership">Platform team</span></div>
+              </div>
+              <div class="metric-actions"><button class="link-btn" id="openLibrary">Browse metric library</button><span class="small muted">Saved personal, team, and governed metrics</span></div>
+              <div class="observations"><strong>Always observed:</strong> completion, stayed on track, output usability, latency, token use, and safety. These diagnose execution and integrity; they do not decide whether this agent is good for its use case.</div>
+            </article>
+          </div>
+
+          <aside class="card receipt">
+            <div class="receipt-top"><div class="card-kicker">Evaluation plan</div><div class="receipt-title">Ready when you are</div></div>
+            <div class="receipt-body">
+              <div class="receipt-item"><span>Agent</span><strong id="receiptVersion">v1.4.0</strong></div>
+              <div class="receipt-item"><span>Cases</span><strong id="receiptCases">24</strong></div>
+              <div class="receipt-item"><span>Use-case metrics</span><strong id="receiptMetrics">3</strong></div>
+              <div class="receipt-item"><span>Coverage</span><strong>100%</strong></div>
+              <div class="receipt-item"><span>Estimated cost</span><strong id="receiptCost">$1.80</strong></div>
+            </div>
+            <div class="receipt-cta"><button class="primary-btn" data-go="run">Review run plan</button><div class="principle-note">Prism keeps the evaluator definition, dataset version, agent version, and outputs together so this run can be reproduced.</div></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-run" hidden>
+        <div class="run-frame">
+          <p class="eyebrow">Run the evaluation</p>
+          <h1>One last look before Prism runs.</h1>
+          <p class="lede">The run receipt makes cost, scope, and reproducibility explicit before compute starts.</p>
+          <div class="card run-summary">
+            <div class="run-line"><span class="run-check">1</span><div><div class="strong">Civic Services Agent</div><div class="small muted">Immutable deployment snapshot</div></div><span class="run-value" id="runVersion">v1.4.0</span></div>
+            <div class="run-line"><span class="run-check">2</span><div><div class="strong" id="runDataset">Civic service scenarios</div><div class="small muted" id="runCasesText">24 development cases</div></div><span class="run-value" id="runMode">Development</span></div>
+            <div class="run-line"><span class="run-check">3</span><div><div class="strong">Three use-case metrics</div><div class="small muted">Two prompt judges and one exact code check</div></div><span class="run-value">100% coverage</span></div>
+            <div class="run-line"><span class="run-check">4</span><div><div class="strong">One repetition</div><div class="small muted">Increase repetitions when measuring nondeterminism</div></div><button class="link-btn" id="runSettings">Run settings</button></div>
+          </div>
+          <div class="run-action"><div><div class="strong">Estimated cost <span id="runCost">$1.80</span></div><div class="small muted">Approx. 2 minutes with 8 parallel workers</div></div><button class="primary-btn" id="startRun">Start evaluation</button></div>
+          <div class="card progress-wrap" id="runProgress" hidden><div class="strong" id="progressTitle">Evaluating cases</div><div class="progress-track" style="margin-top:16px"><div class="progress-bar" id="progressBar"></div></div><div class="progress-meta"><span id="progressText">Preparing immutable run receipt...</span><span id="progressCount">0%</span></div></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-review" hidden>
+        <div id="reviewOverview">
+          <div class="hero-row"><div><p class="eyebrow">Review the evidence</p><h1>The agent usually helps. Three cases need your judgment.</h1><p class="lede">Prism separates use-case quality from operational integrity, then leads you to the smallest useful review queue.</p></div><div class="hero-actions"><button class="secondary-btn" id="viewAllCases">View all cases</button></div></div>
+          <div class="review-top">
+            <article class="card score-card"><div class="card-kicker">Use-case quality</div><div class="score-number">86%</div><div class="score-label">of attached metric checks passed</div><div class="score-foot"><span>3 metrics</span><span id="qualityCases">24 cases</span><span>100% coverage</span></div></article>
+            <article class="card signal-card"><div class="card-head"><div><div class="card-kicker">What good means here</div><h2>Quality by signal</h2></div></div>
+              <div class="signal"><div><div class="strong">Claims match the record</div><div class="small muted">Prompt judge</div></div><div class="signal-track"><div class="signal-fill" style="width:92%"></div></div><div class="signal-score">92%</div></div>
+              <div class="signal"><div><div class="strong">Citizen can act</div><div class="small muted">Prompt judge</div></div><div class="signal-track"><div class="signal-fill" style="width:79%;background:var(--amber)"></div></div><div class="signal-score">79%</div></div>
+              <div class="signal"><div><div class="strong">Required fields present</div><div class="small muted">Exact code check</div></div><div class="signal-track"><div class="signal-fill" style="width:88%"></div></div><div class="signal-score">88%</div></div>
+              <div class="observations"><strong>Operational integrity:</strong> 100% completed, no safety flags, p95 latency 2.1s, median 940 tokens.</div>
+            </article>
+          </div>
+          <article class="card attention-card">
+            <div class="attention-head"><div><div class="card-kicker">Start here</div><h2>Attention cases</h2><p class="helper">Failures, unusual traces, and a healthy control for comparison.</p></div><button class="link-btn" id="whyControls">Why include a healthy case?</button></div>
+            <div class="case-row"><span class="case-status red"></span><div><span class="case-kind">High priority</span><div class="case-title">Permit renewal uses an outdated deadline</div><div class="case-reason">Metric failed and Prism could not produce a reliable failure note.</div></div><button class="primary-btn inspectCase">Inspect</button></div>
+            <div class="case-row"><span class="case-status"></span><div><span class="case-kind">Needs review</span><div class="case-title">Waste pickup answer stops before the next action</div><div class="case-reason">Actionability judge failed; Prism drafted a likely explanation.</div></div><button class="secondary-btn inspectCase">Inspect</button></div>
+            <div class="case-row"><span class="case-status green"></span><div><span class="case-kind control">Healthy control</span><div class="case-title">Library card replacement is accurate and actionable</div><div class="case-reason">A known-good trace to validate that the metric does not flag everything.</div></div><button class="secondary-btn" id="controlCase">Compare</button></div>
+          </article>
+        </div>
+
+        <div class="inspector" id="caseInspector" hidden>
+          <div class="back-row"><button class="quiet-btn" id="backToReview">Back to results</button></div>
+          <div class="hero-row"><div><p class="eyebrow">Case 07 of <span id="inspectTotal">24</span></p><h1>Where the answer stopped being useful.</h1><p class="lede">The output, evaluator evidence, and OpenTelemetry trace stay together.</p></div></div>
+          <div class="inspector-grid">
+            <article class="card transcript"><div class="card-head"><div><div class="card-kicker">Case evidence</div><h2>Waste pickup after a missed collection</h2></div></div>
+              <div class="message input"><div class="message-label">Resident asked</div><p>My recycling was not picked up yesterday. What do I need to do?</p></div>
+              <div class="message expected"><div class="message-label">Expected outcome</div><p>Explain the missed-pickup window and give the resident the exact report link or 311 action.</p></div>
+              <div class="message output"><div class="message-label">Agent answered</div><p>Recycling collection schedules can change because of holidays or service delays. You can check the municipal waste services page for updates.</p></div>
+            </article>
+            <article class="card trace"><div class="card-head"><div><div class="card-kicker">OpenTelemetry trace</div><h2>The failure story</h2></div><span class="type-tag">2.0s</span></div>
+              <div class="trace-list">
+                <div class="span"><span class="span-dot"></span><div><div class="span-name">agent.request</div><div class="span-detail">Input classified as missed waste collection</div></div><span class="span-time">44ms</span></div>
+                <div class="span"><span class="span-dot"></span><div><div class="span-name">tool.search_municipal_record</div><div class="span-detail">Correct service record retrieved</div></div><span class="span-time">362ms</span></div>
+                <div class="span bad"><span class="span-dot"></span><div><div class="span-name">model.compose_response</div><div class="span-detail">Retrieved reporting link was omitted from final answer</div></div><span class="span-time">1.5s</span></div>
+                <div class="span"><span class="span-dot"></span><div><div class="span-name">evaluator.citizen_actionability</div><div class="span-detail">Failed: no specific next action</div></div><span class="span-time">126ms</span></div>
+              </div>
+              <div class="failure-story"><strong>What went wrong:</strong> The agent found the right record, but its response instruction did not require the reporting action to survive summarization.</div>
+            </article>
+          </div>
+          <article class="card note-box"><span class="ai-label">Prism draft - review required</span><textarea class="note-text" id="noteText">The retrieval step succeeded, but the final response omitted the specific 311 reporting action. Likely fix: require every service answer to preserve the next-action field from the retrieved record.</textarea><div class="note-actions"><button class="primary-btn" id="acceptNote">Accept note</button><button class="secondary-btn" id="editNote">Edit</button></div></article>
+          <article class="card decision-bar"><div><div class="strong">What should happen next?</div><div class="small muted">Your decision moves evidence into action.</div></div><div class="decision-actions"><button class="primary-btn" data-go="improve">Edit agent</button><button class="secondary-btn" id="markControl">Mark healthy control</button><button class="secondary-btn" id="nextCase">Next case</button></div></article>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-improve" hidden>
+        <div class="hero-row"><div><p class="eyebrow">Improve the agent</p><h1>Make one evidence-backed change.</h1><p class="lede">Prism suggests a draft. You decide what changes, deploy a real version, and rerun the same evaluation.</p></div></div>
+        <div class="improve-grid">
+          <aside class="card evidence-card"><div class="card-kicker">Evidence carried forward</div><h2>Missing next action</h2><div class="evidence-quote">The correct municipal record was retrieved, but its 311 reporting action disappeared during response composition.</div><div class="evidence-list"><div class="evidence-item"><span class="muted">Affected cases</span><strong>3 of 24</strong></div><div class="evidence-item"><span class="muted">Failed metric</span><strong>Citizen can act</strong></div><div class="evidence-item"><span class="muted">Failure location</span><strong>compose_response</strong></div><div class="evidence-item"><span class="muted">Reviewer</span><strong>You</strong></div></div></aside>
+          <article class="card editor-card">
+            <div id="editorState">
+              <div class="editor-head"><div><div class="card-kicker">Agent instruction</div><h2>Draft change for v1.5.0</h2></div><span class="ai-label">Suggested, never auto-applied</span></div>
+              <div class="editor-body"><div class="recommendation"><strong>Why this change:</strong> it targets the observed failure without relaxing correctness or safety. Review the exact diff before deployment.</div>
+                <div class="diff"><div class="diff-pane"><div class="diff-label">Current - v1.4.0</div><p>Use the municipal record to answer clearly. Summarize the most relevant service information for the resident.</p></div><div class="diff-pane after"><div class="diff-label">Proposed - v1.5.0</div><p>Use the municipal record to answer clearly. Summarize the most relevant service information for the resident.<br><br><span class="added">Always preserve the record's required next action, including the exact URL, phone number, or 311 instruction.</span></p></div></div>
+              </div>
+              <div class="editor-foot"><button class="link-btn" id="regressionMetric">Turn this failure into a regression check</button><button class="primary-btn" id="deployVersion">Deploy v1.5.0</button></div>
+            </div>
+            <div class="deploy-state" id="deployedState" hidden><div class="success-ring">OK</div><h2>v1.5.0 is deployed</h2><p class="muted">The agent changed. The evaluation did not. That makes the comparison meaningful.</p><button class="primary-btn" id="runNewVersion">Run the same evaluation</button><div><button class="link-btn" id="viewDeployReceipt" style="margin-top:12px">View deployment receipt</button></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-compare" hidden>
+        <div class="hero-row"><div><p class="eyebrow">Compare and decide</p><h1>The change helped. One tradeoff still needs a look.</h1><p class="lede">Prism shows evidence and deltas. Your team owns the release decision.</p></div><div class="hero-actions"><button class="secondary-btn" data-open="evidenceModal">Share evidence</button></div></div>
+        <div class="compare-grid">
+          <article class="card comparison"><div class="version-head"><span>Signal</span><span>v1.4.0</span><span>v1.5.0</span></div>
+            <div class="compare-row"><div><div class="strong">Overall use-case quality</div><span class="delta-up">+8 points</span></div><span class="old">86%</span><span class="new">94%</span></div>
+            <div class="compare-row"><div><div class="strong">Citizen can take the next step</div><span class="delta-up">+17 points</span></div><span class="old">79%</span><span class="new">96%</span></div>
+            <div class="compare-row"><div><div class="strong">Claims match the record</div><span class="delta-up">+2 points</span></div><span class="old">92%</span><span class="new">94%</span></div>
+            <div class="compare-row"><div><div class="strong">Required fields present</div><span class="delta-up">+8 points</span></div><span class="old">88%</span><span class="new">96%</span></div>
+            <div class="compare-row"><div><div class="strong">p95 latency</div><span class="delta-down">+0.2s slower</span></div><span class="old">2.1s</span><span class="new">2.3s</span></div>
+            <div class="compare-row"><div><div class="strong">Safety flags</div><span class="delta-up">No change</span></div><span class="old">0</span><span class="new">0</span></div>
+          </article>
+          <aside class="card verdict"><div class="card-kicker">Decision brief</div><h2>A better agent, with a small latency cost.</h2><ul><li>All three missed-action cases now pass.</li><li>No correctness or safety regression.</li><li>Latency rose 0.2 seconds at p95.</li><li>One fresh healthy control was sampled.</li></ul><button class="primary-btn" id="recommendShip">Recommend for release</button><button class="quiet-btn" data-go="improve">Keep iterating</button></aside>
+        </div>
+        <div class="observations" style="margin-top:20px"><strong>No hidden pass mark:</strong> Prism provides evaluator outputs, uncertainty, trace evidence, operational observations, and a reproducible receipt. The product owner decides whether the evidence is sufficient to ship.</div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-wrap" id="dataModal" hidden role="dialog" aria-modal="true" aria-labelledby="dataTitle">
+    <div class="modal wide"><div class="modal-head"><div><div class="card-kicker">Evaluation data</div><h2 id="dataTitle">Bring realistic work into Prism</h2><p class="helper">The source stays hidden from the evaluation logic behind a versioned dataset.</p></div><button class="close-btn" data-close="dataModal" aria-label="Close">x</button></div><div class="modal-body">
+      <div id="dataSources"><div class="source-options"><button class="source-choice"><b>CSV</b><strong>Upload cases</strong><span>Fastest for a developer evaluation</span></button><button class="source-choice selected" id="chooseWarehouse"><b>DB</b><strong>Data warehouse</strong><span>Connect Snowflake or another governed source</span></button><button class="source-choice"><b>API</b><strong>API endpoint</strong><span>Fetch cases from an internal service</span></button></div>
+        <div class="connection-box"><div class="card-head"><div><div class="card-kicker">Warehouse provider</div><h3>Snowflake</h3><p class="helper">Objects are never shown until the connection is verified.</p></div><span class="type-tag">Not connected</span></div><button class="primary-btn" id="configureSnowflake">Configure Snowflake</button></div>
+      </div>
+      <div id="snowflakeForm" hidden><div class="form-grid"><label>Account<input value="humain-prod.us-west-2"></label><label>Warehouse<input value="EVAL_WH"></label><label>Database<input value="AI_QUALITY"></label><label>Role<input value="PRISM_READER"></label></div><div class="status-banner">Prism requests read-only access and stores the credential in your workspace vault. No warehouse object is exposed before verification.</div><button class="primary-btn" id="testConnection" style="margin-top:18px">Verify connection</button></div>
+      <div id="snowflakeObjects" hidden><div class="observations"><strong>Connected.</strong> Read-only access verified for AI_QUALITY.</div><h3 style="margin-top:22px">Choose a dataset</h3><div class="connection-box"><label class="object-row"><input type="radio" name="object"><span><strong>GOLD.CIVIC_SERVICE_CASES</strong><br><span class="small muted">12,480 rows - updated 2 hours ago</span></span></label><label class="object-row"><input type="radio" name="object" id="unknownDataset"><span><strong>STAGING.UNKNOWN_DATASET</strong><br><span class="small muted">380 rows - schema not yet mapped</span></span></label><label class="object-row"><input type="radio" name="object"><span><strong>ARCHIVE.CIVIC_CASES_2025</strong><br><span class="small muted">8,120 rows - historical snapshot</span></span></label></div></div>
+      <div id="mappingStep" hidden><div class="observations"><strong>380 cases found.</strong> Prism profiled the schema. Confirm the fields that define each evaluation case.</div><div class="map-grid"><span class="strong">citizen_question</span><span class="muted">becomes</span><select><option>Input</option></select><span class="strong">municipal_record</span><span class="muted">becomes</span><select><option>Reference context</option></select><span class="strong">expected_action</span><span class="muted">becomes</span><select><option>Expected outcome</option></select></div></div>
+    </div><div class="modal-foot"><button class="secondary-btn" data-close="dataModal">Cancel</button><button class="primary-btn" id="confirmDataset" hidden>Use 380 cases</button></div></div>
+  </div>
+
+  <div class="modal-wrap" id="metricModal" hidden role="dialog" aria-modal="true" aria-labelledby="metricTitle">
+    <div class="modal"><div class="modal-head"><div><div class="card-kicker">Metric composer</div><h2 id="metricTitle">How should this behavior be judged?</h2><p class="helper">Choose the mechanism that best represents the requirement.</p></div><button class="close-btn" data-close="metricModal" aria-label="Close">x</button></div><div class="modal-body"><div class="metric-types"><div class="metric-type selected"><span class="type-icon">AI</span><div><strong>Prompt judge</strong><div class="small muted">Express a nuanced requirement in plain language, with examples</div></div><span class="recommended">Recommended</span></div></div>
+      <div style="margin-top:18px"><label>Metric name<input value="Answer respects the resident's language"></label><label style="margin-top:14px">Evaluation instruction<textarea class="mission" style="min-height:130px;margin-top:7px">Judge whether the response stays in the language used by the resident while preserving names, links, and official service terms.</textarea></label></div>
+      <details style="margin-top:18px"><summary>Use an exact or external evaluator</summary><div class="details-body"><div class="metric-types"><div class="metric-type"><span class="type-icon">{ }</span><div><strong>Code</strong><div class="small muted">A strict deterministic function for exact checks</div></div><span class="type-tag">Available</span></div><div class="metric-type"><span class="type-icon">API</span><div><strong>REST API</strong><div class="small muted">Your evaluator behind an authenticated endpoint</div></div><span class="type-tag">Advanced</span></div><div class="metric-type"><span class="type-icon">AG</span><div><strong>Evaluation agent</strong><div class="small muted">A multi-step judge that can use tools and supporting evidence</div></div><span class="type-tag">Advanced</span></div></div></div></details>
+      <details style="margin-top:10px"><summary>Model, calibration, and ownership</summary><div class="details-body">Prompt judges use the HUMAIN model gateway. Pin a model and temperature, add examples, calibrate against reviewed cases, then save the metric to your library, the team library, or a governed template collection.</div></details>
+    </div><div class="modal-foot"><button class="secondary-btn" data-close="metricModal">Cancel</button><button class="primary-btn" id="saveMetric">Add prompt metric</button></div></div>
+  </div>
+
+  <div class="modal-wrap" id="libraryModal" hidden role="dialog" aria-modal="true" aria-labelledby="libraryTitle"><div class="modal"><div class="modal-head"><div><div class="card-kicker">Metric library</div><h2 id="libraryTitle">Reuse intent, not generic scores</h2><p class="helper">Every saved metric keeps its definition, owner, version, and calibration state.</p></div><button class="close-btn" data-close="libraryModal">x</button></div><div class="modal-body"><div class="metrics"><div class="metric-row"><div><div class="metric-name">Citizen can take the next step</div><div class="metric-desc">v3 - calibrated on 48 reviewed cases</div></div><span class="type-tag">Prompt</span><span class="ownership">Your library</span></div><div class="metric-row"><div><div class="metric-name">Required fields are present</div><div class="metric-desc">v2 - exact schema check</div></div><span class="type-tag">Code</span><span class="ownership">Platform team</span></div><div class="metric-row"><div><div class="metric-name">No unsupported official claims</div><div class="metric-desc">v5 - approved by AI governance</div></div><span class="type-tag">Prompt</span><span class="ownership">HUMAIN template</span></div></div><div class="observations"><strong>Library rule:</strong> a saved metric is a versioned definition you can deliberately attach. Prism never assumes that a metric suitable for one agent is suitable for another.</div></div></div></div>
+
+  <div class="modal-wrap" id="presenterModal" hidden role="dialog" aria-modal="true" aria-labelledby="presenterTitle"><div class="modal wide"><div class="modal-head"><div><div class="card-kicker">Built-in demo guide</div><h2 id="presenterTitle">Tell one clear product story</h2></div><button class="close-btn" data-close="presenterModal">x</button></div><div class="presenter-layout"><div class="presenter-nav" id="tourNav"></div><div class="tour-content"><div class="tour-number" id="tourNumber"></div><h2 id="tourTitle"></h2><p class="lede" id="tourGoal"></p><div class="say-box"><strong>Say this</strong><div id="tourSay" style="margin-top:8px"></div></div><div class="tour-actions"><button class="secondary-btn" id="tourPrev">Previous</button><button class="primary-btn" id="tourNext">Next</button></div></div></div></div></div>
+
+  <div class="modal-wrap" id="evidenceModal" hidden role="dialog" aria-modal="true" aria-labelledby="evidenceTitle"><div class="modal"><div class="modal-head"><div><div class="card-kicker">Shareable evaluation evidence</div><h2 id="evidenceTitle">Civic Services Agent - v1.5.0</h2><p class="helper">A decision-ready record, not a product-authored verdict.</p></div><button class="close-btn" data-close="evidenceModal">x</button></div><div class="modal-body"><div class="evidence-sheet"><div class="evidence-section"><h3>Outcome</h3><p class="muted">Use-case quality improved from 86% to 94%. Actionability improved 17 points. Safety remained clear. p95 latency increased by 0.2 seconds.</p></div><div class="evidence-section"><h3>What was held constant</h3><p class="muted">Dataset version, three use-case metric definitions, evaluator model pins, run settings, and operational observations.</p></div><div class="evidence-section"><h3>Reproducibility receipt</h3><div class="receipt-code">run_id: eval_2026_09_04_1842<br>agent: civic-services-agent@1.5.0<br>dataset: civic-scenarios@2026-09-04<br>metric_set: civic-trust@3<br>otel_trace_export: attached<br>decision: human-owned</div></div></div></div><div class="modal-foot"><button class="secondary-btn" id="copyLink">Copy evidence link</button><button class="primary-btn" id="exportReceipt">Export receipt</button></div></div></div>
+
+  <div class="modal-wrap" id="simpleModal" hidden role="dialog" aria-modal="true"><div class="modal"><div class="modal-head"><div><div class="card-kicker" id="simpleKicker">Context</div><h2 id="simpleTitle">Title</h2></div><button class="close-btn" data-close="simpleModal">x</button></div><div class="modal-body" id="simpleBody"></div></div></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const state = { stage: 'setup', datasetCount: 24, datasetName: 'Civic service scenarios', version: 'v1.4.0', metrics: 3, deployed: false, tour: 0 };
+      const stages = ['setup','run','review','improve','compare'];
+      const $ = (id) => document.getElementById(id);
+      const all = (q) => [...document.querySelectorAll(q)];
+
+      function showToast(message) {
+        const node = $('toast'); node.textContent = message; node.classList.add('show');
+        clearTimeout(window.__toastTimer); window.__toastTimer = setTimeout(() => node.classList.remove('show'), 2400);
+      }
+      function go(stage) {
+        state.stage = stage;
+        stages.forEach((name, index) => {
+          $('screen-' + name).hidden = name !== stage;
+          const tab = document.querySelector('[data-stage="' + name + '"]');
+          tab.classList.toggle('active', name === stage);
+          tab.classList.toggle('done', index < stages.indexOf(stage));
+        });
+        if (stage === 'review') { $('reviewOverview').hidden = false; $('caseInspector').hidden = true; }
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      }
+      function openModal(id) { $(id).hidden = false; const focusable = $(id).querySelector('button,input,textarea,select'); if (focusable) setTimeout(() => focusable.focus(), 40); }
+      function closeModal(id) { $(id).hidden = true; }
+      function simple(title, body, kicker = 'Why this matters') { $('simpleTitle').textContent = title; $('simpleBody').innerHTML = body; $('simpleKicker').textContent = kicker; openModal('simpleModal'); }
+      function sync() {
+        $('agentChip').textContent = 'Civic Services Agent ' + state.version;
+        $('receiptVersion').textContent = state.version;
+        $('runVersion').textContent = state.version;
+        $('receiptCases').textContent = state.datasetCount;
+        $('qualityCases').textContent = state.datasetCount + ' cases';
+        $('inspectTotal').textContent = state.datasetCount;
+        $('datasetName').textContent = state.datasetName;
+        $('runDataset').textContent = state.datasetName;
+        const benchmark = state.datasetCount > 50;
+        $('datasetMeta').textContent = state.datasetCount + (benchmark ? ' benchmark cases - Snowflake' : ' development cases - uploaded CSV');
+        $('runCasesText').textContent = state.datasetCount + (benchmark ? ' benchmark cases' : ' development cases');
+        $('runMode').textContent = benchmark ? 'Benchmark' : 'Development';
+        const cost = benchmark ? '$28.50' : '$1.80'; $('receiptCost').textContent = cost; $('runCost').textContent = cost;
+      }
+
+      all('[data-stage]').forEach(btn => btn.addEventListener('click', () => go(btn.dataset.stage)));
+      all('[data-go]').forEach(btn => btn.addEventListener('click', () => go(btn.dataset.go)));
+      all('[data-open]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.open)));
+      all('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.close)));
+      all('.modal-wrap').forEach(wrap => wrap.addEventListener('click', e => { if (e.target === wrap) closeModal(wrap.id); }));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') all('.modal-wrap').forEach(m => m.hidden = true); });
+
+      $('resetDemo').addEventListener('click', () => location.reload());
+      $('openLibrary').addEventListener('click', () => openModal('libraryModal'));
+      $('saveMetric').addEventListener('click', () => {
+        if (state.metrics === 3) {
+          state.metrics = 4; $('receiptMetrics').textContent = '4';
+          $('metricList').insertAdjacentHTML('beforeend','<div class="metric-row"><div><div class="metric-name">Answer respects the resident\'s language</div><div class="metric-desc">Judge language continuity while preserving official terms</div></div><span class="type-tag">Prompt</span><span class="ownership">Your library</span></div>');
+        }
+        closeModal('metricModal'); showToast('Prompt metric added to this evaluation');
+      });
+
+      $('configureSnowflake').addEventListener('click', () => { $('dataSources').hidden = true; $('snowflakeForm').hidden = false; });
+      $('testConnection').addEventListener('click', () => { $('snowflakeForm').hidden = true; $('snowflakeObjects').hidden = false; showToast('Read-only Snowflake connection verified'); });
+      $('unknownDataset').addEventListener('change', () => { $('snowflakeObjects').hidden = true; $('mappingStep').hidden = false; $('confirmDataset').hidden = false; });
+      $('confirmDataset').addEventListener('click', () => { state.datasetCount = 380; state.datasetName = 'Unknown dataset'; sync(); closeModal('dataModal'); showToast('380 Snowflake cases mapped and versioned'); });
+
+      $('runSettings').addEventListener('click', () => simple('Control cost and variance','<p>Development runs default to one repetition and 8 parallel workers. Increase repetitions only when measuring nondeterminism. Benchmark runs can use sampling, budgets, and scheduled execution.</p><div class="observations"><strong>Current:</strong> one repetition, 8 workers, deterministic evaluator temperature where supported.</div>','Run settings'));
+      $('startRun').addEventListener('click', () => {
+        $('startRun').disabled = true; $('runProgress').hidden = false; $('progressBar').style.width = '14%';
+        setTimeout(() => { $('progressBar').style.width='62%'; $('progressText').textContent='Running agent and attached evaluators...'; $('progressCount').textContent='62%'; }, 420);
+        setTimeout(() => { $('progressBar').style.width='100%'; $('progressText').textContent='Evidence indexed. Review is ready.'; $('progressCount').textContent='100%'; }, 1050);
+        setTimeout(() => go('review'), 1450);
+      });
+      all('.inspectCase').forEach(btn => btn.addEventListener('click', () => { $('reviewOverview').hidden = true; $('caseInspector').hidden = false; window.scrollTo({top:0,behavior:'smooth'}); }));
+      $('backToReview').addEventListener('click', () => { $('reviewOverview').hidden = false; $('caseInspector').hidden = true; });
+      $('whyControls').addEventListener('click', () => simple('A review queue should not assume failure','<p>Attention cases are the small set a human should inspect closely. Most failed a check, raised a safety flag, or look unusual. Some are healthy controls.</p><p>Controls let a developer compare a good trace with a bad one, validate that a metric is not flagging everything, and avoid treating the queue as a pre-decided failure list.</p>','Review design'));
+      $('viewAllCases').addEventListener('click', () => simple('All evaluation cases','<p>The complete case table is available for filtering, slicing, and export, but it stays behind the decision-first summary.</p><div class="receipt-code">24 cases - 21 healthy - 2 failed - 1 healthy control<br>Filter by metric, status, latency, token use, version, or trace attribute.</div>','Case explorer'));
+      $('controlCase').addEventListener('click', () => showToast('Healthy control opened beside the selected failure'));
+      $('acceptNote').addEventListener('click', () => { $('acceptNote').textContent='Accepted'; $('acceptNote').disabled=true; showToast('Prism draft accepted with reviewer attribution'); });
+      $('editNote').addEventListener('click', () => { $('noteText').focus(); showToast('Edit the draft, then accept it'); });
+      $('markControl').addEventListener('click', () => showToast('Case marked healthy; evaluator disagreement recorded'));
+      $('nextCase').addEventListener('click', () => showToast('Showing next attention case'));
+
+      $('regressionMetric').addEventListener('click', () => simple('Create a regression check from evidence','<p>Prism will draft a prompt metric from this failure, propose positive and negative examples, and ask you to calibrate it against reviewed cases before it can gate anything.</p><div class="observations"><strong>Draft requirement:</strong> The final answer preserves the exact next action from the retrieved municipal record.</div><p><button class="primary-btn" onclick="document.getElementById(\'simpleModal\').hidden=true;document.getElementById(\'metricModal\').hidden=false">Open metric composer</button></p>','Advanced workflow'));
+      $('deployVersion').addEventListener('click', () => {
+        state.version='v1.5.0'; state.deployed=true; sync(); $('editorState').hidden=true; $('deployedState').hidden=false; showToast('v1.5.0 deployed with an immutable receipt');
+      });
+      $('viewDeployReceipt').addEventListener('click', () => simple('Deployment receipt','<div class="receipt-code">agent: civic-services-agent@1.5.0<br>parent: civic-services-agent@1.4.0<br>change: response instruction<br>author: current user<br>source_case: eval_case_07<br>status: deployed</div>','Immutable evidence'));
+      $('runNewVersion').addEventListener('click', () => { showToast('Running v1.5.0 against the same evaluation...'); setTimeout(() => go('compare'), 900); });
+      $('recommendShip').addEventListener('click', () => { $('recommendShip').textContent='Recommendation recorded'; $('recommendShip').disabled=true; showToast('Human release recommendation added to the evidence'); });
+      $('copyLink').addEventListener('click', () => showToast('Shareable evidence link copied'));
+      $('exportReceipt').addEventListener('click', () => showToast('Signed evaluation receipt prepared for export'));
+
+      const tour = [
+        {tab:'1. Frame the job', title:'Begin with trust, not a dashboard', goal:'Define the work, realistic cases, and what good means for this agent.', say:'"Prism does not attach generic domain metrics. We define the agent job, bring representative work, and deliberately attach use-case metrics."', stage:'setup'},
+        {tab:'2. Show metric rigor', title:'Separate quality from run health', goal:'Make the custom evaluator model defensible in one minute.', say:'"Prompt, Code, REST API, and Evaluation agent are evaluator mechanisms. Completion, latency, token use, and safety are always-on operational observations, not domain quality scores."', stage:'setup'},
+        {tab:'3. Run with a receipt', title:'Make every run reproducible', goal:'Show that agent, data, metrics, model pins, cost, and settings are known before compute.', say:'"Before we run, Prism records exactly what is being evaluated and how. That receipt is the basis for a fair before-and-after comparison."', stage:'run'},
+        {tab:'4. Review the minimum', title:'Turn a large result set into three decisions', goal:'Lead with quality, integrity, and the smallest useful attention queue.', say:'"We do not make developers hunt through charts. Prism identifies the few cases worth judgment, including a healthy control so the queue is not a pre-decided failure list."', stage:'review'},
+        {tab:'5. Explain the failure', title:'Keep output, evaluator, and trace together', goal:'Show exactly where a good retrieval became an unusable answer.', say:'"The trace shows the record retrieval succeeded. The reporting action disappeared during response composition. Prism drafts the note; the human accepts or corrects it."', stage:'review', inspect:true},
+        {tab:'6. Improve the agent', title:'Change the product, not the score', goal:'Carry reviewed evidence into a deployable agent change.', say:'"The recommendation is a draft, never an automatic edit. We deploy a real v1.5.0, then rerun the exact same evaluation."', stage:'improve'},
+        {tab:'7. Compare and decide', title:'End with evidence, not an invented verdict', goal:'Explain the wins, tradeoff, and human-owned release decision.', say:'"Actionability improves 17 points with no safety or correctness regression. Latency rises 0.2 seconds. Prism makes that tradeoff visible; the product owner decides whether to ship."', stage:'compare'}
+      ];
+      function renderTour() {
+        $('tourNav').innerHTML = tour.map((t,i) => '<button class="tour-step '+(i===state.tour?'active':'')+'" data-tour="'+i+'">'+t.tab+'</button>').join('');
+        all('[data-tour]').forEach(b => b.addEventListener('click', () => { state.tour=Number(b.dataset.tour); renderTour(); }));
+        const item=tour[state.tour]; $('tourNumber').textContent='Demo step '+(state.tour+1)+' of '+tour.length; $('tourTitle').textContent=item.title; $('tourGoal').textContent=item.goal; $('tourSay').textContent=item.say;
+        $('tourPrev').disabled = state.tour===0; $('tourNext').textContent = state.tour===tour.length-1 ? 'Open final screen' : 'Next';
+      }
+      $('tourPrev').addEventListener('click', () => { if(state.tour>0){state.tour--;renderTour();} });
+      $('tourNext').addEventListener('click', () => { const item=tour[state.tour]; closeModal('presenterModal'); go(item.stage); if(item.inspect){$('reviewOverview').hidden=true;$('caseInspector').hidden=false;} if(state.tour<tour.length-1)state.tour++; renderTour(); });
+      renderTour(); sync();
+
+      async function selfTest() {
+        const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const checks = [];
+        const check = (name, pass) => checks.push({name, pass: Boolean(pass)});
+        try {
+          check('five-stage workflow', all('.step-tab').length === 5);
+          check('advanced metric types hidden by default', !document.querySelector('#metricModal details').open);
+          openModal('dataModal'); $('configureSnowflake').click(); $('testConnection').click();
+          check('objects appear only after verification', !$('snowflakeObjects').hidden);
+          $('unknownDataset').click(); $('confirmDataset').click();
+          check('unknown dataset mapped', state.datasetCount === 380 && state.datasetName === 'Unknown dataset');
+          go('run'); $('startRun').click(); await wait(1600);
+          check('run advances to review', state.stage === 'review');
+          document.querySelector('.inspectCase').click();
+          check('case inspector exposes trace and Prism note', !$('caseInspector').hidden && Boolean(document.querySelector('.trace-list')) && Boolean($('noteText')));
+          go('improve'); $('deployVersion').click();
+          check('deployment produces v1.5.0', state.version === 'v1.5.0' && !$('deployedState').hidden);
+          $('runNewVersion').click(); await wait(1000);
+          check('rerun advances to comparison', state.stage === 'compare');
+          openModal('evidenceModal');
+          check('evidence receipt is shareable', !$('evidenceModal').hidden && document.querySelector('.receipt-code').textContent.includes('run_id'));
+          check('presenter guide covers full story', tour.length === 7);
+        } catch (error) { checks.push({name: 'runtime exception: ' + error.message, pass: false}); }
+        const failed = checks.filter(c => !c.pass);
+        const pre = document.createElement('pre'); pre.id = '__selftest'; pre.textContent = checks.map(c => (c.pass ? 'PASS ' : 'FAIL ') + c.name).join('\n') + '\nRESULT ' + (failed.length ? 'FAIL' : 'PASS') + ' (' + checks.length + ' checks)';
+        document.body.appendChild(pre); document.body.dataset.selftest = failed.length ? 'fail' : 'pass';
+      }
+      if (new URLSearchParams(location.search).get('selftest') === '1') selfTest();
+    })();
+  </script>
+</body>
+</html>

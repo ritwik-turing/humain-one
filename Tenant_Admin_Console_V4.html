@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUMAIN ALM — Tenant Console V4</title>
+<style>
+  :root{
+    --ink:#16201C; --muted:#697079; --muted2:#959BA4;
+    --line:#E7EAEE; --line2:#D7DCE2;
+    --bg:#F5F7F8; --card:#FFFFFF;
+    --green:#0E9B76; --green-dark:#0B6F54;
+    --tint:#E7F5EE; --tintline:#BFE3D3;
+    --amber:#B45309; --amber-tint:#FEF3E2; --amber-line:#F5D9AE;
+    --red:#B3261E; --red-tint:#FCEEED; --red-line:#F1C7C4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  a{color:var(--green-dark);text-decoration:none}
+
+  /* header */
+  .top{background:var(--card);border-bottom:1px solid var(--line);padding:0 28px;height:60px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10}
+  .brand{font-weight:700;font-size:16px;letter-spacing:.2px}
+  .brand span{color:var(--green)}
+  .divider{width:1px;height:22px;background:var(--line2)}
+  .console-tag{font-size:13px;color:var(--muted);font-weight:600}
+  .spacer{flex:1}
+  .tenant-badge{display:flex;align-items:center;gap:8px;background:var(--tint);border:1px solid var(--tintline);border-radius:20px;padding:6px 14px;font-size:12.5px;color:var(--green-dark);font-weight:600}
+  .tenant-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .role-pill{font-size:12px;color:var(--muted);border:1px solid var(--line2);border-radius:20px;padding:6px 12px}
+
+  /* layout */
+  .wrap{display:flex;min-height:calc(100vh - 60px)}
+  nav{width:224px;background:var(--card);border-right:1px solid var(--line);padding:20px 12px;flex-shrink:0}
+  .navlabel{font-size:10.5px;letter-spacing:1.2px;color:var(--muted2);font-weight:700;padding:8px 12px 6px}
+  .navitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500;margin-bottom:2px}
+  .navitem:hover{background:var(--bg)}
+  .navitem.active{background:var(--tint);color:var(--green-dark);font-weight:600}
+  .navitem .badge{margin-left:auto;background:var(--green);color:#fff;font-size:10.5px;font-weight:700;border-radius:10px;padding:1px 7px}
+  .navitem .soon{margin-left:auto;font-size:9.5px;color:var(--muted2);border:1px solid var(--line2);border-radius:8px;padding:1px 6px;letter-spacing:.4px}
+  main{flex:1;padding:26px 32px;max-width:1120px}
+
+  /* section switching */
+  section{display:none}
+  section.visible{display:block}
+  h1{font-size:20px;font-weight:700;margin-bottom:4px}
+  .sub{color:var(--muted);margin-bottom:22px;font-size:13.5px}
+
+  /* cards + stats */
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .stat .k{font-size:26px;font-weight:700;letter-spacing:-.5px}
+  .stat .k small{font-size:13px;color:var(--muted);font-weight:500}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:3px}
+  .stat .warn{color:var(--amber);font-weight:600;font-size:11.5px;margin-top:5px}
+  .stat .ok{color:var(--green-dark);font-weight:600;font-size:11.5px;margin-top:5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;overflow:hidden}
+  .cardhead{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cardhead h2{font-size:14.5px;font-weight:700}
+  .cardhead .count{background:var(--tint);color:var(--green-dark);font-size:11px;font-weight:700;border-radius:10px;padding:2px 8px}
+  .cardhead .hint{margin-left:auto;font-size:12px;color:var(--muted2)}
+
+  /* attention list */
+  .attn{padding:0}
+  .attn-item{padding:14px 20px;border-bottom:1px solid var(--line);cursor:pointer}
+  .attn-item:last-child{border-bottom:none}
+  .attn-item:hover{background:var(--bg)}
+  .attn-line{display:flex;align-items:center;gap:12px}
+  .attn-ico{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0}
+  .attn-name{font-weight:600}
+  .attn-why{color:var(--muted);font-size:13px}
+  .attn-chev{margin-left:auto;color:var(--muted2);font-size:12px;transition:transform .15s}
+  .attn-item.open .attn-chev{transform:rotate(90deg)}
+  .attn-detail{display:none;margin-top:12px;background:var(--amber-tint);border:1px solid var(--amber-line);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.55}
+  .attn-item.open .attn-detail{display:block}
+  .attn-detail b{display:block;margin-bottom:4px}
+  .attn-detail .path{margin-top:8px;color:var(--green-dark);font-weight:600;font-size:12.5px}
+
+  /* approvals */
+  .req{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:flex-start;transition:opacity .35s, transform .35s}
+  .req:last-child{border-bottom:none}
+  .req.done{opacity:0;transform:translateX(24px)}
+  .req .avatar{width:34px;height:34px;border-radius:50%;background:var(--tint);color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;border:1px solid var(--tintline)}
+  .req .body{flex:1}
+  .req .who{font-weight:600}
+  .req .what{color:var(--muted);font-size:13px;margin-top:2px;line-height:1.5}
+  .req .meta{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .chip{font-size:11px;font-weight:600;border-radius:12px;padding:2.5px 9px;border:1px solid var(--line2);color:var(--muted)}
+  .chip.type{background:var(--tint);border-color:var(--tintline);color:var(--green-dark)}
+  .chip.age-warn{background:var(--amber-tint);border-color:var(--amber-line);color:var(--amber)}
+  .chip.up{background:#EEF1F3;color:var(--muted)}
+  .req .actions{display:flex;gap:8px;flex-shrink:0;padding-top:2px}
+  .btn{border:1px solid var(--line2);background:var(--card);border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit}
+  .btn:hover{background:var(--bg)}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.primary:hover{background:var(--green-dark)}
+  .btn.danger{border-color:var(--red-line);color:var(--red)}
+  .btn.danger:hover{background:var(--red-tint)}
+  .btn.small{padding:5px 10px;font-size:11.5px}
+
+  /* audit feed */
+  .audit{padding:6px 20px 12px}
+  .audit-line{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px;align-items:baseline}
+  .audit-line:last-child{border-bottom:none}
+  .audit-time{color:var(--muted2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .audit-line.new{animation:fadeIn .5s ease}
+  @keyframes fadeIn{from{background:var(--tint)}to{background:transparent}}
+  .audit-line .evlink{color:var(--green-dark);font-weight:600;cursor:pointer;font-size:12px;margin-left:6px}
+  .audit-line .kind{font-size:10.5px;font-weight:700;border-radius:8px;padding:1px 7px;letter-spacing:.3px}
+  .kind.ap{background:var(--tint);color:var(--green-dark)}
+  .kind.dep{background:#EEF1F3;color:var(--muted)}
+  .kind.rb{background:var(--amber-tint);color:var(--amber)}
+  .kind.ret{background:var(--red-tint);color:var(--red)}
+
+  /* agents table */
+  .filterbar{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+  .fchip{font-size:12px;font-weight:600;border:1px solid var(--line2);border-radius:16px;padding:5px 12px;cursor:pointer;color:var(--muted);background:var(--card)}
+  .fchip:hover{background:var(--bg)}
+  .fchip.on{background:var(--tint);border-color:var(--tintline);color:var(--green-dark)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{font-size:11px;letter-spacing:.6px;color:var(--muted2);font-weight:700;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr.paused td{background:var(--red-tint)}
+  .aname{font-weight:600;white-space:nowrap}
+  .aver{color:var(--muted2);font-size:11.5px;font-weight:500}
+  .lchip{font-size:11px;font-weight:600;border-radius:12px;padding:2.5px 9px;white-space:nowrap}
+  .l-pub{background:var(--tint);color:var(--green-dark)}
+  .l-prog{background:#EEF1F3;color:var(--muted)}
+  .l-attn{background:var(--amber-tint);color:var(--amber)}
+  .l-paused{background:var(--red-tint);color:var(--red)}
+  .l-verify{background:var(--tint);color:var(--green-dark)}
+  .l-changes{background:var(--amber-tint);color:var(--amber)}
+  .c-cert{color:var(--green-dark);font-weight:600;font-size:12px;white-space:nowrap}
+  .c-att{color:var(--amber);font-weight:600;font-size:12px;white-space:nowrap}
+  .trust{font-weight:700;font-variant-numeric:tabular-nums}
+  .num{font-variant-numeric:tabular-nums;color:var(--muted)}
+
+  /* quotas */
+  .quota{padding:16px 20px;border-bottom:1px solid var(--line)}
+  .quota:last-child{border-bottom:none}
+  .qtop{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+  .qname{font-weight:600}
+  .qnums{margin-left:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .qnums b{color:var(--ink)}
+  .qbar{position:relative;height:10px;background:#EEF1F3;border-radius:6px;overflow:visible}
+  .qbar .alloc{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(45deg,#E2E6EA,#E2E6EA 4px,#EEF1F3 4px,#EEF1F3 8px);border-radius:6px}
+  .qbar .used{position:absolute;left:0;top:0;bottom:0;background:var(--green);border-radius:6px}
+  .qbar .ceil{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--muted2)}
+  .qlegend{display:flex;gap:16px;margin-top:8px;font-size:11.5px;color:var(--muted2)}
+  .qlegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .policy-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .policy{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .policy h3{font-size:13.5px;margin-bottom:5px}
+  .policy p{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .roadtag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--muted2);border:1px solid var(--line2);border-radius:8px;padding:1.5px 7px;margin-left:8px;vertical-align:1px}
+
+  /* erasure record */
+  .erasure{display:none;margin:0 20px 16px;background:var(--tint);border:1px solid var(--tintline);border-radius:12px;padding:18px 20px;font-size:13px;line-height:1.6}
+  .erasure.openrec{display:block;animation:fadeIn .4s ease}
+  .erasure h4{font-size:13.5px;margin-bottom:10px}
+  .erasure table{font-size:12.5px}
+  .erasure td{padding:6px 10px;border-bottom:1px dashed var(--tintline)}
+  .erasure tr:last-child td{border-bottom:none}
+  .erasure .ok-line{margin-top:12px;color:var(--green-dark);font-weight:600}
+  .prov{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  /* placeholder sections */
+  .ph{background:var(--card);border:1px dashed var(--line2);border-radius:12px;padding:28px;text-align:left;color:var(--muted)}
+  .ph h3{color:var(--ink);font-size:15px;margin-bottom:6px}
+  .ph .tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.8px;color:var(--muted2);border:1px solid var(--line2);border-radius:10px;padding:2px 9px;margin-bottom:12px}
+  .ph ul{margin:10px 0 0 18px;line-height:1.9;font-size:13px}
+
+  /* ===== V3: roles + verification ===== */
+  .role-switch{display:flex;border:1px solid var(--line2);border-radius:20px;overflow:hidden}
+  .role-switch button{border:0;background:transparent;padding:6px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit}
+  .role-switch button.on{background:var(--tint);color:var(--green-dark)}
+  body[data-role=verifier] .admin-only{display:none !important}
+  body[data-role=admin] .verifier-only{display:none !important}
+  body[data-role=verifier] #agentTable .btn, body[data-role=verifier] #pauseAllBtn{display:none}
+  .score{font-weight:700;color:var(--green-dark)}
+  .vcheck{border:1px solid var(--line);border-radius:10px;margin:10px 0;overflow:hidden;background:var(--card)}
+  .vcheck-head{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;font-weight:600;font-size:13px}
+  .vcheck-head:hover{background:var(--bg)}
+  .vcheck-head .mode{font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--muted2);border:1px solid var(--line2);border-radius:8px;padding:1px 6px}
+  .vcheck-head .st{margin-left:auto;font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px}
+  .st-pass{background:var(--tint);color:var(--green-dark)}
+  .st-manual{background:var(--amber-tint);color:var(--amber)}
+  .st-fail{background:var(--red-tint);color:var(--red)}
+  .vcheck-body{display:none;padding:8px 14px 12px;font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px dashed var(--line)}
+  .vcheck.open .vcheck-body{display:block}
+  .vcheck-body ul{margin:4px 0 8px 18px}
+  .vcheck-body .ev{font-size:11.5px;color:var(--muted2)}
+  .decide{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 2px}
+  .guardian{background:#F3F1FB;border:1px solid #DDD6F3;border-radius:10px;padding:12px 14px;margin-top:12px;font-size:12.5px;line-height:1.6}
+  .guardian b{color:#5B4AA8}
+  .kind.vf{background:#F3F1FB;color:#5B4AA8}
+  .p2{border:1px dashed var(--line2);border-radius:10px;padding:10px 14px;margin:8px 0;color:var(--muted2);font-size:12.5px;line-height:1.6}
+  .p2 b{color:var(--muted)}
+
+  /* ===== V4: verification record ===== */
+  .backlink{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--green-dark);cursor:pointer;margin-bottom:12px}
+  .backlink:hover{text-decoration:underline}
+  .rechead{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+  .rechead .rtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .rechead h2{font-size:17px;font-weight:700}
+  .recgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;border-top:1px solid var(--line);padding-top:12px}
+  .recgrid .rg{font-size:12.5px}
+  .recgrid .rg .lbl{color:var(--muted2);font-size:10.5px;letter-spacing:.5px;font-weight:700;text-transform:uppercase;margin-bottom:3px}
+  .recgrid .rg b{font-weight:600}
+  .ref{font:600 11px ui-monospace,SFMono-Regular,Menlo,monospace;background:#F1F1EC;border:1px solid var(--line2);color:#3A3F49;padding:2px 7px;border-radius:4px;cursor:pointer;white-space:nowrap}
+  .ref:hover{background:var(--tint);border-color:var(--tintline);color:var(--green-dark)}
+  .rstate{font-size:11px;font-weight:700;border-radius:10px;padding:3px 10px}
+  .rs-new{background:#EEF1F3;color:var(--muted)}
+  .rs-rev{background:var(--tint);color:var(--green-dark)}
+  .rs-grd{background:#F3F1FB;color:#5B4AA8}
+  .rs-ok{background:var(--tint);color:var(--green-dark)}
+  .rs-chg{background:var(--amber-tint);color:var(--amber)}
+  .rs-rej{background:var(--red-tint);color:var(--red)}
+
+  .art{border-bottom:1px solid var(--line)}
+  .art:last-child{border-bottom:none}
+  .art-h{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;font-size:13px}
+  .art-h:hover{background:var(--bg)}
+  .art-h .an{font-weight:600;min-width:210px}
+  .art-h .av{color:var(--muted);flex:1}
+  .art-h .chev{color:var(--muted2);font-size:11px;transition:transform .15s}
+  .art.open .chev{transform:rotate(90deg)}
+  .art-b{display:none;padding:2px 20px 16px 20px;background:#FBFCFC;border-top:1px dashed var(--line)}
+  .art.open .art-b{display:block}
+  .kvtab{width:100%;font-size:12.5px;border-collapse:collapse}
+  .kvtab td{padding:6px 8px;border-bottom:1px dashed var(--line);vertical-align:top}
+  .kvtab td:first-child{color:var(--muted);width:190px}
+  .kvtab tr:last-child td{border-bottom:none}
+  .diff{font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;background:#FBFCFC;border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;margin-top:8px}
+  .diff .add{background:#E7F5EE;color:#0B6F54;display:block}
+  .diff .del{background:#FCEEED;color:#B3261E;display:block}
+  .diff .ctx{color:var(--muted2);display:block}
+
+  .chk{border:1px solid var(--line);border-radius:10px;margin:10px 0;overflow:hidden;background:var(--card)}
+  .chk-h{display:flex;align-items:center;gap:10px;padding:12px 15px;cursor:pointer;font-weight:600;font-size:13.5px}
+  .chk-h:hover{background:var(--bg)}
+  .chk-h .idx{width:22px;height:22px;border-radius:6px;background:var(--bg);color:var(--muted);font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+  .chk-h .st{margin-left:auto;font-size:11px;font-weight:700;border-radius:10px;padding:2px 9px;white-space:nowrap}
+  .st-pass{background:var(--tint);color:var(--green-dark)}
+  .st-manual{background:var(--amber-tint);color:var(--amber)}
+  .st-fail{background:var(--red-tint);color:var(--red)}
+  .chk-b{display:none;border-top:1px dashed var(--line)}
+  .chk.open .chk-b{display:block}
+  body.rec-open main{max-width:1400px}
+  /* the record must never force the page to scroll sideways */
+  main{min-width:0}
+  .rechead,.card,.guardian{max-width:100%}
+  @media (max-width:1180px){
+    .sub-r{grid-template-columns:1fr 1fr;gap:8px 14px}
+    .sub-r .sn{grid-column:1 / -1}
+    .recgrid{grid-template-columns:repeat(2,1fr)}
+    .art-h{flex-wrap:wrap}
+    .art-h .an{min-width:0;flex:1 1 100%}
+  }
+  @media (max-width:760px){
+    .sub-r{grid-template-columns:1fr}
+    .recgrid{grid-template-columns:1fr}
+    .decide{flex-direction:column;align-items:stretch}
+    .c2{grid-template-columns:1fr}
+    .gtrack{flex-direction:column}
+    .gtrack .gs{border-radius:0!important}
+  }
+  .sub-r{display:grid;grid-template-columns:minmax(240px,1.35fr) minmax(190px,1.25fr) minmax(120px,.75fr) auto;gap:14px;padding:11px 15px;border-bottom:1px dashed var(--line);font-size:12.5px;align-items:start;line-height:1.45}
+  .sub-r:last-child{border-bottom:none}
+  .sub-r.failed{background:var(--red-tint)}
+  .sub-r.needs{background:var(--amber-tint)}
+  .sub-r .sn{font-weight:600}
+  .sub-r .sm{font-size:9.5px;font-weight:700;letter-spacing:.4px;color:var(--muted2);border:1px solid var(--line2);border-radius:6px;padding:0 5px;margin-left:6px;white-space:nowrap}
+  .sub-r .sr{color:var(--ink)}
+  .sub-r .sb{color:var(--muted2);font-size:11.5px}
+  .sub-r .sx{font-size:11px;font-weight:700;border-radius:8px;padding:2px 8px;white-space:nowrap}
+  .revbox{padding:11px 15px;background:#FBFCFC;border-bottom:1px dashed var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .revbox input{flex:1;min-width:200px;border:1px solid var(--line2);border-radius:7px;padding:7px 10px;font-family:inherit;font-size:12.5px}
+  .revbox input:focus{outline:none;border-color:var(--green)}
+
+  .guardian{background:#F3F1FB;border:1px solid #DDD6F3;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:13px;line-height:1.6}
+  .guardian h3{font-size:14px;color:#5B4AA8;margin-bottom:6px}
+  .gtrack{display:flex;gap:0;margin:12px 0}
+  .gtrack .gs{flex:1;padding:9px 10px;background:var(--card);border:1px solid #DDD6F3;font-size:11.5px;text-align:center;color:var(--muted)}
+  .gtrack .gs:first-child{border-radius:8px 0 0 8px}
+  .gtrack .gs:last-child{border-radius:0 8px 8px 0}
+  .gtrack .gs.on{background:#5B4AA8;border-color:#5B4AA8;color:#fff;font-weight:700}
+  .gtrack .gs.done{background:#EDE9F9;color:#5B4AA8;font-weight:600}
+
+  .decide{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--line);background:#FBFCFC}
+  .composer{display:none;padding:16px 20px;border-top:1px solid var(--line);background:var(--amber-tint)}
+  .composer.on{display:block}
+  .composer h4{font-size:13px;margin-bottom:10px}
+  .cfield{margin-bottom:10px}
+  .cfield label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;letter-spacing:.3px}
+  .cfield input,.cfield select,.cfield textarea{width:100%;border:1px solid var(--line2);border-radius:7px;padding:8px 10px;font-family:inherit;font-size:12.5px;background:var(--card)}
+  .cfield textarea{min-height:60px;resize:vertical}
+  .creq{color:var(--red)}
+  .c2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .p2{border:1px dashed var(--line2);border-radius:10px;padding:11px 14px;margin:8px 0;color:var(--muted2);font-size:12.5px;line-height:1.6}
+  .p2 b{color:var(--muted)}
+  .kind.vf{background:#F3F1FB;color:#5B4AA8}
+  .qbar-mini{position:relative;height:7px;background:#EEF1F3;border-radius:5px;width:110px;margin-top:5px}
+  .qbar-mini .f{position:absolute;left:0;top:0;bottom:0;background:var(--green);border-radius:5px}
+  .qbar-mini .t{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--muted2)}
+  .polrow{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line)}
+  .polrow:last-child{border-bottom:none}
+  .polrow .pn{font-weight:600;font-size:13px;flex:1}
+  .polrow .pd{font-size:12px;color:var(--muted);margin-top:2px;font-weight:400}
+  .sw{width:40px;height:22px;border-radius:12px;background:var(--green);position:relative;cursor:pointer;flex-shrink:0;transition:.15s}
+  .sw.off{background:#CFD4DA}
+  .sw i{position:absolute;top:2px;left:20px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s}
+  .sw.off i{left:2px}
+  .sel{border:1px solid var(--line2);border-radius:7px;padding:6px 9px;font-family:inherit;font-size:12.5px;background:var(--card)}
+
+  .foot{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted2);display:flex;gap:18px;flex-wrap:wrap}
+  .toast{position:fixed;bottom:26px;right:26px;background:var(--ink);color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">HUMAIN <span>ALM</span></div>
+  <div class="divider"></div>
+  <div class="console-tag">Tenant Console</div>
+  <div class="spacer"></div>
+  <div class="tenant-badge"><span class="dot"></span>Turing workspace · alnoor-tenant</div>
+  <div class="role-pill" id="roleName">Tirthankar · Tenant Administrator</div>
+  <div class="role-switch" id="roleSwitch">
+    <button class="on" data-role="admin" onclick="setRole('admin')">Tenant Admin</button>
+    <button data-role="verifier" onclick="setRole('verifier')">Verifier</button>
+  </div>
+</header>
+
+<div class="wrap">
+<nav>
+  <div class="navlabel">VERIFY</div>
+  <div class="navitem" data-s="verification">Verification Queue <span class="badge" id="navVerifyCount">3</span></div>
+  <div class="navitem" data-s="vrecords">Verification Records</div>
+  <div class="navitem admin-only" data-s="vpolicy">Verification Policy</div>
+  <div class="navitem admin-only" data-s="templates">Templates <span class="badge" id="navTplCount">1</span></div>
+  <div class="navlabel" style="margin-top:14px">OPERATE</div>
+  <div class="navitem active" data-s="overview">Overview</div>
+  <div class="navitem admin-only" data-s="approvals">Approvals <span class="badge" id="navApprovalCount">4</span></div>
+  <div class="navitem" data-s="agents">Agents</div>
+  <div class="navlabel admin-only" style="margin-top:14px">GOVERN</div>
+  <div class="navitem admin-only" data-s="members">Members &amp; Access</div>
+  <div class="navitem admin-only" data-s="quotas">Quotas &amp; Policies</div>
+  <div class="navitem" data-s="governance">Governance &amp; Audit</div>
+  <div class="navlabel admin-only" style="margin-top:14px">RESOURCES</div>
+  <div class="navitem admin-only" data-s="data">Tenant Data <span class="soon">PHASE 3</span></div>
+  <div class="navitem admin-only" data-s="cost">Cost <span class="soon">PHASE 3</span></div>
+</nav>
+
+<main>
+
+<!-- ============ VERIFICATION (V4) ============ -->
+<section id="verification">
+  <div id="vqList">
+    <h1>Verification Queue</h1>
+    <div class="sub">A version lands here automatically the moment its evaluation crosses the tenant pass bar. The developer chose the target; you run the tenant's verification policy against the evidence, then decide. Internal listings you publish yourself. Public listings also go to Guardian, on Guardian's own timeline, in parallel.</div>
+
+    <div class="statrow">
+      <div class="stat"><div class="k" id="vqStat">3</div><div class="l">Waiting on the verifier</div><div class="warn" id="vqOldest">Oldest is 2 days old · SLA 2 days</div></div>
+      <div class="stat"><div class="k" id="vqBar">80%</div><div class="l">Tenant pass bar</div><div class="ok">Set in Verification Policy</div></div>
+      <div class="stat"><div class="k" id="vqGrd">1</div><div class="l">With Guardian</div><div class="ok">Public listings · parallel track</div></div>
+      <div class="stat"><div class="k">1.8<small> days</small></div><div class="l">Median turnaround</div><div class="ok">Inside the 2-day SLA</div></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead"><h2>Waiting on you</h2><span class="count" id="vqCount">3</span>
+        <span style="margin-left:auto"><button class="btn small" onclick="resetDemo()" title="Restore the three sample records">Reset sample data</button></span>
+        <span class="fchip on" data-vf="all" onclick="vqFilter(this)">All</span>
+        <span class="fchip" data-vf="internal" onclick="vqFilter(this)">Internal</span>
+        <span class="fchip" data-vf="external" onclick="vqFilter(this)">Public</span>
+        <span class="fchip" data-vf="flag" onclick="vqFilter(this)">Has findings</span>
+      </div>
+      <div id="vqRows"></div>
+      <div id="vqEmpty" style="display:none;padding:34px 20px;text-align:center;color:var(--muted)">
+        Queue clear. A new version appears here the moment its evaluation crosses the tenant pass bar.
+      </div>
+    </div>
+
+    <div class="card" id="guardianCard" style="display:none">
+      <div class="cardhead"><h2>With Guardian</h2><span class="count" id="grdCount">0</span>
+        <span class="hint">already live internally · the public listing is waiting on Guardian's own timeline</span></div>
+      <div id="vqGuardian"></div>
+    </div>
+
+    <div class="card" id="returnedCard" style="display:none">
+      <div class="cardhead"><h2>Returned to the developer</h2><span class="count" id="retCount">0</span>
+        <span class="hint">waiting on a fix · they come back as a new version, and only the failing check re-runs</span></div>
+      <div id="vqReturned"></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead"><h2>Coming in Phase 2</h2><span class="hint">shown for direction · deliberately not built yet</span></div>
+      <div class="audit">
+        <div class="p2"><b>Sandbox security verification</b> — verifier-run checks inside the live sandbox: network probes, privilege-escalation attempts, runtime behaviour under attack. <b>[To be designed in Phase 2]</b></div>
+        <div class="p2"><b>Policy &amp; compliance check (RAG)</b> — the tenant uploads versioned policy and compliance documents; an agent indexes them and runs the first-level check; the verifier interprets the verdict. <b>[To be designed in Phase 2]</b></div>
+        <div class="p2"><b>Production watch</b> — live agents that underperform are flagged to the tenant admin and the verifier, with re-verification and pause paths. <b>[To be designed in Phase 2]</b></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span>Separation of duties: the developer builds and submits · the verifier decides · Guardian certifies public listings</span>
+      <span>Every action writes actor, role, time and outcome to Governance &amp; Audit</span>
+    </div>
+  </div>
+
+  <div id="vqRecord" style="display:none"></div>
+</section>
+
+<!-- ============ VERIFICATION RECORDS ============ -->
+<section id="vrecords">
+  <h1>Verification Records</h1>
+  <div class="sub">Every verification ever run on this tenant, open or closed. A record is immutable: it outlives the version it describes and is the evidence behind any published listing.</div>
+
+  <div class="statrow" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat"><div class="k" id="vrTotal">7</div><div class="l">Records on this tenant</div><div class="ok">3 open · 4 closed</div></div>
+    <div class="stat"><div class="k">100%</div><div class="l">Published agents with a record</div><div class="ok">No listing without evidence</div></div>
+    <div class="stat"><div class="k">2</div><div class="l">Returned to the developer</div><div class="warn">1 resolved · 1 open</div></div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>All records</h2>
+      <span class="fchip on" data-vr="all" onclick="vrFilter(this)">All</span>
+      <span class="fchip" data-vr="open" onclick="vrFilter(this)">Open</span>
+      <span class="fchip" data-vr="approved" onclick="vrFilter(this)">Approved</span>
+      <span class="fchip" data-vr="returned" onclick="vrFilter(this)">Returned</span>
+    </div>
+    <table id="vrTable">
+      <thead><tr><th>RECORD</th><th>AGENT</th><th>TARGET</th><th>QUALITY</th><th>DECISION</th><th>VERIFIER</th><th>CLOSED</th><th></th></tr></thead>
+      <tbody id="vrBody"></tbody>
+    </table>
+  </div>
+  <div class="foot"><span>A record carries the evidence bundle, the check results, the findings and the full actor trail · immutable once closed</span></div>
+</section>
+
+<!-- ============ VERIFICATION POLICY (admin) ============ -->
+<section id="vpolicy">
+  <h1>Verification Policy</h1>
+  <div class="sub">What "verified" means on this tenant. You set the bar, the clock and the checks; the verifier runs exactly this policy against every submission. Changes apply to new submissions only — records already closed are never re-opened.</div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Evaluation pass bar</h2><span class="hint">live in this mock · platform floor is 50%</span></div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">A version becomes eligible for verification at</span><span class="qnums"><b id="thVal">80%</b> · platform floor 50%</span></div>
+      <input type="range" id="thSlider" min="50" max="95" step="5" value="80" style="width:100%;accent-color:var(--green)" oninput="setThreshold(this.value)" onchange="commitThreshold(this.value)">
+      <div class="qlegend" style="margin-top:8px"><span>Below the bar the developer keeps iterating and nothing reaches your queue. The platform will not accept a bar under 50%.</span></div>
+    </div>
+    <div class="polrow">
+      <div class="pn">Verification SLA<div class="pd">Target turnaround from queue entry to decision. Rows past the target are flagged amber in the queue.</div></div>
+      <select class="sel" id="slaSel" onchange="commitSla(this.value)">
+        <option value="1">1 business day</option>
+        <option value="2" selected>2 business days</option>
+        <option value="3">3 business days</option>
+        <option value="5">5 business days</option>
+      </select>
+    </div>
+    <div class="polrow" style="background:#FBFCFC">
+      <div class="pn">Guardian review for this tenant &nbsp;<span class="rstate rs-new">Set by HUMAIN</span>
+        <div class="pd">HUMAIN decides, per tenant, whether internal publishes must also go through Guardian. For <b>this</b> tenant it is <b>not required</b> — your approval publishes internally on its own.<br>
+        Public-marketplace listings always go to Guardian, in every tenant. That is a platform rule and is not configurable here.</div></div>
+      <span class="chip">Inherited · read-only</span>
+    </div>
+    <div class="polrow">
+      <div class="pn">Separation of duties<div class="pd">A submission may never be verified by the person who authored it. Blocked outright for public-marketplace listings; allowed with a recorded warning for internal listings in small teams. The audit always records which role acted.</div></div>
+      <select class="sel" onchange="showToast('Separation of duties set to '+this.value)"><option>Blocked for public · warn for internal</option><option>Blocked for both</option></select>
+    </div>
+    <div class="polrow">
+      <div class="pn">Allow conditional approval<div class="pd">Low-severity findings can ride along as conditions instead of blocking publication.</div></div>
+      <div class="sw" id="swCond" onclick="togglePol(this,'Conditional approval')"><i></i></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Inherited from HUMAIN</h2><span class="chip">read-only</span>
+      <span class="hint">every tenant gets these · you may add on top, never remove</span></div>
+    <div style="padding:12px 20px 16px;font-size:12.5px;line-height:1.9;color:var(--muted)">
+      <b style="color:var(--ink)">Platform baseline checks</b> — data residency &amp; in-Kingdom execution · tenant isolation · PII redaction · secrets hygiene ·
+      prompt-injection resistance · egress deny-all · dependency CVEs (0 critical / 0 high) · licence compliance<br>
+      <b style="color:var(--ink)">Platform floor</b> — the evaluation pass bar may never be set below 50%<br>
+      <b style="color:var(--ink)">Guardian</b> — mandatory for every public-marketplace listing; per-tenant for internal, decided by HUMAIN
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Checks the verifier runs</h2><span class="count">6</span><span class="hint">baseline rows are locked · your own checks are additive</span></div>
+    <div id="polChecks"></div>
+    <div class="audit" style="padding-bottom:14px">
+      <div class="p2"><b>Custom check authoring</b> — upload a tenant-specific check suite, or point a check at your own policy documents. <b>[To be designed in Phase 2]</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Policy history</h2><span class="hint">every change carries actor, time and effect</span></div>
+    <div class="audit" id="polFeed">
+      <div class="audit-line"><span class="audit-time">Aug 12</span><span><b>Tirthankar</b> set the evaluation pass bar to 80% · applied to new submissions</span></div>
+      <div class="audit-line"><span class="audit-time">Aug 12</span><span><b>Tirthankar</b> set the verification SLA to 2 business days</span></div>
+      <div class="audit-line"><span class="audit-time">Aug 4</span><span><b>Tirthankar</b> enabled Guardian certification for public-marketplace listings</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>Policy is per tenant · the platform sets only the floor (50% pass bar) and the sovereign constraints in Quotas &amp; Policies</span></div>
+</section>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview" class="visible">
+  <h1>Overview</h1>
+  <div class="sub" id="ovSub">Monday, 17 August · Everything below is scoped to alnoor-tenant. No other tenant is visible from this console.</div>
+
+  <div class="statrow" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat">
+      <div class="k">14</div>
+      <div class="l">Agents in workspace</div>
+      <div class="ok">8 internal · 6 external</div>
+    </div>
+    <div class="stat">
+      <div class="k">10<small> / 12</small></div>
+      <div class="l">Certified</div>
+      <div class="warn">2 attested, audit pending</div>
+    </div>
+    <div class="stat" style="border-color:var(--tintline);background:var(--tint)">
+      <div class="k" id="statVerify">3</div>
+      <div class="l">Verifications waiting</div>
+      <div class="warn">Oldest is 2 days old · at SLA</div>
+    </div>
+    <div class="stat admin-only">
+      <div class="k" id="statApprovals">4</div>
+      <div class="l">Approvals waiting on you</div>
+      <div class="warn" id="statApprovalsNote">Oldest is 3 days old · 2 more in the verification queue</div>
+    </div>
+    <div class="stat admin-only">
+      <div class="k">2</div>
+      <div class="l">Agents need attention</div>
+      <div class="warn">Action available on both</div>
+    </div>
+    <div class="stat verifier-only">
+      <div class="k" id="ovGrd">1</div>
+      <div class="l">With Guardian</div>
+      <div class="ok">Public listings · parallel track</div>
+    </div>
+    <div class="stat verifier-only">
+      <div class="k">4</div>
+      <div class="l">Decided this week</div>
+      <div class="ok">3 approved · 1 returned</div>
+    </div>
+  </div>
+
+  <div class="card verifier-only">
+    <div class="cardhead"><h2>Waiting on you</h2><span class="count" id="ovQCount">3</span>
+      <span class="hint">oldest first · open a record to verify and decide</span></div>
+    <div id="ovQueue"></div>
+  </div>
+
+  <div class="card verifier-only">
+    <div class="cardhead"><h2>Your recent decisions</h2><span class="hint">every one is an immutable record</span></div>
+    <div class="audit" id="ovDecisions"></div>
+  </div>
+
+  <div class="card admin-only">
+    <div class="cardhead"><h2>Needs attention</h2><span class="count">2</span><span class="hint">Click a row for the reason and the next step</span></div>
+    <div class="attn">
+      <div class="attn-item" onclick="this.classList.toggle('open')">
+        <div class="attn-line">
+          <span class="attn-ico"></span>
+          <span class="attn-name">Trip Planner</span>
+          <span class="attn-why">Evaluation run interrupted</span>
+          <span class="attn-chev">▶</span>
+        </div>
+        <div class="attn-detail">
+          <b>What happened</b>
+          The evaluation run started 14:32 lost its connection at step 3 of 5. No result was recorded, and the agent's certification state is unchanged. Nothing is shown as passed that did not pass.
+          <div class="path">Next step: the run can be resumed from step 3. The developer (Layla Aboud) has been notified; you can also resume it from the agent's lifecycle page.</div>
+        </div>
+      </div>
+      <div class="attn-item" onclick="this.classList.toggle('open')">
+        <div class="attn-line">
+          <span class="attn-ico"></span>
+          <span class="attn-name">HR Onboarder</span>
+          <span class="attn-why">Deployment paused, missing configuration</span>
+          <span class="attn-chev">▶</span>
+        </div>
+        <div class="attn-detail">
+          <b>What happened</b>
+          A new version was submitted with two declared credentials that have no stored values (HR system access, document store). The platform paused the deployment rather than start an agent that cannot work. The current version keeps running untouched.
+          <div class="path">Next step: the developer supplies the two missing values in the submit flow. No action needed from you unless it stays paused past tomorrow.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card admin-only">
+    <div class="cardhead"><h2>Recent activity</h2><span class="hint">The full trail lives in Governance &amp; Audit</span></div>
+    <div class="audit" id="auditFeed">
+      <div class="audit-line"><span class="audit-time">Today 12:05</span><span><b>Yash Chindala</b> approved Research Assistant v3.1 · published to the internal workspace · verification record attached</span></div>
+      <div class="audit-line"><span class="audit-time">Today 10:41</span><span><b>Guardian</b> returned rejection · Citizen Support Agent v2.1 · 2 reasons · routed to the verifier</span></div>
+      <div class="audit-line"><span class="audit-time">Today 11:42</span><span><b>Translation Agent</b> completed evaluation · all metrics passed · certification renewed</span></div>
+      <div class="audit-line"><span class="audit-time">Today 09:15</span><span><b>Invoice Processing App</b> version 1.4 deployed · previous version retained for rollback</span></div>
+      <div class="audit-line"><span class="audit-time">Yesterday 17:03</span><span><b>Marwan Haddad</b> approved dataset access · Arabic legal corpus v2 · now selectable in evaluation setup</span></div>
+      <div class="audit-line"><span class="audit-time">Yesterday 14:26</span><span><b>Research Assistant</b> published to workspace · listing carries evaluation record</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>HUMAIN ALM · Tenant Console</span>
+    <span>All agents run in-Kingdom</span>
+    <span>Platform ceiling and policy set by HUMAIN · view in Quotas &amp; Policies</span>
+  </div>
+</section>
+
+<!-- ============ APPROVALS ============ -->
+<section id="approvals">
+  <h1>Approvals</h1>
+  <div class="sub">Requests from your developers waiting on your decision — environments, dataset access, and the templates their agents are matched against. A developer cannot self-provision infrastructure, so a template request can leave an agent parked until you decide. Every decision is recorded in the audit trail.</div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Waiting on you</h2><span class="count" id="qCount">4</span><span class="hint">Approve is live in this mock · try it</span></div>
+    <div id="queue">
+
+      <div class="req" id="req1">
+        <div class="avatar">LA</div>
+        <div class="body">
+          <div class="who">Layla Aboud · Developer</div>
+          <div class="what">Requests a governed environment to build and test a new agent: <b>Procurement Assistant</b>. The platform has resolved the request against tenant policy; everything fits inside your current quota.</div>
+          <div class="meta">
+            <span class="chip type">Environment request</span>
+            <span class="chip age-warn">Waiting 3 days</span>
+            <span class="chip">Within quota</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Review</button>
+          <button class="btn primary" onclick="approve('req1','Layla Aboud','environment request for Procurement Assistant approved · provisioning started')">Approve</button>
+        </div>
+      </div>
+
+      <div class="req" id="req2">
+        <div class="avatar">OK</div>
+        <div class="body">
+          <div class="who">Omar Khalid · Developer</div>
+          <div class="what">Requests access to the marketplace dataset <b>Invoice evaluation set v3</b> for evaluating Invoice Processing App. Dataset is platform-provided and validated; approval makes it selectable for this tenant.</div>
+          <div class="meta">
+            <span class="chip type">Dataset access</span>
+            <span class="chip">Waiting 1 day</span>
+            <span class="chip">Platform-validated</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Review</button>
+          <button class="btn primary" onclick="approve('req2','Omar Khalid','dataset access approved · Invoice evaluation set v3 now selectable for this tenant')">Approve</button>
+        </div>
+      </div>
+
+      <div class="req" id="req4">
+        <div class="avatar">RC</div>
+        <div class="body">
+          <div class="who">Ritwik Chakradhar · Developer</div>
+          <div class="what">No approved template matches <b>Permit Application Agent</b>. Requests a new template: <b>Custom GPU runtime profile</b>. The agent is <b>parked</b> at Resolve until this is decided — approving it publishes the template and the agent resumes automatically.</div>
+          <div class="meta">
+            <span class="chip type">New template</span>
+            <span class="chip age-warn">Waiting 2 days</span>
+            <span class="chip">Ref TR-2481</span>
+            <span class="chip">Blocks 1 agent</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="openTplReview('TR-2481')">Review</button>
+          <button class="btn primary" onclick="approveTemplate('req4','TR-2481','Custom GPU runtime profile')">Approve &amp; publish</button>
+        </div>
+      </div>
+
+      <div class="req" id="req5">
+        <div class="avatar">LA</div>
+        <div class="body">
+          <div class="who">Layla Aboud · Developer</div>
+          <div class="what">Requests an extension to <b>Advance-python-sandbox</b>: raise memory from 8Gi to 16Gi for a document-heavy agent. Nothing is parked on this one; the current template keeps working.</div>
+          <div class="meta">
+            <span class="chip type">Extension</span>
+            <span class="chip">Waiting 1 day</span>
+            <span class="chip">Ref TR-2488</span>
+            <span class="chip">Within quota</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="openTplReview('TR-2488')">Review</button>
+          <button class="btn primary" onclick="approveTemplate('req5','TR-2488','Advance-python-sandbox · 16Gi')">Approve &amp; publish</button>
+        </div>
+      </div>
+
+      <div id="emptyQueue" style="display:none;padding:34px 20px;text-align:center;color:var(--muted)">
+        Nothing waiting on you. Decisions you make appear in the audit trail below.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Decisions today</h2><span class="hint">Every entry carries actor, time, and outcome</span></div>
+    <div class="audit" id="decisionFeed">
+      <div class="audit-line"><span class="audit-time">Yesterday 17:03</span><span><b>Marwan Haddad</b> approved dataset access · Arabic legal corpus v2</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Requests from developers arrive here · your requests to the platform (quota increases) appear in Quotas &amp; Policies</span>
+    <span>Publish and certification requests never appear here — they route to the Verification Queue</span>
+  </div>
+</section>
+
+<!-- ============ AGENTS ============ -->
+<section id="agents">
+  <h1>Agents</h1>
+  <div class="sub">The tenant's full inventory. One active published version per agent, enforced by the platform. Pause is live in this mock.</div>
+
+  <div class="card">
+    <div class="filterbar">
+      <span class="fchip on" data-f="all" onclick="filterAgents(this)">All · 14</span>
+      <span class="fchip" data-f="published" onclick="filterAgents(this)">Published · 9</span>
+      <span class="fchip" data-f="verify" onclick="filterAgents(this)">In verification · 1</span>
+      <span class="fchip" data-f="changes" onclick="filterAgents(this)">Changes requested · 1</span>
+      <span class="fchip" data-f="progress" onclick="filterAgents(this)">In progress · 1</span>
+      <span class="fchip" data-f="attn" onclick="filterAgents(this)">Needs attention · 2</span>
+      <span style="margin-left:auto"></span>
+      <button class="btn danger small" id="pauseAllBtn" onclick="pauseAll()">Pause all agents</button>
+    </div>
+    <table id="agentTable">
+      <thead><tr>
+        <th>AGENT</th><th>ORIGIN</th><th>LIFECYCLE</th><th>CERTIFICATION</th><th>VERIFICATION</th><th>TRUST</th><th>TASKS 30D</th><th>P95</th><th></th>
+      </tr></thead>
+      <tbody>
+        <tr data-b="published"><td><div class="aname">Translation Agent</div><div class="aver">v2.3 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2188')">vr_2188</span><div class="aver">Yash · Jul 30</div></td><td><span class="trust">96</span></td><td class="num">14,208</td><td class="num">1.9s</td><td><button class="btn small" onclick="togglePause(this,'Translation Agent')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Invoice Processing App</div><div class="aver">v1.4 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2244')">vr_2244</span><div class="aver">Tirthankar · Aug 3</div></td><td><span class="trust">94</span></td><td class="num">9,612</td><td class="num">2.4s</td><td><button class="btn small" onclick="togglePause(this,'Invoice Processing App')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Research Assistant</div><div class="aver">v3.1 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2291')">vr_2291</span><div class="aver">Yash · Aug 15</div></td><td><span class="trust">92</span></td><td class="num">7,845</td><td class="num">3.1s</td><td><button class="btn small" onclick="togglePause(this,'Research Assistant')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Meeting Manager</div><div class="aver">v1.9 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2160')">vr_2160</span><div class="aver">Yash · Jul 18</div></td><td><span class="trust">91</span></td><td class="num">5,410</td><td class="num">1.6s</td><td><button class="btn small" onclick="togglePause(this,'Meeting Manager')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Citizen Support Agent</div><div class="aver">v2.0 active · v2.1 in verification</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2299')">vr_2299</span><div class="aver">Yash · Jul 30</div></td><td><span class="trust">95</span></td><td class="num">21,077</td><td class="num">2.2s</td><td><button class="btn small" onclick="togglePause(this,'Citizen Support Agent')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Arabic Contracts Reviewer</div><div class="aver">v1.2 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2140')">vr_2140</span><div class="aver">Yash · Jul 11</div></td><td><span class="trust">93</span></td><td class="num">3,988</td><td class="num">4.0s</td><td><button class="btn small" onclick="togglePause(this,'Arabic Contracts Reviewer')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Knowledge Search</div><div class="aver">v2.7 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2288')">vr_2288</span><div class="aver">Yash · Aug 7</div></td><td><span class="trust">90</span></td><td class="num">11,530</td><td class="num">1.4s</td><td><button class="btn small" onclick="togglePause(this,'Knowledge Search')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Data Extraction Agent</div><div class="aver">v1.6 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-att">Attested · audit pending</span></td><td><span class="ref" onclick="gotoRecord('vr_2075')">vr_2075</span><div class="aver">Yash · Jun 24</div></td><td><span class="trust">88</span></td><td class="num">6,204</td><td class="num">2.8s</td><td><button class="btn small" onclick="togglePause(this,'Data Extraction Agent')">Pause</button></td></tr>
+        <tr data-b="published"><td><div class="aname">Expense Auditor</div><div class="aver">v1.1 active</div></td><td><span class="chip">External</span></td><td><span class="lchip l-pub">Published</span></td><td><span class="c-att">Attested · audit pending</span></td><td><span class="ref" onclick="gotoRecord('vr_2061')">vr_2061</span><div class="aver">Yash · Jun 19</div></td><td><span class="trust">87</span></td><td class="num">2,441</td><td class="num">3.5s</td><td><button class="btn small" onclick="togglePause(this,'Expense Auditor')">Pause</button></td></tr>
+        <tr data-b="verify"><td><div class="aname">Procurement Compliance Agent</div><div class="aver">v1.4 active · v1.5 in verification</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-verify">In verification</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2317')">vr_2317</span><div class="aver">open · Yash</div></td><td><span class="trust">86</span></td><td class="num">4,802</td><td class="num">2.3s</td><td><button class="btn small" onclick="togglePause(this,'Procurement Compliance Agent')">Pause</button></td></tr>
+        <tr data-b="changes"><td><div class="aname">Health Triage Assistant</div><div class="aver">v1.1 active · v1.2 returned</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-changes">Changes requested</span></td><td><span class="c-att">Attested · audit pending</span></td><td><span class="ref" onclick="gotoRecord('vr_2316')">vr_2316</span><div class="aver">returned · Yash</div></td><td><span class="trust">84</span></td><td class="num">1,930</td><td class="num">3.2s</td><td><button class="btn small" onclick="togglePause(this,'Health Triage Assistant')">Pause</button></td></tr>
+        <tr data-b="progress"><td><div class="aname">Procurement Assistant</div><div class="aver">v0.1 building</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-prog">In progress</span></td><td><span style="color:var(--muted2);font-size:12px">Not yet evaluated</span></td><td><span style="color:var(--muted2)">—</span></td><td><span style="color:var(--muted2)">·</span></td><td class="num">·</td><td class="num">·</td><td></td></tr>
+        <tr data-b="attn"><td><div class="aname">Trip Planner</div><div class="aver">v1.8 active</div></td><td><span class="chip">Internal</span></td><td><span class="lchip l-attn">Needs attention</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2201')">vr_2201</span><div class="aver">Yash · Jul 22</div></td><td><span class="trust">89</span></td><td class="num">4,116</td><td class="num">2.0s</td><td><button class="btn small" onclick="togglePause(this,'Trip Planner')">Pause</button></td></tr>
+        <tr data-b="attn"><td><div class="aname">HR Onboarder</div><div class="aver">v2.1 active · v2.2 paused</div></td><td><span class="chip">External</span></td><td><span class="lchip l-attn">Needs attention</span></td><td><span class="c-cert">Certified</span></td><td><span class="ref" onclick="gotoRecord('vr_2119')">vr_2119</span><div class="aver">Yash · Jul 7</div></td><td><span class="trust">90</span></td><td class="num">3,377</td><td class="num">2.6s</td><td><button class="btn small" onclick="togglePause(this,'HR Onboarder')">Pause</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="foot">
+    <span>Pause stops an agent's runtime in one click and records who did it · resume restores the same version</span>
+    <span>Every published version traces to the verification record that cleared it</span>
+    <span>Each row links to the agent's lifecycle page in the developer portal</span>
+  </div>
+</section>
+
+<!-- ============ MEMBERS & ACCESS ============ -->
+<section id="members">
+  <h1>Members &amp; Access</h1>
+  <div class="sub">Who is in this workspace and what they may do. Developer, Verifier and Tenant Administrator are separate grants. You hold every verifier action as well; the audit records which role acted.</div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Members</h2><span class="count" id="memCount">4</span><span class="hint">Create verifier login is live in this mock</span>
+      <span style="margin-left:auto"><button class="btn primary small" onclick="openInvite()">+ Create login</button></span>
+    </div>
+    <table id="memTable">
+      <thead><tr><th>MEMBER</th><th>ROLE</th><th>MAY DO</th><th>STATUS</th><th>LAST ACTIVE</th><th></th></tr></thead>
+      <tbody id="memBody">
+        <tr><td><div class="aname">Tirthankar</div><div class="aver">tirthankar@turing.com</div></td><td><span class="chip type">Tenant Administrator</span></td><td class="num" style="color:var(--muted);font-size:12px">Everything, including every verifier action</td><td><span class="c-cert">Active</span></td><td class="num">now</td><td></td></tr>
+        <tr><td><div class="aname">Yash Chindala</div><div class="aver">yash@turing.com</div></td><td><span class="chip type">Verifier</span></td><td class="num" style="color:var(--muted);font-size:12px">Verification queue, records, decisions, Guardian</td><td><span class="c-cert">Active</span></td><td class="num">12m ago</td><td><button class="btn small" onclick="showToast('Role change is stubbed in this mock')">Manage</button></td></tr>
+        <tr><td><div class="aname">Ritwik Chakradhar</div><div class="aver">ritwik@turing.com</div></td><td><span class="chip">Developer</span></td><td class="num" style="color:var(--muted);font-size:12px">Build, evaluate, submit · no publish, no certify</td><td><span class="c-cert">Active</span></td><td class="num">2h ago</td><td><button class="btn small" onclick="showToast('Role change is stubbed in this mock')">Manage</button></td></tr>
+        <tr><td><div class="aname">Layla Aboud</div><div class="aver">layla@turing.com</div></td><td><span class="chip">Developer</span></td><td class="num" style="color:var(--muted);font-size:12px">Build, evaluate, submit · no publish, no certify</td><td><span class="c-cert">Active</span></td><td class="num">1d ago</td><td><button class="btn small" onclick="showToast('Role change is stubbed in this mock')">Manage</button></td></tr>
+      </tbody>
+    </table>
+    <div class="composer" id="inviteBox">
+      <h4>Create a login</h4>
+      <div class="c2">
+        <div class="cfield"><label>Full name</label><input id="invName" placeholder="e.g. Noura Al-Fahad"></div>
+        <div class="cfield"><label>Work email</label><input id="invEmail" placeholder="name@turing.com"></div>
+      </div>
+      <div class="c2">
+        <div class="cfield"><label>Role</label><select id="invRole" onchange="invRoleNote()">
+          <option value="Verifier">Verifier</option>
+          <option value="Developer">Developer</option>
+          <option value="Tenant Administrator">Tenant Administrator</option>
+        </select></div>
+        <div class="cfield"><label>Scope</label><input value="alnoor-tenant · this workspace only" disabled></div>
+      </div>
+      <div id="invNote" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px"><button class="btn primary" onclick="createLogin()">Create login</button><button class="btn" onclick="document.getElementById('inviteBox').classList.remove('on')">Cancel</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>What each grant may do</h2><span class="hint">least privilege · one person may hold more than one grant</span></div>
+    <table>
+      <thead><tr><th>ACTION</th><th>DEVELOPER</th><th>VERIFIER</th><th>TENANT ADMIN</th></tr></thead>
+      <tbody>
+        <tr><td>Build, deploy and evaluate an agent</td><td><span class="c-cert">Yes</span></td><td><span style="color:var(--muted2)">No</span></td><td><span style="color:var(--muted2)">No</span></td></tr>
+        <tr><td>Choose internal or public target and submit</td><td><span class="c-cert">Yes</span></td><td><span style="color:var(--muted2)">No</span></td><td><span style="color:var(--muted2)">No</span></td></tr>
+        <tr><td>Run verification checks and decide</td><td><span style="color:var(--muted2)">No</span></td><td><span class="c-cert">Yes</span></td><td><span class="c-cert">Yes</span></td></tr>
+        <tr><td>Publish to the internal workspace</td><td><span style="color:var(--muted2)">No</span></td><td><span class="c-cert">Yes</span></td><td><span class="c-cert">Yes</span></td></tr>
+        <tr><td>Send to Guardian for public certification</td><td><span style="color:var(--muted2)">No</span></td><td><span class="c-cert">Yes</span></td><td><span class="c-cert">Yes</span></td></tr>
+        <tr><td>Set the pass bar, SLA and verification policy</td><td><span style="color:var(--muted2)">No</span></td><td><span style="color:var(--muted2)">No</span></td><td><span class="c-cert">Yes</span></td></tr>
+        <tr><td>Create logins and assign roles</td><td><span style="color:var(--muted2)">No</span></td><td><span style="color:var(--muted2)">No</span></td><td><span class="c-cert">Yes</span></td></tr>
+        <tr><td>Quotas, pause, retire, erasure</td><td><span style="color:var(--muted2)">No</span></td><td><span style="color:var(--muted2)">No</span></td><td><span class="c-cert">Yes</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="foot"><span>Self-verification is blocked for public listings and warned for internal ones · the audit always records which role acted</span></div>
+</section>
+
+<!-- ============ TEMPLATES ============ -->
+<section id="templates">
+  <h1>Templates</h1>
+  <div class="sub">Sandbox configurations agents are matched against during Resolve. Developers never build infrastructure — they request a template, and it is published here. A request that nobody decides leaves an agent parked, so this queue has a real cost to ignoring it.</div>
+
+  <div class="statrow" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat"><div class="k" id="tplActive">3</div><div class="l">Published templates</div><div class="ok">matchable in Resolve</div></div>
+    <div class="stat"><div class="k" id="tplPending">1</div><div class="l">Requests waiting</div><div class="warn" id="tplParkedNote">1 agent parked</div></div>
+    <div class="stat"><div class="k">2</div><div class="l">Approved this quarter</div><div class="ok">Node 20 · +memory extension</div></div>
+    <div class="stat"><div class="k">1</div><div class="l">Rejected</div><div class="warn">Custom CUDA image</div></div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Requests waiting on you</h2><span class="count" id="tplReqCount">1</span>
+      <span class="hint">approving publishes the template and unparks anything waiting on it</span></div>
+    <div id="tplRequests"></div>
+    <div id="tplReqEmpty" style="display:none;padding:30px 20px;text-align:center;color:var(--muted)">
+      No template requests waiting. Developers request one when no approved template matches their agent.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Published templates</h2><span class="count" id="tplCount">3</span>
+      <span class="hint">what Resolve can match an agent to today</span>
+      <span style="margin-left:auto"><button class="btn primary small" onclick="openAuthor()">+ Author template</button></span></div>
+    <table>
+      <thead><tr><th>TEMPLATE</th><th>RUNTIME</th><th>COMPUTE</th><th>BLOCKS</th><th>ORIGIN</th><th>STATUS</th></tr></thead>
+      <tbody id="tplBody">
+        <tr><td><div class="aname">basic-python-sandbox</div><div class="aver">v1.0.0</div></td><td>python 3.11</td><td>2 vCPU · 4Gi</td><td class="num">4</td><td><span class="chip">System default</span></td><td><span class="c-cert">Published</span></td></tr>
+        <tr><td><div class="aname">Advance-python-sandbox</div><div class="aver">v1.0.0</div></td><td>python 3.11</td><td>4 vCPU · 8Gi</td><td class="num">8</td><td><span class="chip">Tenant</span></td><td><span class="c-cert">Published</span></td></tr>
+        <tr><td><div class="aname">Advance-node-sandbox</div><div class="aver">v1.0.0</div></td><td>node 20</td><td>4 vCPU · 8Gi</td><td class="num">8</td><td><span class="chip">Tenant</span></td><td><span class="c-cert">Published</span></td></tr>
+      </tbody>
+    </table>
+    <div class="composer" id="authorBox">
+      <h4>Author a template</h4>
+      <div class="c2">
+        <div class="cfield"><label>Template name</label><input id="tplName" placeholder="e.g. gpu-inference-sandbox"></div>
+        <div class="cfield"><label>Runtime</label><select id="tplRuntime"><option>python 3.11</option><option>node 20</option><option>python 3.12</option></select></div>
+      </div>
+      <div class="c2">
+        <div class="cfield"><label>Compute</label><select id="tplCompute"><option>2 vCPU · 4Gi</option><option>4 vCPU · 8Gi</option><option>8 vCPU · 16Gi</option><option>4 vCPU · 8Gi · GPU A10</option></select></div>
+        <div class="cfield"><label>Runtime blocks</label><select id="tplBlocks"><option>8 · full Sovereign Runtime</option><option>4 · network, cluster, compute, database</option></select></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Published templates are matchable immediately in Resolve. Platform ceilings still apply — a template cannot exceed the compute HUMAIN allocated to this tenant.</div>
+      <div style="display:flex;gap:8px"><button class="btn primary" onclick="publishTemplate()">Publish template</button><button class="btn" onclick="document.getElementById('authorBox').classList.remove('on')">Cancel</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Decisions</h2><span class="hint">actor · time · outcome, same trail as everything else</span></div>
+    <div class="audit" id="tplFeed">
+      <div class="audit-line"><span class="audit-time">Aug 12</span><span class="kind ap">APPROVED</span><span><b>Node 20 template</b> approved by Tirthankar · published to alnoor-tenant</span></div>
+      <div class="audit-line"><span class="audit-time">Aug 9</span><span class="kind ap">APPROVED</span><span><b>Advance-python-sandbox · +memory</b> extension approved by Tirthankar</span></div>
+      <div class="audit-line"><span class="audit-time">Aug 5</span><span class="kind rb">REJECTED</span><span><b>Custom CUDA image · torch 2.3</b> rejected by Tirthankar · outside the platform compute ceiling, requested a ceiling increase instead</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Developers request; you publish. Nothing self-provisions.</span>
+    <span>A parked agent resumes automatically the moment its template is published</span>
+  </div>
+</section>
+
+<!-- ============ QUOTAS & POLICIES ============ -->
+<section id="quotas">
+  <h1>Quotas &amp; Policies</h1>
+  <div class="sub">Every quota shows two numbers: the ceiling HUMAIN set for this tenant, and the allocation you manage inside it. The ceiling is not yours to move; the request path is.</div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Verification policy</h2><span class="hint">the pass bar, SLA and checks live in their own section</span></div>
+    <div class="polrow">
+      <div class="pn">Evaluation pass bar &middot; <b id="qPolBar">80%</b><div class="pd">A version reaches the verifier's queue only when its evaluation crosses this bar. Platform floor is 50%.</div></div>
+      <button class="btn small" onclick="document.querySelector('.navitem[data-s=&quot;vpolicy&quot;]').click()">Open Verification Policy</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Capacity</h2><span class="hint">Grey stripes: your allocation · dark marker: platform ceiling · request increase is live in this mock</span></div>
+
+    <div class="quota">
+      <div class="qtop"><span class="qname">Sandboxes</span><span class="qnums"><b>12</b> in use · 15 allocated · ceiling 20</span></div>
+      <div class="qbar"><div class="alloc" style="width:75%"></div><div class="used" style="width:60%"></div><div class="ceil" style="left:99%"></div></div>
+    </div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">Compute (vCPU)</span><span class="qnums"><b>46</b> in use · 64 allocated · ceiling 96</span></div>
+      <div class="qbar"><div class="alloc" style="width:66%"></div><div class="used" style="width:48%"></div><div class="ceil" style="left:99%"></div></div>
+    </div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">Storage</span><span class="qnums"><b>121 GB</b> in use · 200 GB allocated · ceiling 250 GB</span></div>
+      <div class="qbar"><div class="alloc" style="width:80%"></div><div class="used" style="width:48%"></div><div class="ceil" style="left:99%"></div></div>
+    </div>
+    <div class="quota">
+      <div class="qtop"><span class="qname">Evaluation runs / day</span><span class="qnums"><b>38</b> today · 50 allocated · ceiling 80</span></div>
+      <div class="qbar"><div class="alloc" style="width:62%"></div><div class="used" style="width:47%"></div><div class="ceil" style="left:99%"></div></div>
+      <div class="qlegend" style="margin-top:10px">
+        <span><i style="background:var(--green)"></i>In use</span>
+        <span><i style="background:#E2E6EA"></i>Your allocation</span>
+        <span><i style="background:var(--muted2)"></i>Platform ceiling · set by HUMAIN</span>
+        <span style="margin-left:auto"><button class="btn small" onclick="requestIncrease()">Request ceiling increase</button></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>My requests to HUMAIN</h2><span class="hint">The same request pattern your developers use with you, pointed upward</span></div>
+    <div class="audit" id="upFeed">
+      <div class="audit-line"><span class="audit-time">Jul 30</span><span>Storage allocation raised 150 to 200 GB · approved by platform in 2 days</span></div>
+    </div>
+  </div>
+
+  <div class="policy-grid">
+    <div class="policy"><h3>Region</h3><p>All workloads run in-Kingdom. Residency is provided by the sovereign substrate; it is a fact of the platform, not a tenant setting.</p></div>
+    <div class="policy"><h3>Egress</h3><p>Default deny. Outbound calls are limited to the allowlist declared per agent in its manifest and approved at submission.</p></div>
+    <div class="policy"><h3>Role bindings</h3><p>Three separable grants. Developers build and evaluate inside their own environments; the verifier owns verification, certification and publish decisions; the tenant administrator holds every verifier action plus quotas, members and policy. One person may hold several grants — the audit records which role acted.</p></div>
+    <div class="policy"><h3>Rate &amp; burst limits <span class="roadtag">ROADMAP</span></h3><p>Per-agent request rate and burst ceilings, visible next to the quotas above once the platform exposes them.</p></div>
+  </div>
+
+  <div class="foot">
+    <span>Ceilings and platform policy version are set by HUMAIN · provenance in Governance &amp; Audit</span>
+  </div>
+</section>
+
+<!-- ============ GOVERNANCE & AUDIT ============ -->
+<section id="governance">
+  <h1>Governance &amp; Audit</h1>
+  <div class="sub">Every decision on this tenant, provable, with the evidence one click away. The erasure record is live in this mock.</div>
+
+  <div class="statrow" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stat">
+      <div class="k">10<small> / 12</small></div>
+      <div class="l">Certified agents</div>
+      <div class="warn">2 attested, audit pending</div>
+    </div>
+    <div class="stat">
+      <div class="k">100%</div>
+      <div class="l">Admin actions with an audit entry</div>
+      <div class="ok">Actor, time, outcome on every entry</div>
+    </div>
+    <div class="stat">
+      <div class="k">1</div>
+      <div class="l">Retirement this quarter</div>
+      <div class="ok">Erasure proven · record below</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead">
+      <h2>Audit trail</h2>
+      <span class="fchip on" data-k="all" onclick="filterAudit(this)">All</span>
+      <span class="fchip" data-k="ap" onclick="filterAudit(this)">Approvals</span>
+      <span class="fchip" data-k="dep" onclick="filterAudit(this)">Deployments</span>
+      <span class="fchip" data-k="rb" onclick="filterAudit(this)">Rollbacks</span>
+      <span class="fchip" data-k="ret" onclick="filterAudit(this)">Retirements</span>
+      <span class="fchip" data-k="vf" onclick="filterAudit(this)">Verification</span>
+    </div>
+    <div class="audit" id="trail">
+      <div class="audit-line" data-k="vf"><span class="audit-time">Today 12:05</span><span class="kind vf">VERIFY</span><span><b>Yash Chindala</b> approved Research Assistant v3.1 · published to the internal workspace · verification record attached</span></div>
+      <div class="audit-line" data-k="vf"><span class="audit-time">Today 10:41</span><span class="kind vf">VERIFY</span><span><b>Guardian</b> returned rejection · Citizen Support Agent v2.1 · 2 reasons · routed to the verifier (Yash Chindala)</span></div>
+      <div class="audit-line" data-k="dep"><span class="audit-time">Today 09:15</span><span class="kind dep">DEPLOY</span><span><b>Invoice Processing App</b> v1.4 deployed by Omar Khalid · previous version retained</span></div>
+      <div class="audit-line" data-k="rb"><span class="audit-time">Aug 7 16:40</span><span class="kind rb">ROLLBACK</span><span><b>Knowledge Search</b> v2.7 restored over v2.8 by Layla Aboud · one atomic change: rollback deployed, v2.8 listing unpublished, v2.7 promoted · versions, listing and My Agents agree</span></div>
+      <div class="audit-line" data-k="ap"><span class="audit-time">Aug 7 11:02</span><span class="kind ap">APPROVAL</span><span><b>Marwan Haddad</b> approved dataset access · Arabic legal corpus v2</span></div>
+      <div class="audit-line" data-k="ret"><span class="audit-time">Aug 4 15:19</span><span class="kind ret">RETIREMENT</span><span><b>Legacy Ticket Triage</b> retired by you · listing removed · sandbox torn down · data erased<span class="evlink" onclick="toggleErasure()">View erasure record</span></span></div>
+      <div class="audit-line" data-k="ap"><span class="audit-time">Aug 4 15:12</span><span class="kind ap">APPROVAL</span><span><b>You</b> approved retirement of Legacy Ticket Triage · requested by Omar Khalid</span></div>
+      <div class="audit-line" data-k="dep"><span class="audit-time">Aug 3 10:44</span><span class="kind dep">DEPLOY</span><span><b>Citizen Support Agent</b> v2.0 deployed by platform pipeline after certification</span></div>
+    </div>
+
+    <div class="erasure" id="erasureRec">
+      <h4>Erasure record · Legacy Ticket Triage · retirement of Aug 4, 15:19</h4>
+      <table>
+        <tr><td style="width:200px;color:var(--muted)">Preserved before erasure</td><td>Agent record, version history, evaluation results, audit entries · confirmed saved 15:19:04</td></tr>
+        <tr><td style="color:var(--muted)">Erased, in order</td><td>Agent code and package (15:19:11) · runtime stopped and removed (15:19:26) · images and artifacts (15:19:58)</td></tr>
+        <tr><td style="color:var(--muted)">Data categories held</td><td>Ticket text (operational), no special categories declared</td></tr>
+        <tr><td style="color:var(--muted)">Triggered by</td><td>Tenant administrator (you), on Omar Khalid's request</td></tr>
+        <tr><td style="color:var(--muted)">Not erased</td><td>Nothing withheld · no legal holds applied</td></tr>
+      </table>
+      <div class="ok-line">No recoverable data remains in storage the platform controls. This record is immutable and outlives the agent.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cardhead"><h2>Verification records</h2><span class="hint">the evidence behind every published listing · full registry in Verification Records</span></div>
+    <div class="audit">
+      <div class="audit-line"><span class="audit-time">Today</span><span class="kind vf">OPEN</span><span><b>3 records in review</b> · Procurement Compliance v1.5, Citizen Support v2.1, Health Triage v1.2<span class="evlink" onclick="document.querySelector('.navitem[data-s=&quot;vrecords&quot;]').click()">Open the registry</span></span></div>
+      <div class="audit-line"><span class="audit-time">Aug 15</span><span class="kind vf">VERIFY</span><span><b>Research Assistant v3.1</b> approved by Yash Chindala · published to the internal workspace · <span class="ref" onclick="gotoRecord('vr_2291')">vr_2291</span></span></div>
+      <div class="audit-line"><span class="audit-time">Aug 7</span><span class="kind vf">VERIFY</span><span><b>Knowledge Search v2.7</b> approved with conditions by Yash Chindala · 1 low-severity finding attached · <span class="ref" onclick="gotoRecord('vr_2288')">vr_2288</span></span></div>
+      <div class="audit-line"><span class="audit-time">Jul 22</span><span class="kind vf">VERIFY</span><span><b>Trip Planner v1.7</b> changes requested by Yash Chindala · finding returned to the developer · <span class="ref" onclick="gotoRecord('vr_2201')">vr_2201</span></span></div>
+    </div>
+  </div>
+
+  <div class="prov">
+    <div class="policy">
+      <h3>Tenant provenance</h3>
+      <p>alnoor-tenant created by the platform on 12 March 2026 · operating under platform policy version 3.2 · policy set and versioned by HUMAIN.</p>
+    </div>
+    <div class="policy">
+      <h3>Agent identity <span class="roadtag">ROADMAP</span></h3>
+      <p>Every agent runs under a platform-issued identity, matching its registration with the evaluation service. Displayed here per agent once exposed.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="audit">
+      <div class="audit-line"><span style="font-weight:600;color:var(--green-dark)">No cross-tenant visibility exists on this platform.</span><span style="color:var(--muted)">This console sees alnoor-tenant and nothing else; the same boundary applies to every tenant.</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Every admin action lands here with actor, time, and outcome · the audit survives the resources it describes</span>
+  </div>
+</section>
+
+<!-- ============ TENANT DATA (PHASE 3) ============ -->
+<section id="data">
+  <h1>Tenant Data</h1>
+  <div class="sub">Agent memory, cache, and retention, governed.</div>
+  <div class="ph"><span class="tag">BUILT IN PHASE 3</span>
+    <h3>What lands here</h3>
+    <ul>
+      <li>Agent memory, platform-managed with a structured schema · usage per agent</li>
+      <li>Retention, TTL, and a verifiable delete path per agent (the PDPL guarantee)</li>
+      <li>Cache status per agent</li>
+      <li>Residency: provided by the sovereign substrate, shown as a fact, not a setting</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ COST (PHASE 3) ============ -->
+<section id="cost">
+  <h1>Cost</h1>
+  <div class="sub">What this tenant consumes.</div>
+  <div class="ph"><span class="tag">BUILT IN PHASE 3 · PRICING MODEL UNDER DECISION</span>
+    <h3>What lands here</h3>
+    <ul><li>Spend by agent and by sandbox, current period</li><li>Pricing model (tenant-priced vs bundled) shown once decided, honestly tagged until then</li></ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // nav switching
+  document.querySelectorAll('.navitem').forEach(item=>{
+    item.addEventListener('click',()=>{
+      document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('visible'));
+      document.getElementById(item.dataset.s).classList.add('visible');
+      window.scrollTo(0,0);
+    });
+  });
+
+  // live interaction 1: approve a request
+  let pending = 4;
+  function approve(id, actor, outcome){
+    const row = document.getElementById(id);
+    row.classList.add('done');
+    setTimeout(()=>{ row.style.display='none';
+      pending--;
+      document.getElementById('qCount').textContent = pending;
+      document.getElementById('navApprovalCount').textContent = pending;
+      document.getElementById('statApprovals').textContent = pending;
+      if(pending===1){ document.getElementById('statApprovalsNote').textContent='Oldest is 1 day old'; }
+      if(pending===0){
+        document.getElementById('emptyQueue').style.display='block';
+        document.getElementById('navApprovalCount').style.display='none';
+        document.getElementById('statApprovalsNote').textContent='All clear';
+        document.getElementById('statApprovalsNote').className='ok';
+      }
+      addAudit(actor, outcome, 'ap');
+      showToast('Approved · recorded in the audit trail');
+    }, 350);
+  }
+
+  // live interaction 2: erasure record drill-in
+  function toggleErasure(){
+    const el = document.getElementById('erasureRec');
+    el.classList.toggle('openrec');
+    if(el.classList.contains('openrec')) showToast('Erasure record opened · immutable, auditor-readable');
+  }
+
+  // live interaction 3: pause / resume + pause all
+  function togglePause(btn, name){
+    const tr = btn.closest('tr');
+    const chipCell = tr.querySelector('.lchip');
+    if(tr.classList.contains('paused')){
+      tr.classList.remove('paused');
+      chipCell.className = 'lchip ' + (tr.dataset.prev || 'l-pub');
+      chipCell.textContent = tr.dataset.prevText || 'Published';
+      btn.textContent = 'Pause';
+      addAudit('You', name + ' resumed · same version restored, no redeploy', 'dep');
+      showToast(name + ' resumed');
+    } else {
+      tr.dataset.prev = chipCell.className.replace('lchip ','');
+      tr.dataset.prevText = chipCell.textContent;
+      tr.classList.add('paused');
+      chipCell.className = 'lchip l-paused';
+      chipCell.textContent = 'Paused by you';
+      btn.textContent = 'Resume';
+      addAudit('You', name + ' paused · runtime stopped, version and data untouched', 'dep');
+      showToast(name + ' paused · recorded in the audit trail');
+    }
+  }
+  function pauseAll(){
+    const btn = document.getElementById('pauseAllBtn');
+    if(btn.dataset.armed !== '1'){
+      btn.dataset.armed = '1';
+      btn.textContent = 'Click again to confirm · pauses all 11 running agents';
+      setTimeout(()=>{ btn.dataset.armed=''; btn.textContent='Pause all agents'; }, 4000);
+      return;
+    }
+    btn.dataset.armed='';
+    btn.textContent='Pause all agents';
+    document.querySelectorAll('#agentTable tbody tr').forEach(tr=>{
+      const b = tr.querySelector('td:last-child .btn');
+      if(b && !tr.classList.contains('paused')){
+        const chipCell = tr.querySelector('.lchip');
+        tr.dataset.prev = chipCell.className.replace('lchip ','');
+        tr.dataset.prevText = chipCell.textContent;
+        tr.classList.add('paused');
+        chipCell.className='lchip l-paused';
+        chipCell.textContent='Paused by you';
+        b.textContent='Resume';
+      }
+    });
+    addAudit('You', 'emergency pause · all running agents stopped in one action · versions and data untouched', 'dep');
+    showToast('All agents paused · one audit entry, one click to reverse per agent');
+  }
+
+  // agents filter
+  function filterAgents(chip){
+    document.querySelectorAll('#agents .fchip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');
+    const f = chip.dataset.f;
+    document.querySelectorAll('#agentTable tbody tr').forEach(tr=>{
+      tr.style.display = (f==='all' || tr.dataset.b===f) ? '' : 'none';
+    });
+  }
+
+  // audit filter
+  function filterAudit(chip){
+    document.querySelectorAll('#governance .fchip').forEach(c=>c.classList.remove('on'));
+    chip.classList.add('on');
+    const k = chip.dataset.k;
+    document.querySelectorAll('#trail .audit-line').forEach(l=>{
+      l.style.display = (k==='all' || l.dataset.k===k) ? '' : 'none';
+    });
+  }
+
+  // shared: append audit entries everywhere relevant
+  function addAudit(actor, outcome, kind){
+    const t = new Date();
+    const hh = String(t.getHours()).padStart(2,'0'), mm = String(t.getMinutes()).padStart(2,'0');
+    const mk = ()=> {
+      const line = document.createElement('div');
+      line.className='audit-line new';
+      line.dataset.k = kind;
+      const tag = kind==='ap' ? '<span class="kind ap">APPROVAL</span>' : kind==='vf' ? '<span class="kind vf">VERIFY</span>' : '<span class="kind dep">ACTION</span>';
+      line.innerHTML = '<span class="audit-time">Today '+hh+':'+mm+'</span>'+tag+'<span><b>'+actor+'</b> · '+outcome+'</span>';
+      return line;
+    };
+    const trail = document.getElementById('trail');
+    trail.insertBefore(mk(), trail.firstChild);
+    const feed = document.getElementById('auditFeed');
+    feed.insertBefore(mk(), feed.firstChild);
+    if(kind==='ap'){
+      const df = document.getElementById('decisionFeed');
+      df.insertBefore(mk(), df.firstChild);
+    }
+  }
+
+  function showToast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 2600);
+  }
+
+  // ===== V3: roles =====
+  function setRole(r){
+    document.body.dataset.role = r;
+    document.querySelectorAll('#roleSwitch button').forEach(b=>b.classList.toggle('on', b.dataset.role===r));
+    document.getElementById('roleName').textContent = r==='admin' ? 'Tirthankar · Tenant Administrator' : 'Yash Chindala · Verifier';
+    const cur = document.querySelector('section.visible');
+    if(r==='verifier' && cur){
+      const nav = document.querySelector('.navitem[data-s="'+cur.id+'"]');
+      if(nav && nav.classList.contains('admin-only')) document.querySelector('.navitem[data-s="verification"]').click();
+    }
+    renderOverview();
+    showToast(r==='admin' ? 'Tenant admin view · every verifier action included' : 'Verifier view · verification, agents and audit only');
+  }
+  function whoActs(){ return document.body.dataset.role==='verifier' ? 'Yash Chindala' : 'Tirthankar (admin, acting as verifier)'; }
+
+  // ===== V3: verification queue =====
+  function setThreshold(v){
+    CFG.bar = +v;
+    const t=document.getElementById('thVal'); if(t) t.textContent = v+'%';
+    const bar = document.getElementById('vqBar'); if(bar) bar.textContent = v+'%';
+  }
+  function commitThreshold(v){
+    CFG.bar = +v;
+    addAudit('Tirthankar', 'set the evaluation pass bar to '+v+'% · applies to new submissions only', 'ap');
+    showToast('Pass bar set to '+v+'% · recorded in the audit trail');
+    renderQueue();
+  }
+  document.body.dataset.role = 'admin';
+
+  /* ================= V4 · VERIFICATION RECORDS ================= */
+  const CFG = { bar:80, sla:2, guardian:true, conditional:true };
+
+  function baseChecks(){ return [
+   {n:'Access &amp; least privilege', subs:[
+     {t:'Tools and connectors invoked are declared in the manifest', m:'AUTO', r:'0 undeclared across 1,240 traced calls', bar:'0 undeclared', ev:'trace_2288', s:'pass'},
+     {t:'Connector scopes are minimal for the declared purpose', m:'AUTO', r:'6 scopes · 4 read-only · 0 unused write', bar:'no write scope without a writing path', ev:'scope_1142', s:'pass'},
+     {t:'Secrets resolve from the tenant vault at runtime', m:'AUTO', r:'3 secrets · 0 embedded in code, manifest or logs', bar:'0 embedded', ev:'sec_scan_881', s:'pass'}]},
+   {n:'Prompt-injection &amp; misuse resistance', subs:[
+     {t:'Direct injection attack set', m:'AUTO', r:'34 / 34 refused · 0 instruction overrides', bar:'0 overrides', ev:'run_212', s:'pass'},
+     {t:'Indirect injection via retrieved documents and tool output', m:'AUTO', r:'18 / 18 flagged and refused', bar:'all flagged', ev:'run_212', s:'pass'},
+     {t:'System-prompt extraction and jailbreak regression', m:'AUTO', r:'0 leakage · jailbreak suite v7 pass (30 cases)', bar:'0 leakage · suite pass', ev:'run_212 · suite v7', s:'pass'}]},
+   {n:'Data protection &amp; residency', subs:[
+     {t:'PII redaction on evaluation traces', m:'AUTO', r:'4 applied · 0 missed', bar:'0 missed', ev:'policy_trace_2291', s:'pass'},
+     {t:'No cross-tenant data path', m:'AUTO', r:'Sandbox isolation confirmed by platform record', bar:'attestation present', ev:'plat_att_77', s:'pass'},
+     {t:'In-Kingdom execution', m:'AUTO', r:'KSA · Riyadh · sovereign substrate', bar:'in-Kingdom', ev:'deploy_v1.5', s:'pass'}]},
+   {n:'Egress &amp; network', subs:[
+     {t:'Observed outbound calls are a subset of the approved allowlist', m:'AUTO', r:'6 observed · 6 approved · 0 undeclared', bar:'0 undeclared endpoints', ev:'trace_2291', s:'pass'},
+     {t:'Deny-all default in effect', m:'AUTO', r:'Default deny confirmed at the network block', bar:'deny-all', ev:'net_cfg_119', s:'pass'}]},
+   {n:'Code &amp; supply chain', subs:[
+     {t:'Dependency vulnerability scan', m:'AUTO', r:'0 critical · 0 high · 2 medium (waived, note recorded)', bar:'0 critical · 0 high', ev:'scan_1189', s:'pass'},
+     {t:'Static analysis for dangerous patterns', m:'AUTO', r:'0 flags · no shell injection, dynamic loading or obfuscation', bar:'0 unexplained flags', ev:'scan_1189', s:'pass'},
+     {t:'Manifest matches the package', m:'AUTO', r:'Runtime, entrypoints and 5-node graph match manifest hash', bar:'exact match', ev:'sha256:9af3c1', s:'pass'},
+     {t:'Dependency licences are permitted', m:'AUTO', r:'41 dependencies · 0 disallowed licences', bar:'0 disallowed', ev:'lic_442', s:'pass'}]},
+   {n:'Behaviour &amp; listing integrity', subs:[
+     {t:'High-risk and irreversible actions route to a human', m:'MANUAL', r:'Case package routed to the procurement officer queue', bar:'agent makes no final decision', ev:'handoff_rec_88', s:'review'},
+     {t:'Capability stays inside what the listing claims', m:'MANUAL', r:'Listing diff v1.4 → v1.5 · 1 capability line added', bar:'no undisclosed capability', ev:'listing_diff_15', s:'review'},
+     {t:'Refusal behaviour on harmful requests', m:'MANUAL', r:'8 sampled refusals from the eval transcript', bar:'sampled refusals correct', ev:'eval_sample_24', s:'review'}]}
+  ];}
+
+  function withOverrides(over){
+    const c = baseChecks();
+    (over||[]).forEach(o=>{ const sub=c[o.c].subs[o.s]; Object.assign(sub,o.v); });
+    return c;
+  }
+
+  const VRECORDS = {
+    vr_2317:{ id:'vr_2317', code:'PC', agent:'Procurement Compliance Agent', ver:'v1.5', dev:'Ritwik Chakradhar',
+      target:'internal', submitted:'Today 09:47', waited:'4 hours', age:0, holder:'Yash Chindala', state:'in_review',
+      quality:{score:86, suite:'procurement-compliance-eval v4', dataset:'synthetic-procurement-records v3', prev:81, runs:'3 runs · v1.3 74% → v1.4 81% → v1.5 86%'},
+      checks:withOverrides(), guardian:null,
+      prior:'auto',
+      audit:[{t:'Today 09:47', a:'Ritwik Chakradhar', r:'developer', o:'submitted v1.5 for verification · target internal workspace'},
+             {t:'Today 09:47', a:'Platform', r:'system', o:'evaluation 86% cleared the tenant bar of 80% · record opened, evidence bundle sealed'},
+             {t:'Today 11:02', a:'Yash Chindala', r:'verifier', o:'picked up the record · 14 automated checks resolved on open'}]},
+
+    vr_2318:{ id:'vr_2318', code:'CS', agent:'Citizen Support Agent', ver:'v2.1', dev:'Ritwik Chakradhar',
+      target:'external', submitted:'Yesterday 16:20', waited:'1 day', age:1, holder:'Yash Chindala', state:'in_review',
+      quality:{score:91, suite:'citizen-eligibility-eval v6', dataset:'synthetic-citizen-records v4', prev:88, runs:'4 runs · v1.9 82% → v2.0 88% → v2.1 91%'},
+      checks:withOverrides([{c:5,s:0,v:{s:'pass', r:'Case package routed to the case officer queue · reviewed'}},
+                            {c:5,s:1,v:{s:'pass', r:'Listing diff v2.0 → v2.1 · no capability change · reviewed'}},
+                            {c:5,s:2,v:{s:'pass', r:'11 sampled refusals correct · reviewed'}}]),
+      guardian:{state:'not_sent'},
+      prior:'auto',
+      audit:[{t:'Yesterday 16:20', a:'Ritwik Chakradhar', r:'developer', o:'submitted v2.1 for verification · target public marketplace'},
+             {t:'Yesterday 16:20', a:'Platform', r:'system', o:'evaluation 91% cleared the tenant bar of 80% · record opened, evidence bundle sealed'},
+             {t:'Today 08:15', a:'Yash Chindala', r:'verifier', o:'picked up the record'},
+             {t:'Today 08:52', a:'Yash Chindala', r:'verifier', o:'recorded all three behaviour reviews · every check now passing'}]},
+
+    vr_2316:{ id:'vr_2316', code:'HT', agent:'Health Triage Assistant', ver:'v1.2', dev:'Layla Aboud',
+      target:'internal', submitted:'Aug 15 10:04', waited:'2 days', age:2, holder:'Yash Chindala', state:'in_review',
+      quality:{score:84, suite:'health-triage-eval v2', dataset:'synthetic-health-records v1', prev:79, runs:'2 runs · v1.1 79% → v1.2 84%'},
+      checks:withOverrides([{c:3,s:0,v:{s:'fail', r:'7 observed · 6 approved · 1 undeclared: api.symptom-lookup.io',
+                                        bar:'0 undeclared endpoints', ev:'trace_2304'}}]),
+      guardian:null,
+      prior:'auto',
+      audit:[{t:'Aug 15 10:04', a:'Layla Aboud', r:'developer', o:'submitted v1.2 for verification · target internal workspace'},
+             {t:'Aug 15 10:04', a:'Platform', r:'system', o:'evaluation 84% cleared the tenant bar of 80% · record opened, evidence bundle sealed'},
+             {t:'Aug 16 09:30', a:'Yash Chindala', r:'verifier', o:'picked up the record · egress check failed on open'}]}
+  };
+
+  /* Closed records are full records too — same shape, read-only.
+     Built from a compact ledger so every reference in the console resolves. */
+  const CLOSED_LEDGER = [
+    // id      code  agent                          ver     target      dev                  score decision                     who            when
+    ['vr_2299','CS','Citizen Support Agent',        'v2.0','external','Ritwik Chakradhar',   88,'Approved',                  'Yash Chindala','Jul 30'],
+    ['vr_2290','PC','Procurement Compliance Agent', 'v1.4','internal','Ritwik Chakradhar',   81,'Approved with conditions',  'Yash Chindala','Jul 28'],
+    ['vr_2263','PC','Procurement Compliance Agent', 'v1.3','internal','Ritwik Chakradhar',   74,'Changes requested',         'Yash Chindala','Jul 14'],
+    ['vr_2291','RA','Research Assistant',           'v3.1','internal','Layla Aboud',         93,'Approved',                  'Yash Chindala','Aug 15'],
+    ['vr_2288','KS','Knowledge Search',             'v2.7','internal','Layla Aboud',         87,'Approved with conditions',  'Yash Chindala','Aug 7'],
+    ['vr_2244','IP','Invoice Processing App',       'v1.4','external','Omar Khalid',         90,'Approved',                  'Tirthankar',   'Aug 3'],
+    ['vr_2201','TP','Trip Planner',                 'v1.7','internal','Layla Aboud',         81,'Changes requested',         'Yash Chindala','Jul 22'],
+    ['vr_2188','TR','Translation Agent',            'v2.3','internal','Omar Khalid',         96,'Approved',                  'Yash Chindala','Jul 30'],
+    ['vr_2160','MM','Meeting Manager',              'v1.9','internal','Omar Khalid',         91,'Approved',                  'Yash Chindala','Jul 18'],
+    ['vr_2140','AC','Arabic Contracts Reviewer',    'v1.2','external','Layla Aboud',         93,'Approved',                  'Yash Chindala','Jul 11'],
+    ['vr_2119','HO','HR Onboarder',                 'v2.1','external','Omar Khalid',         90,'Approved',                  'Yash Chindala','Jul 7'],
+    ['vr_2075','DE','Data Extraction Agent',        'v1.6','external','Layla Aboud',         88,'Approved with conditions',  'Yash Chindala','Jun 24'],
+    ['vr_2061','EA','Expense Auditor',              'v1.1','external','Omar Khalid',         87,'Approved with conditions',  'Yash Chindala','Jun 19']
+  ];
+  const DECCLS={'Approved':'rs-ok','Approved with conditions':'rs-ok','Changes requested':'rs-chg','Rejected':'rs-rej'};
+
+  function buildClosed(row){
+    const [id,code,agent,ver,target,dev,score,decision,who,when]=row;
+    const returned = decision==='Changes requested' || decision==='Rejected';
+    const over = returned ? [{c:3,s:0,v:{s:'fail',
+        r:'7 observed · 6 approved · 1 undeclared endpoint',
+        bar:'0 undeclared endpoints', ev:'trace_'+id.slice(3)}}] : [];
+    const r={ id:id, code:code, agent:agent, ver:ver, dev:dev, target:target,
+      submitted:when, waited:'—', age:0, holder:who, state:'closed',
+      decision:decision, decidedBy:who, decidedOn:when,
+      quality:{score:score, suite:agent.toLowerCase().split(' ')[0]+'-eval v3',
+        dataset:'synthetic-'+agent.toLowerCase().split(' ')[0]+'-records v2',
+        prev:Math.max(60,score-5), runs:'closed cycle · scored '+score+'%'},
+      checks: withOverrides(over), guardian: target==='external'?{state:'done',pass:true}:null,
+      prior:[], audit:[
+        {t:when, a:dev, r:'developer', o:'submitted '+ver+' for verification · target '+(target==='external'?'public marketplace':'internal workspace')},
+        {t:when, a:'Platform', r:'system', o:'evaluation '+score+'% cleared the tenant bar · evidence bundle sealed'},
+        {t:when, a:who, r:'verifier', o:'reviewed the evidence bundle and ran the tenant verification policy'}]
+    };
+    if(target==='external' && !returned) r.audit.push({t:when, a:'Guardian', r:'system', o:'returned passed · public listing cleared'});
+    r.audit.push({t:when, a:who, r:'verifier', o:decision.toLowerCase()+' · record closed and sealed'});
+    return r;
+  }
+  const CLOSED={}; CLOSED_LEDGER.forEach(function(row){ CLOSED[row[0]]=buildClosed(row); });
+
+  /* agent-consistent history: a record's prior cycles are the SAME agent's earlier records */
+  function priorsFor(agent, beforeId){
+    return CLOSED_LEDGER.filter(function(r){ return r[2]===agent && r[0]!==beforeId; })
+      .map(function(r){ return {v:r[3], d:r[7], who:r[8], when:r[9], rec:r[0],
+        note:r[7]==='Approved with conditions'?'one low-severity finding waived as a condition'
+            :r[7]==='Changes requested'?'returned to the developer, resolved in the next version'
+            :'clean pass on every check'}; });
+  }
+  function recOf(id){ return VRECORDS[id] || CLOSED[id] || null; }
+  /* closing a record keeps everything it accumulated — findings and trail included */
+  function sealRecord(live, row){
+    const closed=buildClosed(row);
+    if(live){
+      if((live.findings||[]).length) closed.findings=live.findings.slice();
+      if((live.audit||[]).length)    closed.audit=live.audit.slice();
+      if(live.guardian)              closed.guardian=live.guardian;
+      if(live.certified)             closed.certified=true;
+      closed.quality=live.quality||closed.quality;
+      closed.checks=live.checks||closed.checks;
+      closed.submitted=live.submitted||closed.submitted;
+      closed.dev=live.dev||closed.dev;
+    }
+    return closed;
+  }
+  let VCLOSED=[];
+  function rebuildClosedList(){
+    VCLOSED = CLOSED_LEDGER.map(function(r){
+      return {id:r[0], agent:r[2]+' '+r[3], target:r[4], q:r[6], d:r[7], who:r[8], when:r[9], cls:DECCLS[r[7]]||'rs-ok'};
+    });
+  }
+  rebuildClosedList();
+
+
+  function bundleOf(r){ return [
+    ['Quality evaluation report', r.quality.score+'% against the '+CFG.bar+'% bar · '+r.quality.suite, 'ev_'+r.id.slice(3),'quality'],
+    ['Agent manifest + hash', 'schema v1 · pinned', 'sha256:9af3c1','manifest'],
+    ['Manifest diff vs live version', r.ver+' vs live · egress allowlist delta included', 'diff_'+r.id.slice(3),'diff'],
+    ['Prompt-safety suite result', '82 attack cases · 0 overrides · suite v7', 'run_212','safety'],
+    ['Egress trace diff', (r.checks[3].subs[0].s==='fail'?'7 observed · 1 undeclared':'6 observed · 6 approved'), r.checks[3].subs[0].ev,'egress'],
+    ['Code &amp; dependency scan', '0 critical · 0 high · 2 medium waived', 'scan_1189','scan'],
+    ['Policy traces + redactions', '4 redactions applied · all claims linked to approved rules', 'policy_trace_2291','policy'],
+    ['Deployment record', r.ver+' · git main@8f2a1c · '+r.dev+' · KSA Riyadh', 'deploy_'+r.ver,'deploy']
+  ];}
+
+  function artBody(kind, r){
+    if(kind==='quality') return '<table class="kvtab">'+
+      '<tr><td>Score vs tenant bar</td><td><b>'+r.quality.score+'%</b> · bar '+CFG.bar+'% · previous version '+r.quality.prev+'%</td></tr>'+
+      '<tr><td>Correctness</td><td>94% · within threshold</td></tr>'+
+      '<tr><td>Safety</td><td>Pass · within threshold</td></tr>'+
+      '<tr><td>Hallucination</td><td>1.4% · within threshold</td></tr>'+
+      '<tr><td>Access control</td><td>Pass · within threshold</td></tr>'+
+      '<tr><td>Suite / dataset</td><td>'+r.quality.suite+' · '+r.quality.dataset+'</td></tr>'+
+      '<tr><td>Run history</td><td>'+r.quality.runs+'</td></tr></table>';
+    if(kind==='diff') return '<div class="diff">'+
+      '<span class="ctx">  runtime: python:3.11</span>'+
+      '<span class="ctx">  access_scope: ministry-scoped</span>'+
+      '<span class="ctx">  egress_allowlist:</span>'+
+      '<span class="ctx">    - api.tenant-erp.local</span>'+
+      (r.checks[3].subs[0].s==='fail'
+        ? '<span class="del">-   # api.symptom-lookup.io called at runtime but never declared</span>'
+        : '<span class="add">+   - api.rates.tenant.local   # declared in v1.5</span>')+
+      '<span class="ctx">  evaluation_suites:</span>'+
+      '<span class="add">+   - '+r.quality.suite+'</span>'+
+      '</div><div style="font-size:12px;color:var(--muted);margin-top:8px">The egress delta is the line most findings come from — it is shown to the developer before submission, so nothing here is a surprise.</div>';
+    if(kind==='egress') return '<table class="kvtab">'+
+      '<tr><td>Approved allowlist</td><td>api.tenant-erp.local · vault.tenant.local · log.tenant.local · auth.tenant.local · store.tenant.local · rates.tenant.local</td></tr>'+
+      '<tr><td>Observed at runtime</td><td>'+(r.checks[3].subs[0].s==='fail'
+        ? 'the six approved endpoints <b style="color:var(--red)">plus api.symptom-lookup.io (undeclared)</b>'
+        : 'the six approved endpoints, nothing else')+'</td></tr>'+
+      '<tr><td>Default posture</td><td>Deny-all · outbound limited to the manifest allowlist</td></tr></table>';
+    if(kind==='manifest') return '<div class="diff"><span class="ctx">apiVersion: humain.one/v1</span><span class="ctx">kind: Agent</span>'+
+      '<span class="ctx">metadata: { name: '+r.agent.toLowerCase().replace(/ /g,'-')+', version: '+r.ver+' }</span>'+
+      '<span class="ctx">runtime: python:3.11</span><span class="ctx">source: { type: git, repo: turing/'+r.code.toLowerCase()+', ref: main@8f2a1c }</span>'+
+      '<span class="ctx">access_scope: ministry-scoped</span><span class="ctx">certification_profile: gov-citizen-v1</span></div>';
+    if(kind==='safety') return '<table class="kvtab">'+
+      '<tr><td>Direct injection</td><td>34 prompts · 34 refused</td></tr>'+
+      '<tr><td>Indirect injection</td><td>18 documents / tool outputs · all flagged</td></tr>'+
+      '<tr><td>Extraction attempts</td><td>0 leakage</td></tr>'+
+      '<tr><td>Jailbreak regression</td><td>suite v7 · 30 cases · pass</td></tr>'+
+      '<tr><td>Suite version recorded</td><td>v7 — re-certification triggers if the suite advances</td></tr></table>';
+    if(kind==='scan') return '<table class="kvtab">'+
+      '<tr><td>Critical / high</td><td>0 / 0</td></tr>'+
+      '<tr><td>Medium</td><td>2 · waived with a recorded note (transitive, no reachable path)</td></tr>'+
+      '<tr><td>Static analysis</td><td>0 flags</td></tr>'+
+      '<tr><td>Manifest ↔ code</td><td>exact match to pinned hash</td></tr></table>';
+    if(kind==='policy') return '<table class="kvtab">'+
+      '<tr><td>Redactions applied</td><td>4 · 0 missed</td></tr>'+
+      '<tr><td>Policy traces</td><td>all claims linked to approved rules</td></tr>'+
+      '<tr><td>Human handoff</td><td>structured case package recorded</td></tr></table>';
+    return '<table class="kvtab">'+
+      '<tr><td>Version</td><td>'+r.ver+'</td></tr><tr><td>Source</td><td>git main@8f2a1c</td></tr>'+
+      '<tr><td>Actor</td><td>'+r.dev+'</td></tr><tr><td>Placement</td><td>KSA · Riyadh (sovereign)</td></tr></table>';
+  }
+
+  function chkState(c){
+    if(c.subs.some(x=>x.s==='fail')) return ['st-fail','Finding'];
+    if(c.subs.some(x=>x.s==='review')) return ['st-manual','Your review'];
+    return ['st-pass','Pass · '+c.subs.length];
+  }
+  function openRecord(id){
+    const r = recOf(id); if(!r) return;
+    document.getElementById('vqList').style.display='none';
+    document.body.classList.add('rec-open');
+    const el = document.getElementById('vqRecord');
+    el.style.display='block'; el.innerHTML = recordHTML(r);
+    window.scrollTo(0,0);
+  }
+  function closeRecord(){
+    document.body.classList.remove('rec-open');
+    document.getElementById('vqRecord').style.display='none';
+    document.getElementById('vqList').style.display='block';
+    renderQueue(); window.scrollTo(0,0);
+  }
+
+  function recordHTML(r){
+    const ext = r.target==='external';
+    const stateMap={in_review:['rs-rev','In review'],approved:['rs-ok','Approved'],returned:['rs-chg','Changes requested'],rejected:['rs-rej','Rejected']};
+    const st = r.state==='closed' ? [(DECCLS[r.decision]||'rs-ok'), r.decision] : (stateMap[r.state]||['rs-new','New']);
+    const failing = r.checks.filter(c=>c.subs.some(x=>x.s==='fail')).length;
+    const pending = r.checks.filter(c=>c.subs.some(x=>x.s==='review')).length;
+    const closed  = r.state==='closed';
+    const priors  = r.prior==='auto' ? priorsFor(r.agent, r.id) : (r.prior||[]);
+
+    let h = '<div class="backlink" onclick="closeRecord()">‹ Back to the queue</div>';
+
+    /* 1 · header */
+    h += '<div class="rechead"><div class="rtop">'+
+      '<span class="ref" onclick="copyRef(\''+r.id+'\')">'+r.id+'</span>'+
+      '<h2>'+r.agent+' · '+r.ver+'</h2>'+
+      '<span class="chip type">'+(ext?'Public marketplace':'Internal workspace')+'</span>'+
+      '<span class="rstate '+st[0]+'">'+st[1]+'</span></div>'+
+      '<div class="recgrid">'+
+      '<div class="rg"><div class="lbl">Developer</div><b>'+r.dev+'</b></div>'+
+      '<div class="rg"><div class="lbl">Submitted</div><b>'+r.submitted+'</b><div style="color:var(--muted2)">waiting '+r.waited+'</div></div>'+
+      '<div class="rg"><div class="lbl">Holder</div><b>'+r.holder+'</b><div style="color:var(--muted2)">verifier</div></div>'+
+      '<div class="rg"><div class="lbl">Quality</div><b>'+r.quality.score+'%</b> <span style="color:var(--muted2)">bar '+CFG.bar+'%</span>'+
+      '<div class="qbar-mini"><div class="f" style="width:'+r.quality.score+'%"></div><div class="t" style="left:'+CFG.bar+'%"></div></div></div>'+
+      '</div></div>';
+
+    if(closed){
+      h += '<div class="card" style="border-color:var(--tintline);background:var(--tint)"><div style="padding:14px 20px;font-size:13px;line-height:1.6">'+
+        '<b>This record is closed and immutable.</b> '+r.decision+' by '+r.decidedBy+' on '+r.decidedOn+'. '+
+        'It is kept as the evidence behind the listing and outlives the version it describes — nothing here can be edited or re-decided. '+
+        'A new version starts a new record.</div></div>';
+    }
+
+    /* 2 · evidence bundle */
+    h += '<div class="card"><div class="cardhead"><h2>Evidence bundle</h2><span class="count">8 / 8</span>'+
+      '<span class="hint">sealed at submission · exactly what the developer previewed</span></div>';
+    bundleOf(r).forEach(function(a,i){
+      h += '<div class="art" onclick="this.classList.toggle(\'open\')"><div class="art-h">'+
+        '<span class="chev">▶</span><span class="an">'+a[0]+'</span><span class="av">'+a[1]+'</span>'+
+        '<span class="ref" onclick="event.stopPropagation();copyRef(\''+a[2]+'\')">'+a[2]+'</span></div>'+
+        '<div class="art-b">'+artBody(a[3], r)+'</div></div>';
+    });
+    h += '</div>';
+
+    /* 3 · verification set */
+    h += '<div class="card"><div class="cardhead"><h2>Verification set</h2><span class="count">6 checks · 18 sub-checks</span>'+
+      '<span class="hint">'+(failing?failing+' finding · ':'')+(pending?pending+' awaiting your review':'all resolved')+'</span></div><div style="padding:6px 15px 14px">';
+    r.checks.forEach(function(c,ci){
+      const cs = chkState(c);
+      h += '<div class="chk'+(cs[0]!=='st-pass'?' open':'')+'"><div class="chk-h" onclick="this.closest(\'.chk\').classList.toggle(\'open\')">'+
+        '<span class="idx">'+(ci+1)+'</span>'+c.n+'<span class="st '+cs[0]+'">'+cs[1]+'</span></div><div class="chk-b">';
+      c.subs.forEach(function(x,si){
+        const cls = x.s==='fail'?' failed':(x.s==='review'?' needs':'');
+        const badge = x.s==='fail'?'<span class="sx st-fail">Fail</span>':(x.s==='review'?'<span class="sx st-manual">Review</span>':'<span class="sx st-pass">Pass</span>');
+        h += '<div class="sub-r'+cls+'"><div class="sn">'+x.t+'<span class="sm">'+x.m+'</span></div>'+
+          '<div class="sr">'+x.r+'</div><div class="sb">bar: '+x.bar+'</div>'+
+          '<div style="display:flex;gap:6px;align-items:center"><span class="ref" onclick="copyRef(\''+x.ev+'\')">'+x.ev+'</span>'+badge+'</div></div>';
+      });
+      if(!closed && c.subs.some(x=>x.s==='review')){
+        h += '<div class="revbox"><input placeholder="Your review note — what you checked and what you concluded" id="note'+ci+'">'+
+          '<button class="btn primary small" onclick="recordReview(\''+r.id+'\','+ci+')">Record review</button></div>';
+      }
+      h += '</div></div>';
+    });
+    h += '</div></div>';
+
+    /* 4 · prior cycles */
+    h += '<div class="card"><div class="cardhead"><h2>Prior cycles for this agent</h2><span class="hint">what changed since the last verification</span></div><div class="audit">';
+    if(!priors.length) h += '<div style="padding:14px 0;color:var(--muted)">First verification for this agent. No prior cycles on record.</div>';
+    priors.forEach(function(p){
+      h += '<div class="audit-line"><span class="audit-time">'+p.when+'</span><span class="kind vf">'+p.v+'</span>'+
+        '<span><b>'+p.d+'</b> by '+p.who+' · '+p.note+'<span class="evlink" onclick="openRecord(\''+p.rec+'\')">'+p.rec+' →</span></span></div>';
+    });
+    h += '</div></div>';
+
+    /* 5 · guardian */
+    if(ext){
+      const g = r.guardian||{state:'not_sent'};
+      h += '<div class="guardian" id="grdBox"><h3>Guardian certification · required for the public marketplace</h3>'+
+        'Guardian runs on its own timeline. You do not wait for it: approve here and the agent publishes to the internal workspace immediately, while the Guardian request runs in parallel for the public listing.'+
+        '<div class="gtrack" id="gTrack">'+
+          '<div class="gs '+(g.state==='not_sent'?'on':'done')+'">1 · Not sent</div>'+
+          '<div class="gs '+(g.state==='running'?'on':(g.state==='done'?'done':''))+'">2 · With Guardian</div>'+
+          '<div class="gs '+(g.state==='done'?'on':'')+'">3 · Verdict</div>'+
+        '</div>'+
+        '<div id="gBody">'+guardianBody(r)+'</div>'+
+        '<div style="font-size:11.5px;color:var(--muted2);margin-top:10px">Contract simplified in this mock: one call returning pass, or fail with guidance. The live contract is <b>embedded_audit.v1</b> — findings plus a recommendation band.</div>'+
+        '</div>';
+    } else {
+      h += '<div class="card"><div class="cardhead"><h2>Guardian</h2><span class="hint">not in this path</span></div>'+
+        '<div style="padding:14px 20px;font-size:13px;color:var(--muted)">This version targets the <b>internal workspace</b>. Guardian certification applies only to public-marketplace listings — your approval publishes it directly.</div></div>';
+    }
+
+    /* 5b · findings raised on this record */
+    if((r.findings||[]).length){
+      h += '<div class="card"><div class="cardhead"><h2>Findings raised</h2><span class="count">'+r.findings.length+'</span>'+
+        '<span class="hint">sent to '+r.dev+' · each carries the failing check, the evidence and the re-run path</span></div>';
+      r.findings.forEach(function(f){
+        h += '<div class="art open"><div class="art-h"><span class="an">'+f.id+' · '+f.cat+'</span>'+
+          '<span class="av">'+f.chk+'</span>'+
+          '<span class="sx '+(f.sev==='Low'?'st-pass':(f.sev==='Medium'?'st-manual':'st-fail'))+'">'+f.sev+'</span>'+
+          '<span class="ref" onclick="copyRef(\''+f.ev+'\')">'+f.ev+'</span></div>'+
+          '<div class="art-b"><table class="kvtab">'+
+          '<tr><td>Source</td><td>'+f.src+' · raised on '+f.ver+'</td></tr>'+
+          '<tr><td>Detail</td><td>'+f.note+'</td></tr>'+
+          '<tr><td>Re-run path</td><td><b>'+f.path+'</b></td></tr></table></div></div>';
+      });
+      h += '</div>';
+    }
+
+    /* 6 · decision */
+    const canDecide = failing===0 && pending===0;
+    if(closed){
+      h += '<div class="card"><div class="cardhead"><h2>Decision</h2><span class="hint">final · recorded '+r.decidedOn+'</span></div>'+
+        '<div style="padding:16px 20px;font-size:13px"><span class="rstate '+(DECCLS[r.decision]||'rs-ok')+'">'+r.decision+'</span>'+
+        '<span style="margin-left:10px;color:var(--muted)">by '+r.decidedBy+' · '+r.decidedOn+
+        (r.target==='external'?' · Guardian certification passed':'')+'</span></div></div>';
+    } else {
+    h += '<div class="card"><div class="cardhead"><h2>Decision</h2><span class="hint">'+
+      (canDecide?'all checks resolved — every decision available':'Reject and Request changes are always available; approval needs every check resolved')+'</span></div>'+
+      '<div style="padding:12px 20px 0;font-size:12px;color:var(--muted)">'+
+        (r.dev===whoActs()
+          ? '<b style="color:var(--red)">You authored this submission.</b> Self-verification is blocked for public listings and recorded as a warning for internal ones.'
+          : 'Separation of duties satisfied — submitted by <b>'+r.dev+'</b>, verified by <b>'+whoActs()+'</b>. The audit records which role acted.')+
+        '</div>'+
+      '<div class="decide">'+
+      '<button class="btn primary" '+(canDecide?'':'disabled style="opacity:.45;cursor:not-allowed"')+' onclick="decide(\''+r.id+'\',\'approve\')">Approve &amp; publish'+(ext?' to internal + send to Guardian':' to workspace')+'</button>'+
+      '<button class="btn" '+(canDecide?'':'disabled style="opacity:.45;cursor:not-allowed"')+' onclick="openComposer(\''+r.id+'\',\'cond\')">Approve with conditions</button>'+
+      '<button class="btn" onclick="openComposer(\''+r.id+'\',\'changes\')">Request changes</button>'+
+      '<button class="btn danger" onclick="openComposer(\''+r.id+'\',\'reject\')">Reject</button>'+
+      '</div>'+
+      '<div class="composer" id="comp">'+
+        '<h4 id="compTitle">Send a finding to the developer</h4>'+
+        '<div class="c2">'+
+          '<div class="cfield"><label>Category</label><select id="cCat">'+
+            r.checks.map(function(c,i){return '<option>'+(i+1)+' · '+c.n.replace(/&amp;/g,"&")+'</option>';}).join('')+'</select></div>'+
+          '<div class="cfield"><label>Severity</label><select id="cSev"><option>Critical</option><option selected>High</option><option>Medium</option><option>Low</option></select></div>'+
+        '</div>'+
+        '<div class="cfield"><label>Failing check</label><input id="cChk" value="'+(failing?'Egress · observed calls ⊆ approved allowlist':'')+'"></div>'+
+        '<div class="cfield"><label>Evidence reference</label><input id="cEv" value="'+(failing?r.checks[3].subs[0].ev:'')+'"></div>'+
+        '<div class="cfield"><label>Re-run path <span class="creq">· required</span></label><textarea id="cPath" placeholder="What the developer must change, and which check re-runs after they resubmit">'+(failing?'Declare api.symptom-lookup.io in the manifest egress allowlist, or remove the call. Bump the version and resubmit — only the egress check re-runs.':'')+'</textarea></div>'+
+        '<div class="cfield"><label>Note to the developer</label><textarea id="cNote" placeholder="Plain-language context"></textarea></div>'+
+        '<div style="display:flex;gap:8px"><button class="btn primary" onclick="sendFinding(\''+r.id+'\')">Send to developer</button>'+
+        '<button class="btn" onclick="document.getElementById(\'comp\').classList.remove(\'on\')">Cancel</button></div>'+
+      '</div></div>';
+
+    }
+
+    /* 7 · audit strip */
+    h += '<div class="card"><div class="cardhead"><h2>Record trail</h2><span class="hint">actor · role · time · outcome on every action</span></div>'+
+      '<div class="audit" id="recTrail">';
+    r.audit.slice().reverse().forEach(function(a){
+      h += '<div class="audit-line"><span class="audit-time">'+a.t+'</span><span class="kind vf">'+a.r.toUpperCase()+'</span><span><b>'+a.a+'</b> '+a.o+'</span></div>';
+    });
+    h += '</div></div>';
+    h += '<div class="foot"><span>This record is immutable once closed · it outlives the version it describes</span><span>Everything here also lands in Governance &amp; Audit</span></div>';
+    return h;
+  }
+
+  function guardianBody(r){
+    const g = r.guardian||{state:'not_sent'};
+    if(g.state==='not_sent') return '<button class="btn primary" id="gBtn" onclick="sendGuardian(\''+r.id+'\')">Send to Guardian now</button>'+
+      '<span style="font-size:12px;color:var(--muted);margin-left:10px">Or approve first — approval sends it automatically.</span>';
+    if(g.state==='running') return '<b>With Guardian since '+g.sent+'.</b> Typical turnaround is under an hour. The internal listing is already live; the public listing waits on this verdict.';
+    if(g.state==='done' && g.pass) return '<div style="color:var(--green-dark);font-weight:700;margin-bottom:6px">Guardian returned: passed'+(g.cycle?' · cycle '+g.cycle:'')+'</div>'+
+      'Certification is complete. <b>Publishing to the marketplace is now unlocked for '+r.dev+'</b> — the developer performs the release, because both gates it depends on have already been cleared: your approval and Guardian\'s certification. '+
+      'The internal listing has been serving throughout.'+
+      '<div style="margin-top:10px"><button class="btn primary" onclick="certifyDone(\''+r.id+'\')">Notify the developer &amp; close the record</button></div>';
+    return '<div style="color:var(--red);font-weight:700;margin-bottom:6px">Guardian returned: failed · with guidance'+(g.cycle?' · cycle '+g.cycle:'')+'</div>'+
+      '<ul style="margin:0 0 10px 18px"><li>The external model endpoint used for document summarisation is not on the certified list for cross-tenant offerings. <i>Guidance: switch to a certified in-Kingdom endpoint, or request certification for this provider.</i></li>'+
+      '<li>The listing claims "real-time case status" but the evidence bundle contains no evaluation covering that path. <i>Guidance: add an evaluation case for the status path, or remove the claim from the listing.</i></li></ul>'+
+      '<button class="btn primary" onclick="forwardGuardian(\''+r.id+'\')">Forward guidance to the developer</button>'+
+      '<div style="font-size:11.5px;color:var(--muted2);margin-top:8px">Feedback moves one level down: Guardian → you → developer. The internal listing stays live throughout.</div>';
+  }
+
+  /* ---------- queue ---------- */
+  let vqf='all';
+  function vqFilter(el){ document.querySelectorAll('[data-vf]').forEach(c=>c.classList.remove('on')); el.classList.add('on'); vqf=el.dataset.vf; renderQueue(); }
+  function renderQueue(){
+    const box=document.getElementById('vqRows'); if(!box) return;
+    const ids=Object.keys(VRECORDS).filter(function(k){
+      const r=VRECORDS[k]; if(r.state!=='in_review') return false;
+      if(vqf==='internal') return r.target==='internal';
+      if(vqf==='external') return r.target==='external';
+      if(vqf==='flag') return r.checks.some(c=>c.subs.some(x=>x.s==='fail'));
+      return true;
+    });
+    box.innerHTML = ids.map(function(k){
+      const r=VRECORDS[k];
+      const fail=r.checks.some(c=>c.subs.some(x=>x.s==='fail'));
+      const pend=r.checks.some(c=>c.subs.some(x=>x.s==='review'));
+      const late=r.age>=CFG.sla;
+      return '<div class="req"><div class="avatar">'+r.code+'</div><div class="body">'+
+        '<div class="who">'+r.agent+' · '+r.ver+' &nbsp;<span class="chip type">'+(r.target==='external'?'Public marketplace':'Internal workspace')+'</span></div>'+
+        '<div class="what">Submitted by <b>'+r.dev+'</b>. Evaluation <span style="font-weight:700;color:var(--green-dark)">'+r.quality.score+'%</span> against the tenant bar of '+CFG.bar+'%. '+
+        (fail?'<b style="color:var(--red)">One check is failing — a finding is ready to send.</b>':(pend?'Automated checks are resolved; three behaviour reviews are waiting on you.':'Every check has passed and is ready for your decision.'))+'</div>'+
+        '<div class="meta">'+
+          '<span class="chip'+(late?' age-warn':'')+'">Waiting '+r.waited+(late?' · past SLA':'')+'</span>'+
+          '<span class="chip">Quality '+r.quality.score+'% · bar '+CFG.bar+'%</span>'+
+          '<span class="chip">Evidence 8 / 8</span>'+
+          (fail?'<span class="chip age-warn">1 finding</span>':'')+
+          (pend?'<span class="chip">3 reviews pending</span>':'')+
+        '</div></div>'+
+        '<div class="actions"><button class="btn primary" onclick="openRecord(\''+k+'\')">Open record</button></div></div>';
+    }).join('') || '';
+    const anyOther=Object.keys(VRECORDS).some(function(k){ const r=VRECORDS[k];
+      return r.state==='returned'||r.state==='rejected'||(r.target==='external'&&r.state==='approved'); });
+    document.getElementById('vqEmpty').style.display = (ids.length||anyOther)?'none':'block';
+
+    const grd=Object.keys(VRECORDS).filter(function(k){ const r=VRECORDS[k];
+      return r.target==='external' && r.state==='approved' && r.guardian; });
+    const gbox=document.getElementById('vqGuardian'), gcard=document.getElementById('guardianCard');
+    if(gbox&&gcard){
+      gcard.style.display = grd.length?'block':'none';
+      document.getElementById('grdCount').textContent=grd.length;
+      const gs=document.getElementById('vqGrd'); if(gs) gs.textContent=grd.length;
+      gbox.innerHTML = grd.map(function(k){
+        const r=VRECORDS[k], g=r.guardian||{};
+        const label = g.state==='running' ? 'Certification running'
+          : (g.state==='done' && g.pass) ? 'Certified · developer may publish'
+          : (g.state==='done') ? 'Returned guidance · needs forwarding' : 'Not sent';
+        const cls = (g.state==='done' && !g.pass) ? 'age-warn' : '';
+        return '<div class="req"><div class="avatar">'+r.code+'</div><div class="body">'+
+          '<div class="who">'+r.agent+' · '+r.ver+' &nbsp;<span class="chip type">Public marketplace</span></div>'+
+          '<div class="what"><b>Live in the internal workspace already.</b> You approved it, so it is serving; only the public listing is waiting on Guardian'+
+          (g.cycle?' (cycle '+g.cycle+')':'')+'.</div>'+
+          '<div class="meta"><span class="chip '+cls+'">'+label+'</span><span class="chip">Record '+r.id+'</span></div>'+
+          '</div><div class="actions"><button class="btn primary small" onclick="openRecord(\''+k+'\')">Open record</button></div></div>';
+      }).join('');
+    }
+
+    const ret=Object.keys(VRECORDS).filter(k=>VRECORDS[k].state==='returned'||VRECORDS[k].state==='rejected');
+    const rbox=document.getElementById('vqReturned'), rcard=document.getElementById('returnedCard');
+    if(rbox&&rcard){
+      rcard.style.display = ret.length?'block':'none';
+      document.getElementById('retCount').textContent=ret.length;
+      rbox.innerHTML = ret.map(function(k){
+        const r=VRECORDS[k];
+        const rejected = r.state==='rejected';
+        return '<div class="req"><div class="avatar">'+r.code+'</div><div class="body">'+
+          '<div class="who">'+r.agent+' · '+r.ver+' &nbsp;<span class="rstate '+(rejected?'rs-rej':'rs-chg')+'">'+(rejected?'Rejected':'Changes requested')+'</span></div>'+
+          '<div class="what">Finding sent to <b>'+r.dev+'</b> with the failing check, the evidence and the re-run path. '+
+          'Nothing is waiting on you until they resubmit.</div>'+
+          '<div class="meta"><span class="chip">Record '+r.id+'</span><span class="chip">Target '+(r.target==='external'?'public':'internal')+'</span></div>'+
+          '</div><div class="actions">'+
+          '<button class="btn small" onclick="openRecord(\''+k+'\')">Open record</button>'+
+          '<button class="btn primary small" onclick="simulateResubmit(\''+k+'\')">Simulate resubmission</button>'+
+          '</div></div>';
+      }).join('');
+    }
+    const open=Object.keys(VRECORDS).filter(k=>VRECORDS[k].state==='in_review').length;
+    document.getElementById('vqCount').textContent=open;
+    document.getElementById('vqStat').textContent=open;
+    const nv=document.getElementById('navVerifyCount'); nv.textContent=open; nv.style.display=open?'':'none';
+  }
+
+  /* ---------- actions ---------- */
+  function copyRef(t){ navigator.clipboard&&navigator.clipboard.writeText(t); showToast('Reference '+t+' copied'); }
+  let FID=104; function nextFindingId(){ return 'VF-'+(++FID); }
+  /* Guardian re-audits in the same thread: the first cycle returns guidance,
+     the cycle after the developer's fix passes. Both outcomes are demoable. */
+  const GRD_CYCLES={};
+  function guardianVerdict(agent){ const c=(GRD_CYCLES[agent]||0)+1; GRD_CYCLES[agent]=c; return {cycle:c, pass:c>1}; }
+  function pushAudit(r, actor, role, out){ r.audit.push({t:nowStr(), a:actor, r:role, o:out}); }
+  function nowStr(){ const d=new Date(); return 'Today '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+  function recordReview(id, ci){
+    const r=VRECORDS[id];
+    if(!r){ showToast('That record is closed — reopen it from Verification Records'); return; } const note=(document.getElementById('note'+ci)||{}).value||'';
+    r.checks[ci].subs.forEach(function(x){ if(x.s==='review'){ x.s='pass'; x.r=x.r+' · reviewed'; } });
+    pushAudit(r, whoActs(), roleNow(), 'recorded the behaviour and listing review'+(note?' — "'+note+'"':''));
+    addAudit(whoActs(), 'recorded a manual review on '+r.agent+' '+r.ver+' ('+r.id+')', 'vf');
+    openRecord(id); showToast('Review recorded · decision unlocked when every check is resolved');
+  }
+  function openComposer(id, kind){
+    const c=document.getElementById('comp'); c.classList.add('on');
+    document.getElementById('compTitle').textContent = kind==='reject'
+      ? 'Reject this version — the developer receives this finding'
+      : kind==='cond'
+      ? 'Attach a condition — it publishes now, and this must be cleared in the next version'
+      : 'Request changes — the developer receives this finding';
+    var sev=document.getElementById('cSev'); if(sev) sev.value = (kind==='cond')?'Low':'High';
+    var pl=document.getElementById('cPath');
+    if(pl) pl.placeholder = (kind==='cond')
+      ? 'What must be cleared in the next version — non-blocking today'
+      : 'What the developer must change, and which check re-runs after they resubmit';
+    c.dataset.kind=kind; c.scrollIntoView({block:'center'});
+  }
+  function sendFinding(id){
+    if(!VRECORDS[id]){ showToast('That record is closed — a decision has already been recorded'); closeRecord(); return; }
+    const path=document.getElementById('cPath').value.trim();
+    if(!path){ showToast('A re-run path is required — the developer must know how to fix and retest'); document.getElementById('cPath').focus(); return; }
+    const r=VRECORDS[id]; const kind=document.getElementById('comp').dataset.kind;
+    const sev=document.getElementById('cSev').value, cat=document.getElementById('cCat').value;
+    if(kind==='cond'){
+      /* non-blocking: it publishes now and the condition travels with the record */
+      const cid=nextFindingId();
+      r.findings=(r.findings||[]).concat([{id:cid, src:'Verifier', cat:cat.replace(/^\d+ · /,''), sev:sev,
+        state:'condition', ver:r.ver,
+        chk:(document.getElementById('cChk').value||'see the verification set'),
+        ev:(document.getElementById('cEv').value||'—'), path:path,
+        note:(document.getElementById('cNote').value||'Attached as a condition — non-blocking for this version.')}]);
+      pushAudit(r, whoActs(), roleNow(), 'approved '+r.ver+' with conditions · '+cid+' ('+sev+', '+cat+') attached as non-blocking');
+      document.getElementById('comp').classList.remove('on');
+      decide(id,'cond');
+      return;
+    }
+    r.state = kind==='reject'?'rejected':'returned';
+    const fid=nextFindingId();
+    r.findings=(r.findings||[]).concat([{id:fid, src:'Verifier', cat:cat.replace(/^\d+ · /,''), sev:sev, state:'open', ver:r.ver,
+      chk:(document.getElementById('cChk').value||'see the verification set'),
+      ev:(document.getElementById('cEv').value||'—'), path:path,
+      note:(document.getElementById('cNote').value||'Raised by the verifier against the tenant verification policy.')}]);
+    pushAudit(r, whoActs(), roleNow(), (kind==='reject'?'rejected ':'requested changes on ')+r.ver+' · finding '+fid+' ('+sev+', '+cat+') sent with evidence and a re-run path');
+    addAudit(whoActs(), (kind==='reject'?'rejected ':'requested changes on ')+r.agent+' '+r.ver+' · finding sent to '+r.dev+' with the failing check, evidence and re-run path', 'vf');
+    refreshAgentRow(r.agent, kind==='reject'?'Rejected':'Changes requested','l-changes',r.id,'returned · '+whoActs().split(' ')[0]);
+    showToast(kind==='reject'?'Rejected · finding is now actionable in the developer portal':'Changes requested · finding is now actionable in the developer portal');
+    syncOut(); renderQueue(); renderOverview(); closeRecord();
+  }
+  function decide(id, kind){
+    const r=VRECORDS[id];
+    if(!r){ showToast('That record is closed — a decision has already been recorded'); closeRecord(); return; }
+    const ext=r.target==='external';
+    r.state='approved';
+    if(kind==='cond'){
+      pushAudit(r, whoActs(), roleNow(), 'approved '+r.ver+' with conditions · 1 low-severity finding attached, non-blocking · published to the internal workspace');
+      addAudit(whoActs(), 'conditionally approved '+r.agent+' '+r.ver+' · published to the internal workspace · condition recorded on '+r.id, 'vf');
+      showToast('Approved with conditions · published to the internal workspace');
+    } else {
+      pushAudit(r, whoActs(), roleNow(), 'approved '+r.ver+' · published to the internal workspace');
+      addAudit(whoActs(), 'approved '+r.agent+' '+r.ver+' · published to the internal workspace · record '+r.id, 'vf');
+      showToast(ext?'Approved · live internally, Guardian request raised in parallel':'Approved · published to the internal workspace');
+    }
+    if(ext){
+      r.guardian={state:'running', sent:nowStr()};
+      pushAudit(r,'Platform','system','raised the Guardian certification request in parallel · the internal listing is already live');
+      addAudit('Platform','Guardian certification requested for '+r.agent+' '+r.ver+' · runs in parallel on Guardian’s timeline','vf');
+      setTimeout(function(){
+        const v=guardianVerdict(r.agent);
+        r.guardian={state:'done', pass:v.pass, cycle:v.cycle};
+        if(v.pass){
+          pushAudit(r,'Guardian','system','returned passed on cycle '+v.cycle+' · public-marketplace listing cleared');
+          addAudit('Guardian','returned passed on '+r.agent+' '+r.ver+' · public listing cleared · record '+r.id,'vf');
+          showToast('Guardian passed · the public listing is cleared to go live');
+          /* stays approved — it is already live internally; the pending action is Guardian-specific */
+        } else {
+          pushAudit(r,'Guardian','system','returned failed with guidance on cycle '+v.cycle+' · 2 items routed to the verifier');
+          addAudit('Guardian','returned failed with guidance on '+r.agent+' '+r.ver+' · routed to the verifier','vf');
+          showToast('Guardian returned: failed with guidance · open the record');
+        }
+        renderQueue();
+      }, 3200);
+    }
+    if(ext){
+      /* the public listing still needs Guardian — the record stays open until that verdict lands */
+      renderRecords(); renderOverview(); closeRecord();
+    } else {
+      CLOSED_LEDGER.unshift([r.id,r.code,r.agent,r.ver,r.target,r.dev,r.quality.score,
+        kind==='cond'?'Approved with conditions':'Approved', whoActs(),'Today']);
+      CLOSED[r.id]=sealRecord(r, CLOSED_LEDGER[0]); rebuildClosedList();
+      delete VRECORDS[r.id];
+      refreshAgentRow(r.agent,'Published','l-pub',r.id,(kind==='cond'?'conditions · ':'')+whoActs().split(' ')[0]);
+      syncOut(); renderQueue(); renderRecords(); renderOverview(); closeRecord();
+    }
+  }
+  function sendGuardian(id){
+    const r=VRECORDS[id]; if(!r){ showToast('That record is closed'); return; } r.guardian={state:'running', sent:nowStr()};
+    pushAudit(r, whoActs(), roleNow(), 'sent the evidence package to Guardian for public-marketplace certification');
+    addAudit(whoActs(),'sent '+r.agent+' '+r.ver+' to Guardian for certification','vf');
+    openRecord(id); showToast('Sent to Guardian · they review on their own timeline');
+    setTimeout(function(){
+      const v=guardianVerdict(r.agent);
+      r.guardian={state:'done', pass:v.pass, cycle:v.cycle};
+      pushAudit(r,'Guardian','system', v.pass
+        ? 'returned passed on cycle '+v.cycle+' · public-marketplace listing cleared'
+        : 'returned failed with guidance on cycle '+v.cycle+' · 2 items');
+      addAudit('Guardian', (v.pass?'returned passed on ':'returned failed with guidance on ')+r.agent+' '+r.ver+' · '+(v.pass?'public listing cleared':'routed to the verifier'),'vf');
+      if(document.getElementById('vqRecord').style.display!=='none') openRecord(id);
+      showToast(v.pass?'Guardian passed · public listing cleared':'Guardian returned: failed with guidance');
+    }, 3000);
+  }
+  function certifyDone(id){
+    const r=VRECORDS[id]; if(!r){ showToast('That record is closed'); return; }
+    r.state='approved'; r.certified=true;
+    pushAudit(r, whoActs(), roleNow(), 'recorded Guardian certification for '+r.ver+' · publishing to the marketplace unlocked for '+r.dev+' · record closed');
+    addAudit(whoActs(), 'Guardian certification recorded for '+r.agent+' '+r.ver+' · marketplace publishing unlocked for '+r.dev+' · record '+r.id, 'vf');
+    CLOSED_LEDGER.unshift([r.id,r.code,r.agent,r.ver,r.target,r.dev,r.quality.score,'Approved',whoActs(),'Today']);
+    CLOSED[r.id]=sealRecord(r, CLOSED_LEDGER[0]); rebuildClosedList();
+    delete VRECORDS[id];
+    refreshAgentRow(r.agent,'Certified','l-verify',r.id,'certified · '+whoActs().split(' ')[0]);
+    showToast('Certification recorded · the developer can now publish to the marketplace');
+    syncOut(); renderQueue(); renderRecords(); renderOverview(); closeRecord();
+  }
+  const GRD_FINDINGS=[
+    {id:'GRD-201', src:'Guardian', cat:'Certified endpoints', sev:'High', state:'open',
+     chk:'External model endpoint on the certified list for cross-tenant offerings', ev:'grd_cyc_88f2',
+     path:'Switch document summarisation to a certified in-Kingdom endpoint, or request certification for this provider. Bump the version and resubmit — Guardian re-runs only this item.',
+     note:'Guidance from Guardian, forwarded by the verifier. The internal listing is unaffected and stays live.'},
+    {id:'GRD-202', src:'Guardian', cat:'Listing integrity', sev:'High', state:'open',
+     chk:'Every claim in the listing is covered by an evaluation', ev:'listing_diff_21',
+     path:'Add an evaluation case covering the real-time case-status path, or remove that claim from the listing copy. Re-run the quality suite and resubmit.',
+     note:'The listing claims "real-time case status" but no evaluation covers that path.'}];
+  function forwardGuardian(id){
+    const r=VRECORDS[id]; if(!r){ showToast('That record is closed'); return; }
+    r.state='returned';
+    r.findings=(r.findings||[]).concat(GRD_FINDINGS.map(function(f){ return Object.assign({},f,{ver:r.ver}); }));
+    pushAudit(r, whoActs(), roleNow(), 'forwarded Guardian’s two guidance items to '+r.dev+' as findings with re-run paths');
+    addAudit(whoActs(),'forwarded Guardian guidance to '+r.dev+' · '+r.agent+' '+r.ver+' returns to the developer loop · internal listing stays live','vf');
+    showToast('Guidance forwarded · actionable in the developer portal · internal listing stays live');
+    syncOut(); renderQueue(); renderOverview(); closeRecord();
+  }
+
+  /* record ids are issued once and never reused, whatever the queue is doing */
+  let REC_SEQ=2400;
+  function bumpVer(v){ const m=v.match(/^v(\d+)\.(\d+)$/); return m?('v'+m[1]+'.'+(+m[2]+1)):(v+'a'); }
+  function simulateResubmit(oldId){
+    const o=VRECORDS[oldId];
+    if(!o){ showToast('That record is closed — nothing to resubmit'); return; }
+    const newId='vr_'+(++REC_SEQ);
+    const nv=bumpVer(o.ver);
+    const fresh=JSON.parse(JSON.stringify(o));
+    fresh.id=newId; fresh.ver=nv; fresh.state='in_review';
+    fresh.submitted=nowStr(); fresh.waited='just now'; fresh.age=0; fresh.holder=VERIFIER_NAME();
+    fresh.quality.prev=o.quality.score; fresh.quality.score=Math.min(99,o.quality.score+3);
+    /* the developer fixed the failing check; everything else is carried over unchanged */
+    let fixed=[];
+    fresh.checks.forEach(function(c,ci){ c.subs.forEach(function(x,si){
+      if(x.s==='fail'){ x.s='pass'; x.r=x.r.replace(/7 observed · 6 approved · 1 undeclared[^·]*/,'6 observed · 6 approved · 0 undeclared'); fixed.push(c.n); }
+    });});
+    fresh.audit=[{t:nowStr(), a:o.dev, r:'developer', o:'resubmitted as '+nv+' after clearing '+(fixed.length||1)+' finding · only the failing check re-ran'},
+                 {t:nowStr(), a:'Platform', r:'system', o:'evaluation '+fresh.quality.score+'% cleared the tenant bar · new record '+newId+' opened, evidence bundle re-sealed'}];
+    fresh.prior='auto';
+    VRECORDS[newId]=fresh;
+    /* close out the old cycle */
+    CLOSED_LEDGER.unshift([oldId,o.code,o.agent,o.ver,o.target,o.dev,o.quality.score,
+      o.state==='rejected'?'Rejected':'Changes requested', VERIFIER_NAME(), 'Today']);
+    CLOSED[oldId]=sealRecord(o, CLOSED_LEDGER[0]); rebuildClosedList();
+    delete VRECORDS[oldId];
+    addAudit(o.dev, 'resubmitted '+o.agent+' as '+nv+' after clearing the finding · new record '+newId+' is in the verification queue', 'vf');
+    refreshAgentRow(o.agent,'In verification','l-verify',newId,'open · '+VERIFIER_NAME().split(' ')[0]);
+    showToast(o.agent+' '+nv+' resubmitted · back in your queue, only the failing check re-ran');
+    syncOut(); renderQueue(); renderRecords(); renderOverview();
+  }
+  function VERIFIER_NAME(){ return 'Yash Chindala'; }
+  function resetDemo(){ location.reload(); }
+
+  /* ---------- records registry ---------- */
+  let vrf='all';
+  function vrFilter(el){ document.querySelectorAll('[data-vr]').forEach(c=>c.classList.remove('on')); el.classList.add('on'); vrf=el.dataset.vr; renderRecords(); }
+  function renderRecords(){
+    const b=document.getElementById('vrBody'); if(!b) return;
+    const open=Object.keys(VRECORDS).filter(k=>VRECORDS[k].state==='in_review').map(function(k){
+      const r=VRECORDS[k]; return {id:r.id, agent:r.agent+' '+r.ver, target:r.target, q:r.quality.score, d:'In review', who:r.holder, when:'—', cls:'rs-rev', live:k};
+    });
+    let rows=open.concat(VCLOSED);
+    if(vrf==='open') rows=rows.filter(r=>r.d==='In review');
+    if(vrf==='approved') rows=rows.filter(r=>r.d.indexOf('Approved')===0);
+    if(vrf==='returned') rows=rows.filter(r=>r.d==='Changes requested'||r.d==='Rejected');
+    b.innerHTML = rows.map(function(r){
+      return '<tr><td><span class="ref" onclick="copyRef(\''+r.id+'\')">'+r.id+'</span></td>'+
+        '<td><div class="aname">'+r.agent+'</div></td>'+
+        '<td><span class="chip">'+(r.target==='external'?'Public':'Internal')+'</span></td>'+
+        '<td><span class="trust">'+r.q+'</span></td>'+
+        '<td><span class="rstate '+r.cls+'">'+r.d+'</span></td>'+
+        '<td class="num">'+r.who+'</td><td class="num">'+r.when+'</td>'+
+        '<td><button class="btn small" onclick="gotoRecord(\''+(r.live||r.id)+'\')">'+(r.live?'Open':'View')+'</button></td></tr>';
+    }).join('');
+    const t=document.getElementById('vrTotal'); if(t) t.textContent=rows.length;
+  }
+  function gotoRecord(k){ document.querySelector('.navitem[data-s="verification"]').click(); openRecord(k); }
+
+  /* ---------- policy ---------- */
+  const POLCHECKS=[['Access &amp; least privilege','Tools, scopes and secrets match the manifest'],
+    ['Prompt-injection &amp; misuse resistance','Direct, indirect, extraction and jailbreak suites'],
+    ['Data protection &amp; residency','Redaction, isolation and in-Kingdom execution'],
+    ['Egress &amp; network','Observed calls against the approved allowlist'],
+    ['Code &amp; supply chain','Dependency CVEs, static analysis, manifest match, licences'],
+    ['Behaviour &amp; listing integrity','Human handoff, scope creep, refusal behaviour — manual review']];
+  function renderPolicy(){
+    const b=document.getElementById('polChecks'); if(!b) return;
+    b.innerHTML = POLCHECKS.map(function(p,i){
+      return '<div class="polrow"><div class="pn">'+(i+1)+' · '+p[0]+'<div class="pd">'+p[1]+'</div></div>'+
+        '<select class="sel" onchange="showToast(\''+p[0].replace(/&amp;/g,"and")+' set to \'+this.value)"><option>Required</option><option>Advisory</option></select>'+
+        '<div class="sw" onclick="togglePol(this,\''+p[0].replace(/&amp;/g,"and")+'\')"><i></i></div></div>';
+    }).join('');
+  }
+  function togglePol(el,name){
+    el.classList.toggle('off');
+    const on=!el.classList.contains('off');
+    showToast(name+(on?' enabled':' disabled')+' · applies to new submissions');
+    addAudit('Tirthankar', name+(on?' enabled':' disabled')+' in the verification policy', 'ap');
+  }
+  function commitSla(v){ CFG.sla=+v; addAudit('Tirthankar','set the verification SLA to '+v+' business day'+(v>1?'s':''),'ap'); showToast('SLA set to '+v+' business day'+(v>1?'s':'')); renderQueue(); }
+
+  /* ---------- members ---------- */
+  function openInvite(){ document.getElementById('inviteBox').classList.add('on'); invRoleNote(); }
+  function invRoleNote(){
+    const r=document.getElementById('invRole').value;
+    const m={'Verifier':'This login may open the verification queue, run the tenant policy, decide, and send to Guardian. It cannot change quotas, policy or members.',
+      'Developer':'This login may build, evaluate and submit agents. It can never certify or publish.',
+      'Tenant Administrator':'Full control of the tenant, including every verifier action. Grant sparingly.'};
+    document.getElementById('invNote').textContent=m[r];
+  }
+  function createLogin(){
+    const n=document.getElementById('invName').value.trim(), e=document.getElementById('invEmail').value.trim(), r=document.getElementById('invRole').value;
+    if(!n||!e){ showToast('Name and email are required'); return; }
+    const body=document.getElementById('memBody');
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><div class="aname">'+n+'</div><div class="aver">'+e+'</div></td>'+
+      '<td><span class="chip'+(r!=='Developer'?' type':'')+'">'+r+'</span></td>'+
+      '<td class="num" style="color:var(--muted);font-size:12px">'+(r==='Verifier'?'Verification queue, records, decisions, Guardian':(r==='Developer'?'Build, evaluate, submit · no publish, no certify':'Everything, including every verifier action'))+'</td>'+
+      '<td><span class="c-att">Invited</span></td><td class="num">—</td><td></td>';
+    body.appendChild(tr);
+    document.getElementById('memCount').textContent=body.children.length;
+    document.getElementById('inviteBox').classList.remove('on');
+    document.getElementById('invName').value=''; document.getElementById('invEmail').value='';
+    addAudit('Tirthankar','created a login for '+n+' with the '+r+' role · invitation sent','ap');
+    showToast(r+' login created for '+n+' · recorded in the audit trail');
+  }
+
+  function roleNow(){ return document.body.dataset.role==='verifier'?'verifier':'admin (verifier grant)'; }
+
+  /* ---------- templates: developers request, the tenant admin publishes ---------- */
+  const TPLREQ={
+    'TR-2481':{id:'TR-2481', name:'Custom GPU runtime profile', type:'New template', dev:'Ritwik Chakradhar',
+      waited:'2 days', parks:'Permit Application Agent', reason:'No approved template satisfies the declared GPU runtime profile.',
+      spec:'python 3.11 · 4 vCPU · 8Gi · GPU A10 · 8 runtime blocks', ceiling:'within the platform compute ceiling'},
+    'TR-2488':{id:'TR-2488', name:'Advance-python-sandbox · 16Gi', type:'Extension', dev:'Layla Aboud',
+      waited:'1 day', parks:null, reason:'Document-heavy agent exceeds 8Gi during evaluation runs.',
+      spec:'python 3.11 · 4 vCPU · 16Gi · 8 runtime blocks', ceiling:'within the platform compute ceiling'}
+  };
+  function renderTemplates(){
+    const box=document.getElementById('tplRequests'); if(!box) return;
+    const ids=Object.keys(TPLREQ);
+    box.innerHTML = ids.map(function(k){
+      const r=TPLREQ[k];
+      return '<div class="req" id="tpl_'+k+'"><div class="avatar">'+r.dev.split(' ').map(x=>x[0]).join('')+'</div><div class="body">'+
+        '<div class="who">'+r.name+' &nbsp;<span class="chip type">'+r.type+'</span></div>'+
+        '<div class="what">Requested by <b>'+r.dev+'</b>. '+r.reason+
+        (r.parks?' <b style="color:var(--amber)">'+r.parks+' is parked until you decide.</b>':' Nothing is parked on this one.')+'</div>'+
+        '<div class="meta"><span class="chip'+(r.parks?' age-warn':'')+'">Waiting '+r.waited+'</span>'+
+        '<span class="chip">Ref '+r.id+'</span><span class="chip">'+r.spec+'</span>'+
+        '<span class="chip">'+r.ceiling+'</span></div></div>'+
+        '<div class="actions">'+
+        '<button class="btn primary small" onclick="approveTemplate(null,\''+r.id+'\',\''+r.name.replace(/'/g,"")+'\')">Approve &amp; publish</button>'+
+        '<button class="btn danger small" onclick="rejectTemplate(\''+r.id+'\')">Reject</button>'+
+        '</div></div>';
+    }).join('');
+    const n=ids.length;
+    ['tplReqCount','tplPending','navTplCount'].forEach(function(x){ const e=document.getElementById(x); if(e) e.textContent=n; });
+    const nav=document.getElementById('navTplCount'); if(nav) nav.style.display=n?'':'none';
+    const empty=document.getElementById('tplReqEmpty'); if(empty) empty.style.display=n?'none':'block';
+    const parked=ids.filter(k=>TPLREQ[k].parks).length;
+    const pn=document.getElementById('tplParkedNote');
+    if(pn){ pn.textContent = parked? parked+' agent parked' : 'nothing parked'; pn.className = parked?'warn':'ok'; }
+  }
+  function openTplReview(id){
+    const r=TPLREQ[id]; if(!r){ showToast('That request is already decided'); return; }
+    document.querySelector('.navitem[data-s="templates"]').click();
+    showToast(r.id+' · '+r.spec+(r.parks?' · parks '+r.parks:''));
+  }
+  function addTplFeed(html, kind){
+    const f=document.getElementById('tplFeed'); if(!f) return;
+    const d=document.createElement('div'); d.className='audit-line new';
+    d.innerHTML='<span class="audit-time">Today</span><span class="kind '+(kind||'ap')+'">'+(kind==='rb'?'REJECTED':'APPROVED')+'</span><span>'+html+'</span>';
+    f.insertBefore(d, f.firstChild);
+  }
+  function approveTemplate(rowId, id, name){
+    const r=TPLREQ[id];
+    if(!r){ showToast('That request is already decided'); return; }
+    /* publish it into the catalogue — this is what makes it matchable in Resolve */
+    const body=document.getElementById('tplBody');
+    if(body){
+      const tr=document.createElement('tr');
+      const parts=r.spec.split(' · ');
+      tr.innerHTML='<td><div class="aname">'+r.name+'</div><div class="aver">v1.0.0 · just published</div></td>'+
+        '<td>'+(parts[0]||'python 3.11')+'</td><td>'+(parts[1]||'')+' '+(parts[2]||'')+'</td>'+
+        '<td class="num">8</td><td><span class="chip">Tenant</span></td><td><span class="c-cert">Published</span></td>';
+      body.appendChild(tr);
+      const c=document.getElementById('tplCount'); if(c) c.textContent=body.children.length;
+      const a=document.getElementById('tplActive'); if(a) a.textContent=body.children.length;
+    }
+    const parked=r.parks;
+    delete TPLREQ[id];
+    renderTemplates();
+    addTplFeed('<b>'+name+'</b> approved by '+whoActs()+' · published to alnoor-tenant'+(parked?' · '+parked+' resumed at Resolve':''), 'ap');
+    addAudit(whoActs(), 'approved template request '+id+' · '+name+' published'+(parked?' · '+parked+' resumed automatically':''), 'ap');
+    if(rowId){ const row=document.getElementById(rowId); if(row){ row.classList.add('done'); setTimeout(function(){ row.style.display='none'; decApprovals(); },350); } }
+    showToast(parked ? name+' published · '+parked+' resumed at Resolve' : name+' published · matchable in Resolve');
+  }
+  function rejectTemplate(id){
+    const r=TPLREQ[id]; if(!r){ showToast('That request is already decided'); return; }
+    const parked=r.parks; delete TPLREQ[id]; renderTemplates();
+    addTplFeed('<b>'+r.name+'</b> rejected by '+whoActs()+' · reason sent to '+r.dev, 'rb');
+    addAudit(whoActs(), 'rejected template request '+id+' · '+r.name+' · reason sent to '+r.dev, 'ap');
+    showToast(parked ? 'Rejected · '+r.dev+' notified, '+parked+' stays parked until they resubmit' : 'Rejected · '+r.dev+' notified');
+  }
+  function openAuthor(){ document.getElementById('authorBox').classList.add('on'); }
+  function publishTemplate(){
+    const n=document.getElementById('tplName').value.trim();
+    if(!n){ showToast('A template name is required'); return; }
+    const rt=document.getElementById('tplRuntime').value, cp=document.getElementById('tplCompute').value, bl=document.getElementById('tplBlocks').value;
+    const body=document.getElementById('tplBody');
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><div class="aname">'+n+'</div><div class="aver">v1.0.0 · just published</div></td><td>'+rt+'</td><td>'+cp+'</td>'+
+      '<td class="num">'+bl.split(' ')[0]+'</td><td><span class="chip">Tenant</span></td><td><span class="c-cert">Published</span></td>';
+    body.appendChild(tr);
+    document.getElementById('tplCount').textContent=body.children.length;
+    document.getElementById('tplActive').textContent=body.children.length;
+    document.getElementById('authorBox').classList.remove('on');
+    document.getElementById('tplName').value='';
+    addTplFeed('<b>'+n+'</b> authored and published by '+whoActs(), 'ap');
+    addAudit(whoActs(), 'authored and published template '+n+' · matchable in Resolve', 'ap');
+    showToast(n+' published · matchable in Resolve');
+  }
+  function decApprovals(){
+    pending--;
+    const q=document.getElementById('qCount'), nv=document.getElementById('navApprovalCount'), st=document.getElementById('statApprovals');
+    if(q) q.textContent=pending; if(nv) nv.textContent=pending; if(st) st.textContent=pending;
+    if(pending<=0){ const e=document.getElementById('emptyQueue'); if(e) e.style.display='block'; if(nv) nv.style.display='none'; }
+  }
+
+  /* ---- shared store: same origin, so the developer portal reads exactly what happens here ---- */
+  const AGENT_KEY={'Citizen Support Agent':'citizen','Procurement Compliance Agent':'procurement',
+    'Health Triage Assistant':'health','Permit Application Agent':'permit','Fraud Signals Agent':'fraud'};
+  function devState(r){
+    if(r.state==='rejected') return 'rejected';
+    if(r.state==='returned') return (r.findings||[]).some(f=>f.src==='Guardian')?'guardian_returned':'changes';
+    if(r.state==='closed'){
+      /* a closed record is not automatically an approval — read the decision */
+      if(r.decision==='Rejected') return 'rejected';
+      if(r.decision==='Changes requested') return 'changes';
+      if(r.certified) return 'certified';
+      return 'approved';
+    }
+    if(r.state==='approved' && r.certified) return 'certified';
+    if(r.state==='approved') return 'approved';
+    return 'in_review';
+  }
+  /* the inventory row must agree with the record the moment it is decided */
+  function refreshAgentRow(agent, life, cls, recId, who){
+    try{
+      const rows=[...document.querySelectorAll('#agentTable tbody tr')];
+      const tr=rows.find(r=>{const n=r.querySelector('.aname'); return n && n.textContent.trim()===agent;});
+      if(!tr) return;
+      const chip=tr.querySelector('.lchip'); if(chip){ chip.className='lchip '+cls; chip.textContent=life; }
+      const ref=tr.querySelector('.ref');
+      if(ref && recId){ ref.textContent=recId; ref.setAttribute('onclick',"gotoRecord('"+recId+"')");
+        const sub=ref.parentElement.querySelector('.aver'); if(sub) sub.textContent=who; }
+      tr.dataset.b = cls==='l-pub'?'published':(cls==='l-verify'?'verify':(cls==='l-changes'?'changes':tr.dataset.b));
+    }catch(e){}
+  }
+  function syncOut(){
+    try{
+      const out={};
+      const add=function(r){
+        const k=AGENT_KEY[r.agent]; if(!k) return;
+        out[k]={state:devState(r), rec:r.id, ver:r.ver, target:r.target, score:r.quality.score,
+          submitted:r.submitted, holder:(r.state==='returned'||r.state==='rejected')?'Returned to you':r.holder,
+          decision:r.decision||null,
+          checks:r.checks.map(function(c){ return [c.n.replace(/&amp;/g,'&'),
+            c.subs.some(x=>x.s==='fail')?'fail':(c.subs.some(x=>x.s==='review')?'review':'pass')]; }),
+          findings:(r.findings||[]),
+          trail:r.audit.map(function(a){ return [a.t, a.a==='Platform'?'Platform':(a.a===r.dev?'You':a.a), a.o]; })};
+      };
+      /* an open record always wins; otherwise the MOST RECENT closed one.
+         CLOSED_LEDGER is newest-first, so walk it rather than object insertion order. */
+      Object.keys(VRECORDS).forEach(function(k){ add(VRECORDS[k]); });
+      CLOSED_LEDGER.forEach(function(row){
+        const rec=CLOSED[row[0]]; if(!rec) return;
+        const key=AGENT_KEY[rec.agent];
+        if(key && !out[key]) add(rec);
+      });
+      localStorage.setItem('humain.verification.v1', JSON.stringify({t:new Date().toISOString(), by:whoActs(), records:out}));
+    }catch(e){}
+  }
+
+  function renderOverview(){
+    const sub=document.getElementById('ovSub');
+    const isV=document.body.dataset.role==='verifier';
+    if(sub) sub.textContent = isV
+      ? 'Monday, 17 August · Your verification workload for alnoor-tenant. Everything you decide becomes an immutable record.'
+      : 'Monday, 17 August · Everything below is scoped to alnoor-tenant. No other tenant is visible from this console.';
+    const box=document.getElementById('ovQueue');
+    if(box){
+      const ids=Object.keys(VRECORDS).filter(k=>VRECORDS[k].state==='in_review')
+        .sort((a,b)=>VRECORDS[b].age-VRECORDS[a].age);
+      document.getElementById('ovQCount').textContent=ids.length;
+      box.innerHTML = ids.length? ids.map(function(k){
+        const r=VRECORDS[k];
+        const fail=r.checks.some(c=>c.subs.some(x=>x.s==='fail'));
+        const pend=r.checks.some(c=>c.subs.some(x=>x.s==='review'));
+        const late=r.age>=CFG.sla;
+        return '<div class="attn-item" onclick="gotoRecord(\''+k+'\')" style="cursor:pointer">'+
+          '<div class="attn-line"><span class="attn-ico" style="background:'+(fail?'var(--red)':(late?'var(--amber)':'var(--green)'))+'"></span>'+
+          '<span class="attn-name">'+r.agent+' · '+r.ver+'</span>'+
+          '<span class="attn-why">'+(fail?'a check is failing — a finding is ready to send'
+            :(pend?'automated checks resolved · behaviour review waiting on you'
+            :'every check passed · ready for your decision'))+'</span>'+
+          '<span class="attn-chev" style="color:var(--muted2);font-size:12px">'+r.waited+(late?' · past SLA':'')+' ›</span></div></div>';
+      }).join('') : '<div style="padding:26px 20px;text-align:center;color:var(--muted)">Nothing waiting on you.</div>';
+    }
+    const dec=document.getElementById('ovDecisions');
+    if(dec){
+      dec.innerHTML = VCLOSED.slice(0,5).map(function(r){
+        return '<div class="audit-line"><span class="audit-time">'+r.when+'</span><span class="kind vf">'+
+          (r.d==='Changes requested'||r.d==='Rejected'?'RETURNED':'APPROVED')+'</span>'+
+          '<span><b>'+r.agent+'</b> · '+r.d.toLowerCase()+' by '+r.who+
+          '<span class="evlink" onclick="event.stopPropagation();gotoRecord(\''+r.id+'\')">'+r.id+' →</span></span></div>';
+      }).join('');
+    }
+  }
+
+  renderQueue(); renderRecords(); renderPolicy(); renderOverview(); renderTemplates(); syncOut();
+</script>
+</body>
+</html>
