@@ -526,7 +526,7 @@ const eras=[
   // 24 Aug marker
   const xm=ml+9*bw+1;
   s+=`<line x1="${xm}" x2="${xm}" y1="${mt-8}" y2="${y(0)}" stroke="${css('ok')}" stroke-dasharray="3 3"/>`;
-  s+=`<text x="${xm-4}" y="${mt+8}" text-anchor="end" font-size="10" fill="${css('ok')}">24 Aug: one owner</text>`;
+  s+=`<text x="${xm+5}" y="${mt+8}" text-anchor="start" font-size="10" fill="${css('ok')}">24 Aug: one owner</text>`;
   s+='</svg>';
   document.getElementById('chart-hours').innerHTML=s;
 })();
