@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>HUMAIN Account Postmortem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a long-form review on one reading column, a sticky contents rail on wide screens, figures breaking slightly wider than the text. */
+:root{
+  --bg:#F2F4F3; --surface:#FFFFFF; --sunk:#E7ECEA; --ink:#13201E; --muted:#566663; --line:#D3DCD9;
+  --accent:#0D6A5B; --accent-soft:#D6EAE5; --warn:#A8701A; --warn-soft:#F4E7CF; --crit:#AE3A2E; --crit-soft:#F5DDD9; --ok:#2E7A4D; --ok-soft:#DCEDE2;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1514; --surface:#15201E; --sunk:#1B2826; --ink:#E4EDEA; --muted:#93A4A0; --line:#2A3835;
+  --accent:#53B9A4; --accent-soft:#183A34; --warn:#E0A64A; --warn-soft:#3A2E17; --crit:#E46C5E; --crit-soft:#3E1F1B; --ok:#62BD86; --ok-soft:#1A3626; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1514; --surface:#15201E; --sunk:#1B2826; --ink:#E4EDEA; --muted:#93A4A0; --line:#2A3835;
+  --accent:#53B9A4; --accent-soft:#183A34; --warn:#E0A64A; --warn-soft:#3A2E17; --crit:#E46C5E; --crit-soft:#3E1F1B; --ok:#62BD86; --ok-soft:#1A3626; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:40px 80px;display:grid;grid-template-columns:1fr;gap:40px}
+@media (min-width:1100px){.wrap{grid-template-columns:200px minmax(0,1fr)}}
+nav.toc{display:none}
+@media (min-width:1100px){nav.toc{display:block;position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;font-size:13px}}
+nav.toc p{font:500 11px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:6px;counter-reset:t}
+nav.toc a{color:var(--muted);text-decoration:none;display:flex;gap:8px}
+nav.toc a::before{counter-increment:t;content:counter(t,decimal-leading-zero);font-family:var(--f-mono);font-size:11px;padding-top:2px;color:var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--accent)}
+main{min-width:0;max-width:860px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.eyebrow{font:500 12px/1.4 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,5.4vw,58px);line-height:1.04;letter-spacing:-.015em;margin-top:14px}
+h2{font-size:clamp(26px,3vw,34px);line-height:1.12;letter-spacing:-.01em}
+h3{font-size:20px;line-height:1.25}
+p{margin:0}
+.dek{font-size:19px;line-height:1.55;color:var(--muted);max-width:62ch;margin-top:18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;font:400 13px/1.4 var(--f-mono);color:var(--muted)}
+.meta b{color:var(--ink);font-weight:500}
+
+section{margin-top:72px;display:grid;gap:18px}
+.sec-head{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:22px}
+.sec-head .n{font:500 12px/1 var(--f-mono);color:var(--muted);letter-spacing:.06em}
+.prose{display:grid;gap:14px;max-width:66ch}
+.prose p{font-size:16.5px}
+.lead{font-family:var(--f-display);font-size:23px;line-height:1.45;max-width:60ch}
+
+.blameless{background:var(--accent-soft);border-radius:10px;padding:18px 20px;display:grid;gap:6px;margin-top:30px;max-width:72ch}
+.blameless strong{font:500 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+/* KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:6px}
+.kpi{background:var(--surface);padding:18px 18px 16px;display:grid;gap:6px;align-content:start}
+.kpi .v{font:500 34px/1 var(--f-display);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.kpi .v.crit{color:var(--crit)} .kpi .v.warn{color:var(--warn)}
+.kpi .l{font-size:13px;line-height:1.4;color:var(--muted)}
+
+
+/* Short version: three columns */
+.tri{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.tri .col{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px;display:grid;gap:12px;align-content:start;min-width:0}
+.tri .col.fail{border-top:3px solid var(--crit)} .tri .col.learn{border-top:3px solid var(--warn)} .tri .col.next{border-top:3px solid var(--ok)}
+.col-k{font:500 12px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase}
+.fail .col-k{color:var(--crit)} .learn .col-k{color:var(--warn)} .next .col-k{color:var(--ok)}
+.tri ol,.tri ul{margin:0;padding-left:20px;display:grid;gap:10px;font-size:14.5px;line-height:1.5}
+.tri li::marker{font-family:var(--f-mono);color:var(--muted)}
+.tri li b{font-weight:600}
+.col-link{font:500 12.5px/1.3 var(--f-mono)}
+
+/* Revenue chain */
+.chain{display:grid;gap:0;counter-reset:g}
+.gate{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}
+.gate:first-child{border-top:1px solid var(--line)}
+.gate .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:500 12px/1 var(--f-mono);border:2px solid var(--line);color:var(--muted);background:var(--surface)}
+.gate.done .dot{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.gate.never .dot{border-color:var(--crit);color:var(--crit);background:var(--crit-soft)}
+.gate.unk .dot{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.gate h3{font-family:var(--f-body);font-size:16px;font-weight:600}
+.gate p{font-size:14.5px;color:var(--muted);margin-top:3px}
+.pill{font:500 11px/1 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:6px 8px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.neu{background:var(--sunk);color:var(--muted)}
+.build-line{display:flex;gap:10px;align-items:center;font:500 12px/1.3 var(--f-mono);color:var(--crit);padding:10px 0 2px 58px}
+.build-line::before{content:"";flex:0 0 22px;height:2px;background:var(--crit)}
+
+/* Figures */
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 20px 16px;display:grid;gap:12px}
+figure .scroll{overflow-x:auto}
+figcaption{font-size:13.5px;color:var(--muted);line-height:1.5;max-width:75ch}
+figcaption b{color:var(--ink);font-weight:600}
+.fig-title{font:600 14px/1.3 var(--f-body)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+svg text{font-family:var(--f-mono)}
+
+/* Timeline */
+.tl{list-style:none;margin:0;padding:0;display:grid}
+.tl li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.tl time{font:500 12.5px/1.5 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.tl .ev{display:grid;gap:4px;min-width:0}
+.tl .ev p{font-size:15px}
+.tl .tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font:500 10.5px/1 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;padding:4px 6px;border-radius:4px}
+.tag.com{background:var(--crit-soft);color:var(--crit)} .tag.dir{background:var(--warn-soft);color:var(--warn)} .tag.del{background:var(--ok-soft);color:var(--ok)} .tag.dep{background:var(--sunk);color:var(--muted)}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{font:500 12px/1 var(--f-mono);padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* Whys */
+.whys{display:grid;gap:0;border-left:2px solid var(--accent);margin-left:6px}
+.why{padding:10px 0 14px 22px;position:relative;display:grid;gap:4px}
+.why::before{content:"";position:absolute;left:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.why .q{font:500 12px/1.3 var(--f-mono);color:var(--accent);letter-spacing:.04em}
+.why p{font-size:16px}
+.why.root::before{background:var(--accent)}
+.why.root p{font-family:var(--f-display);font-size:20px;line-height:1.4}
+
+/* Factors */
+.factors{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.factor{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:8px;align-content:start;min-width:0}
+.factor .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.factor .id{font:500 12px/1 var(--f-mono);color:var(--muted)}
+.factor h3{font-family:var(--f-body);font-size:15.5px;font-weight:600;line-height:1.35}
+.factor p{font-size:14px;color:var(--muted);line-height:1.5}
+.factor blockquote{margin:0;font-family:var(--f-display);font-size:15.5px;line-height:1.45;color:var(--ink);padding-left:10px;border-left:2px solid var(--line)}
+.factor .cost{font:500 12px/1.4 var(--f-mono);color:var(--ink)}
+.sev{display:inline-flex;gap:3px}
+.sev span{width:8px;height:8px;border-radius:2px;background:var(--line)}
+.sev.s3 span{background:var(--crit)} .sev.s2 span:nth-child(-n+2){background:var(--warn)} .sev.s1 span:first-child{background:var(--muted)}
+
+/* Tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.raci td{text-align:center;font-family:var(--f-mono);font-weight:500}
+.raci td:first-child{text-align:left;font-family:var(--f-body);font-weight:500}
+.raci .A{background:var(--accent);color:var(--surface);border-radius:4px}
+.raci span{display:inline-block;min-width:34px;padding:3px 6px}
+.raci .R{background:var(--accent-soft);color:var(--accent);border-radius:4px}
+
+/* Eras */
+.eras{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.era{border-radius:8px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);display:grid;gap:4px}
+.era .w{font:500 11.5px/1.3 var(--f-mono);color:var(--muted)}
+.era .who{font-weight:600;font-size:15px}
+.era p{font-size:13px;color:var(--muted)}
+.era.now{border-color:var(--ok);background:var(--ok-soft)}
+.era.now .who{color:var(--ok)}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:10px;align-content:start;min-width:0}
+.box h3{font-family:var(--f-body);font-size:15px;font-weight:600}
+.box ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14.5px}
+.box.good{border-top:3px solid var(--ok)} .box.bad{border-top:3px solid var(--crit)} .box.unk{border-top:3px solid var(--warn)}
+
+.actions{display:grid;gap:10px}
+.act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.act h3{font-family:var(--f-body);font-size:15.5px;font-weight:600}
+.act p{font-size:14px;color:var(--muted);grid-column:1/-1}
+.act .own{font:500 12px/1.4 var(--f-mono);color:var(--accent);text-align:right}
+.act .meas{grid-column:1/-1;font:400 12.5px/1.5 var(--f-mono);color:var(--ink)}
+.act .meas b{color:var(--muted);font-weight:500}
+.note{font-size:13px;color:var(--muted)}
+footer{margin-top:72px;border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:var(--muted);display:grid;gap:8px}
+footer ul{margin:0;padding-left:18px;display:grid;gap:4px;font-family:var(--f-mono);font-size:12px;word-break:break-word}
+
+@media (max-width:560px){
+  .tl li{grid-template-columns:1fr;gap:4px}
+  .gate{grid-template-columns:36px minmax(0,1fr)}
+  .gate .pill{grid-column:2;justify-self:start}
+  .build-line{padding-left:0}
+  .act{grid-template-columns:1fr} .act .own{text-align:left}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bar-anim{transition:opacity .2s}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <p>Contents</p>
+  <ol>
+    <li><a href="#answer">Failures, learnings, next</a></li>
+    <li><a href="#chain">Where revenue broke</a></li>
+    <li><a href="#effort">Effort against direction</a></li>
+    <li><a href="#timeline">Timeline</a></li>
+    <li><a href="#why">Root cause</a></li>
+    <li><a href="#factors">Contributing factors</a></li>
+    <li><a href="#ledger">Objective changes</a></li>
+    <li><a href="#rework">Rework</a></li>
+    <li><a href="#delivery">What went well</a></li>
+    <li><a href="#today">Where it stands</a></li>
+    <li><a href="#actions">Actions</a></li>
+    <li><a href="#raci">RACI</a></li>
+    <li><a href="#evidence">Evidence</a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <div class="eyebrow">HUMAIN ONE · Turing × HUMAIN KSA · Blameless account postmortem</div>
+  <h1>5,806 engineering hours, no signed scope, no revenue</h1>
+  <p class="dek">How Turing ran the HUMAIN account from the 26 March announcement to 8 October 2026, and why a strong team doing real work never produced a paid outcome.</p>
+  <div class="meta">
+    <span>Period <b>26 Mar to 8 Oct 2026</b></span>
+    <span>Sprints <b>S0 to S10</b></span>
+    <span>Prepared <b>8 Oct 2026</b>, Product</span>
+    <span>Status <b>Internal draft</b></span>
+  </div>
+  <div class="blameless">
+    <strong>Blameless by design</strong>
+    <p>This review examines gates, ownership and operating choices. It does not assign fault to any person on either side. Everyone involved acted reasonably on the information and authority they had. The client relationship is healthy and the engineering was good. The question here is narrow: why did that work never turn into revenue?</p>
+  </div>
+</header>
+
+<section id="answer">
+  <div class="sec-head"><span class="n">01</span><h2>The short version</h2></div>
+  <div class="tri">
+    <div class="col fail">
+      <span class="col-k">Biggest reasons we failed</span>
+      <ol>
+        <li><b>We built before anything was signed.</b> 5,806 hours went in against an SOW that stayed a draft from 28 Mar. No price, no revenue share and no named payer.</li>
+        <li><b>The objective moved with the decision maker.</b> 10 changes of objective and 4 hand-overs. 9 of the 10 changes landed within a sprint of a hand-over.</li>
+        <li><b>Nobody owned turning the account into revenue.</b> It was never classified as a lighthouse, revenue or capability account, and no path to revenue was written down.</li>
+        <li><b>We discovered requests, not the problem.</b> By 29 May there were still no success metrics and no agreed end state.</li>
+        <li><b>We said yes and kept polishing.</b> Half the objective changes were our own calls, and about 21% of hours became rework.</li>
+      </ol>
+    </div>
+    <div class="col learn">
+      <span class="col-k">Learnings</span>
+      <ul>
+        <li><b>An announcement is not a contract.</b> Speed without a signed anchor turned into rework, not revenue.</li>
+        <li><b>One owner works.</b> Since 24 Aug a single objective owner has kept decisions stable, and the Evaluations hub shipped.</li>
+        <li><b>Effort should follow conviction.</b> Decide what kind of account it is before staffing it.</li>
+        <li><b>Every decision needs a name and a date.</b> Meetings and stakeholders are no substitute for one accountable person.</li>
+        <li><b>Cap each proof.</b> Set an engineering and inference budget before building, not after.</li>
+      </ul>
+    </div>
+    <div class="col next">
+      <span class="col-k">What to do next</span>
+      <ol>
+        <li><b>Name the economic buyer and the objective owner</b> in writing with the client.</li>
+        <li><b>Price the Evaluations hub</b> as a signed SOW amendment or a paid pilot.</li>
+        <li><b>Get RC-1 and RC-2 accepted</b> so work already shipped becomes billable.</li>
+        <li><b>Date the three blocked decisions:</b> verifier persona, tenant contract and code-generation ownership.</li>
+        <li><b>Cap new build</b> until the first two actions land.</li>
+      </ol>
+      <a class="col-link" href="#actions">Owners and measures in section 11</a>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><span class="v">5,806</span><span class="l">engineering hours logged, S1 to S10 (S7 to S10 are a lower bound)</span></div>
+    <div class="kpi"><span class="v crit">0</span><span class="l">signed scope documents</span></div>
+    <div class="kpi"><span class="v crit">0</span><span class="l">revenue, invoice or price figures on record</span></div>
+    <div class="kpi"><span class="v warn">10</span><span class="l">changes of objective in 11 sprints</span></div>
+    <div class="kpi"><span class="v warn">4</span><span class="l">changes of client decision maker</span></div>
+    <div class="kpi"><span class="v warn">~21%</span><span class="l">rework: 416 h logged plus about 800 h estimated</span></div>
+  </div>
+</section>
+
+<section id="chain">
+  <div class="sec-head"><span class="n">02</span><h2>Where the revenue chain broke</h2></div>
+  <div class="prose"><p>A services account turns into revenue through a short chain of gates. HUMAIN cleared the first two. Building started after gate 2, and gates 3 to 7 never closed, so 5,806 hours had no billing event attached.</p></div>
+  <div class="chain">
+    <div class="gate done"><span class="dot">1</span><div><h3>Public commitment</h3><p>Partnership announced at FII PRIORITY Miami on 26 Mar. Turing named as the marketplace's first US customer.</p></div><span class="pill ok">26 Mar</span></div>
+    <div class="gate done"><span class="dot">2</span><div><h3>Scope drafted</h3><p>Humain Marketplace Enablement SOW v4.03.1: RC-0 to RC-10 and TR-1 to TR-17 across Phases 0 to 3, planned at 9, 10 and 13 people.</p></div><span class="pill ok">28 Mar</span></div>
+    <div class="build-line">Delivery started here on 20 Apr, on the strength of the announcement</div>
+    <div class="gate never"><span class="dot">3</span><div><h3>Scope signed</h3><p>Still with HUMAIN Legal through the Sprint 0 to 5 status decks. The only signature in the record is internal: a 27% SOW coverage baseline signed on 19 May.</p></div><span class="pill crit">Never</span></div>
+    <div class="gate never"><span class="dot">4</span><div><h3>Commercial model agreed</h3><p>Kickoff notes list "separate commercial track development" and "revenue sharing model discussion" as open. The marketplace's own pricing was "under decision". Monetisation was out of LEAP scope by decision.</p></div><span class="pill crit">Never</span></div>
+    <div class="gate never"><span class="dot">5</span><div><h3>Economic buyer named</h3><p>The SteerCo deck lists executive sponsors and proposes a monthly exec review of "phase progress vs SOW, budget". There is no record that it ran or that anyone owned the budget.</p></div><span class="pill crit">Never</span></div>
+    <div class="gate unk"><span class="dot">6</span><div><h3>Phase-gate acceptance</h3><p>Sprint 8 aimed to "start closing the contract" with RC-1 and RC-2 sign-off by 22 Aug. No sign-off is recorded, and RC items rolled into Sprints 9 and 10.</p></div><span class="pill warn">Not recorded</span></div>
+    <div class="gate never"><span class="dot">7</span><div><h3>Invoice issued, revenue recognized</h3><p>No invoice, rate card or billed amount appears in any document, worklog or decision page reviewed.</p></div><span class="pill crit">None found</span></div>
+  </div>
+</section>
+
+<section id="effort">
+  <div class="sec-head"><span class="n">03</span><h2>Effort kept rising while direction kept moving</h2></div>
+  <figure>
+    <div class="fig-title">Engineering hours per sprint, with changes of objective and decision-maker eras</div>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Hours from worklogs</span>
+      <span><i style="background:var(--accent);opacity:.45"></i>Hours, lower bound (counted from tickets)</span>
+      <span><i style="background:var(--warn)"></i>Change of objective or premise</span>
+    </div>
+    <div class="scroll"><div id="chart-hours"></div></div>
+    <figcaption><b>Read it this way:</b> hours stayed at 600 to 760 a sprint through August, while the objective changed 9 times between S4 and S9. The S4 dip is the 15 to 26 June sprint (255 h). Since 24 August, a single objective owner has kept direction stable. The S10 figure covers only part of a sprint.</figcaption>
+  </figure>
+  <figure>
+    <div class="fig-title">Cumulative hours against signed scope</div>
+    <div class="scroll"><div id="chart-cum"></div></div>
+    <figcaption>Every hour sits above a signed-scope line that never left zero. Each sprint added about 600 hours of exposure with nothing to invoice against.</figcaption>
+  </figure>
+</section>
+
+<section id="timeline">
+  <div class="sec-head"><span class="n">04</span><h2>Timeline</h2></div>
+  <div class="filters" role="group" aria-label="Filter timeline">
+    <button type="button" data-f="all" aria-pressed="true">All</button>
+    <button type="button" data-f="com" aria-pressed="false">Commercial</button>
+    <button type="button" data-f="dir" aria-pressed="false">Direction change</button>
+    <button type="button" data-f="del" aria-pressed="false">Delivery</button>
+    <button type="button" data-f="dep" aria-pressed="false">Dependency</button>
+  </div>
+  <ol class="tl" id="tl"></ol>
+  <p class="note">Sprint dates follow Jira: S1 started 4 May, S10 started 7 Sep. The LEAP date differs across sources (7 Aug, 21 Aug, end of August), and no source confirms whether the LEAP demo ran.</p>
+</section>
+
+<section id="why">
+  <div class="sec-head"><span class="n">05</span><h2>Root cause: five whys</h2></div>
+  <div class="whys">
+    <div class="why"><span class="q">Why is there no revenue?</span><p>No milestone was ever accepted as invoiceable, and no rate or price was ever set.</p></div>
+    <div class="why"><span class="q">Why was nothing invoiceable?</span><p>There was no signed scope defining acceptance, price or payer. The SOW stayed a draft from 28 March onward.</p></div>
+    <div class="why"><span class="q">Why did building go ahead without it?</span><p>The public announcement made speed look like the commercial priority. Announcing first was a sound call. Building without an anchor left neither side a document to point to when the premise moved.</p></div>
+    <div class="why"><span class="q">Why did the commercial track stay open for six months?</span><p>No one on either side was accountable for converting the account. The account was never classified as a lighthouse, a revenue account or a reusable capability, so effort was never tied to a path to revenue.</p></div>
+    <div class="why root"><span class="q">Root cause</span><p>Turing entered an ambiguous, transformation-shaped engagement with a playbook built for defined execution work: staff first, build fast, say yes. It had no qualification gate, no paid discovery and no single owner per stage.</p></div>
+  </div>
+</section>
+
+<section id="factors">
+  <div class="sec-head"><span class="n">06</span><h2>Contributing factors</h2></div>
+  <div class="prose"><p>Severity reflects how directly each factor blocked conversion to revenue. It does not measure how much effort each one cost.</p></div>
+  <div class="factors" id="factors-grid"></div>
+</section>
+
+<section id="ledger">
+  <div class="sec-head"><span class="n">07</span><h2>Ten changes of objective, four hand-overs</h2></div>
+  <div class="eras">
+    <div class="era"><span class="w">S0 to S1 · 20 Apr to 18 May</span><span class="who">No named owner</span><p>Building from the SOW draft and kickoff requests.</p></div>
+    <div class="era"><span class="w">S2 to S5 · from 18 May</span><span class="who">Andrew</span><p>Approval through the Friday demos, plus Daniel on Wednesdays.</p></div>
+    <div class="era"><span class="w">S5 to S7</span><span class="who">Sijong as a second lens</span><p>Overrides alternate with Andrew's calls.</p></div>
+    <div class="era"><span class="w">S7 to S8</span><span class="who">Andrew again</span><p>V9 approved, then rebuilt as the V10 keynote.</p></div>
+    <div class="era now"><span class="w">S8 onward · from 11 Aug</span><span class="who">Yasir, one voice</span><p>Since 24 Aug, decisions have held.</p></div>
+  </div>
+  <figure>
+    <div class="fig-title">Where the 10 changes came from</div>
+    <div id="chart-attrib"></div>
+    <figcaption><b>Half of the changes were Turing's own planning calls.</b> Every change on the HUMAIN side came from someone senior to the previous approver. One quote captures the pattern: "Direction has come from Andrew, then Sijong, and now Yasir, and the three of them want different things." That is a correlation, not proof of cause, and one hand-over date is inferred.</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>Sprint</th><th>Date</th><th>Change of objective or premise</th><th>Origin</th><th>Cost signal</th></tr></thead>
+    <tbody id="ledger-body"></tbody>
+  </table></div>
+  <p class="note">The count (10), the sprint split (S1 1, S4 1, S6 3, S7 1, S8 3, S9 1) and the attribution (Turing 5, Yasir 4, Daniel 1) come from the 17 Sep analysis. Mapping each sprint slot to the specific event listed is a reconstruction from the decision record. An earlier tally of 18 to 20 "re-cuts" was narrowed to these 10 premise-level changes.</p>
+</section>
+
+<section id="rework">
+  <div class="sec-head"><span class="n">08</span><h2>About one hour in five was rework</h2></div>
+  <figure>
+    <div class="fig-title">Where the hours went</div>
+    <div id="chart-split"></div>
+    <div class="fig-title" style="margin-top:8px">Rework by workstream later descoped</div>
+    <div id="chart-rework"></div>
+    <figcaption>Jira records <b>416 hours</b> on five workstreams that were later descoped. The roughly 800 hours of re-planning and re-implementation is an estimate. None of this rework traces to engineering quality. It traces to premises that changed after the build had started.</figcaption>
+  </figure>
+</section>
+
+<section id="delivery">
+  <div class="sec-head"><span class="n">09</span><h2>What went well</h2></div>
+  <div class="two">
+    <div class="box good"><h3>Delivery held under churn</h3><ul>
+      <li>Sprint 5 closed with 436 issues, 361 done, and incomplete work was preserved rather than marked done.</li>
+      <li>Sandbox provisioning on GKE, Terraform, the agent registry, deploy records, the Submit Agent flow and Group 1 observability UX all shipped.</li>
+      <li>Prototypes reached Evaluations V110, Agent Lifecycle V70, Public Marketplace V16, Tenant Admin V4 and the LEAP V10 keynote.</li>
+    </ul></div>
+    <div class="box good"><h3>The fix has already been tested</h3><ul>
+      <li>Since 24 Aug there has been one objective owner, and the Evaluations hub shipped against a stable direction.</li>
+      <li>Prism facts were settled on 1 Sep: no pass bar, no metrics attached at the start, and cost taken from tokens only.</li>
+      <li>Product decisions PD-001 to PD-013 have been logged since 9 Sep, so they no longer live only in meetings.</li>
+    </ul></div>
+    <div class="box good"><h3>The relationship stayed healthy</h3><ul>
+      <li>The client kept engaging in weekly reviews through 14 Sep, with specific, actionable feedback.</li>
+      <li>Board hygiene held: deferred work was labelled rather than deleted, and the H2O-O spine went to backlog with its history intact.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="today">
+  <div class="sec-head"><span class="n">10</span><h2>Where the account stands on 8 October</h2></div>
+  <div class="two">
+    <div class="box bad"><h3>Commercial</h3><ul>
+      <li>SOW unsigned. No price, no payer named, no accepted milestone.</li>
+      <li>No record of the engagement ending or pausing. Verifier planning was still running on 23 to 24 Sep.</li>
+      <li>Prototype pages went private on 6 to 7 Oct. Only V70 and V110 were republished.</li>
+    </ul></div>
+    <div class="box unk"><h3>Three of six next items wait on a decision, not on build time</h3><ul>
+      <li><b>Verifier persona:</b> a separate verifier was ruled out on 11 Aug and is being planned again.</li>
+      <li><b>Tenant admin:</b> waiting on HUMAIN's tenant and identity contract.</li>
+      <li><b>Agent creation:</b> who owns code generation has been disputed since 24 Aug.</li>
+    </ul></div>
+    <div class="box unk"><h3>Debt carried forward</h3><ul>
+      <li>Sprint 9 scope: 129 backlog tickets (10 critical, 44 high), 17 security tickets including cross-tenant authorization, and 33 QA bugs.</li>
+      <li>KSA data residency: all infrastructure is still in us-central1, which was flagged on 10 Jul and is still unscheduled.</li>
+      <li>The 14 Sep review list is still open: summary and compare views, the trace re-layout, and a security review for custom-code metrics.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="actions">
+  <div class="sec-head"><span class="n">11</span><h2>Actions</h2></div>
+  <div class="prose"><p>Proposed by this review and not yet agreed. Each action has one accountable role and one measure. Owners are roles, so the practice can assign names.</p></div>
+  <h3>For the HUMAIN account, now</h3>
+  <div class="actions" id="acts-now"></div>
+  <h3 style="margin-top:14px">For the Enterprise AI playbook</h3>
+  <div class="actions" id="acts-play"></div>
+</section>
+
+<section id="raci">
+  <div class="sec-head"><span class="n">12</span><h2>The enabler: one RACI across the playbook</h2></div>
+  <div class="prose"><p>HUMAIN had stakeholders and meetings, but no stage had one accountable name. This matrix is an illustrative starting point. The practice sets the real names.</p></div>
+  <div class="tbl"><table class="raci">
+    <thead><tr><th>Playbook stage</th><th>Account</th><th>Solutions</th><th>Product</th><th>Research</th><th>Engineering</th><th>Practice</th></tr></thead>
+    <tbody id="raci-body"></tbody>
+  </table></div>
+  <p class="note">A = accountable, one per stage. R = responsible. C = consulted. I = informed.</p>
+</section>
+
+<section id="evidence">
+  <div class="sec-head"><span class="n">13</span><h2>Evidence and confidence</h2></div>
+  <div class="two">
+    <div class="box good"><h3>From the record</h3><ul>
+      <li>SOW v4.03.1 dated 28 Mar and unsigned.</li>
+      <li>Jira counts through 13 Jul, verified live at the time.</li>
+      <li>S1 to S6 hours from the worklog exports (2,251 h for S1 to S4, 1,441 h for S5 to S6).</li>
+      <li>416 h of descoped work, from Jira.</li>
+    </ul></div>
+    <div class="box unk"><h3>Estimated or inferred</h3><ul>
+      <li>S7 to S10 hours are a lower bound, counted from tickets.</li>
+      <li>The ~800 h of re-planning is an estimate.</li>
+      <li>The link between changes and hand-overs is a correlation, and one hand-over date is inferred.</li>
+      <li>The exact boundaries of the decision-maker eras.</li>
+    </ul></div>
+    <div class="box bad"><h3>Not checked</h3><ul>
+      <li>Live Jira after 13 Jul.</li>
+      <li>The source Google Doc, which needs Turing account access. The 17 Sep PDF export was used instead.</li>
+      <li>Finance systems. If finance holds a billed amount, it overrides the "no revenue on record" finding.</li>
+    </ul></div>
+  </div>
+  <footer>
+    <span>Sources reviewed</span>
+    <ul>
+      <li>Enterprise AI: Improving our playbook (PDF, 17 Sep 2026)</li>
+      <li>2026-09-15_humain-one_retro_v1 · 2026-09-15_humain-one_roadmap_v1</li>
+      <li>2026-09-18_humain-one_enterprise-ai-findings_v2 · rahul-cover-email_v3</li>
+      <li>Humain_SOW_Requirements_Mapping · sow_status_mapping_v1 · jira_to_sow_mapping</li>
+      <li>HUMAIN_Sprint1-4_Worklog · HUMAIN_Sprint5-6_Worklog · Sprint 6, 7, 8 scope and planning workbooks</li>
+      <li>Andrew_Client_Demo_Writeup_2026-05-29 · SteerCo deck (11 Jun) · 2026-09-14 review notes</li>
+      <li>SecondBrain/Humain/STATE.md and decision pages for 10 Jul, 23 Jul, 17 Aug, 24 Aug, 27 Aug</li>
+    </ul>
+  </footer>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const css=v=>`var(--${v})`;
+
+/* ---------- Data ---------- */
+const sprints=[
+  {s:'S0',d:'20 Apr',h:0,lb:false,c:0},
+  {s:'S1',d:'4 May',h:702,lb:false,c:1},
+  {s:'S2',d:'18 May',h:670,lb:false,c:0},
+  {s:'S3',d:'28 May',h:624,lb:false,c:0},
+  {s:'S4',d:'15 Jun',h:255,lb:false,c:1},
+  {s:'S5',d:'29 Jun',h:762,lb:false,c:0},
+  {s:'S6',d:'13 Jul',h:667,lb:false,c:3},
+  {s:'S7',d:'28 Jul',h:716,lb:true,c:1},
+  {s:'S8',d:'11 Aug',h:720,lb:true,c:3},
+  {s:'S9',d:'24 Aug',h:566,lb:true,c:1},
+  {s:'S10',d:'7 Sep',h:124,lb:true,c:0}
+];
+const eras=[
+  {from:0,to:1,label:'No owner'},
+  {from:2,to:4,label:'Andrew'},
+  {from:5,to:7,label:'Andrew / Sijong'},
+  {from:8,to:10,label:'Yasir'}
+];
+
+/* ---------- Hours chart ---------- */
+(function(){
+  const W=780,H=330,ml=46,mr=12,mt=40,mb=58;
+  const iw=W-ml-mr, ih=H-mt-mb, max=800;
+  const bw=iw/sprints.length;
+  const y=v=>mt+ih-(v/max)*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:600px;display:block" role="img" aria-label="Bar chart of engineering hours per sprint from S0 to S10 with changes of objective marked">`;
+  [0,200,400,600,800].forEach(t=>{
+    s+=`<line x1="${ml}" x2="${W-mr}" y1="${y(t)}" y2="${y(t)}" stroke="${css('line')}" stroke-width="1"/>`;
+    s+=`<text x="${ml-8}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="${css('muted')}">${t}</text>`;
+  });
+  // eras band
+  eras.forEach((e,i)=>{
+    const x1=ml+e.from*bw+2, x2=ml+(e.to+1)*bw-2;
+    const last=i===eras.length-1;
+    s+=`<rect x="${x1}" y="${H-26}" width="${x2-x1}" height="20" rx="4" fill="${last?css('ok-soft'):css('sunk')}"/>`;
+    s+=`<text x="${(x1+x2)/2}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="${last?css('ok'):css('muted')}">${e.label}</text>`;
+  });
+  sprints.forEach((p,i)=>{
+    const x=ml+i*bw+bw*0.18, w=bw*0.64;
+    if(p.h>0) s+=`<rect x="${x}" y="${y(p.h)}" width="${w}" height="${y(0)-y(p.h)}" rx="3" fill="${css('accent')}" fill-opacity="${p.lb?0.45:1}"><title>${p.s} from ${p.d}: ${p.h} h${p.lb?' (lower bound)':''}</title></rect>`;
+    s+=`<text x="${x+w/2}" y="${p.h>0?y(p.h)-6:y(0)-6}" text-anchor="middle" font-size="11" fill="${css('ink')}">${p.h}</text>`;
+    s+=`<text x="${x+w/2}" y="${y(0)+16}" text-anchor="middle" font-size="11.5" font-weight="500" fill="${css('ink')}">${p.s}</text>`;
+    s+=`<text x="${x+w/2}" y="${y(0)+29}" text-anchor="middle" font-size="9.5" fill="${css('muted')}">${p.d}</text>`;
+    for(let k=0;k<p.c;k++){
+      const cx=x+w/2+(k-(p.c-1)/2)*13;
+      s+=`<circle cx="${cx}" cy="${mt-22}" r="5.5" fill="${css('warn')}"><title>${p.c} change(s) of objective in ${p.s}</title></circle>`;
+    }
+  });
+  s+=`<text x="${ml}" y="12" font-size="10.5" fill="${css('muted')}">● = change of objective</text>`;
+  // 24 Aug marker
+  const xm=ml+9*bw+1;
+  s+=`<line x1="${xm}" x2="${xm}" y1="${mt-8}" y2="${y(0)}" stroke="${css('ok')}" stroke-dasharray="3 3"/>`;
+  s+=`<text x="${xm-4}" y="${mt+8}" text-anchor="end" font-size="10" fill="${css('ok')}">24 Aug: one owner</text>`;
+  s+='</svg>';
+  document.getElementById('chart-hours').innerHTML=s;
+})();
+
+/* ---------- Cumulative ---------- */
+(function(){
+  const W=780,H=220,ml=52,mr=70,mt=16,mb=34;
+  const iw=W-ml-mr, ih=H-mt-mb, max=6000;
+  let cum=0; const pts=sprints.map((p,i)=>{cum+=p.h;return{i,v:cum,s:p.s}});
+  const x=i=>ml+(i/(sprints.length-1))*iw, y=v=>mt+ih-(v/max)*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:600px;display:block" role="img" aria-label="Cumulative hours rising to 5,806 while signed scope stays at zero">`;
+  [0,2000,4000,6000].forEach(t=>{
+    s+=`<line x1="${ml}" x2="${W-mr}" y1="${y(t)}" y2="${y(t)}" stroke="${css('line')}"/>`;
+    s+=`<text x="${ml-8}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="${css('muted')}">${t.toLocaleString('en-US')}</text>`;
+  });
+  const area=`M${x(0)},${y(0)} `+pts.map(p=>`L${x(p.i)},${y(p.v)}`).join(' ')+` L${x(pts.length-1)},${y(0)} Z`;
+  s+=`<path d="${area}" fill="${css('accent')}" fill-opacity=".12"/>`;
+  s+=`<path d="${pts.map((p,k)=>(k?'L':'M')+x(p.i)+','+y(p.v)).join(' ')}" fill="none" stroke="${css('accent')}" stroke-width="2.5"/>`;
+  s+=`<line x1="${ml}" x2="${W-mr}" y1="${y(0)}" y2="${y(0)}" stroke="${css('crit')}" stroke-width="2.5"/>`;
+  s+=`<text x="${W-mr+6}" y="${y(0)+4}" font-size="11" fill="${css('crit')}">Signed: 0</text>`;
+  const L=pts[pts.length-1];
+  s+=`<circle cx="${x(L.i)}" cy="${y(L.v)}" r="4.5" fill="${css('accent')}"/>`;
+  s+=`<text x="${x(L.i)+8}" y="${y(L.v)+4}" font-size="11.5" font-weight="500" fill="${css('ink')}">5,806 h</text>`;
+  pts.forEach(p=>{s+=`<text x="${x(p.i)}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="${css('muted')}">${p.s}</text>`});
+  s+='</svg>';
+  document.getElementById('chart-cum').innerHTML=s;
+})();
+
+/* ---------- Attribution ---------- */
+(function(){
+  const d=[{k:'Turing internal planning',v:5,c:'accent'},{k:'Yasir (HUMAIN)',v:4,c:'warn'},{k:'Daniel (HUMAIN)',v:1,c:'warn'},{k:'Andrew (HUMAIN)',v:0,c:'line'},{k:'Sijong (HUMAIN)',v:0,c:'line'}];
+  const W=640,row=30,lw=190,H=d.length*row+6,iw=W-lw-40;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:640px;display:block" role="img" aria-label="Origin of the 10 objective changes">`;
+  d.forEach((r,i)=>{
+    const yy=i*row+4;
+    s+=`<text x="${lw-10}" y="${yy+16}" text-anchor="end" font-size="12" fill="${css('ink')}" style="font-family:var(--f-body)">${r.k}</text>`;
+    s+=`<rect x="${lw}" y="${yy+4}" width="${iw}" height="16" rx="3" fill="${css('sunk')}"/>`;
+    if(r.v) s+=`<rect x="${lw}" y="${yy+4}" width="${iw*r.v/5}" height="16" rx="3" fill="${css(r.c)}"/>`;
+    s+=`<text x="${lw+(r.v?iw*r.v/5:0)+8}" y="${yy+16}" font-size="12" font-weight="500" fill="${css('ink')}">${r.v}</text>`;
+  });
+  s+='</svg>';
+  document.getElementById('chart-attrib').innerHTML=s;
+})();
+
+/* ---------- Split + rework ---------- */
+(function(){
+  const total=5806, logged=416, est=790, stood=total-logged-est;
+  const W=760,H=64;
+  const segs=[{v:stood,c:'accent',o:1,l:`Stood: ~${stood.toLocaleString('en-US')} h (79%)`},{v:logged,c:'crit',o:1,l:'Rework in Jira: 416 h'},{v:est,c:'crit',o:.45,l:'Re-planning, est. ~800 h'}];
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block" role="img" aria-label="Of 5,806 hours about 4,600 stood, 416 were logged rework and about 800 estimated rework">`;
+  let x=0;
+  segs.forEach(g=>{const w=W*g.v/total;s+=`<rect x="${x}" y="4" width="${w-2}" height="26" rx="3" fill="${css(g.c)}" fill-opacity="${g.o}"/>`;x+=w});
+  s+=`<text x="0" y="52" font-size="11.5" fill="${css('ink')}">${segs[0].l}</text>`;
+  s+=`<text x="${W}" y="52" text-anchor="end" font-size="11.5" fill="${css('crit')}">Rework ~1,200 h (~21%)</text>`;
+  s+='</svg>';
+  document.getElementById('chart-split').innerHTML=s;
+
+  const d=[['GCP-specific infrastructure',150,'54 tickets. Stranded when HUMAIN ruled out hard GCP dependencies on 11 Aug'],['H2O-O spine',140,'11 stories, 8 people. Descoped to backlog on 10 Jul'],['Early evaluation glue',70,'Built before the eval-first pivot and the 1 Sep Prism facts'],['Tenant database split',30,'13 tickets. Multi-tenancy cut, then moved to HUMAIN'],['Verifier flow',26,'11 tickets. Separate verifier persona ruled out on 11 Aug']];
+  const W2=760,row=46,lw=210,iw=W2-lw-60,H2=d.length*row;
+  let t=`<svg viewBox="0 0 ${W2} ${H2}" width="100%" style="min-width:560px;display:block" role="img" aria-label="Rework hours by descoped workstream">`;
+  d.forEach((r,i)=>{
+    const yy=i*row;
+    t+=`<text x="${lw-10}" y="${yy+17}" text-anchor="end" font-size="12" fill="${css('ink')}" style="font-family:var(--f-body)">${r[0]}</text>`;
+    t+=`<rect x="${lw}" y="${yy+5}" width="${iw*r[1]/150}" height="16" rx="3" fill="${css('crit')}"/>`;
+    t+=`<text x="${lw+iw*r[1]/150+8}" y="${yy+17}" font-size="12" font-weight="500" fill="${css('ink')}">${r[1]} h</text>`;
+    t+=`<text x="${lw}" y="${yy+36}" font-size="10.5" fill="${css('muted')}">${r[2]}</text>`;
+  });
+  t+='</svg>';
+  document.getElementById('chart-rework').innerHTML='<div class="scroll">'+t+'</div>';
+})();
+
+/* ---------- Timeline ---------- */
+const events=[
+  ['~24 Feb','com','Kickoff work packages listed. Next steps include "separate commercial track development" and a "revenue sharing model discussion".'],
+  ['26 Mar','com','Partnership announced at FII PRIORITY Miami.'],
+  ['28 Mar','com','SOW v4.03.1 drafted: RC-0 to RC-10, TR-1 to TR-17, Phases 0 to 3. It is never signed.'],
+  ['20 Apr','del','Delivery starts with Sprint 0: SOW alignment, C4 L1 and the agent.yaml draft.'],
+  ['4 May','dir','S1: Prism evaluation deferred to Phase 2/3 and Track A (VM) descoped. 15 stories done.'],
+  ['18 May','dir','S2: Andrew becomes the approval surface through Friday demos, with Daniel on Wednesdays.'],
+  ['19 May','com','Internal SOW status: Phase 0 100%, Phase 1 at 2 of 13. A 27% coverage baseline is signed internally, the only signature on record.'],
+  ['29 May','dir','Client demo: "UI/UX looks clunky". Turing lists no success metrics, no end state and bottlenecked decisions.'],
+  ['11 Jun','com','SteerCo deck proposes a monthly exec review of phase progress against SOW and budget. No record that it ran.'],
+  ['15 Jun','dir','S4: multi-tenancy cut to single-tenant through LEAP. 202 issues at close.'],
+  ['2 Jul','del','Soft approval for the Submit Agent front end. Certification may be mocked for LEAP.'],
+  ['10 Jul','dir','H2O-O spine (11 stories) descoped to backlog, so RC-2 slips. All infrastructure found to be in us-central1 despite KSA residency.'],
+  ['10 Jul','dep','Prism job 121 fails 100 of 100 datapoints, and the Prism base URL change breaks Turing wrappers.'],
+  ['13 Jul','del','Sprint 5 closes with 436 issues and 361 done. Sprint 6 opens with 116 issues, goal multi-agent enablement.'],
+  ['16 Jul','dir','Marketplace cut back to a tenant acquisition flow with a magic link.'],
+  ['23 Jul','dir','V9 governed flow, approved on 15 Jul, rejected as "too dense" and rebuilt as the V10 one-prompt keynote.'],
+  ['4 Aug','dir','Product reframed as a "Validation Control Plane". HUMAIN leaders hold different views of the target product.'],
+  ['11 Aug','dir','Yasir becomes the overriding voice. Multi-tenancy moves to HUMAIN, hard GCP dependencies are ruled out and the separate verifier is dropped.'],
+  ['22 Aug','com','Target date for RC-1 and RC-2 sign-off to "start closing the contract". No sign-off recorded.'],
+  ['24 Aug','dir','Pivot to evaluation first. One objective owner from this date.'],
+  ['1 Sep','del','Prism facts settled: no pass bar, no metrics at start, cost from tokens.'],
+  ['14 Sep','del','Client review of the Evaluations hub produces a concrete fix list.'],
+  ['17 Sep','com','Findings shared internally under the guidance of Jonathan and VK: "are perfectionism and saying yes too often slowing our revenue?"'],
+  ['6 Oct','del','Prototype pages taken private. Only V70 and V110 republished.']
+];
+const tagName={com:'Commercial',dir:'Direction',del:'Delivery',dep:'Dependency'};
+const tl=document.getElementById('tl');
+tl.innerHTML=events.map(e=>`<li data-t="${e[1]}"><time>${e[0]}</time><div class="ev"><div class="tags"><span class="tag ${e[1]}">${tagName[e[1]]}</span></div><p>${e[2]}</p></div></li>`).join('');
+document.querySelectorAll('.filters button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.filters button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  const f=b.dataset.f;
+  tl.querySelectorAll('li').forEach(li=>{li.hidden=!(f==='all'||li.dataset.t===f)});
+}));
+
+/* ---------- Factors ---------- */
+const factors=[
+  ['F1',3,'The commercial anchor was never set','The SOW stayed unsigned. Pricing and revenue share stayed open from kickoff, and monetisation was out of LEAP scope by decision.','5,806 h built against no signed scope','"Building without an anchor was the gap."'],
+  ['F2',3,'Decision ownership moved four times','Approval moved from no named owner to Andrew, to Sijong overrides, back to Andrew, then to Yasir. 9 of the 10 objective changes landed within a sprint of a hand-over.','10 objective changes','"With no countersigned baseline, every conversation can reopen what we are fundamentally building."'],
+  ['F3',3,'No one owned conversion','The account was never classified as a lighthouse, revenue account or reusable capability. No path to revenue was written down, and no stage had one accountable name.','No economic buyer named',''],
+  ['F4',2,'Discovery started from requests, not the problem','By 29 May, success metrics and an end state were still undefined. Discovery produced a feature list, not a tested problem thesis.','Rework seeded from S1','"We began with requests, not the business problem."'],
+  ['F5',2,'The wrong engagement model','An AGI services playbook built for defined execution was used on TI work that needed consulting-led transformation.','Staffed before qualified','"We used an AGI services playbook for TI services work."'],
+  ['F6',2,'Internal alignment was expensive','It took about eight conversations with Turing leaders to reach common ground. Five of the ten objective changes were Turing\'s own calls.','5 of 10 changes internal',''],
+  ['F7',2,'The demo drove the scope','The LEAP date moved across sources (7 Aug, 21 Aug, end of August). V9 was approved on 15 Jul and rebuilt as V10 on 23 Jul because the audience changed.','62+ Agent Lifecycle versions','"Perfectionism improved each output. Saying yes expanded the input."'],
+  ['F8',2,'The infrastructure premise reversed','The plan was to start with one provider first. On 11 Aug HUMAIN required no hard GCP dependencies ("five clouds plus government on-premise"). KSA residency was never scheduled.','150 h stranded',''],
+  ['F9',1,'Dependencies on HUMAIN systems','Keycloak secrets held the governance trio for five sprints. H2O-O contract instability, an unclear Guardian, Prism failures and Figma access all gated work.','Governance trio carried 5 sprints','']
+];
+document.getElementById('factors-grid').innerHTML=factors.map(f=>`<article class="factor"><div class="hd"><span class="id">${f[0]}</span><span class="sev s${f[1]}" aria-label="Severity ${f[1]} of 3"><span></span><span></span><span></span></span></div><h3>${f[2]}</h3><p>${f[3]}</p>${f[5]?`<blockquote>${f[5]}</blockquote>`:''}<span class="cost">${f[4]}</span></article>`).join('');
+
+/* ---------- Ledger ---------- */
+const ledger=[
+  ['S1','May','Prism evaluation deferred to Phase 2/3 and Track A (VM) descoped','Turing planning','Eval work restarted later'],
+  ['S4','Jun','Multi-tenancy and tenant isolation cut to single-tenant through LEAP','Turing planning','Tenant DB split, 30 h'],
+  ['S6','10 Jul','H2O-O spine descoped to backlog, RC-2 close slips','Turing planning','140 h, 11 stories'],
+  ['S6','Jul','Multi-agent enablement becomes the primary sprint goal','Turing planning','Sprint re-planned'],
+  ['S6','16 Jul','Marketplace cut back to a tenant acquisition flow with a magic link','Daniel','Marketplace re-cut'],
+  ['S7','23 Jul','V9 governed flow rebuilt as the V10 one-prompt keynote','Turing planning','Demo rebuilt in a week'],
+  ['S8','11 Aug','Turing stops multi-tenancy, which moves to HUMAIN at platform level','Yasir','Tenant work stranded'],
+  ['S8','11 Aug','Hard GCP dependencies ruled out','Yasir','150 h, 54 tickets'],
+  ['S8','11 Aug','Separate verifier persona dropped','Yasir','26 h, 11 tickets'],
+  ['S9','24 Aug','Pivot to evaluation first','Yasir','70 h early eval glue']
+];
+document.getElementById('ledger-body').innerHTML=ledger.map(r=>`<tr><td class="num">${r[0]}</td><td class="num">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('');
+
+/* ---------- Actions ---------- */
+const now=[
+  ['Name the economic buyer and one objective owner, in writing','Confirm who on the HUMAIN side owns budget and who owns direction. On the evidence since 24 Aug, the direction owner is Yasir.','Account lead','A named buyer and owner, with dates, confirmed by the client'],
+  ['Turn the Evaluations hub into a priced, scoped outcome','It is the most stable and most valued asset. Package it as a signed SOW amendment or a paid pilot with acceptance criteria.','Account lead, with Product','A signature or a purchase order'],
+  ['Get acceptance on what already shipped','The RC-1 and RC-2 sign-off missed its 22 Aug target. Ask for formal acceptance of delivered phases so past work becomes billable.','Engineering lead','Signed RC-1 and RC-2 acceptance'],
+  ['Give each blocked decision a date','Verifier persona, tenant and identity contract, code-generation ownership. Each gets one owner and a decision date.','Product lead','3 decisions logged in the PD log with dates'],
+  ['Cap new build until the first two land','Keep a maintenance and fix budget for the 14 Sep list and the security findings. Hold new scope until the account is anchored.','Practice lead','Hours capped per sprint, reviewed weekly']
+];
+const play=[
+  ['Qualify before staffing','Name the client owner. Get a signed scope or a paid discovery. Classify the account as a lighthouse, revenue account or reusable capability, and write down the path to revenue.','Practice lead','No team staffed without a qualification record'],
+  ['Discover, then align','Discovery ends with a tested problem thesis and success criteria, not a feature list. Choose the AGI or TI model. Agree one Turing north star before the first client commitment.','Solutions lead','Problem thesis signed off before the build starts'],
+  ['Prove before scaling','Test the smallest useful solution. Agree what good enough means. Cap engineering effort and inference spend per proof.','Product lead','Effort and inference cap set per proof'],
+  ['Reuse what works','Capture proven evaluation cases and components for the next engagement, within client permissions.','Engineering lead','Reusable assets catalogued at each phase close']
+];
+const act=a=>`<div class="act"><h3>${a[0]}</h3><span class="own">${a[2]}</span><p>${a[1]}</p><span class="meas"><b>Measure:</b> ${a[3]}</span></div>`;
+document.getElementById('acts-now').innerHTML=now.map(act).join('');
+document.getElementById('acts-play').innerHTML=play.map(act).join('');
+
+/* ---------- RACI ---------- */
+const raci=[
+  ['Qualify the account','R','C','C','I','I','A'],
+  ['Discover the problem','C','A/R','C','C','C','I'],
+  ['Align on one north star','C','C','R','C','C','A'],
+  ['Build the roadmap','C','C','A/R','C','C','I'],
+  ['Prove the smallest solution','I','C','A','R','R','I'],
+  ['Deliver and harden','C','I','C','C','A/R','I'],
+  ['Capture what is reusable','I','C','R','R','A','C']
+];
+document.getElementById('raci-body').innerHTML=raci.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map(c=>`<td><span class="${c.startsWith('A')?'A':c==='R'?'R':''}">${c}</span></td>`).join('')}</tr>`).join('');
+})();
+</script>
+
+</body>
+</html>
